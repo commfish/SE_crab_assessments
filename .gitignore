@@ -1,0 +1,16 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+*.Rproj
+
+*.png
+./data
+*.docx
+*.html
+/data
+/results
+
+/instructions
+
