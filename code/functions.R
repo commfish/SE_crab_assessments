@@ -65,7 +65,7 @@ short_t <- function(bypot_st, year, area) {
     mutate(significant = ifelse(p.value < 0.05 & slope > 0, 1,
                                 ifelse(p.value <0.05 & slope <0, -1, 0))) %>%
     mutate(score = 0.25*significant) -> short_term_results
-  write_csv(short_term_results, paste0('results/redcrab/', area, '/',year,  '/shortterm.csv'))
+  write_csv(short_term_results, paste0('results/rkc/', area, '/',year,  '/shortterm.csv'))
 }
 
 
@@ -114,7 +114,7 @@ long_t <- function(dat5_current, baseline, year, area, location) {
     mutate(recruit.status = baseline_values_long$recruit.status) -> long_term_results #estimate is slope from regression
   
   # final results with score - save here
-  write_csv(long_term_results, paste0('results/redcrab/', area, '/', year, '/longterm.csv'))
+  write_csv(long_term_results, paste0('results/rkc/', area, '/', year, '/longterm.csv'))
   
 }
 
@@ -138,7 +138,7 @@ weights <- function(dat1, slope, intercept, area, year){
               prer_lbs = wt.mean(weight_lb[Recruit.Status == "Pre_Recruit"], 
                                  Number.Of.Specimens[Recruit.Status == "Pre_Recruit"])) -> male_weights
   # final results with score - save here
-  write_csv(male_weights, paste0('results/redcrab/', area, '/', year, '/maleweights.csv'))
+  write_csv(male_weights, paste0('results/rkc/', area, '/', year, '/maleweights.csv'))
 }
 
 
@@ -163,9 +163,9 @@ poorclutch1 %>%
   summarise(Pclutch = mean(var1) , Pclutch.se = (sd(var1))/sqrt(sum(!is.na(var1)))) -> poorclutch_summary_all
 
 poorclutch1 %>% filter(Year == year) -> poorclutch1_current
-write_csv(poorclutch1_current, paste0('results/redcrab/', area, '/', year, '/poorclutch1_current.csv'))
-write_csv(poorclutch1, paste0('results/redcrab/', area, '/', year, '/poorclutch_all.csv'))
-write_csv(poorclutch_summary_all, paste0('results/redcrab/', area, '/', year, '/poorclutch_summary_all.csv'))
+write_csv(poorclutch1_current, paste0('results/rkc/', area, '/', year, '/poorclutch1_current.csv'))
+write_csv(poorclutch1, paste0('results/rkc/', area, '/', year, '/poorclutch_all.csv'))
+write_csv(poorclutch_summary_all, paste0('results/rkc/', area, '/', year, '/poorclutch_summary_all.csv'))
 
 }
 
@@ -195,7 +195,7 @@ poor_clutch_long <- function(poorclutch_current, area, year){
     longt_female <- as.data.frame(longt_female)
       }
   #return(longt_female)
-  write_csv(longt_female, paste0('results/redcrab/', area, '/', year, '/lt_female.csv'))
+  write_csv(longt_female, paste0('results/rkc/', area, '/', year, '/lt_female.csv'))
 }
 
 poor_clutch_short <- function(females_all, area, year){
@@ -227,7 +227,7 @@ poor_clutch_short <- function(females_all, area, year){
     mutate(score = 0.25*significant) -> shortt_female #estimate is slope from regression
   # final results with score - save here
   
-  write.csv(shortt_female, paste0('results/redcrab/', area, '/', year, '/short_female.csv'))
+  write.csv(shortt_female, paste0('results/rkc/', area, '/', year, '/short_female.csv'))
 }
 
 ### females egg percentage ------------
@@ -239,17 +239,17 @@ egg_percent <-function(LgF_dat1, area, year){
   clutch_by_pot %>%
     group_by(Year) %>% 
     summarise(mean = mean(egg_mean), egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) -> egg_per_mean
-  write_csv(egg_per_mean, paste0('results/redcrab/', area, '/', year,  '/egg_percent_mean_all.csv'))
-  write_csv(LgF_dat1, paste0('results/redcrab/', area, '/', year, '/largef_all.csv'))
+  write_csv(egg_per_mean, paste0('results/rkc/', area, '/', year,  '/egg_percent_mean_all.csv'))
+  write_csv(LgF_dat1, paste0('results/rkc/', area, '/', year, '/largef_all.csv'))
 }
 
 
 ### total stock health table --------------
 total_health <- function(area, year){
-  longterm <- read_csv(paste0('results/redcrab/', area, '/', year, '/longterm.csv'))
-  shortterm <- read_csv(paste0('results/redcrab/', area, '/',  year, '/shortterm.csv'))
-  lt_female <- read_csv(paste0('results/redcrab/', area, '/',  year, '/lt_female.csv'))
-  short_female <- read_csv(paste0('results/redcrab/', area, '/', year, '/short_female.csv'))
+  longterm <- read_csv(paste0('results/rkc/', area, '/', year, '/longterm.csv'))
+  shortterm <- read_csv(paste0('results/rkc/', area, '/',  year, '/shortterm.csv'))
+  lt_female <- read_csv(paste0('results/rkc/', area, '/',  year, '/lt_female.csv'))
+  short_female <- read_csv(paste0('results/rkc/', area, '/', year, '/short_female.csv'))
 
 total_health <- sum(longterm$significant, shortterm$score, 
                     lt_female$significant, short_female$score) # long term scores CPUE
@@ -274,7 +274,7 @@ stock_health %>%
                                                                          ifelse(health_status == "above average", 0.15,
                                                                                 ifelse(health_status == "healthy", 0.20, "unk")))))) -> stock_health
 #select ( - score_f) -> stock_health
-write_csv(stock_health, paste0('results/redcrab/', area, '/', year, '/stock_health.csv'))
+write_csv(stock_health, paste0('results/rkc/', area, '/', year, '/stock_health.csv'))
 }
 
 
@@ -286,16 +286,16 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   # option refers to output from this function. 
   # Option 1 - all 4 on one file, Option 2 - just p1, p4 (males), 
   # Option 3 - p2,p3 (females), Option 4 - created for Seymour Canal scaling issues
-  CPUE_wt_graph <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+  CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                    '/cpue_wt_since_93.csv')) # changed this to one since 93 - make this change to all processing codes.
-  poorclutch_summary <- read.csv(paste0('./results/redcrab/', survey.location, 
+  poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
                                         '/', cur_yr, '/poorclutch_summary_all.csv'))
-  egg_mean_all <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+  egg_mean_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/egg_percent_mean_all.csv'))
   # file with year and mean percent poor clutch and se poor clutch from 1993 to current
-  mr_adjust <- read.csv('./data/redcrab/adj_final_stock_assessment.csv')
-  baseline <- read.csv("./data/redcrab/longterm_means.csv")
-  biomass <- read.csv("./data/redcrab/biomass.csv") 
+  mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
+  baseline <- read.csv("./data/rkc/longterm_means.csv")
+  biomass <- read.csv("./data/rkc/biomass.csv") 
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   # mr adjustments can be made in the function using mr_adjust file.
   # prep data 
@@ -513,7 +513,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
                 panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
                 ifelse(option == 3, 
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/redcrab/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/rkc/', survey.location, '_', cur_yr, '_', 
                             option, '.png'), panel,  
          dpi = 800, width = 8, height = 9.5)
 }
@@ -528,17 +528,17 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   # Option 1 - all 4 on one file, Option 2 - just p1, p4 (males), 
   # Option 3 - p2,p3 (females), 
   # scale - created for Seymour Canal scaling issues
-  CPUE_wt_graph <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+  CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                    '/cpue_wt_all_yrs.csv'))
-  poorclutch_summary <- read.csv(paste0('./results/redcrab/', survey.location, 
+  poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
                                         '/', cur_yr, '/poorclutch_summary_all.csv'))
-  egg_mean_all <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+  egg_mean_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/egg_percent_mean_all.csv'))
   # file with year and mean percent poor clutch and se poor clutch from 1993 to current
-  mr_adjust <- read.csv('./data/redcrab/adj_final_stock_assessment.csv')
-  baseline <- read.csv("./data/redcrab/longterm_means.csv")
-  biomass <- read.csv("./data/redcrab/biomass.csv") 
-  conf <- read.csv("./data/redcrab/confidential_harvest_2018.csv")
+  mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
+  baseline <- read.csv("./data/rkc/longterm_means.csv")
+  biomass <- read.csv("./data/rkc/biomass.csv") 
+  conf <- read.csv("./data/rkc/confidential_harvest_2018.csv")
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   # mr adjustments can be made in the function using mr_adjust file.
   # prep data 
@@ -788,17 +788,17 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
   # Option 1 - all 4 on one file, Option 2 - just p1, p4 (males), 
   # Option 3 - p2,p3 (females), 
   # scale - created for Seymour Canal scaling issues
-  CPUE_wt_graph <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+  CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                    '/cpue_wt_all_yrs.csv'))
-  poorclutch_summary <- read.csv(paste0('./results/redcrab/', survey.location, 
+  poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
                                         '/', cur_yr, '/poorclutch_summary_all.csv'))
-  egg_mean_all <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+  egg_mean_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/egg_percent_mean_all.csv'))
   # file with year and mean percent poor clutch and se poor clutch from 1993 to current
-  mr_adjust <- read.csv('./data/redcrab/adj_final_stock_assessment.csv')
-  baseline <- read.csv("./data/redcrab/longterm_means.csv")
-  biomass <- read.csv("./data/redcrab/biomass.csv") 
-  conf <- read.csv("./data/redcrab/confidential_harvest_2018.csv")
+  mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
+  baseline <- read.csv("./data/rkc/longterm_means.csv")
+  biomass <- read.csv("./data/rkc/biomass.csv") 
+  conf <- read.csv("./data/rkc/confidential_harvest_2018.csv")
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   # mr adjustments can be made in the function using mr_adjust file.
   # prep data 
@@ -1041,7 +1041,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
                 panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
                 ifelse(option == 3, 
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/redcrab/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/rkc/', survey.location, '_', cur_yr, '_', 
                 option, 'non_conf_presentation.png'), panel,  
          dpi = 800, width = 8, height = 9.5)
 }
