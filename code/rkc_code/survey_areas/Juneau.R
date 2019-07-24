@@ -83,6 +83,7 @@ dat4 %>%
   mutate(inverse_n = 1 / npots, weighting = inverse_n * Area) ->dat5
 dat5 %>%
   dplyr::rename(Missing = Var.6, Large.Females = `Large Females`, Small.Females = `Small Females`) -> dat5
+# this is neccessary so that current years file (dat5) matches the historic file names
 
 # This version is ready to calculate CPUE for each recruit class
 # Calculates a weighted mean CPUE and SE for each recruit class
