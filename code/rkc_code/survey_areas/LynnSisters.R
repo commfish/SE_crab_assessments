@@ -1,4 +1,4 @@
-#K.Palof 
+# K.Palof 
 # ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19
 # code to process data from Ocean AK to use in crab CSA models.  
 #  
@@ -14,21 +14,19 @@ survey.location <- 'LynnSisters'
 #####Load Data ---------------------------------------------------
 # change input file and input folder for each
 dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_LS_17_18.csv'))
-    # this is input from OceanAK - set up as red crab survey data for CSA
+    # this is input from OceanAK - set up as 'red crab survey data for CSA'
+    # Year is cur_yr and pr_yr, project code 007, !! Location = Lynn Sisters and St.James Bay !! (make sure you check both), Species = red king crab 
 area <- read.csv(paste0('./data/rkc/', survey.location, '/LynnCanal_strata_area.csv')) 
     #this file is the same every year.  Unless the survey methods change
-histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/LS_perpot_all_17.csv'))
+histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/LS_perpot_all_yrs.csv'))
      ## !!!!  this file will be 'EI_perpot_all_16' and just get updated with current years data.
 females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv'))
 # fixed at bottom of code, should work fine for years in future (past 2018)
 ## use this for raw historic female data in 2017, create input file for future
-raw_data <- read.csv(paste0('./data/rkc/', survey.location, 
-                             '/RKC survey_historicpots_LS.csv'))
-
 baseline <- read.csv("./data/rkc/longterm_means.csv")
 # update this file after running CSA - 
 biomass <- read.csv("./data/rkc/biomass.csv") 
-# file for all locations.  Has legal and mature biomass from CSA, harvest
+# file for all locations.  Has legal and mature biomass from CSA, harvest,etc.  Needs to be updated after you run CSA for this area.
 
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
@@ -144,7 +142,7 @@ CPUE_ALL_YEARS <- rbind(historicdata, dat5_cur_yr)
 # this is the final file by pot.  Now this file can be summarized to give CPUE by year like above (see dat 5 to CPUE_wt_JNU_2016)
 # change same of folder and file.
 write.csv(CPUE_ALL_YEARS, paste0('./results/redcrab/', survey.location, '/', 
-                                 cur_yr, '/LS_perpot_all_', cur_yr,'.csv'), 
+                                 cur_yr, '/LS_perpot_all_yrs.csv'), 
                                 row.names = FALSE)
 
 
