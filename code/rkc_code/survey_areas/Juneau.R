@@ -74,7 +74,7 @@ tab %>%
   summarise(npots  = length(Pot.No)) -> pots_per_strata
 
 #####Weighted CPUE current year -----------------------------------
-#the weighting is the product of the area for each strata and the inverse (1/n) of the number of pots per strata per year
+# the weighting is the product of the area for each strata and the inverse (1/n) of the number of pots per strata per year
 # need to combine data sets to accomplish this.
 tab %>%
   right_join(pots_per_strata) -> dat4
@@ -84,8 +84,8 @@ dat4 %>%
 dat5 %>%
   dplyr::rename(Missing = Var.6, Large.Females = `Large Females`, Small.Females = `Small Females`) -> dat5
 
-#This version is ready to calculate CPUE for each recruit class
-#Calculates a weighted mean CPUE and SE for each recruit class
+# This version is ready to calculate CPUE for each recruit class
+# Calculates a weighted mean CPUE and SE for each recruit class
 dat5 %>%
   group_by(Year) %>%
   summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
@@ -129,7 +129,8 @@ unique(dat$Time.Hauled)
 head(histdat)
 head(dat5)
 
-histdat %>% select(Year, Location, Trip.No, Pot.No, Strata.Code, Missing, 
+histdat %>% 
+  select(Year, Location, Trip.No, Pot.No, Strata.Code, Missing, 
                    Juvenile, Large.Females, Post_Recruit, Pre_Recruit, 
                    Recruit, Small.Females, Area, npots, inverse_n, 
                    weighting) -> historicdata
@@ -145,7 +146,7 @@ CPUE_ALL_YEARS <- rbind(historicdata, dat5_cur_yr)
 # change same of folder and file.
 write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', 
                                  survey.location, '/', cur_yr, '/JNU_perpot_all_', cur_yr,'.csv'), 
-          row.names = FALSE)
+                                 row.names = FALSE)
 
 
 ## Trends - short and long and female stats for stock health weighting ---------------
