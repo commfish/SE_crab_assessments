@@ -148,6 +148,7 @@ CPUE_ALL_YEARS <- rbind(historicdata, dat5_cur_yr)
 write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', survey.location, '/', 
                         cur_yr, '/EI_perpot_all_yrs.csv'), row.names = FALSE) 
 
+## Trends - short and long and female stats for stock health weighting ---------------
 ##### Short term trends -------------------------------------
 #look at trend for the last 4 years.  Need a file with last four years 
 CPUE_ALL_YEARS %>%
@@ -159,41 +160,11 @@ short_t(bypot_st, cur_yr, "Excursion")
 bypot_st_long <- gather(bypot_st, recruit.status, crab, Missing:Small.Females, factor_key = TRUE) 
 ggplot(bypot_st_long, aes(Year,crab)) +geom_point() +facet_wrap(~recruit.status)
 
-### short term plots----------------
-plot(BYPOT_ST$Year, BYPOT_ST$Juvenile)
-Juv_fit <-lm(Juvenile ~ Year, data = BYPOT_ST, weights = weighting)
-abline(Juv_fit, col= 'red')
-summary(Juv_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Large.Females)
-Lfem_fit <-lm(Large.Females ~ Year, data = BYPOT_ST, weights = weighting)
-abline(Lfem_fit, col= 'red')
-summary(Lfem_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Post_Recruit)
-PR_fit <-lm(Post_Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(PR_fit, col= 'red')
-summary(PR_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Pre_Recruit)
-PreR_fit <-lm(Pre_Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(PreR_fit, col= 'red')
-summary(PreR_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Recruit)
-R_fit <-lm(Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(R_fit, col= 'red')
-summary(R_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Small.Females)
-smF_fit <-lm(Small.Females ~ Year, data = BYPOT_ST, weights = weighting)
-abline(smF_fit, col= 'red')
-summary(smF_fit)
 
 ##### Long term trends ---------------------
-#compare current year CPUE distribution to the long term mean
-dat5_cur_yr
-#make sure you have a file with only current years data - created above
+# compare current year CPUE distribution to the long term mean
+head(dat5_cur_yr)
+# make sure you have a file with only current years data - created above
 
 long_t(dat5_cur_yr, baseline, cur_yr, 'Excursion', 'Excursion')
 # output is saved as longterm.csv
@@ -212,6 +183,7 @@ weights(dat1, 3.12, 7.67, "Excursion", cur_yr)
 # large or mature females
 dat1 %>%
   filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> LgF_dat1 # current 2 years
+
 # This selects those rows that do not have an egg percentage.
 # if these rows have a egg. development code and egg condition code then the egg percentage should be there
 # if developement = 3 and condition is 4 or 5 then egg percentage should be 0.
@@ -219,17 +191,19 @@ LgF_dat1[is.na(LgF_dat1$Egg.Percent),]
 # need to change these to 0 if applicable. 
 #LgF_dat1 %>%
 #  mutate(Egg.Percent =ifelse(is.na(Egg.Percent), 0, Egg.Percent)) -> LgF_dat1
-
 LgF_dat1 %>% 
   filter(Year == cur_yr) %>% 
   select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
               Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
               Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_curyr
 
+# Currently (2019) just load the largef_all.csv file and add current year
+head(females)
 largef_all <- rbind(females, LgF_dat1_curyr) # raw female data for all years.
+write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
+                              'largef_all.csv')))
 
 ##### % poor (<10 %) clutch -----------------------------------
-
 poor_clutch(largef_all, 'Excursion', cur_yr)
 # output is saved as poorclutch1_current.csv - which has all pots for 2017
 # and poorclutch_summary_all.csv which has the percentage and 
