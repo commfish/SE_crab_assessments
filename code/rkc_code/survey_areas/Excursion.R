@@ -17,14 +17,15 @@ survey.location <- 'Excursion'
 
 #####Load Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKC survey CSA_EI_17_18.csv'))
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKC survey CSA_EI_18_19.csv'))
                   # this is input from OceanAK - set up as red crab survey data for CSA
+                  # Year = 2018,2019, project code 007, Location - Excursion Inlet, species - red king crab
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Excursion_strata_area.csv')) 
                   #this file is the same every year.  Unless the survey methods change
-histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/EI_perpot_all.csv'))
+histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/EI_perpot_all_yrs.csv'))
  ## !!!!  this file will be 'EI_perpot_all_16' and just get updated with current years data.
 females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv'))
-#raw_data <- read.csv("./data/rkc/Excursion/RKC survey_historicpots_ei.csv")
+# raw_data <- read.csv("./data/rkc/Excursion/RKC survey_historicpots_ei.csv")
         ## use this for raw historic female data in 2017, create input file for future
 
 baseline <- read.csv("./data/rkc/longterm_means.csv")
@@ -144,7 +145,7 @@ CPUE_ALL_YEARS <- rbind(historicdata, dat5_cur_yr)
 # this is the final file by pot.  Now this file can be summarized to give CPUE by year like above (see dat 5 to CPUE_wt_JNU_2016)
 # change same of folder and file.
 write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', survey.location, '/', 
-                        cur_yr, '/EI_perpot_all_', cur_yr,'.csv'), row.names = FALSE)
+                        cur_yr, '/EI_perpot_all_yrs.csv'), row.names = FALSE) 
 
 ##### Short term trends -------------------------------------
 #look at trend for the last 4 years.  Need a file with last four years 
