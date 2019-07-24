@@ -513,7 +513,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
                 panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
                 ifelse(option == 3, 
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/rkc/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/rkc/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
                             option, '.png'), panel,  
          dpi = 800, width = 8, height = 9.5)
 }
@@ -773,7 +773,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
                 panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
                 ifelse(option == 3, 
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/redcrab/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/redcrab/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
                 option, 'non_conf.png'), panel,  
          dpi = 800, width = 8, height = 9.5)
 }
@@ -1041,7 +1041,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
                 panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
                 ifelse(option == 3, 
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/rkc/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/rkc/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
                 option, 'non_conf_presentation.png'), panel,  
          dpi = 800, width = 8, height = 9.5)
 }
