@@ -13,7 +13,7 @@ survey.location <- 'LynnSisters'
 
 #####Load Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_LS_17_18.csv'))
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_LS_18_19.csv'))
     # this is input from OceanAK - set up as 'red crab survey data for CSA'
     # Year is cur_yr and pr_yr, project code 007, !! Location = Lynn Sisters and St.James Bay !! (make sure you check both), Species = red king crab 
 area <- read.csv(paste0('./data/rkc/', survey.location, '/LynnCanal_strata_area.csv')) 
@@ -26,11 +26,13 @@ females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/large
 baseline <- read.csv("./data/rkc/longterm_means.csv")
 # update this file after running CSA - 
 biomass <- read.csv("./data/rkc/biomass.csv") 
-# file for all locations.  Has legal and mature biomass from CSA, harvest,etc.  Needs to be updated after you run CSA for this area.
+#   file for all locations. Has biomass estimates from CSA,
+#   must be updated after CSA model is run for current year USING current year's model
+#             NOT historic forecast!
 
+## survey data QAC -------
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
-sapply(dat, unique)
 
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
@@ -42,27 +44,27 @@ dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
-# one female here that don't have recruit status due to no lengths
 
-# also need to check soak time and to make sure all crab that were measured have a recruit status
+# **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
 
-##### By Pot ----------------------------------------------------
-#Now summarize by pot - remember to keep areas seperate.
-#Need Number of Specimens by recruit class
+## CPUE calc --------------
+##### By Pot -------------------------------
+# Now summarize by pot - remember to keep areas seperate.
+# need Number of Specimens by recruit class
+# keep trip no. to merge with historic dat
 dat1 %>%
   group_by(Year, Location, Trip.No, Pot.No, Density.Strata.Code, Recruit.Status) %>%
   summarise(crab = sum(Number.Of.Specimens)) -> dat2
 # keep trip no to merge with historic data.
 
 dat3 <- dcast(dat2, Year + Location + Trip.No + Pot.No +Density.Strata.Code ~ Recruit.Status, sum, drop=TRUE)
-
 head(dat3)# check to make sure things worked.
 
 # Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has it's own area file or area per
 #     strata.  This is used to calculating the weighting for weighted CPUE.
 dat3 %>%
-  right_join(area) -> tab
+  left_join(area) -> tab
 #Calculates the number of pots per strata.  
 tab %>%
   group_by(Year, Location, Density.Strata.Code) %>%
@@ -70,9 +72,8 @@ tab %>%
 
 
 ##### Weighted CPUE current year -----------------------------------
-#the weighting is the product of the area for each strata and the inverse (1/n) of the number of pots per strata per year
+# the weighting is the product of the area for each strata and the inverse (1/n) of the number of pots per strata per year
 # need to combine data sets to accomplish this.
-
 tab %>%
   right_join(pots_per_strata) -> dat4
 
@@ -82,8 +83,8 @@ dat5 %>%
   dplyr::rename(Missing = Var.6, Large.Females = `Large Females`, Small.Females = `Small Females`) -> dat5
 # this is neccessary so that current years file (dat5) matches the historic file names
 
-#This version is ready to calculate CPUE for each recruit class
-#Calculates a weighted mean CPUE and SE for each recruit class
+# This version is ready to calculate CPUE for each recruit class
+# Calculates a weighted mean CPUE and SE for each recruit class
 dat5 %>%
   group_by(Year) %>%
   summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
@@ -95,7 +96,8 @@ dat5 %>%
 CPUE_wt
 # check to confirm last years CPUEs match - that's why we use two years.
 
-write.csv(CPUE_wt, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/LS_CPUE_',cur_yr, '.csv'), 
+# **FIX** need to make sure a folder for the current year exists here 
+write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/LS_CPUE_',cur_yr, '.csv'), 
           row.names = FALSE)
 
 # weighted cpue by strata --- just for comparison
@@ -108,31 +110,35 @@ dat5 %>%
             MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
             SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/
                                                                           (sqrt(sum(!is.na(Small.Females)))))) 
+(sqrt(sum(!is.na(Small.Females)))))) 
+# look at results to see the spread between stratas...in high biomass years even low strata 1,2 had higher CPUE. >1 or 2
 
-#### survey mid date -----
+#### survey mid date -----  
+#  ** fix **  make this calculated from data not just visual
 head(dat)
 unique(dat$Time.Hauled)
 # need to seperate time hauled to just have data hauled look for mid-date 
 dat %>% filter(Year == cur_yr)  # 7-22
 dat[738,8] # 7-19
-# so mid-date would be 19th.
+# so mid-date would be 21st.
 
 
 ##### Historic file ---------------------------------------
-#need to add current years CPUE to the historic CPUE file.  For simplicity reasons this will be inputed for each of the bays.  This will avoid
+# need to add current years pot summary to the historic pot summary file.  
+# For simplicity reasons this will be inputed for each of the bays.  This will avoid
 # any issues with recalculating the crab per pot due to edits in data.
 # read in historic by pot file and make sure variable names match
 
-head(histdat) # see if any columns don't match those in dat5 - why doesn't historic have npots?
-# new historic data has density strata as "Strata.Code"
-
+head(histdat)
 head(dat5)
 
-histdat %>% select(Year, Location, Trip.No, Pot.No, Strata.Code, Missing, 
+histdat %>% 
+  select(Year, Location, Trip.No, Pot.No, Strata.Code, Missing, 
                    Juvenile, Large.Females, Post_Recruit, Pre_Recruit, 
                    Recruit, Small.Females, Area, npots, inverse_n, 
                    weighting) -> historicdata
-dat5 %>% rename(Strata.Code = Density.Strata.Code) -> dat6
+dat5 %>% 
+  dplyr::rename(Strata.Code = Density.Strata.Code) -> dat6
 
 # need to add current year to historicdata file
 # only current years
@@ -141,7 +147,7 @@ dat6 %>%
 CPUE_ALL_YEARS <- rbind(historicdata, dat5_cur_yr)
 # this is the final file by pot.  Now this file can be summarized to give CPUE by year like above (see dat 5 to CPUE_wt_JNU_2016)
 # change same of folder and file.
-write.csv(CPUE_ALL_YEARS, paste0('./results/redcrab/', survey.location, '/', 
+write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', survey.location, '/', 
                                  cur_yr, '/LS_perpot_all_yrs.csv'), 
                                 row.names = FALSE)
 
