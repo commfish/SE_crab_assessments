@@ -151,7 +151,7 @@ write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', survey.location, '/',
                                  cur_yr, '/LS_perpot_all_yrs.csv'), 
                                 row.names = FALSE)
 
-
+## Trends - short and long and female stats for stock health weighting ---------------
 ##### Short term trends -------------------------------------
 #look at trend for the last 4 years.  Need a file with last four years in to JNU_CPUE_ALL
 CPUE_ALL_YEARS %>%
@@ -163,44 +163,15 @@ short_t(bypot_st, cur_yr, "LynnSisters")
 bypot_st_long <- gather(bypot_st, recruit.status, crab, Missing:Small.Females, factor_key = TRUE) 
 ggplot(bypot_st_long, aes(Year,crab)) +geom_point() +facet_wrap(~recruit.status)
 
-### short term plots----------------
-plot(BYPOT_ST$Year, BYPOT_ST$Juvenile)
-Juv_fit <-lm(Juvenile ~ Year, data = BYPOT_ST, weights = weighting)
-abline(Juv_fit, col= 'red')
-summary(Juv_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Large.Females)
-Lfem_fit <-lm(Large.Females ~ Year, data = BYPOT_ST, weights = weighting)
-abline(Lfem_fit, col= 'red')
-summary(Lfem_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Post_Recruit)
-PR_fit <-lm(Post_Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(PR_fit, col= 'red')
-summary(PR_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Pre_Recruit)
-PreR_fit <-lm(Pre_Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(PreR_fit, col= 'red')
-summary(PreR_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Recruit)
-R_fit <-lm(Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(R_fit, col= 'red')
-summary(R_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Small.Females)
-smF_fit <-lm(Small.Females ~ Year, data = BYPOT_ST, weights = weighting)
-abline(smF_fit, col= 'red')
-summary(smF_fit)
 
 ##### Long term trends ---------------------
-#compare current year CPUE distribution to the long term mean
+# compare current year CPUE distribution to the long term mean
 dat5_cur_yr
-#make sure you have a file with only current years data - created above
+# make sure you have a file with only current years data - created above
 
 long_t(dat5_cur_yr, baseline, cur_yr, 'LynnSisters', 'LynnSisters')
 # output is saved as longterm.csv
+
 
 ##### Weights from length - weight relatinship.-----------------
     # Linear model is changed for each area
@@ -216,6 +187,7 @@ weights(dat1,3.07, 7.42, "LynnSisters", cur_yr)
 # large or mature females
 dat1 %>%
   filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> LgF_dat1
+
 # This selects those rows that do not have an egg percentage.
 # if these rows have a egg. development code and egg condition code then the egg percentage should be there
 # if developement = 3 and condition is 4 or 5 then egg percentage should be 0.
@@ -232,13 +204,16 @@ LgF_dat1 %>%
          Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_curyr
 
 largef_all <- rbind(females, LgF_dat1_curyr) # raw female data for all years.
+write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
+                              'largef_all.csv')))
+
 ##### % poor (<10 %) clutch -----------------------------------
 poor_clutch(largef_all, 'LynnSisters', cur_yr)
 # output is saved as poorclutch_current.csv - which has all pots for current year
 #     and poorclutch_17.csv which has the percentage and SD of poor clutches for current year
 
 ##### Long term females -------------------------
-poorclutch_current <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_current <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                       '/poorclutch1_current.csv'))
 # bring in output from function above with the current years pots. 
 glimpse(poorclutch_current)
@@ -250,7 +225,7 @@ poor_clutch_long(poorclutch_current, 'LynnSisters', cur_yr)
 # look at trend for the last 4 years.  Need a file with last four years in it - females from above
 # input data the first time (2016) and then add to it.
 # save this file here for future years
-poorclutch_all <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/poorclutch_all.csv'))
 
 #function for short term trends and output saving.
