@@ -247,7 +247,7 @@ total_health('LynnSisters', cur_yr)
 head(dat5)
 dat5 %>% group_by(Year, Location) %>%  select(Year, Location, Juvenile, Small.Females, 
                                               Large.Females, Pre_Recruit, Recruit,Post_Recruit) %>% 
-  summarise_all(funs(sum)) -> raw_samp
+  summarise_all(sum) -> raw_samp
 
 dat5 %>% 
   group_by(Year) %>% 
@@ -255,7 +255,7 @@ dat5 %>%
   right_join(raw_samp) %>% 
   as.data.frame() -> raw_samp
 
-write.csv(raw_samp, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/raw_sample.csv'))
+write.csv(raw_samp, paste0('./results/rkc/', survey.location, '/', cur_yr, '/raw_sample.csv'))
 
 
 ### stock assessment figures --------------
@@ -271,11 +271,13 @@ CPUE_ALL_YEARS %>%
 CPUE_wt_all  
 CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
 
-write.csv(CPUE_wt_from93, paste0('results/redcrab/', survey.location, '/', 
-                                 cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
+write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
+                                 cur_yr, '/cpue_wt_since_93.csv'), row.names = FALSE)
 
+write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
+                              cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
-panel_figure('LynnSisters', 2018, 'LynnSisters')
+#panel_figure('LynnSisters', 2018, 'LynnSisters')
 panel_figure('LynnSisters', 2018, 'LynnSisters', 1, 0) # panel with all 3 figures
 panel_figure('LynnSisters', 2018, 'LynnSisters', 2, 0) # male panel
 panel_figure('LynnSisters', 2018, 'LynnSisters', 3, 0) # female panel
