@@ -17,19 +17,19 @@ survey.location <- 'Excursion'
 
 #####Load Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv(paste0('./data/redcrab/', survey.location,'/RKC survey CSA_EI_17_18.csv'))
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKC survey CSA_EI_17_18.csv'))
                   # this is input from OceanAK - set up as red crab survey data for CSA
-area <- read.csv(paste0('./data/redcrab/', survey.location, '/Excursion_strata_area.csv')) 
+area <- read.csv(paste0('./data/rkc/', survey.location, '/Excursion_strata_area.csv')) 
                   #this file is the same every year.  Unless the survey methods change
-histdat <- read.csv(paste0('./results/redcrab/', survey.location, '/', pr_yr, '/EI_perpot_all.csv'))
+histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/EI_perpot_all.csv'))
  ## !!!!  this file will be 'EI_perpot_all_16' and just get updated with current years data.
-females <- read.csv(paste0('./results/redcrab/', survey.location,'/', pr_yr, '/largef_all.csv'))
-#raw_data <- read.csv("./data/redcrab/Excursion/RKC survey_historicpots_ei.csv")
+females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv'))
+#raw_data <- read.csv("./data/rkc/Excursion/RKC survey_historicpots_ei.csv")
         ## use this for raw historic female data in 2017, create input file for future
 
-baseline <- read.csv("./data/redcrab/longterm_means.csv")
+baseline <- read.csv("./data/rkc/longterm_means.csv")
 # update this file after running CSA - 
-biomass <- read.csv("./data/redcrab/biomass.csv") 
+biomass <- read.csv("./data/rkc/biomass.csv") 
 # file for all locations.  Has legal and mature biomass from CSA, harvest
 
 head(dat)
@@ -97,7 +97,7 @@ dat5 %>%
 CPUE_wt
 # check to confirm last years CPUEs match - that's why we use two years.
 # change name and folder for each area
-write.csv(CPUE_wt, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/EI_CPUE_',cur_yr, '.csv'), 
+write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/EI_CPUE_',cur_yr, '.csv'), 
           row.names = FALSE)
 
 # weighted cpue by strata --- just for comparison
@@ -143,7 +143,7 @@ dat6 %>%
 CPUE_ALL_YEARS <- rbind(historicdata, dat5_cur_yr)
 # this is the final file by pot.  Now this file can be summarized to give CPUE by year like above (see dat 5 to CPUE_wt_JNU_2016)
 # change same of folder and file.
-write.csv(CPUE_ALL_YEARS, paste0('./results/redcrab/', survey.location, '/', 
+write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', survey.location, '/', 
                         cur_yr, '/EI_perpot_all_', cur_yr,'.csv'), row.names = FALSE)
 
 ##### Short term trends -------------------------------------
@@ -151,7 +151,7 @@ write.csv(CPUE_ALL_YEARS, paste0('./results/redcrab/', survey.location, '/',
 CPUE_ALL_YEARS %>%
   filter(Year >= cur_yr - 3) -> bypot_st # short term file has last 4 years in it
 
-#function creates output file in folder /results/redcrab/'area'
+#function creates output file in folder /results/rkc/'area'
 short_t(bypot_st, cur_yr, "Excursion")
 # output is saved as shortterm.csv
 bypot_st_long <- gather(bypot_st, recruit.status, crab, Missing:Small.Females, factor_key = TRUE) 
@@ -234,7 +234,7 @@ poor_clutch(largef_all, 'Excursion', cur_yr)
 #                                          SD of poor clutches for all years
 
 ##### Long term females -------------------------
-poorclutch_current <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_current <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                            '/poorclutch1_current.csv'))
 # bring in output from function above with the current years pots. 
 glimpse(poorclutch_current)
@@ -246,7 +246,7 @@ poor_clutch_long(poorclutch_current, 'Excursion', cur_yr)
 #look at trend for the last 4 years.  Need a file with last four years in it - females from above
 # input data the first time (2016) and then add to it.
 # save this file here for future years
-poorclutch_all <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                               '/poorclutch_all.csv'))
 #function for short term trends and output saving.
 poor_clutch_short(poorclutch_all, 'Excursion', cur_yr)
@@ -276,7 +276,7 @@ dat5 %>%
   right_join(raw_samp) %>% 
   as.data.frame() -> raw_samp
 
-write.csv(raw_samp, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/raw_sample.csv'))
+write.csv(raw_samp, paste0('./results/rkc/', survey.location, '/', cur_yr, '/raw_sample.csv'))
 
 ### stock assessment figures --------------
 head(CPUE_ALL_YEARS)
@@ -291,19 +291,19 @@ CPUE_ALL_YEARS %>%
 CPUE_wt_all  
 CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
 
-write.csv(CPUE_wt_from93, paste0('results/redcrab/', survey.location, '/', 
+write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
                                  cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
-panel_figure('Excursion', 2018, 'Excursion', 1) # panel with all 3 figures
-panel_figure('Excursion', 2018, 'Excursion', 2) # male panel
-panel_figure('Excursion', 2018, 'Excursion', 3) # female panel
+panel_figure('Excursion', 2019, 'Excursion', 1) # panel with all 3 figures
+panel_figure('Excursion', 2019, 'Excursion', 2) # male panel
+panel_figure('Excursion', 2019, 'Excursion', 3) # female panel
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
 
 ### NON CONF panel --------------
-panel_figure_NC('Excursion', 2018, 'Excursion', 1, 0) # panel with all 3 figures
-panel_figure_NC('Excursion', 2018, 'Excursion', 2, 0)
+panel_figure_NC('Excursion', 2019, 'Excursion', 1, 0) # panel with all 3 figures
+panel_figure_NC('Excursion', 2019, 'Excursion', 2, 0)
 
 ### presentation figure -----
-panel_figure_NC_PRES('Excursion', 2018, 'Excursion', 2, 0)
-panel_figure_NC_PRES('Excursion', 2018, 'Excursion', 3, 0)
+panel_figure_NC_PRES('Excursion', 2019, 'Excursion', 2, 0)
+panel_figure_NC_PRES('Excursion', 2019, 'Excursion', 3, 0)
