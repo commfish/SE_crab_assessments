@@ -278,44 +278,21 @@ write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/',
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
 #panel_figure('LynnSisters', 2018, 'LynnSisters')
-panel_figure('LynnSisters', 2018, 'LynnSisters', 1, 0) # panel with all 3 figures
-panel_figure('LynnSisters', 2018, 'LynnSisters', 2, 0) # male panel
-panel_figure('LynnSisters', 2018, 'LynnSisters', 3, 0) # female panel
+panel_figure('LynnSisters', 2019, 'LynnSisters', 1, 0) # panel with all 3 figures
+panel_figure('LynnSisters', 2019, 'LynnSisters', 2, 0) # male panel
+panel_figure('LynnSisters', 2019, 'LynnSisters', 3, 0) # female panel
 
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
 
 ### NON CONF panel --------------
-panel_figure_NC('LynnSisters', 2018, 'LynnSisters', 1, 0) # panel with all 3 figures
-panel_figure_NC('LynnSisters', 2018, 'LynnSisters', 2, 0)
+panel_figure_NC('LynnSisters', 2019, 'LynnSisters', 1, 0) # panel with all 3 figures
+panel_figure_NC('LynnSisters', 2019, 'LynnSisters', 2, 0)
 
 ### presentation figure -----
-panel_figure_NC_PRES('LynnSisters', 2018, 'LynnSisters', 2, 0)
-panel_figure_NC_PRES('LynnSisters', 2018, 'LynnSisters', 3, 0)
+panel_figure_NC_PRES('LynnSisters', 2019, 'LynnSisters', 2, 0)
+panel_figure_NC_PRES('LynnSisters', 2019, 'LynnSisters', 3, 0)
 
-### female file all years -----
-# create females file for all years
-# raw_data has OceanAK output until 2016. 
-
-levels(raw_data$Pot.Condition)
-raw_data %>%
-  filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> raw_dat1
-raw_dat1 %>%
-  filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> all_LgF_dat1
-all_LgF_dat1[is.na(all_LgF_dat1$Egg.Percent),]
-all_LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_all
-
-LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
-  
-largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
-write.csv(largef_all, (paste0('./results/redcrab/', survey.location, '/', cur_yr, '/', 
-                              'largef_all.csv')))
 
 
 
