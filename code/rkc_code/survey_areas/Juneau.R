@@ -151,11 +151,11 @@ write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/',
 
 ## Trends - short and long and female stats for stock health weighting ---------------
 ### Short term trends -------------------
-#look at trend for the last 4 years.  Need a file with last four years in to JNU_CPUE_ALL
+# look at trend for the last 4 years.  Need a file with last four years in to JNU_CPUE_ALL
 CPUE_ALL_YEARS %>%
   filter(Year >= cur_yr - 3) -> bypot_st # short term file has last 4 years in it
 
-#function creates output file in folder /results/redcrab/'area'
+# function creates output file in folder /results/redcrab/'area'
 short_t(bypot_st, cur_yr, "Juneau")
 # output is saved as shortterm.csv
 bypot_st_long <- gather(bypot_st, recruit.status, crab, Missing:Small.Females, 
@@ -164,9 +164,9 @@ ggplot(bypot_st_long, aes(Year,crab)) +geom_point() +facet_wrap(~recruit.status)
 
 
 ##### Long term trends ---------------------
-#compare current year CPUE distribution to the long term mean
+# compare current year CPUE distribution to the long term mean
 head(dat5_cur_yr)
-#make sure you have a file with only current years data - created above
+# make sure you have a file with only current years data - created above
 
 long_t(dat5_cur_yr, baseline, cur_yr, 'Juneau', 'Juneau')
 # output is saved as longterm.csv
@@ -263,7 +263,7 @@ dat5 %>%
   right_join(raw_samp) %>% 
   as.data.frame() -> raw_samp
 
-write.csv(raw_samp, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/raw_sample.csv'))
+write.csv(raw_samp, paste0('./results/rkc/', survey.location, '/', cur_yr, '/raw_sample.csv'))
 
 ### stock assessment figures --------------
 head(CPUE_ALL_YEARS)
@@ -278,10 +278,10 @@ CPUE_ALL_YEARS %>%
 CPUE_wt_all  
 CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
 
-write.csv(CPUE_wt_from93, paste0('results/redcrab/', survey.location, '/', 
+write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
                                  cur_yr, '/cpue_wt_since_93.csv'), row.names = FALSE)
 
-write.csv(CPUE_wt_all, paste0('results/redcrab/', survey.location, '/', 
+write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 panel_figure('Juneau', 2019, 'Juneau')
 
