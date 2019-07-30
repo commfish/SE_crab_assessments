@@ -1,39 +1,37 @@
-#K.Palof 
-# ADF&G 8-4-16 updated for Peril Strait  / updated 8-2-18
-# code to process data from Ocean AK to use in crab CSA models.  
-#  
+# K.Palof   katie.palof@alaska.gov
+# ADF&G 8-4-16 updated for Peril Strait(Deadman's Reach)  / updated 8-2-18/ 7-30-19
 
-rm(list = ls())# clear workspace from previous area 
-##Load Packages/functions ---------------------------------
+# R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
+#     output and figures for annual stock health report.
+
+# Read me:
+#     update code with date updated (top), change global year, and pull new survey data (see below)
+
+## load -------------------------
 source('./code/functions.R')
 
-## setup year --------
-cur_yr <- 2018
+## setup global ---------------
+cur_yr <- 2019
 pr_yr <- cur_yr -1
-survey.location <- 'Peril'
-# area is Peril but in data files it's Deadman Reach
+survey.location <- 'Peril'   # area is Peril but in data files it's Deadman Reach
 
-#####Load Data ---------------------------------------------------
-# change input file and input folder for each
-dat <- read.csv(paste0('./data/redcrab/', survey.location,'/RKCsurveyCSA_PS_17_18.csv'))
+## data -------------------
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PS_18_19.csv'))# file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
-area <- read.csv(paste0('./data/redcrab/', survey.location, '/Peril_strata_area.csv')) 
-#this file is the same every year.  Unless the survey methods change
-histdat <- read.csv(paste0('./results/redcrab/', survey.location, '/', pr_yr, '/PS_perpot_all_17.csv'))
-## !!!!  this file will be 'EI_perpot_all_16' and just get updated with current years data.
-#females <- read.csv(paste0('./results/redcrab/', survey.location,'/', pr_yr, '/largef_all.csv'))
-# fixed at bottom of code, should work fine for years in future (past 2018)
-## use this for raw historic female data in 2017, create input file for future
-raw_data <- read.csv(paste0('./data/redcrab/', survey.location, 
-                            '/RKC survey_historicpots_ps.csv'))
+#   survey area should match that in the name of this script file; Deadmans Reach
+area <- read.csv(paste0('./data/rkc/', survey.location, '/Peril_strata_area.csv')) # same every year
 
-baseline <- read.csv("./data/redcrab/longterm_means.csv")
-# update this file after running CSA - 
-biomass <- read.csv("./data/redcrab/biomass.csv") 
-# file for all locations.  Has legal and mature biomass from CSA, harvest
+histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/PS_perpot_all_', pr_yr, '.csv'))
+## !!!!  this file will be 'EI_perpot_all_pr_yr' and just get updated with current years data.
+females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv'))
 
-head(dat)
-glimpse(dat) # confirm that data was read in correctly.
+
+baseline <- read.csv("./data/rkc/longterm_means.csv") # same every year
+biomass <- read.csv("./data/rkc/biomass.csv") # ** update ** from CSA model
+#   file for all locations. Has biomass estimates from CSA,
+#   must be updated after CSA model is run for current year USING current year's model
+#             NOT historic forecast!
+
 
 
 ##### Initial review of new data ---------------------------------
