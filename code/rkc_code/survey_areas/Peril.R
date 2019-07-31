@@ -47,8 +47,7 @@ dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
-# pot 35 crab 1-8 have no sex.code - send adam e-mail 8-3-18 **fix**
-# **fix** 
+# pot 40 - 2018 - specimen 1 has no length **fix**
 
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
