@@ -220,7 +220,7 @@ poor_clutch(largef_all, 'Peril', cur_yr)
 #     and poorclutch_17.csv which has the percentage and SD of poor clutches for current year 
 
 ##### Long term females -------------------------
-poorclutch_current <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_current <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                       '/poorclutch1_current.csv'))
 # bring in output from function above with the current years pots. 
 glimpse(poorclutch_current)
@@ -232,7 +232,7 @@ poor_clutch_long(poorclutch_current, 'Peril', cur_yr)
 #look at trend for the last 4 years.  Need a file with last four years in it - females from above
 # input data the first time (2016) and then add to it.
 # save this file here for future years
-poorclutch_all <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/poorclutch_all.csv'))
 
 #function for short term trends and output saving.
@@ -262,7 +262,7 @@ dat5 %>%
   right_join(raw_samp) %>% 
   as.data.frame() -> raw_samp
 
-write.csv(raw_samp, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/raw_sample.csv'))
+write.csv(raw_samp, paste0('./results/rkc/', survey.location, '/', cur_yr, '/raw_sample.csv'))
 
 ### stock assessment figures --------------
 head(CPUE_ALL_YEARS)
@@ -277,26 +277,26 @@ CPUE_ALL_YEARS %>%
 CPUE_wt_all  
 CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
 
-write.csv(CPUE_wt_from93, paste0('results/redcrab/', survey.location, '/', 
+write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
                                  cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
 
-#panel_figure('Peril', 2018, 'Deadman Reach')
+#panel_figure('Peril', 2019, 'Deadman Reach')
 
-panel_figure('Peril', 2018, 'Deadman Reach', 1) # panel with all 3 figures
-panel_figure('Peril', 2018, 'Deadman Reach', 2) # male panel
-panel_figure('Peril', 2018, 'Deadman Reach', 3) # female panel
+panel_figure('Peril', 2019, 'Deadman Reach', 1) # panel with all 3 figures
+panel_figure('Peril', 2019, 'Deadman Reach', 2) # male panel
+panel_figure('Peril', 2019, 'Deadman Reach', 3) # female panel
 
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
 
 ### NON CONF panel --------------
-panel_figure_NC('Peril', 2018, 'Deadman Reach', 1, 0) # panel with all 3 figures
-panel_figure_NC('Peril', 2018, 'Deadman Reach', 2, 0)
+panel_figure_NC('Peril', 2019, 'Deadman Reach', 1, 0) # panel with all 3 figures
+panel_figure_NC('Peril', 2019, 'Deadman Reach', 2, 0)
 
 ### presentation figure -----
-panel_figure_NC_PRES('Peril', 2018, 'Deadman Reach', 2, 0)
-panel_figure_NC_PRES('Peril', 2018, 'Deadman Reach', 3, 0)
+panel_figure_NC_PRES('Peril', 2019, 'Deadman Reach', 2, 0)
+panel_figure_NC_PRES('Peril', 2019, 'Deadman Reach', 3, 0)
 
 ### female file all years -----
 # create females file for all years
@@ -319,7 +319,7 @@ LgF_dat1 %>%
          Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
 
 largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
-write.csv(largef_all, (paste0('./results/redcrab/', survey.location, '/', cur_yr, '/', 
+write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
                               'largef_all.csv')))
 
 
