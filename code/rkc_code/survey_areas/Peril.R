@@ -33,9 +33,11 @@ biomass <- read.csv("./data/rkc/biomass.csv") # ** update ** from CSA model
 #             NOT historic forecast!
 
 
-
-##### Initial review of new data ---------------------------------
+## survey data QAC -------
+head(dat)
+glimpse(dat) # confirm that data was read in correctly.
 sapply(dat, unique)
+
 # remove pots with Pot condition code that's not "normal" or 1 
 levels(dat$Pot.Condition)
 dat %>%
