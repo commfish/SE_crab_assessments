@@ -39,6 +39,7 @@ biomass <- read.csv("./data/rkc/biomass.csv") # ** update ** from CSA model
 ## survey data QAC -------
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
+sapply(dat, unique)
 
 # remove pots with Pot condition code that's not "normal" or 1 
 levels(dat$Pot.Condition)
