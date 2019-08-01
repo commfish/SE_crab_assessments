@@ -15,7 +15,7 @@ survey.location = 'Peril'
 
 ## CPUE from survey / data for CSA
 ```{r CPUE, echo = FALSE }
-cpue_cur_yr <- read.csv(paste0('../results/redcrab/', survey.location, '/', cur_yr, '/PS_CPUE_', cur_yr,'.csv'))
+cpue_cur_yr <- read.csv(paste0(here::here(),'/results/rkc/', survey.location, '/', cur_yr, '/PS_CPUE_', cur_yr,'.csv'))
 kable(cpue_cur_yr, digits = 6)
 
 
@@ -27,27 +27,27 @@ kable(cpue_cur_yr, digits = 6)
 
 ### Male weights from survey 
 ```{r weights, echo = FALSE }
-male_weights <- read.csv(paste0('../results/redcrab/', survey.location, '/', cur_yr,'/maleweights.csv'))
+male_weights <- read.csv(paste0(here::here(),'/results/rkc/', survey.location, '/', cur_yr,'/maleweights.csv'))
 kable(male_weights, digits = 3)
 ```
 
 ## Short term trends in CPUE
 ```{r short term, echo = FALSE }
-short_term_results <- read.csv(paste0('../results/redcrab/', survey.location, '/', cur_yr,'/shortterm.csv'))
+short_term_results <- read.csv(paste0(here::here(),'/results/rkc/', survey.location, '/', cur_yr,'/shortterm.csv'))
 kable(short_term_results, digits = 3)
 ```
 
 
 ## Long term trends in CPUE
 ```{r long term,echo = FALSE  }
-long_term_results <- read.csv(paste0('../results/redcrab/', survey.location, '/', cur_yr,'/longterm.csv'))
+long_term_results <- read.csv(paste0(here::here(),'/results/rkc/', survey.location, '/', cur_yr,'/longterm.csv'))
 kable(long_term_results, digits = 3)
 ```
 
 ## Female health
 #### percentage and SD of poor clutches (<25%)
 ```{r female health,echo = FALSE  }
-poorclutch_curyr <- read.csv(paste0('../results/redcrab/', survey.location, '/', cur_yr,'/poorclutch_summary_all.csv'))
+poorclutch_curyr <- read.csv(paste0(here::here(),'/results/rkc/', survey.location, '/', cur_yr,'/poorclutch_summary_all.csv'))
 poorclutch_curyr %>% 
   filter(Year >= cur_yr-1) -> poorclutch_curyr
 
@@ -57,14 +57,14 @@ kable(poorclutch_curyr, digits = 3)
 
 ####long term mean comparison
 ```{r long term female, echo = FALSE}
-lt_female <- read.csv(paste0('../results/redcrab/', survey.location, '/' , cur_yr,'/lt_female.csv'))
+lt_female <- read.csv(paste0(here::here(),'/results/rkc/', survey.location, '/' , cur_yr,'/lt_female.csv'))
 
 kable(lt_female, digits = 3)
 ```
 
 ####short term females
 ```{r short term female, echo = FALSE}
-short_female <- read.csv(paste0('../results/redcrab/', survey.location, '/', cur_yr,'/short_female.csv'))
+short_female <- read.csv(paste0(here::here(),'/results/rkc/', survey.location, '/', cur_yr,'/short_female.csv'))
 
 kable(short_female, digits = 3)
 ```
@@ -72,7 +72,7 @@ kable(short_female, digits = 3)
 
 ####Mean egg percentage for mature females
 ```{r egg per female, echo = FALSE}
-egg_per_mean <- read.csv(paste0('../results/redcrab/', survey.location, '/', cur_yr,'/egg_percent_mean_all.csv'))
+egg_per_mean <- read.csv(paste0(here::here(),'/results/rkc/', survey.location, '/', cur_yr,'/egg_percent_mean_all.csv'))
 egg_per_mean %>% 
   filter(Year >= cur_yr-1) -> egg_per_mean
 
@@ -83,7 +83,7 @@ kable(egg_per_mean, digits = 3)
 
 ## Stock health
 ```{r stock health, echo = FALSE}
-stock_health <- read.csv(paste0('../results/redcrab/', survey.location, '/', cur_yr,'/stock_health.csv'))
+stock_health <- read.csv(paste0(here::here(),'/results/rkc/', survey.location, '/', cur_yr,'/stock_health.csv'))
 
 kable(stock_health, digits = 3)
 ```
