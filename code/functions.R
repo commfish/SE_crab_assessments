@@ -24,6 +24,7 @@ library(FNGr)
 library(scales)
 library(cowplot)
 library(here)
+library(TeachingDemos)
 
 #font_import()
 loadfonts(device="win")
