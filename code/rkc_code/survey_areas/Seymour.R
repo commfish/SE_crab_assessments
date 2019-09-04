@@ -1,34 +1,34 @@
 # K.Palof 
 # katie.palof@alaska.gov
-# ADF&G 8-3-16 updated for Seymour Canal  / updated 8-8-17/8-9-18
-# code to process data from Ocean AK to use in crab CSA models.  
-#  
-# Current year: 2018
+# ADF&G 8-3-16 updated for Seymour Canal  / updated 8-8-17/8-9-18 / 9-4-19
+# R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
+#     output and figures for annual stock health report.
 
-rm(list = ls())# clear workspace from previous area 
-##Load Packages/functions ----------------
+# Read me:
+#     update code with date updated (top), change global year, and pull new survey data (see below)
+
+## load -------------------------
 source('./code/functions.R')
 
-## setup year --------
-cur_yr <- 2018
+## setup global ---------------
+cur_yr <- 2019
 pr_yr <- cur_yr -1
 survey.location <- 'Seymour'
 
 #####Load Data ---------------------------
-# change input file and input folder for each
-dat <- read.csv(paste0('./data/redcrab/', survey.location,'/RKCsurveyCSA_SC_17_18.csv'))
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_SC_18_19.csv'))
              # this is input from OceanAK - set up as red crab survey data for CSA
-area <- read.csv(paste0('./data/redcrab/', survey.location, '/Seymour_strata_area.csv')) 
+area <- read.csv(paste0('./data/rkc/', survey.location, '/Seymour_strata_area.csv')) 
              #this file is the same every year.  Unless the survey methods change
-histdat <- read.csv(paste0('./results/redcrab/', survey.location, '/', pr_yr, '/SC_perpot_all_17.csv'))
+histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/SC_perpot_all_17.csv'))
            ## !!!!  this file will be 'SC_perpot_all_17' and just get updated with current years data.
-#females <- read.csv(paste0('./results/redcrab/', survey.location,'/', pr_yr, '/largef_all.csv'))
-raw_data <- read.csv("./data/redcrab/Seymour/RKC survey_historicpots_SC.csv")
+#females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv'))
+raw_data <- read.csv("./data/rkc/Seymour/RKC survey_historicpots_SC.csv")
 ## use this for raw historic female data in 2017, create input file for future
 
-baseline <- read.csv("./data/redcrab/longterm_means.csv")
+baseline <- read.csv("./data/rkc/longterm_means.csv")
 # update this file after running CSA - 
-biomass <- read.csv("./data/redcrab/biomass.csv") 
+biomass <- read.csv("./data/rkc/biomass.csv") 
 # file for all locations.  Has legal and mature biomass from CSA, harvest
 
 head(dat)
@@ -97,7 +97,7 @@ dat5 %>%
 CPUE_wt
 # check to confirm last years CPUEs match - that's why we use two years.
 # global survey.location and year
-write.csv(CPUE_wt, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/SC_CPUE_',cur_yr, '.csv'), 
+write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/SC_CPUE_',cur_yr, '.csv'), 
           row.names = FALSE)
 
 #### survey mid date -----
@@ -130,7 +130,7 @@ dat6 %>%
 CPUE_ALL_YEARS <- rbind(historicdata, dat5_cur_yr)
 # this is the final file by pot.  Now this file can be summarized to give CPUE by year like above (see dat 5 to CPUE_wt_JNU_2016)
 # change same of folder and file.
-write.csv(CPUE_ALL_YEARS, paste0('./results/redcrab/', survey.location, '/', 
+write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', survey.location, '/', 
                                  cur_yr, '/SC_perpot_all_', cur_yr,'.csv'), row.names = FALSE)
 
 ##### Short term trends -------------------------------------
@@ -138,7 +138,7 @@ write.csv(CPUE_ALL_YEARS, paste0('./results/redcrab/', survey.location, '/',
 CPUE_ALL_YEARS %>%
   filter(Year >= cur_yr - 3) -> bypot_st # short term file has last 4 years in it
 
-#function creates output file in folder /results/redcrab/'area'
+#function creates output file in folder /results/rkc/'area'
 short_t(bypot_st, cur_yr, "Seymour")
 # output is saved as shortterm.csv
 bypot_st_long <- gather(bypot_st, recruit.status, crab, Missing:Small.Females, factor_key = TRUE) 
@@ -225,7 +225,7 @@ poor_clutch(largef_all, 'Seymour', cur_yr)
 #     and poorclutch_17.csv which has the percentage and SD of poor clutches for 2017 
 
 ##### Long term females -------------------------
-poorclutch_current <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_current <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                       '/poorclutch1_current.csv'))
 # bring in output from function above with the current years pots. 
 glimpse(poorclutch_current)
@@ -237,7 +237,7 @@ poor_clutch_long(poorclutch_current, 'Seymour', cur_yr)
 #look at trend for the last 4 years.  Need a file with last four years in it - females from above
 # input data the first time (2016) and then add to it.
 # save this file here for future years
-poorclutch_all <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/poorclutch_all.csv'))
 #function for short term trends and output saving.
 poor_clutch_short(poorclutch_all, 'Seymour', cur_yr)
@@ -267,7 +267,7 @@ dat5 %>%
   right_join(raw_samp) %>% 
   as.data.frame() -> raw_samp
 
-write.csv(raw_samp, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/raw_sample.csv'))
+write.csv(raw_samp, paste0('./results/rkc/', survey.location, '/', cur_yr, '/raw_sample.csv'))
 
 ### stock assessment figures --------------
 head(CPUE_ALL_YEARS)
@@ -282,7 +282,7 @@ CPUE_ALL_YEARS %>%
 CPUE_wt_all  
 CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
 
-write.csv(CPUE_wt_from93, paste0('results/redcrab/', survey.location, '/', 
+write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
                                  cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
 panel_figure('Seymour', 2018, 'Seymour Canal', 1, 1) # panel with all 3 figures
@@ -320,7 +320,7 @@ LgF_dat1 %>%
          Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
 
 largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
-write.csv(largef_all, (paste0('./results/redcrab/', survey.location, '/', cur_yr, '/', 
+write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
                               'largef_all.csv')))
 
 
