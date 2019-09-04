@@ -17,27 +17,27 @@ pr_yr <- cur_yr -1
 survey.location <- 'Gambier'
 
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_GB_17_18.csv'))
-            # this is input from OceanAK - set up as red crab survey data for CSA
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_GB_18_19.csv'))# file name will change annually
+# this is input from OceanAK - set up as red crab survey data for CSA
+#   survey area should match that in the name of this script file
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Gambier_strata_area.csv')) 
             #this file is the same every year.  Unless the survey methods change
-histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/GB_perpot_all_17.csv'))
-        ## !!!!  this file will be 'EI_perpot_all_16' and just get updated with current years data.
-#females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv'))
-      # fixed at bottom of code, should work fine for years in future (past 2018)
-      ## use this for raw historic female data in 2017, create input file for future
-raw_data <- read.csv(paste0('./data/rkc/', survey.location, 
-                            '/RKC survey_historicpots_GB.csv'))
+histdat <- read.csv(paste0('./results/rkc/', survey.location, 
+                           '/', pr_yr, '/GB_perpot_all_', pr_yr, '.csv'))
+        ## !!!!  this file will be 'GB_perpot_all_pr_yr' and just get updated with current years data.
+females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv'))
+   
+baseline <- read.csv("./data/rkc/longterm_means.csv") # same every year
+biomass <- read.csv("./data/rkc/biomass.csv") # ** update ** from CSA model
+#   file for all locations. Has biomass estimates from CSA,
+#   must be updated after CSA model is run for current year USING current year's model
+#             NOT historic forecast!
 
-baseline <- read.csv("./data/rkc/longterm_means.csv")
-# update this file after running CSA - 
-biomass <- read.csv("./data/rkc/biomass.csv") 
-# file for all locations.  Has legal and mature biomass from CSA, harvest
-
+## survey data QAC -------
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
+sapply(dat, unique)
 
-##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
 levels(dat$Pot.Condition)
 dat %>%
@@ -47,22 +47,22 @@ dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
-# one female here that don't have recruit status due to no lengths
 
-# also need to check soak time and to make sure all crab that were measured have a recruit status
+# **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
 
-##### By Pot ----------------------------------------------------
-#Now summarize by pot - remember to keep areas seperate.
-#Need Number of Specimens by recruit class
+## CPUE calc --------------
+##### By Pot -------------------------------
+# Now summarize by pot - remember to keep areas seperate.
+# need Number of Specimens by recruit class
+# keep trip no. to merge with historic data 
 dat1 %>%
   group_by(Year, Location, Trip.No, Pot.No, Density.Strata.Code, Recruit.Status) %>%
   summarise(crab = sum(Number.Of.Specimens)) -> dat2
-# keep trip no to merge with historic data.
 
 dat3 <- dcast(dat2, Year + Location + Trip.No + Pot.No +Density.Strata.Code ~ Recruit.Status, sum, drop=TRUE)
 
-head(dat3)# check to make sure things worked.
+head(dat3)# confirm data is summarized by pot with recruit classes each in a column 
 
 # Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has it's own area file or area per
 #     strata.  This is used to calculating the weighting for weighted CPUE.
