@@ -77,7 +77,6 @@ tab %>%
 ##### Weighted CPUE current year -----------------------------------
 #the weighting is the product of the area for each strata and the inverse (1/n) of the number of pots per strata per year
 # need to combine data sets to accomplish this.
-
 tab %>%
   right_join(pots_per_strata) -> dat4
 
@@ -87,8 +86,8 @@ dat5 %>%
   rename(Missing = Var.6, Large.Females = `Large Females`, Small.Females = `Small Females`) -> dat5
 # this is neccessary so that current years file (dat5) matches the historic file names
 
-#This version is ready to calculate CPUE for each recruit class
-#Calculates a weighted mean CPUE and SE for each recruit class
+# This version is ready to calculate CPUE for each recruit class
+# Calculates a weighted mean CPUE and SE for each recruit class
 dat5 %>%
   group_by(Year) %>%
   summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
@@ -99,7 +98,6 @@ dat5 %>%
             SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt
 CPUE_wt
 # check to confirm last years CPUEs match - that's why we use two years.
-# change name and folder for each area
 write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/GB_CPUE_',cur_yr, '.csv'), 
           row.names = FALSE)
 
@@ -113,30 +111,31 @@ dat5 %>%
             MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
             SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/
                                                                           (sqrt(sum(!is.na(Small.Females)))))) 
+# look at results to see the spread between stratas...in high biomass years even low strata 1,2 had higher CPUE. >1 or 2
 
-#### survey mid date -----
+#### survey mid date -----  
+#  ** fix **  make this calculated from data not just visual
 head(dat)
 unique(dat$Time.Hauled)
 # need to seperate time hauled to just have data hauled look for mid-date 
-dat %>% filter(Year == cur_yr)  # 7-27
-
+dat %>% filter(Year == cur_yr)  # hauled 8-10 and 8-11
 
 
 ##### Historic file ---------------------------------------
-#need to add current years CPUE to the historic CPUE file.  For simplicity reasons this will be inputed for each of the bays.  This will avoid
+# need to add current years pot summary to the historic pot summary file.  
+# For simplicity reasons this will be inputed for each of the bays.  This will avoid
 # any issues with recalculating the crab per pot due to edits in data.
 # read in historic by pot file and make sure variable names match
-
-head(histdat) # see if any columns don't match those in dat5 - why doesn't historic have npots?
-# new historic data has density strata as "Strata.Code"
-
+head(histdat)
 head(dat5)
 
-histdat %>% select(Year, Location, Trip.No, Pot.No, Strata.Code, Missing, 
+histdat %>% 
+  select(Year, Location, Trip.No, Pot.No, Strata.Code, Missing, 
                    Juvenile, Large.Females, Post_Recruit, Pre_Recruit, 
                    Recruit, Small.Females, Area, npots, inverse_n, 
                    weighting) -> historicdata
-dat5 %>% rename(Strata.Code = Density.Strata.Code) -> dat6
+dat5 %>% 
+  dplyr::rename(Strata.Code = Density.Strata.Code) -> dat6
 
 # need to add current year to historicdata file
 # only current years
@@ -144,14 +143,14 @@ dat6 %>%
   filter(Year == cur_yr) -> dat5_cur_yr
 CPUE_ALL_YEARS <- rbind(historicdata, dat5_cur_yr)
 # this is the final file by pot.  Now this file can be summarized to give CPUE by year like above (see dat 5 to CPUE_wt_JNU_2016)
-# change same of folder and file.
 write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', survey.location, '/', 
                                  cur_yr, '/GB_perpot_all_', cur_yr,'.csv'), 
           row.names = FALSE)
 
 
-##### Short term trends -------------------------------------
-#look at trend for the last 4 years.  Need a file with last four years
+## Trends - short and long and female stats for stock health weighting ---------------
+### Short term trends -------------------
+# look at trend for the last 4 years.  Need a file with last four years
 CPUE_ALL_YEARS %>%
   filter(Year >= cur_yr - 3) -> bypot_st # short term file has last 4 years in it
 
@@ -167,41 +166,10 @@ bypot_st %>%
   gather(recruit.status, crab, Pre_Recruit:Post_Recruit, factor_key = TRUE) %>% 
   ggplot(aes(Year, crab)) +geom_point() + facet_wrap(~recruit.status)
 
-### short term plots----------------
-plot(BYPOT_ST$Year, BYPOT_ST$Juvenile)
-Juv_fit <-lm(Juvenile ~ Year, data = BYPOT_ST, weights = weighting)
-abline(Juv_fit, col= 'red')
-summary(Juv_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Large.Females)
-Lfem_fit <-lm(Large.Females ~ Year, data = BYPOT_ST, weights = weighting)
-abline(Lfem_fit, col= 'red')
-summary(Lfem_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Post_Recruit)
-PR_fit <-lm(Post_Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(PR_fit, col= 'red')
-summary(PR_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Pre_Recruit)
-PreR_fit <-lm(Pre_Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(PreR_fit, col= 'red')
-summary(PreR_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Recruit)
-R_fit <-lm(Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(R_fit, col= 'red')
-summary(R_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Small.Females)
-smF_fit <-lm(Small.Females ~ Year, data = BYPOT_ST, weights = weighting)
-abline(smF_fit, col= 'red')
-summary(smF_fit)
-
 ##### Long term trends ---------------------
-#compare current year CPUE distribution to the long term mean
-dat5_cur_yr
-#make sure you have a file with only current years data - created above
+# compare current year CPUE distribution to the long term mean
+head(dat5_cur_yr)
+# make sure you have a file with only current years data - created above
 
 long_t(dat5_cur_yr, baseline, cur_yr, 'Gambier', 'Gambier')
 # output is saved as longterm.csv
@@ -225,20 +193,28 @@ dat1 %>%
 # if these rows have a egg. development code and egg condition code then the egg percentage should be there
 # if developement = 3 and condition is 4 or 5 then egg percentage should be 0.
 LgF_dat1[is.na(LgF_dat1$Egg.Percent),]
+# need to change these to 0 if applicable. 
 #LgF_dat1 %>%
-# mutate(Egg.Percent =ifelse(is.na(Egg.Percent), 0, Egg.Percent)) -> LgF_dat1
-#need to remove if missing data
-# need to change these to 0 if just juvenile
-#LgF_dat1 %>%
-#  filter(!is.na(Egg.Percent)) -> LgF_dat1
+#  mutate(Egg.Percent =ifelse(is.na(Egg.Percent), 0, Egg.Percent)) -> LgF_dat1
 LgF_dat1 %>% 
   filter(Year == cur_yr) %>% 
   select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
          Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
          Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_curyr
 
-#largef_all <- rbind(females, LgF_dat1_curyr) # raw female data for all years.
-# use this next year, 2018 file created below to bring in historic years
+# Currently (2019) just load the largef_all.csv file and add current year
+head(females)
+
+# want to add 0's for egg percent if egg development code is 3 or 4
+#LgF_dat1_all %>% 
+#  mutate(Egg.Percent = ifelse((Egg.Development.Code == 3 & 
+#                                 Egg.Condition.Code == 4 |Egg.Condition.Code == 5), 
+#                              0, Egg.Percent)) -> LgF_dat1_all
+
+largef_all <- rbind(females, LgF_dat1_curyr) # raw female data for all years.
+write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
+                              'largef_all.csv')))
+
 
 ##### % poor (<10 %) clutch -----------------------------------
 
@@ -274,8 +250,10 @@ egg_percent(largef_all, 'Gambier', cur_yr)
 total_health('Gambier', cur_yr)
 # works as long as all files are saved in folder with area name
 
+
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 ### raw sample size -----------
 head(dat5)
