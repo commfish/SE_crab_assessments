@@ -1,58 +1,63 @@
 # K.Palof 
-# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18
-# code to process data from Ocean AK to use in crab CSA models.  
-#  
-# Current year: 2018
+# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18/ 9-4-19
+# R script contains code to process data from Ocean AK to use in crab CSA models, 
+#      code to run CSA model, and calls to create 
+#     output and figures for annual stock health report.
 
-rm(list = ls())# clear workspace from previous area 
-##Load Packages/functions ---------------------------------
+
+# Read me:
+#     update code with date updated (top), change global year, and pull new survey data (see below)
+
+## load -------------------------
 source('./code/functions.R')
 
-## setup year --------
-cur_yr <- 2018
+## setup global ---------------
+cur_yr <- 2019
 pr_yr <- cur_yr -1
 survey.location <- 'Pybus'
 
-#####Load Data ---------------------------------------------------
-# change input file and input folder for each
-dat <- read.csv(paste0('./data/redcrab/', survey.location,'/RKCsurveyCSA_PB_17_18.csv'))
+## data -------------------
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PB_18_19.csv'))# file name will change annually
               # this is input from OceanAK - set up as red crab survey data for CSA
-area <- read.csv(paste0('./data/redcrab/', survey.location, '/Pybus_strata_area.csv')) 
+area <- read.csv(paste0('./data/rkc/', survey.location, '/Pybus_strata_area.csv')) 
               #this file is the same every year.  Unless the survey methods change
-histdat <- read.csv(paste0('./results/redcrab/', survey.location, '/', pr_yr, '/PB_perpot_all_17.csv'))
-## !!!!  this file will be 'EI_perpot_all_16' and just get updated with current years data.
-#females <- read.csv(paste0('./results/redcrab/', survey.location,'/', pr_yr, '/largef_all.csv'))
-# fixed at bottom of code, should work fine for years in future (past 2018)
-## use this for raw historic female data in 2017, create input file for future
-raw_data <- read.csv(paste0('./data/redcrab/', survey.location, 
-                            '/RKC survey_historicpots_PB.csv'))
+histdat <- read.csv(paste0('./results/rkc/', survey.location, 
+                           '/', pr_yr, '/PB_perpot_all_', pr_yr, '.csv'))
+## !!!!  this file will be 'PB_perpot_all_pr_yr' and just get updated with current years data.
+females <- read.csv(paste0('./results/rkc/', survey.location,
+                           '/', pr_yr, '/largef_all.csv'))
 
-baseline <- read.csv("./data/redcrab/longterm_means.csv")
+baseline <- read.csv("./data/rkc/longterm_means.csv") # same every year
 # update this file after running CSA - 
-biomass <- read.csv("./data/redcrab/biomass.csv") 
-# file for all locations.  Has legal and mature biomass from CSA, harvest
+biomass <- read.csv("./data/rkc/biomass.csv") # ** update ** from CSA model
+#   file for all locations. Has biomass estimates from CSA,
+#   must be updated after CSA model is run for current year USING current year's model
+#             NOT historic forecast!
 
+## survey data QAC -------
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
+sapply(dat, unique)
 
-##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
 levels(dat$Pot.Condition)
 dat %>%
   filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> dat1
-
 dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
 # one female here that don't have recruit status due to no lengths
+## 2019 ** FIX ** pot 5 doesn't have a density strata code
 
-# also need to check soak time and to make sure all crab that were measured have a recruit status
+# **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
 
-##### By Pot ----------------------------------------------------
-#Now summarize by pot - remember to keep areas seperate.
-#Need Number of Specimens by recruit class
+## CPUE calc --------------
+##### By Pot -------------------------------
+# Now summarize by pot - remember to keep areas seperate.
+# need Number of Specimens by recruit class
+# keep trip no. to merge with historic data 
 dat1 %>%
   group_by(Year, Location, Trip.No, Pot.No, Density.Strata.Code, Recruit.Status) %>%
   summarise(crab = sum(Number.Of.Specimens)) -> dat2
@@ -98,7 +103,7 @@ dat5 %>%
 CPUE_wt
 # check to confirm last years CPUEs match - that's why we use two years.
 # change name and folder for each area
-write.csv(CPUE_wt, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/PB_CPUE_',cur_yr, '.csv'), 
+write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/PB_CPUE_',cur_yr, '.csv'), 
           row.names = FALSE)
 
 # weighted cpue by strata --- just for comparison
@@ -143,7 +148,7 @@ dat6 %>%
 CPUE_ALL_YEARS <- rbind(historicdata, dat5_cur_yr)
 # this is the final file by pot.  Now this file can be summarized to give CPUE by year like above (see dat 5 to CPUE_wt_JNU_2016)
 # change same of folder and file.
-write.csv(CPUE_ALL_YEARS, paste0('./results/redcrab/', survey.location, '/', 
+write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', survey.location, '/', 
                                  cur_yr, '/PB_perpot_all_', cur_yr,'.csv'), 
           row.names = FALSE)
 
@@ -153,7 +158,7 @@ write.csv(CPUE_ALL_YEARS, paste0('./results/redcrab/', survey.location, '/',
 CPUE_ALL_YEARS %>%
   filter(Year >= cur_yr - 3) -> bypot_st # short term file has last 4 years in it
 
-#function creates output file in folder /results/redcrab/'area'
+#function creates output file in folder /results/rkc/'area'
 short_t(bypot_st, cur_yr, "Pybus")
 # output is saved as shortterm.csv
 bypot_st_long <- gather(bypot_st, recruit.status, crab, Missing:Small.Females, factor_key = TRUE) 
@@ -237,7 +242,7 @@ poor_clutch(largef_all, 'Pybus', cur_yr)
 #     and poorclutch_17.csv which has the percentage and SD of poor clutches for current year 
 
 ##### Long term females -------------------------
-poorclutch_current <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_current <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                       '/poorclutch1_current.csv'))
 # bring in output from function above with the current years pots. 
 glimpse(poorclutch_current)
@@ -249,7 +254,7 @@ poor_clutch_long(poorclutch_current, 'Pybus', cur_yr)
 #look at trend for the last 4 years.  Need a file with last four years in it - females from above
 # input data the first time (2016) and then add to it.
 # save this file here for future years
-poorclutch_all <- read.csv(paste0('./results/redcrab/', survey.location, '/', cur_yr,
+poorclutch_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/poorclutch_all.csv'))
 
 #function for short term trends and output saving.
@@ -279,7 +284,7 @@ dat5 %>%
   right_join(raw_samp) %>% 
   as.data.frame() -> raw_samp
 
-write.csv(raw_samp, paste0('./results/redcrab/', survey.location, '/', cur_yr, '/raw_sample.csv'))
+write.csv(raw_samp, paste0('./results/rkc/', survey.location, '/', cur_yr, '/raw_sample.csv'))
 
 
 ### stock assessment figures --------------
@@ -295,7 +300,7 @@ CPUE_ALL_YEARS %>%
 CPUE_wt_all  
 CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
 
-write.csv(CPUE_wt_from93, paste0('results/redcrab/', survey.location, '/', 
+write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
                                  cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
 ### note !!! need to update bimoass.csv file with 2018 CSA estiamte before running 
@@ -332,7 +337,7 @@ LgF_dat1 %>%
          Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
 
 largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
-write.csv(largef_all, (paste0('./results/redcrab/', survey.location, '/', cur_yr, '/', 
+write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
                               'largef_all.csv')))
 
 
