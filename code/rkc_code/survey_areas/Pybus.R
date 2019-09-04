@@ -47,8 +47,6 @@ dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
-# one female here that don't have recruit status due to no lengths
-## 2019 ** FIX ** pot 5 doesn't have a density strata code
 
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
@@ -61,17 +59,15 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
 dat1 %>%
   group_by(Year, Location, Trip.No, Pot.No, Density.Strata.Code, Recruit.Status) %>%
   summarise(crab = sum(Number.Of.Specimens)) -> dat2
-# keep trip no to merge with historic data.
 
 dat3 <- dcast(dat2, Year + Location + Trip.No + Pot.No +Density.Strata.Code ~ Recruit.Status, sum, drop=TRUE)
-
 head(dat3)# check to make sure things worked.
 
 # Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has it's own area file or area per
 #     strata.  This is used to calculating the weighting for weighted CPUE.
 dat3 %>%
   right_join(area) -> tab
-#Calculates the number of pots per strata.  
+# Calculates the number of pots per strata.  
 tab %>%
   group_by(Year, Location, Density.Strata.Code) %>%
   summarise(npots  = length(Pot.No)) -> pots_per_strata
@@ -80,7 +76,6 @@ tab %>%
 ##### Weighted CPUE current year -----------------------------------
 # the weighting is the product of the area for each strata and the inverse (1/n) of the number of pots per strata per year
 # need to combine data sets to accomplish this.
-
 tab %>%
   right_join(pots_per_strata) -> dat4
 
@@ -90,8 +85,8 @@ dat5 %>%
   rename(Missing = Var.6, Large.Females = `Large Females`, Small.Females = `Small Females`) -> dat5
 # this is neccessary so that current years file (dat5) matches the historic file names
 
-#This version is ready to calculate CPUE for each recruit class
-#Calculates a weighted mean CPUE and SE for each recruit class
+# This version is ready to calculate CPUE for each recruit class
+# Calculates a weighted mean CPUE and SE for each recruit class
 dat5 %>%
   group_by(Year) %>%
   summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
@@ -102,7 +97,6 @@ dat5 %>%
             SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt
 CPUE_wt
 # check to confirm last years CPUEs match - that's why we use two years.
-# change name and folder for each area
 write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/PB_CPUE_',cur_yr, '.csv'), 
           row.names = FALSE)
 
@@ -116,8 +110,10 @@ dat5 %>%
             MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
             SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/
                                                                           (sqrt(sum(!is.na(Small.Females)))))) 
+# look at results to see the spread between stratas...in high biomass years even low strata 1,2 had higher CPUE. >1 or 2
 
-#### survey mid date -----
+#### survey mid date -----  
+#  ** fix **  make this calculated from data not just visual
 head(dat)
 unique(dat$Time.Hauled)
 # need to seperate time hauled to just have data hauled look for mid-date 
@@ -125,23 +121,22 @@ dat %>% filter(Year == cur_yr)  # 7-25
 
 
 ##### Historic file ---------------------------------------
-# need to add current years CPUE to the historic CPUE file.  For simplicity reasons this will be inputed for each of the bays.  This will avoid
+# need to add current years pot summary to the historic pot summary file.  
+# For simplicity reasons this will be inputed for each of the bays.  This will avoid
 # any issues with recalculating the crab per pot due to edits in data.
 # read in historic by pot file and make sure variable names match
-
-head(histdat) # see if any columns don't match those in dat5 - why doesn't historic have npots?
-# new historic data has density strata as "Strata.Code"
-
+head(histdat)
 head(dat5)
 
-histdat %>% select(Year, Location, Trip.No, Pot.No, Strata.Code, Missing, 
+histdat %>% 
+  select(Year, Location, Trip.No, Pot.No, Strata.Code, Missing, 
                    Juvenile, Large.Females, Post_Recruit, Pre_Recruit, 
                    Recruit, Small.Females, Area, npots, inverse_n, 
                    weighting) -> historicdata
-dat5 %>% rename(Strata.Code = Density.Strata.Code) -> dat6
+dat5 %>% 
+  dplyr::rename(Strata.Code = Density.Strata.Code) -> dat6
 
 # need to add current year to historicdata file
-# Locations in historic file are numbers.  Here I have names, should I change this?
 # only current years
 dat6 %>%
   filter(Year == cur_yr) -> dat5_cur_yr
@@ -152,7 +147,8 @@ write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/', survey.location, '/',
                                  cur_yr, '/PB_perpot_all_', cur_yr,'.csv'), 
           row.names = FALSE)
 
-##### Short term trends -------------------------------------
+## Trends - short and long and female stats for stock health weighting ---------------
+### Short term trends -------------------
 #look at trend for the last 4 years.  Need a file with last four years 
 
 CPUE_ALL_YEARS %>%
@@ -163,37 +159,6 @@ short_t(bypot_st, cur_yr, "Pybus")
 # output is saved as shortterm.csv
 bypot_st_long <- gather(bypot_st, recruit.status, crab, Missing:Small.Females, factor_key = TRUE) 
 ggplot(bypot_st_long, aes(Year,crab)) +geom_point() +facet_wrap(~recruit.status)
-
-### short term plots----------------
-plot(BYPOT_ST$Year, BYPOT_ST$Juvenile)
-Juv_fit <-lm(Juvenile ~ Year, data = BYPOT_ST, weights = weighting)
-abline(Juv_fit, col= 'red')
-summary(Juv_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Large.Females)
-Lfem_fit <-lm(Large.Females ~ Year, data = BYPOT_ST, weights = weighting)
-abline(Lfem_fit, col= 'red')
-summary(Lfem_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Post_Recruit)
-PR_fit <-lm(Post_Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(PR_fit, col= 'red')
-summary(PR_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Pre_Recruit)
-PreR_fit <-lm(Pre_Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(PreR_fit, col= 'red')
-summary(PreR_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Recruit)
-R_fit <-lm(Recruit ~ Year, data = BYPOT_ST, weights = weighting)
-abline(R_fit, col= 'red')
-summary(R_fit)
-
-plot(BYPOT_ST$Year, BYPOT_ST$Small.Females)
-smF_fit <-lm(Small.Females ~ Year, data = BYPOT_ST, weights = weighting)
-abline(smF_fit, col= 'red')
-summary(smF_fit)
 
 ##### Long term trends ---------------------
 #compare current year CPUE distribution to the long term mean
