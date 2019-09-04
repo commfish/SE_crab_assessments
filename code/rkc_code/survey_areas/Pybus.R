@@ -162,7 +162,7 @@ ggplot(bypot_st_long, aes(Year,crab)) +geom_point() +facet_wrap(~recruit.status)
 
 ##### Long term trends ---------------------
 #compare current year CPUE distribution to the long term mean
-dat5_cur_yr
+head(dat5_cur_yr)
 #make sure you have a file with only current years data - created above
 
 long_t(dat5_cur_yr, baseline, cur_yr, 'Pybus', 'Pybus')
@@ -178,7 +178,7 @@ glimpse(dat1) # raw data for both 2016 and 2017
 weights(dat1, 3.06, 7.383, "Pybus", cur_yr)
 # output saved as maleweights.csv
 
-##### Females - large or mature females --------------------------
+##### Females --------------------------
 # large or mature females
 dat1 %>%
   filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> LgF_dat1
@@ -186,22 +186,20 @@ dat1 %>%
 # if these rows have a egg. development code and egg condition code then the egg percentage should be there
 # if developement = 3 and condition is 4 or 5 then egg percentage should be 0.
 LgF_dat1[is.na(LgF_dat1$Egg.Percent),]
+# need to change these to 0 if applicable. 
 #LgF_dat1 %>%
-# mutate(Egg.Percent =ifelse(is.na(Egg.Percent), 0, Egg.Percent)) -> LgF_dat1
-#need to remove if missing data
-#LgF_dat1 %>%
-#  filter(!is.na(Egg.Percent)) -> LgF_dat1
+#  mutate(Egg.Percent =ifelse(is.na(Egg.Percent), 0, Egg.Percent)) -> LgF_dat1
 LgF_dat1 %>% 
   filter(Year == cur_yr) %>% 
   select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
          Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
          Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_curyr
 
-#largef_all <- rbind(females, LgF_dat1_curyr) # raw female data for all years.
-# use this next year, 2018 file created below to bring in historic years
+largef_all <- rbind(females, LgF_dat1_curyr) # raw female data for all years.
+write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
+                              'largef_all.csv')))
 
 ##### % poor (<10 %) clutch -----------------------------------
-
 poor_clutch(largef_all, 'Pybus', cur_yr)
 # output is saved as poorclutch_current.csv - which has all pots for current year
 #     and poorclutch_17.csv which has the percentage and SD of poor clutches for current year 
