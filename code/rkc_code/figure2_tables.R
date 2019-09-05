@@ -1,25 +1,24 @@
+# K.Palof
+# katie.palof@alaska.gov
+# 08/03/2018 / 9-4-19
+
 # notes ----
 # This script is a work in progress to develop figures like those currently used to view the 
 #     stock health of crab species in Southeast.  Current figures are in SigmaPlot. 
 #     Figure 2 is regional biomass from CSA estimate - use current year's model
 
-# K.Palof
-# katie.palof@alaska.gov
-# 08/03/2018
-
-rm(list = ls())# clear workspace - helpful when jumping between files 
 # load -----
 source('./code/functions.R')
 
 # data -----
-cur_yr <- 2018
-mr_adjust <- read.csv('./data/redcrab/adj_final_stock_assessment.csv')
-fishery.status <- read.csv('./data/redcrab/Juneau/hind_fore_cast_2018.csv') # has fishery status
+cur_yr <- 2019
+mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
+fishery.status <- read.csv('./data/rkc/Juneau/hind_fore_cast_JNU_current.csv') # has fishery status
 #                     may want to save this information somewhere else in the future
-biomass <- read.csv("./data/redcrab/biomass.csv") 
+biomass <- read.csv("./data/rkc/biomass.csv") 
 # file for all locations.  Has legal and mature biomass from current year CSA & harvest
 # mr adjustments can be made in the function using mr_adjust file.
-exploit_rate <- read.csv("./data/redcrab/table3.csv")
+exploit_rate <- read.csv("./data/rkc/table3.csv")
 
 ## clean up figure 2-------
 # add in mr adjustments
@@ -33,7 +32,7 @@ biomass %>%
                             legal.biomass*weighted_ADJ), 
          adj.mature = ifelse(Location == "Juneau", mature.biomass, 
                             mature.biomass*weighted_ADJ))-> biomass
-write.csv(biomass, paste0('./results/redcrab/biomass_', cur_yr, '.csv'))
+write.csv(biomass, paste0('./results/rkc/biomass_', cur_yr, '.csv'))
 # use these values for Table A2 in stock health document
 
 # regional biomass ----
@@ -44,15 +43,16 @@ biomass %>%
   as.data.frame() -> regional.b
 fishery.status %>% 
   select(Year = year, status) %>% 
-  mutate(status = ifelse(status == "PU only", "closed", as.character(status))) %>% 
+  mutate(status = ifelse(status == "PU only", "closed", as.character(status))) -> fishery.status.update
   # add next line to deal with current year which is TBD in file but will most 
   # likely be closed in current year (2018)
-  mutate(status = ifelse(status == "TBD", "closed", as.character(status)))-> fishery.status.update
+  # %>% mutate(status = ifelse(status == "TBD", "closed", as.character(status))) -> fishery.status.update
+   
 
 
 regional.b %>% 
   left_join(fishery.status.update) -> regional.b
-write.csv(regional.b, paste0('./results/redcrab/regional_biomass_', cur_yr, '.csv'))
+write.csv(regional.b, paste0('./results/rkc/regional_biomass_', cur_yr, '.csv'))
 # use these values for table A1 in stock health document 
 
 # change in biomass estimation ----
@@ -113,7 +113,7 @@ regional.b %>%
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_CSA, aes(x = st_yr, y = pounds, label = label), 
           hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
-  ggsave(paste0('./figures/redcrab/CSAregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/CSAregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 # Figure 2 TBD regional biomass M/R adjusted biomass---------
@@ -149,7 +149,7 @@ regional.b %>%
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
             hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
-  ggsave(paste0('./figures/redcrab/MRregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/MRregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 # Figure 2 **CLOSED** regional biomass M/R adjusted biomass---------
 # should have 2018 model with longterm baselines (1993-2007) and closure status. 
@@ -184,7 +184,7 @@ regional.b %>%
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
             hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
-  ggsave(paste0('./figures/redcrab/MRregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/MRregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 
@@ -247,7 +247,7 @@ biomass %>%
   select(-weighted_ADJ) %>% 
   bind_rows(regional_totals) %>% 
   left_join(equ_rate) %>% 
-  write.csv(paste0('./results/redcrab/regional_', cur_yr, '.csv'), row.names = FALSE) -> biomass_rate
+  write.csv(paste0('./results/rkc/regional_', cur_yr, '.csv'), row.names = FALSE) -> biomass_rate
 
 # Table 3 - bioamss, adj, Equ.er.adj -----------
 #biomass_rate %>% 
