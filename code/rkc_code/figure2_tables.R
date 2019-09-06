@@ -32,7 +32,7 @@ biomass %>%
                             legal.biomass*weighted_ADJ), 
          adj.mature = ifelse(Location == "Juneau", mature.biomass, 
                             mature.biomass*weighted_ADJ))-> biomass
-write.csv(biomass, paste0('./results/rkc/biomass_', cur_yr, '.csv'))
+write.csv(biomass, paste0('./results/rkc/Region1/', cur_yr, '/biomass_', cur_yr, '.csv'))
 # use these values for Table A2 in stock health document
 
 # regional biomass ----
@@ -50,7 +50,7 @@ fishery.status %>%
    
 regional.b %>% 
   left_join(fishery.status.update) -> regional.b
-write.csv(regional.b, paste0('./results/rkc/regional_biomass_', cur_yr, '.csv'))
+write.csv(regional.b, paste0('./results/rkc/Region1/', cur_yr, '/regional_biomass_', cur_yr, '.csv'))
 # use these values for table A1 in stock health document 
 
 # change in biomass estimation ----
@@ -59,7 +59,19 @@ regional.b %>%
   gather(type, pounds, legal:adj_mature, factor_key = TRUE) %>% 
   select(-status) %>% 
   spread(key = Year, value = pounds) %>% 
-  mutate(change = (`2019`-`2018`)/`2018`) # report these values in stock health doc
+  mutate(change = 100*(`2019`-`2018`)/`2018`) -> change# report these values in stock health doc
+write.csv(change, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_regional_biomass_', cur_yr, '.csv'))
+# these values go in regional overview section, other values from last years forecast
+#     come from excel sheet "Figure 1, table 2019"
+
+biomass %>% 
+  filter(Year > cur_yr-2) %>% 
+  select(-harvest, -weighted_ADJ) %>% 
+  gather(type, pounds, legal.biomass:adj.mature, factor_key = TRUE) %>% 
+  spread(key = Year, value = pounds) %>% 
+  mutate(change = 100*(`2019`-`2018`)/`2018`) -> change2
+write.csv(change2, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_area_biomasses_', cur_yr, '.csv'))
+#
 
 # baseline ---
 # 1993 - 2007 
@@ -111,7 +123,7 @@ regional.b %>%
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_CSA, aes(x = st_yr, y = pounds, label = label), 
           hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
-  ggsave(paste0('./figures/rkc/CSAregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/', cur_yr, '/CSAregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 # Figure 2 TBD regional biomass M/R adjusted biomass---------
@@ -147,7 +159,7 @@ regional.b %>%
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
             hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
-  ggsave(paste0('./figures/rkc/MRregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/', cur_yr, '/MRregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 # Figure 2 **CLOSED** regional biomass M/R adjusted biomass---------
 # should have 2018 model with longterm baselines (1993-2007) and closure status. 
@@ -245,7 +257,7 @@ biomass %>%
   select(-weighted_ADJ) %>% 
   bind_rows(regional_totals) %>% 
   left_join(equ_rate) %>% 
-  write.csv(paste0('./results/rkc/regional_', cur_yr, '.csv'), row.names = FALSE) -> biomass_rate
+  write.csv(paste0('./results/rkc/Region1/', cur_yr, '/regional_', cur_yr, '.csv'), row.names = FALSE) -> biomass_rate
 
 # Table 3 - bioamss, adj, Equ.er.adj -----------
 #biomass_rate %>% 
@@ -265,7 +277,7 @@ files <- c(paste0(here::here(),"/results/rkc/Pybus/", cur_yr, "/raw_sample.csv")
            paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/raw_sample.csv"), 
            paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/raw_sample.csv"), 
            paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/raw_sample.csv"))
-files <- files[2:7]
+#files <- files[2:7]
 raw_samp <- files %>%
   map(read.csv) %>%    # read in all the files individually, using
   # the function read_csv() from the readr package
