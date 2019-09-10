@@ -396,12 +396,14 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   
   # Figure panel -----
   #### F1a mature male plot -----------
-  p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class))+ 
+  p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
     geom_point(aes(colour = recruit.class, shape = recruit.class, 
                    fill = recruit.class), size =3) +
     geom_line(aes(group = recruit.class, colour = recruit.class))+
-    scale_colour_manual(name = "", values = c("grey1", "grey65", "grey34"))+
-    scale_fill_manual(name = "", values = c("grey1", "grey65", "grey34")) +
+    #scale_colour_manual(name = "", values = c("grey1", "grey65", "grey34"))+
+    #scale_fill_manual(name = "", values = c("grey1", "grey65", "grey34")) +
+    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
+    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
     scale_shape_manual(name = "", values = c(15, 16, 17))+
     scale_y_continuous(breaks = seq(min(0),max((max(males_graph$mean) + max(males_graph$se))), by = 1)) + # change to have more tick marks
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
@@ -410,11 +412,16 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     ggtitle(survey.location) + ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-    geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
-                  width =.4) +
-    geom_hline(yintercept = baseline2$Pre_Recruit, color = "grey65")+
-    geom_hline(yintercept = baseline2$Recruit, color = "grey34")+
-    geom_hline(yintercept = baseline2$Post_Recruit, color = "black")+
+    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+                alpha = 0.2) +
+    #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
+    #              width =.4) +
+    geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", 
+               linetype = "dotdash", lwd = 1)+
+    geom_hline(yintercept = baseline2$Recruit, color = "#56B4E9", 
+               linetype = "longdash", lwd = 1)+
+    geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
+               lwd = 1)+
     theme(legend.position = c(0.8,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"), 
@@ -422,22 +429,27 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   
 
   ### F1b females/juvenile plot ---------------
-  p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class))+ 
+  p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
     geom_point(aes(color = recruit.class, shape = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c("grey34","grey62", "grey1"))+
+    #scale_colour_manual(name = "", values = c("grey34","grey62", "grey1"))+
     scale_shape_manual(name = "", values = c(17, 16, 15))+
-    
+    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
+    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
     #ylim(0,25) + 
     scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-    geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
-                  width =.4) +
-    geom_hline(yintercept = baseline2$Juvenile, color = "grey62")+
-    geom_hline(yintercept = baseline2$Small.Female, color = "grey34")+
-    geom_hline(yintercept = baseline2$Large.Female, color = "black")+
+    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+                alpha = 0.2) +
+    #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
+    #              width =.4) +
+    geom_hline(yintercept = baseline2$Juvenile, color = "#E69F00", 
+               linetype = "dotdash", lwd = 1)+
+    geom_hline(yintercept = baseline2$Small.Female, color = "#999999", 
+               linetype = "longdash", lwd = 1)+
+    geom_hline(yintercept = baseline2$Large.Female, color = "#56B4E9")+
     theme(legend.position = c(0.7,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"))
