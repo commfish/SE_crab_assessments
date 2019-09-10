@@ -166,7 +166,8 @@ regional.b %>%
 #   also show 2018 forecast as distinct from model output
 regional.b %>% 
   select(Year, adj_legal, adj_mature, status) %>%
-  gather(type, pounds, adj_legal:adj_mature, factor_key = TRUE) %>% 
+  gather(type, pounds, adj_legal:adj_mature, factor_key = TRUE) %>%
+  mutate(status = replace(status, which(status == "TBD"), "closed")) %>% # can replace the TBD with open or closed
   ggplot(aes(Year, pounds, group = type)) +
   geom_line(aes(colour = type, group = type, linetype = type))+
   geom_point(aes(colour = type, shape = status, fill = type), size =3) +
