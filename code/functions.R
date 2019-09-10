@@ -382,6 +382,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     mutate(adj.legal = legal.biomass*weighted_ADJ, 
            adj.mature = mature.biomass*weighted_ADJ) -> biomass
   
+  if(survey.location != "Juneau") {
   biomass %>% 
     select(-weighted_ADJ, -legal.biomass, -mature.biomass) %>% 
     gather(type, pounds, harvest:adj.mature, factor_key = TRUE) %>% 
@@ -389,10 +390,24 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     filter(Year >= 1993) -> biomass_graph
   
   biomass_graph %>% 
-    filter(Year <= 2007) %>% 
-    spread(type, pounds) %>% 
-    summarise(mature_adj_mean = mean(adj.mature), 
-              legal_adj_mean = mean(adj.legal)) -> baseline_means
+      filter(Year <= 2007) %>% 
+      spread(type, pounds) %>% 
+      summarise(mature_adj_mean = mean(adj.mature), 
+                legal_adj_mean = mean(adj.legal)) -> baseline_means
+  }
+  
+  if(survey.location == "Juneau"){
+    biomass %>% 
+      select(-weighted_ADJ, -adj.legal, -adj.mature) %>% 
+      gather(type, pounds, harvest:mature.biomass, factor_key = TRUE) %>% 
+      filter(Location == survey.location) %>% 
+      filter(Year >= 1993) -> biomass_graph
+    biomass_graph %>% 
+      filter(Year <= 2007) %>% 
+      spread(type, pounds) %>% 
+      summarise(mature_mean = mean(mature.biomass), 
+                legal_mean = mean(legal.biomass)) -> baseline_means
+  }
   
   # Figure panel -----
   #### F1a mature male plot -----------
@@ -417,11 +432,11 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
     #              width =.4) +
     geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", 
-               linetype = "dotdash", lwd = 1)+
+               linetype = "dotdash", lwd = 0.75)+
     geom_hline(yintercept = baseline2$Recruit, color = "#56B4E9", 
-               linetype = "longdash", lwd = 1)+
+               linetype = "longdash", lwd = 0.75)+
     geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
-               lwd = 1)+
+               lwd = 0.75)+
     theme(legend.position = c(0.8,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"), 
@@ -446,9 +461,9 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
     #              width =.4) +
     geom_hline(yintercept = baseline2$Juvenile, color = "#E69F00", 
-               linetype = "dotdash", lwd = 1)+
+               linetype = "dotdash", lwd = 0.75)+
     geom_hline(yintercept = baseline2$Small.Female, color = "#999999", 
-               linetype = "longdash", lwd = 1)+
+               linetype = "longdash", lwd = 0.75)+
     geom_hline(yintercept = baseline2$Large.Female, color = "#56B4E9")+
     theme(legend.position = c(0.7,0.8), 
           axis.text = element_text(size = 12), 
@@ -487,7 +502,9 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     p3 = p3 + xlab("Year")
   }
   
+  
   ### biomass harvest graph --------------
+  if(survey.location != "Juneau"){
   p4 <- ggplot(biomass_graph, aes(Year, pounds, group = type))+ 
     geom_point(aes(color = type, shape = type), size =3) +
     geom_line(aes(color = type, group = type, linetype = type))+
@@ -509,10 +526,34 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     geom_hline(data = baseline_means, aes(yintercept = mature_adj_mean), 
                color = "grey55", linetype = "dashed")
   if(scale == 1){
-    p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1400000),
-                  breaks= seq(min(0), max(1400000), by = 50000), oob = rescale_none)
+    p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1600000),
+                  breaks= seq(min(0), max(1600000), by = 150000), oob = rescale_none)
   }
-
+  }
+  
+  if(survey.location == "Juneau"){
+    p4 <- ggplot(biomass_graph, aes(Year, pounds, group = type))+ 
+      geom_point(aes(color = type, shape = type), size =3) +
+      geom_line(aes(color = type, group = type, linetype = type))+
+      scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
+      scale_shape_manual(name = "", values = c(1, 18, 32))+
+      scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
+      ylab("Biomass (lbs)") + 
+      xlab("Year") +
+      theme(plot.title = element_text(hjust =0.5)) + 
+      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
+                                                          na.rm = TRUE) + 25000),
+                         breaks= seq(min(0), max(max(biomass_graph$pounds, 
+                                                     na.rm = TRUE)+25000), by = 50000)) +
+      theme(legend.position = c(0.8,0.9), 
+            axis.text = element_text(size = 12), 
+            axis.title=element_text(size=14,face="bold")) + 
+      geom_hline(data = baseline_means, aes(yintercept = legal_mean), color = "grey1")+
+      geom_hline(data = baseline_means, aes(yintercept = mature_mean), 
+                 color = "grey55", linetype = "dashed")
+  }
+  
   ### FINAL plot -------------
   #png(paste0('./figures/redcrab/', survey.location, '_', cur_yr, '.png'), res= 600, 
   #    width = 8, height =11, units = "in")
