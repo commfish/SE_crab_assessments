@@ -379,18 +379,19 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   
   biomass %>% 
     left_join(mr_adjust2) %>% 
-    mutate(adj.legal = legal.biomass*weighted_ADJ) -> biomass
+    mutate(adj.legal = legal.biomass*weighted_ADJ, 
+           adj.mature = mature.biomass*weighted_ADJ) -> biomass
   
   biomass %>% 
-    select(-weighted_ADJ) %>% 
-    gather(type, pounds, harvest:adj.legal, factor_key = TRUE) %>% 
+    select(-weighted_ADJ, -legal.biomass, -mature.biomass) %>% 
+    gather(type, pounds, harvest:adj.mature, factor_key = TRUE) %>% 
     filter(Location == survey.location) %>% 
     filter(Year >= 1993) -> biomass_graph
   
   biomass_graph %>% 
     filter(Year <= 2007) %>% 
     spread(type, pounds) %>% 
-    summarise(legal_mean = mean(legal.biomass), 
+    summarise(mature_adj_mean = mean(adj.mature), 
               legal_adj_mean = mean(adj.legal)) -> baseline_means
   
   # Figure panel -----
@@ -478,10 +479,10 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   p4 <- ggplot(biomass_graph, aes(Year, pounds, group = type))+ 
     geom_point(aes(color = type, shape = type), size =3) +
     geom_line(aes(color = type, group = type, linetype = type))+
-    scale_colour_manual(name = "", values = c("grey1", "grey1", "grey48", "grey62"))+
-    scale_shape_manual(name = "", values = c(1, 18, 32, 18))+
-    scale_linetype_manual(name = "", values = c("blank", "solid", "solid", "dashed")) +
-    ylab("Legal biomass (lbs)") + 
+    scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
+    scale_shape_manual(name = "", values = c(1, 18, 32))+
+    scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
+    ylab("Biomass (lbs)") + 
     xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
@@ -492,8 +493,9 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     theme(legend.position = c(0.8,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) + 
-    geom_hline(data = baseline_means, aes(yintercept = legal_mean), color = "grey1")+
-    geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey62", linetype = "dashed")
+    geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey1")+
+    geom_hline(data = baseline_means, aes(yintercept = mature_adj_mean), 
+               color = "grey55", linetype = "dashed")
   if(scale == 1){
     p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1400000),
                   breaks= seq(min(0), max(1400000), by = 50000), oob = rescale_none)
