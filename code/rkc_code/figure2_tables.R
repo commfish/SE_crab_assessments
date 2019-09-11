@@ -195,7 +195,7 @@ regional.b %>%
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
             hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
-  ggsave(paste0('./figures/rkc/MRregional_biomass2', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/', cur_yr, '/MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 
