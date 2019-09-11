@@ -700,7 +700,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     mutate(harvest = ifelse(confidential == "no", harvest, 'na')) %>% 
     mutate(harvest = as.numeric(harvest)) %>% 
     select(-weighted_ADJ, -permits, -confidential, -legal.biomass, -mature.biomass) %>% 
-    gather(type, pounds, harvest:adj.legal, factor_key = TRUE) %>% 
+    gather(type, pounds, harvest:adj.mature, factor_key = TRUE) %>% 
     filter(Location == survey.location)  -> biomass_graph
   
   biomass_graph %>% 
@@ -819,28 +819,54 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   }
   
   ### biomass harvest graph --------------
-  p4 <- ggplot(biomass_graph, aes(Year, pounds, group = type))+ 
-    geom_point(aes(color = type, shape = type), size =3) +
-    geom_line(aes(color = type, group = type, linetype = type))+
-    scale_colour_manual(name = "", values = c("grey1", "grey1", "grey48", "grey62"))+
-    scale_shape_manual(name = "", values = c(1, 18, 32, 18))+
-    scale_linetype_manual(name = "", values = c("blank", "solid", "solid", "dashed")) +
-    ylab("Legal biomass (lbs)") + 
-    xlab("Year") +
-    theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-    scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
-                                                        na.rm = TRUE) + 25000),
-                       breaks= seq(min(0), max(max(biomass_graph$pounds, 
-                                                   na.rm = TRUE)+25000), by = 50000)) +
-    theme(legend.position = c(0.8,0.8), 
-          axis.text = element_text(size = 12), 
-          axis.title=element_text(size=14,face="bold")) + 
-    geom_hline(data = baseline_means, aes(yintercept = legal_mean), color = "grey1")+
-    geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey62", linetype = "dashed")
-  if(scale == 1){
-    p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1400000),
-                                 breaks= seq(min(0), max(1400000), by = 50000), oob = rescale_none)
+  if(survey.location != "Juneau"){
+    p4 <- ggplot(biomass_graph, aes(Year, pounds, group = type))+ 
+      geom_point(aes(color = type, shape = type), size =3) +
+      geom_line(aes(color = type, group = type, linetype = type))+
+      scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
+      scale_shape_manual(name = "", values = c(1, 18, 32))+
+      scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
+      ylab("Biomass (lbs)") + 
+      xlab("Year") +
+      theme(plot.title = element_text(hjust =0.5)) + 
+      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
+                                                          na.rm = TRUE) + 25000),
+                         breaks= seq(min(0), max(max(biomass_graph$pounds, 
+                                                     na.rm = TRUE)+25000), by = 50000)) +
+      theme(legend.position = c(0.8,0.8), 
+            axis.text = element_text(size = 12), 
+            axis.title=element_text(size=14,face="bold")) + 
+      geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey1")+
+      geom_hline(data = baseline_means, aes(yintercept = mature_adj_mean), 
+                 color = "grey55", linetype = "dashed")
+    if(scale == 1){
+      p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1600000),
+                                   breaks= seq(min(0), max(1600000), by = 150000), oob = rescale_none)
+    }
+  }
+  
+  if(survey.location == "Juneau"){
+    p4 <- ggplot(biomass_graph, aes(Year, pounds, group = type))+ 
+      geom_point(aes(color = type, shape = type), size =3) +
+      geom_line(aes(color = type, group = type, linetype = type))+
+      scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
+      scale_shape_manual(name = "", values = c(1, 18, 32))+
+      scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
+      ylab("Biomass (lbs)") + 
+      xlab("Year") +
+      theme(plot.title = element_text(hjust =0.5)) + 
+      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
+                                                          na.rm = TRUE) + 25000),
+                         breaks= seq(min(0), max(max(biomass_graph$pounds, 
+                                                     na.rm = TRUE)+25000), by = 50000)) +
+      theme(legend.position = c(0.8,0.9), 
+            axis.text = element_text(size = 12), 
+            axis.title=element_text(size=14,face="bold")) + 
+      geom_hline(data = baseline_means, aes(yintercept = legal_mean), color = "grey1")+
+      geom_hline(data = baseline_means, aes(yintercept = mature_mean), 
+                 color = "grey55", linetype = "dashed")
   }
   
   ### FINAL plot -------------
@@ -858,7 +884,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
                 panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
                 ifelse(option == 3, 
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/redcrab/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/rkc/',cur_yr, '/non_conf/', survey.location, '_', cur_yr, '_', 
                 option, 'non_conf.png'), panel,  
          dpi = 800, width = 8, height = 9.5)
 }
