@@ -585,7 +585,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   # Option 3 - p2,p3 (females), 
   # scale - created for Seymour Canal scaling issues
   CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
-                                   '/cpue_wt_all_yrs.csv'))
+                                   '/cpue_wt_since_93.csv'))
   poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
                                         '/', cur_yr, '/poorclutch_summary_all.csv'))
   egg_mean_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
@@ -689,34 +689,53 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   
   biomass %>% 
     left_join(mr_adjust2) %>% 
-    mutate(adj.legal = legal.biomass*weighted_ADJ) %>% 
+    mutate(adj.legal = legal.biomass*weighted_ADJ, 
+           adj.mature = mature.biomass*weighted_ADJ) %>% 
     left_join(conf_summary) %>% 
     mutate(confidential = replace_na(confidential, 'no'))-> biomass
-  
+ 
+ if(survey.location != "Juneau") {
   biomass %>% 
     filter(Year >= 1993) %>% 
     mutate(harvest = ifelse(confidential == "no", harvest, 'na')) %>% 
     mutate(harvest = as.numeric(harvest)) %>% 
-    select(-weighted_ADJ, -permits, -confidential) %>% 
+    select(-weighted_ADJ, -permits, -confidential, -legal.biomass, -mature.biomass) %>% 
     gather(type, pounds, harvest:adj.legal, factor_key = TRUE) %>% 
     filter(Location == survey.location)  -> biomass_graph
   
   biomass_graph %>% 
     filter(Year <= 2007) %>% 
     spread(type, pounds) %>% 
-    summarise(legal_mean = mean(legal.biomass), 
+    summarise(mature_adj_mean = mean(adj.mature), 
               legal_adj_mean = mean(adj.legal)) -> baseline_means
+ }
   
+  if(survey.location == "Juneau"){
+    biomass %>% 
+      filter(Year >= 1993) %>% 
+      mutate(harvest = ifelse(confidential == "no", harvest, 'na')) %>% 
+      mutate(harvest = as.numeric(harvest)) %>% 
+      select(-weighted_ADJ, -permits, -confidential, -adj.legal, -adj.mature) %>% 
+      gather(type, pounds, harvest:mature.biomass, factor_key = TRUE) %>% 
+      filter(Location == survey.location)  -> biomass_graph
+    biomass_graph %>% 
+      filter(Year <= 2007) %>% 
+      spread(type, pounds) %>% 
+      summarise(mature_mean = mean(mature.biomass), 
+                legal_mean = mean(legal.biomass)) -> baseline_means
+  }
   
   
   # Figure panel -----
   #### F1a mature male plot -----------
-  p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class))+ 
+  p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
     geom_point(aes(colour = recruit.class, shape = recruit.class, 
                    fill = recruit.class), size =3) +
     geom_line(aes(group = recruit.class, colour = recruit.class))+
-    scale_colour_manual(name = "", values = c("grey1", "grey65", "grey34"))+
-    scale_fill_manual(name = "", values = c("grey1", "grey65", "grey34")) +
+    #scale_colour_manual(name = "", values = c("grey1", "grey65", "grey34"))+
+    #scale_fill_manual(name = "", values = c("grey1", "grey65", "grey34")) +
+    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
+    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
     scale_shape_manual(name = "", values = c(15, 16, 17))+
     scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
                        oob = rescale_none) +
@@ -724,34 +743,44 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     ggtitle(survey.location) + ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-    geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
-                  width =.4) +
-    geom_hline(yintercept = baseline2$Pre_Recruit, color = "grey65")+
-    geom_hline(yintercept = baseline2$Recruit, color = "grey34")+
-    geom_hline(yintercept = baseline2$Post_Recruit, color = "black")+
+    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+                alpha = 0.2) +
+    #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
+    #              width =.4) +
+    geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", 
+               linetype = "dotdash", lwd = 0.75) +
+    geom_hline(yintercept = baseline2$Recruit, color = "#56B4E9", 
+               linetype = "longdash", lwd = 0.75) +
+    geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
+               lwd = 0.75) +
     theme(legend.position = c(0.8,0.8), 
           axis.text = element_text(size = 12), 
-          axis.title=element_text(size=14,face="bold"), 
+          axis.title=element_text(size = 14,face="bold"), 
           plot.title = element_text(size = 24))
   
   
   ### F1b females/juvenile plot ---------------
-  p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class))+ 
+  p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
     geom_point(aes(color = recruit.class, shape = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c("grey34","grey62", "grey1"))+
+    #scale_colour_manual(name = "", values = c("grey34","grey62", "grey1"))+
+    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
+    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
     scale_shape_manual(name = "", values = c(17, 16, 15))+
-    
-    #ylim(0,25) + 
+        #ylim(0,25) + 
     scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-    geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
-                  width =.4) +
-    geom_hline(yintercept = baseline2$Juvenile, color = "grey62")+
-    geom_hline(yintercept = baseline2$Small.Female, color = "grey34")+
-    geom_hline(yintercept = baseline2$Large.Female, color = "black")+
+    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+                alpha = 0.2) +
+    #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
+    #              width =.4) +
+    geom_hline(yintercept = baseline2$Juvenile, color = "#E69F00", 
+               linetype = "dotdash", lwd = 0.75)+
+    geom_hline(yintercept = baseline2$Small.Female, color = "#999999", 
+               linetype = "longdash", lwd = 0.75)+
+    geom_hline(yintercept = baseline2$Large.Female, color = "#56B4E9")+
     theme(legend.position = c(0.7,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"))
