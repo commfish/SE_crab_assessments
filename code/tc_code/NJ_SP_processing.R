@@ -17,22 +17,21 @@
 source('./code/tc_code/sp_nj_figures.R')
 cur_yr <- 2019
 
-#####Data ---------------------------------------------------
+# Data ---------------
 # change input file and input folder for each
-dat <- read.csv("./data/nj_stp/Juneau_red crab survey for Tanner crab CSA_2018.csv")
-# all current year pots from Juneau and Barlow Cove
-# this is input from OceanAK - set up as red crab survey data for CSA
-area <- read.csv("./data/nj_stp/stp_strata_area.csv") 
-#     density strata for tanner stratification in Stephen's Passage area
-seperate <- read.csv("./data/nj_stp/2018_sp_pots.csv") 
+dat <- read.csv("./data/tanner/nj_stp/Juneau_red crab survey for Tanner crab CSA_2019.csv")
+# all current year pots from Juneau and Barlow Cove - OceanAK
+area <- read.csv("./data/tanner/nj_stp/stp_strata_area.csv")  #density strata for tanner stratification in Stephen's Passage area
+seperate <- read.csv("./data/tanner/nj_stp/2018_sp_pots.csv") 
 #     from Kellii using GIS, puts Juneau area pots into density strata
-baseline <- read.csv("./data/rkc_tanner/longterm_means_TC.csv")
+baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 
 SP_hist <- read.csv(paste0('./results/nj_stp/', cur_yr-1, '/SP_rawdata_all.csv'))
 NJ_hist <- read.csv(paste0('./results/nj_stp/', cur_yr-1, '/NJ_rawdata_all.csv'))
 # bring in historic data for each area below.
-
 #females <- read.csv("./data/Juneau/RKC_11_16_large females_by_pot.csv")
+
+## data processing -------------------
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
 
@@ -42,7 +41,7 @@ dat %>% select(Year, Location.Code, Location, Pot.No, Depth.Fathoms, Latitude.De
   group_by(Year, Location, Pot.No) %>% 
   summarise(Depth.Fathoms = mean(Depth.Fathoms), Latitude.Decimal.Degrees = mean(Latitude.Decimal.Degrees), 
             Longitude.Decimal.Degrees = mean(Longitude.Decimal.Degrees)) -> juneau_pot_info
-write.csv(juneau_pot_info, paste0('./data/nj_stp/juneau_pot_info_', cur_yr,'.csv'))
+write.csv(juneau_pot_info, paste0('./data/tanner/nj_stp/juneau_pot_info_', cur_yr,'.csv'))
 
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
