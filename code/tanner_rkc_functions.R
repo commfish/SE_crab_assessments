@@ -59,7 +59,7 @@ short_t_tanner <- function(bypot_st, year) {
     mutate(significant = ifelse(p.value < 0.05 & slope > 0, 1,
                                 ifelse(p.value <0.05 & slope <0, -1, 0))) %>%
     mutate(score = 0.25*significant) -> short_term_results
-  write_csv(short_term_results, paste0('results/RKCS_tanner/', year, '/shortterm.csv'))
+  write_csv(short_term_results, paste0('results/tanner/tanner_rkc/', year, '/shortterm.csv'))
 }
 
 ### Long term function -------------------
@@ -164,7 +164,7 @@ poor_clutch_short <- function(females_all, year){
     mutate(significant = ifelse(p.value < 0.05 & slope > 0, 1,
                                 ifelse(p.value <0.05 & slope <0, -1, 0))) %>%
     mutate(score = 0.25*significant) -> short_term_results
-  write_csv(short_term_results, paste0('results/RKCS_tanner/', year, '/female_shortterm.csv'))
+  write_csv(short_term_results, paste0('results/tanner/tanner_rkc/', year, '/female_shortterm.csv'))
 }
 
 ## CONF panel figure ---------------
@@ -179,15 +179,15 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
   # Option 3 - p2,p3 (females)
   # confidential - whether to include confidential data, if "include" then include all data, 
   #               if "exclude" then remove confidential data (i.e. Non-conf graphs)
-  CPUE_wt_graph <- read.csv(paste0('./results/RKCS_tanner/', cur_yr,
+  CPUE_wt_graph <- read.csv(paste0('./results/tanner/tanner_rkc/', cur_yr,
                                    '/RKCS_CPUE_all.csv'))
-  poorclutch_summary <- read.csv(paste0('./results/RKCS_tanner/', cur_yr, '/RKCS_percent_low_clutch.csv'))
-  egg_mean_all <- read.csv(paste0('./results/RKCS_tanner/', cur_yr,
+  poorclutch_summary <- read.csv(paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_percent_low_clutch.csv'))
+  egg_mean_all <- read.csv(paste0('./results/tanner/tanner_rkc/', cur_yr,
                                   '/RKCS_percent_clutch.csv'))
   # file with year and mean percent poor clutch and se poor clutch 
-  baseline <- read.csv("./data/rkc_tanner/longterm_means_TC.csv")
-  biomass <- read.csv("./data/rkc_tanner/tanner_2018_biomassmodel.csv") 
-  harvest <- read.csv("./results/tanner/tanner_comm_catch_97_2018_confid.csv") # needs to be updated with
+  baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
+  biomass <- read.csv("./data/tanner/tanner_rkc/tanner_2018_biomassmodel.csv") 
+  harvest <- read.csv("./results/tanner/tanner_rkc/tanner_comm_catch_97_2018_confid.csv") # needs to be updated with
                                     # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
 
@@ -395,11 +395,11 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
   
 if(conf == "exclude"){  
-  ggsave(paste0('./figures/rkcs_tanner/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/tanner/tanner_rkc/', survey.location, '_', cur_yr, '_', 
                 option, '_nonconf.png'), panel,  
          dpi = 800, width = 8, height = 9.5)}
 if(conf == "include"){
-  ggsave(paste0('./figures/rkcs_tanner/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/tanner/tanner_rkc/', survey.location, '_', cur_yr, '_', 
                 option, 'confidential.png'), panel,  
          dpi = 800, width = 8, height = 9.5)}
 }
@@ -417,15 +417,15 @@ panel_figure_pres <- function(survey.location, cur_yr, area, option, conf){
   # Option 3 - p2,p3 (females)
   # confidential - whether to include confidential data, if "include" then include all data, 
   #               if "exclude" then remove confidential data (i.e. Non-conf graphs)
-  CPUE_wt_graph <- read.csv(paste0('./results/RKCS_tanner/', cur_yr,
+  CPUE_wt_graph <- read.csv(paste0('./results/tanner/tanner_rkc/', cur_yr,
                                    '/RKCS_CPUE_all.csv'))
-  poorclutch_summary <- read.csv(paste0('./results/RKCS_tanner/', cur_yr, '/RKCS_percent_low_clutch.csv'))
+  poorclutch_summary <- read.csv(paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_percent_low_clutch.csv'))
   egg_mean_all <- read.csv(paste0('./results/RKCS_tanner/', cur_yr,
                                   '/RKCS_percent_clutch.csv'))
   # file with year and mean percent poor clutch and se poor clutch 
-  baseline <- read.csv("./data/rkc_tanner/longterm_means_TC.csv")
-  biomass <- read.csv("./data/rkc_tanner/tanner_2018_biomassmodel.csv") 
-  harvest <- read.csv("./results/tanner/tanner_comm_catch_97_2018_confid.csv") # needs to be updated with
+  baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
+  biomass <- read.csv("./data/tanner/tanner_rkc/tanner_2018_biomassmodel.csv") 
+  harvest <- read.csv("./results/tanner/tanner_rkc/tanner_comm_catch_97_2018_confid.csv") # needs to be updated with
   # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   
@@ -641,11 +641,11 @@ panel_figure_pres <- function(survey.location, cur_yr, area, option, conf){
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
   
   if(conf == "exclude"){  
-    ggsave(paste0('./figures/rkcs_tanner/', survey.location, '_', cur_yr, '_', 
+    ggsave(paste0('./figures/tanner/tanner_rkc/', survey.location, '_', cur_yr, '_', 
                   option, '_nonconf_presentation.png'), panel,  
            dpi = 800, width = 8, height = 9.5)}
   if(conf == "include"){
-    ggsave(paste0('./figures/rkcs_tanner/', survey.location, '_', cur_yr, '_', 
+    ggsave(paste0('./figures/tanner/tanner_rkc/', survey.location, '_', cur_yr, '_', 
                   option, 'confidential_presentation.png'), panel,  
            dpi = 800, width = 8, height = 9.5)}
 }
