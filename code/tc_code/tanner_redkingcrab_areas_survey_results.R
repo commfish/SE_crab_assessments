@@ -49,9 +49,17 @@ rkc_usable_areas <- c("Deadman Reach", "Excursion Inlet", "Gambier Bay", "Lynn S
                       "Seymour Canal", "St. James Bay")
 dat1 %>%
   filter(Location %in% rkc_usable_areas) %>%
-  mutate(experimental = ifelse(Location == 'Seymour Canal' & Pot.No > 54 & Year == 2015, 1, 0)) %>%
+  mutate(experimental = ifelse(Location == 'Seymour Canal' & Pot.No > 54 & Year == 2015, 1, 
+                               ifelse(Location == 'Seymour Canal' &  Pot.No > 54 & Year == 2019, 1,
+                                      ifelse(Location == "Excursion Inlet" & Pot.No > 56 & Year == 2019, 1, 0 )))) %>%
   filter(experimental == 0) -> dat1a
   # remove seymour canal swan cove pots, these are only pot #'s greater than 54 in 2015.
+
+  # need to confirm that rkcs area tagging pots in 2019 - seymour and excusion are NOT included
+dat1a %>% 
+  filter(Year == 2019) %>% 
+  group_by(Location) %>% 
+  summarise(n = max(Pot.No)) # confirm 2019 pot removed.  **FIX** this for future
 
 ##### add columns used later ----------------------------
 dat1a %>%
