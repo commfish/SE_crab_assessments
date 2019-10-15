@@ -116,15 +116,14 @@ dat3 %>%
             SmallF_u = mean(Small.Females), SmallF_SE = (sd(Small.Females)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_all
 # check to confirm last years CPUEs match - that's why we use two years.
 # change name and folder for each area
-write.csv(CPUE_all, paste0('./results/tanner/tanner_rkc/', cur_yr, '/rkcs_CPUE_all.csv'))
+write.csv(CPUE_all, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_CPUE_all.csv'))
 
 ##### Historic file ---------------------------------------
 
-#brought in all the years - 2013 to 2016 - needed at once from OceanAK in the future can do this or add current
+# brought in all the years - needed at once from OceanAK in the future can do this or add current
 #   year to this file.
-# this is the final file by pot.  Now this file can be summarized to give CPUE by year like above (see dat 5 to CPUE_wt_JNU_2016)
-# change same of folder and file.
-write.csv(dat3, paste0('./results/RKCS_tanner/', cur_yr, '/RKCS_perpot_allyears.csv'))
+# this is the final file by pot.  Now this file can be summarized to give CPUE by year like above
+write.csv(dat3, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_perpot_allyears.csv'))
 
 ##### Short term trends -------------------------------------
 # look at trend for the last 4 years.  Need a file with last four years
@@ -160,7 +159,7 @@ baseline
 areas <- c('PB', 'EI', 'LS', 'GB', 'SC', 'PS')
 
 long_term <- lapply(areas, long_loop_17, curyr = cur_yr)
-write.csv(long_term, paste0('./results/RKCS_tanner/', cur_yr, '/long_term.csv'))
+write.csv(long_term, paste0('./results/tanner/tanner_rkc/', cur_yr, '/long_term.csv'))
 
 ##### Weights from length - weight relatinship--------------------
 # Linear model is changed for each area
@@ -191,7 +190,7 @@ datWL %>%
             prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
                                Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
 
-write.csv(male_weights, paste0('./results/RKCS_tanner/', cur_yr, '/RKCS_weights.csv'))
+write.csv(male_weights, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_weights.csv'))
 
 
 ##### mid-date survey-------------
