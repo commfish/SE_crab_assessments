@@ -169,11 +169,10 @@ glimpse(Tdat1)
 # need just the date of Time.Set and then to get the mid-date
 #Tdat1 %>%
 # mutate(time.set = as.POSIXlt(Time.Set)) -> Tdat1
-Tdat1 %>% filter(Year == 2018 & AREA == "SC")
-
+Tdat1 %>% filter(Year == cur_yr & AREA == "SC")
+#** FIX ** 
 
 ##### Females - large or mature females --------------------------
-
 # large or mature females
 Tdat1 %>%
   filter(Sex.Code == 2, mod_recruit == 'Large.Females') -> LgF_Tdat1
@@ -204,7 +203,8 @@ poorclutch1 %>%
 poorclutch1 %>%
   group_by(AREA, Year)%>%
   summarise(Pclutch = mean(var1)*100 , Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
-write.csv(percent_low_clutch, paste0('./results/RKCS_tanner/', cur_yr, '/RKCS_percent_low_clutch.csv'))
+write.csv(percent_low_clutch, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_percent_low_clutch.csv'))
+# **FIX** turn this into function also
 
 ##### egg percentage overall -----------------------------------
 LgF_Tdat1 %>%
@@ -219,7 +219,7 @@ clutch_by_pot %>%
 # add this to the table with percent_low_clutch?
 percent_low_clutch %>%
   right_join(percent_clutch) -> female_clutch_info
-write.csv(female_clutch_info, paste0('./results/RKCS_tanner/', cur_yr, '/RKCS_percent_clutch.csv'))
+write.csv(female_clutch_info, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_percent_clutch.csv'))
 
 
 ##### Long term females -------------------------
@@ -232,7 +232,7 @@ poorclutch1 %>%
 
 Fem_long_term <- lapply(areas, Fem_long_loop)
 Fem_long_term
-write.csv(Fem_long_term, paste0('./results/RKCS_tanner/', cur_yr, '/Female_long_term.csv'))
+write.csv(Fem_long_term, paste0('./results/tanner/tanner_rkc/', cur_yr, '/Female_long_term.csv'))
 # need to figure out a way to store these results in a better format
 
 ##### Short term females ------------------------
