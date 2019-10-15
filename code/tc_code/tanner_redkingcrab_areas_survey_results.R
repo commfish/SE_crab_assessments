@@ -81,11 +81,12 @@ dat1ab %>%
                                   ifelse(Sex.Code ==2 & Egg.Development.Code==4 & !is.na(Egg.Development.Code), 'Small.Females', 
                                          ifelse(Sex.Code ==2 & Width.Millimeters>0 & !is.na(Width.Millimeters), 'Large.Females', 
                                                 ifelse(is.na(Width.Millimeters), 'Missing', 'Missing'))))))))) -> Tdat1
-#write.csv(Tdat1, './results/problemstanner3.csv')
-Tdat1 %>% filter(mod_recruit == "Missing") # check for data issues
 
-Tdat1 %>% filter(is.na(mod_recruit))
-
+Tdat1 %>% 
+  filter(mod_recruit == "Missing") %>%  # check for data issues
+  write.csv('./results/tanner/problemstanner1.csv')
+Tdat1 %>% filter(is.na(mod_recruit)) %>% 
+  write.csv('./results/tanner/problemstanner2.csv')
 ##### By Pot ----------------------------------------------------
 #Now summarize by pot - remember to keep areas seperate.
 #Need Number of Specimens by recruit class
