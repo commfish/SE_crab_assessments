@@ -36,7 +36,7 @@ dat1 %>%
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> test1
 # 2018 excursion pot 2 and 42
 # 2019 gambier bay pot 39
-write.csv(test1, "./results/tanner/data_issues.csv")
+write.csv(test1, "./results/tanner/tanner_rkc/data_issues.csv")
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - tanner soak time should be between 16-20??? double check this
 
@@ -84,9 +84,9 @@ dat1ab %>%
 
 Tdat1 %>% 
   filter(mod_recruit == "Missing") %>%  # check for data issues
-  write.csv('./results/tanner/problemstanner1.csv')
+  write.csv('./results/tanner/tanner_rkc/problemstanner1.csv')
 Tdat1 %>% filter(is.na(mod_recruit)) %>% 
-  write.csv('./results/tanner/problemstanner2.csv')
+  write.csv('./results/tanner/tanner_rkc/problemstanner2.csv')
 ##### By Pot ----------------------------------------------------
 #Now summarize by pot - remember to keep areas seperate.
 #Need Number of Specimens by recruit class
@@ -103,8 +103,8 @@ dat3 <- dcast(dat2, Year + AREA + Pot.No ~ mod_recruit, sum, drop=TRUE)
 # No weighting by strata here for RKCS data due to it being designed for RKC.
 
 ##### CPUE for all years ----------------------------------
-#This version is ready to calculate CPUE for each recruit class
-#Calculates a  mean CPUE and SE for each recruit class 
+# This version is ready to calculate CPUE for each recruit class
+# Calculates a  mean CPUE and SE for each recruit class 
 # not weighted due to lack of tanner specific strata on red crab survey
 dat3 %>%
   group_by(AREA, Year) %>%
@@ -116,7 +116,7 @@ dat3 %>%
             SmallF_u = mean(Small.Females), SmallF_SE = (sd(Small.Females)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_all
 # check to confirm last years CPUEs match - that's why we use two years.
 # change name and folder for each area
-write.csv(CPUE_all, paste0('./results/RKCS_tanner/', cur_yr, '/RKCS_CPUE_all.csv'))
+write.csv(CPUE_all, paste0('./results/tanner/tanner_rkc/', cur_yr, '/rkcs_CPUE_all.csv'))
 
 ##### Historic file ---------------------------------------
 
