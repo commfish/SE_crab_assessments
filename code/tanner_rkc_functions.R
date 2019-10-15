@@ -110,7 +110,8 @@ long_loop_17 <- function(x, curyr){
   long_ttest(x, curyr, baseline = baseline, bypot = dat3)
 }
 
-weight_L <- function(Tdat1){
+## weight-length function -------------
+weight_L <- function(Tdat1, cur_yr){
   weight_length <- data.frame(AREA =character(),  slope =numeric(), coeff = numeric())
   # Linear model is changed for each area
   #AREA = unique(Tdat1$AREA) #"LS" "PS" "EI" "GB" "PB" "SC"
@@ -124,20 +125,19 @@ weight_L <- function(Tdat1){
     mutate(weight_lb = (exp((slope*log(Width.Millimeters)) - coeff ))*(2.2/1000))-> datWL
   Mature = c("Pre_Recruit", "Recruit", "Post_Recruit")
   Legal =c("Recruit", "Post_Recruit")
+  datWL %>% 
+    group_by(AREA, Year) %>% 
+    filter(Sex.Code == 1) %>% 
+    summarise(mature_lbs = wt.mean(weight_lb[mod_recruit %in% Mature], 
+                                   Number.Of.Specimens[mod_recruit %in% Mature]), 
+              legal_lbs = wt.mean(weight_lb[mod_recruit %in% Legal], 
+                                  Number.Of.Specimens[mod_recruit %in% Legal]), 
+              prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
+                                 Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
+  
+  write.csv(male_weights, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_weights.csv'))
   
 }
-
-datWL %>% 
-  group_by(AREA, Year) %>% 
-  filter(Sex.Code == 1) %>% 
-  summarise(mature_lbs = wt.mean(weight_lb[mod_recruit %in% Mature], 
-                                 Number.Of.Specimens[mod_recruit %in% Mature]), 
-            legal_lbs = wt.mean(weight_lb[mod_recruit %in% Legal], 
-                                Number.Of.Specimens[mod_recruit %in% Legal]), 
-            prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
-                               Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
-
-write.csv(male_weights, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_weights.csv'))
 
 
 ### female percent poor clutch ---------
