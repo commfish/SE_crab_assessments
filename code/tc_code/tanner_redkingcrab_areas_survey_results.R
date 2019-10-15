@@ -34,10 +34,11 @@ dat1 %>%
   filter(Recruit.Status == "", Width.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> test1
-# come back and redo this analysis once the 2017 data is edited and fixed!!!!!!!!!
-
-# also need to check soak time and to make sure all crab that were measured have a recruit status
-#come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
+# 2018 excursion pot 2 and 42
+# 2019 gambier bay pot 39
+write.csv(test1, "./results/tanner/data_issues.csv")
+# **FIX **  calculate soak time 
+#come back later and add a soak time column - tanner soak time should be between 16-20??? double check this
 
 ##### Tanner specific manipulations -----------------------------
 ####Survey areas ONLY 
