@@ -162,36 +162,7 @@ long_term <- lapply(areas, long_loop_17, curyr = cur_yr)
 write.csv(long_term, paste0('./results/tanner/tanner_rkc/', cur_yr, '/long_term.csv'))
 
 ##### Weights from length - weight relatinship--------------------
-# Linear model is changed for each area
-weight_length <- data.frame(AREA =character(),  slope =numeric(), coeff = numeric())
-
-#AREA = unique(Tdat1$AREA) #"LS" "PS" "EI" "GB" "PB" "SC"
-#slope = c(2.86,3.13, 3.30, 3.26, 3.05, 3.10)
-#coeff = c(7.33, 8.69, 9.48, 9.39, 8.34, 8.55)
-
-weight_length <- data.frame(AREA = unique(Tdat1$AREA), slope = c(2.86,3.13, 3.30, 3.26, 3.05, 3.10),
-                            coeff = c(7.33, 8.69, 9.48, 9.39, 8.34, 8.55))
-
-glimpse(Tdat1) # raw data for all years
-Tdat1 %>%
-  right_join(weight_length) %>%
-  mutate(weight_lb = (exp((slope*log(Width.Millimeters)) - coeff ))*(2.2/1000))-> datWL
-
-Mature = c("Pre_Recruit", "Recruit", "Post_Recruit")
-Legal =c("Recruit", "Post_Recruit")
-
-datWL %>% 
-  group_by(AREA, Year) %>% 
-  filter(Sex.Code == 1) %>% 
-  summarise(mature_lbs = wt.mean(weight_lb[mod_recruit %in% Mature], 
-                                 Number.Of.Specimens[mod_recruit %in% Mature]), 
-            legal_lbs = wt.mean(weight_lb[mod_recruit %in% Legal], 
-                                Number.Of.Specimens[mod_recruit %in% Legal]), 
-            prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
-                               Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
-
-write.csv(male_weights, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_weights.csv'))
-
+weight_L(Tdat1, cur_yr) # function found in tanner_rkc_functions.R
 
 ##### mid-date survey-------------
 glimpse(Tdat1)
