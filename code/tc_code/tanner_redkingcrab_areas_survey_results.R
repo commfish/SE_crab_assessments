@@ -4,23 +4,25 @@
 # includes: Excursion, Seymour Canal, Pybus Bay, Gambier Bay, Peril Strait, and Lynn Sisters
 # code to process data from Ocean AK to use in crab CSA models.  
 
-### Load ---------------------------------
+## Load ---------------------------------
 source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with mutiple areas at once.
-cur_yr <- 2018
+## setup global ---------------
+cur_yr <- 2019
+pr_yr <- cur_yr -1
 
-### Data ---------------------------------------------------
+## Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv("./data/rkc_tanner/red crab survey for Tanner crab CSA_18.csv")
+dat <- read.csv("./data/tanner/tanner_rkc/red crab survey for Tanner crab CSA_19.csv")
                   # this is input from OceanAK - set up as red crab survey data for CSA has all years
                   # 1997 to present 
-# all data in this file do not need area, historic or female files here
+                  # all data in this file do not need area, historic or female files here
+baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
+biomass <- read.csv("./data/tanner/tanner_rkc/tanner_2019_biomassmodel.csv") 
+# this file should be updated with current year model output.
 
+# survey data QAC -------
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
-
-baseline <- read.csv("./data/rkc_tanner/longterm_means_TC.csv")
-biomass <- read.csv("./data/rkc_tanner/biomass_tanner_RKCareas.csv") 
-# this file should be updated with 2018 model output.
 
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
