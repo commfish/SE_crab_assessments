@@ -80,11 +80,11 @@ write.csv(comm.catch.sum, paste0('./results/tanner/tanner_comm_catch', cur_yr,'.
 harvest2 %>%
   #filter (Season == "Sep2017 - Aug18") %>% 
  # filter(Date.of.Landing != '2018-07-13 00:00:00') %>% 
-  group_by(survey.area, Date.of.Landing) %>%
+  group_by(Year, survey.area, Date.of.Landing) %>%
   summarise(numbers = sum(Number.Of.Animals)) ->mid.catch
 
 mid.catch %>% 
-  group_by(survey.area) %>% 
+  group_by(survey.area, Year) %>% 
   summarise(total = sum(numbers)) -> step1
 mid.catch %>% 
   left_join(step1) %>% 
@@ -94,14 +94,15 @@ write.csv(mid.catch2, paste0('./results/tanner/tanner_mid_catch_date', cur_yr, '
 
 ### current year total annual harvest  ---------------------
 comm.catch.sum %>%
-  group_by(Season)%>%
+  group_by(Year)%>%
   summarise(numbers = sum(numbers), pounds = sum(pounds)) -> annual_catch
 
 write.csv(annual_catch, paste0('./results/tanner/tanner_annual_catch_', cur_yr,'.csv'))
 
 
 ### all years ----------------------
-unique(harvest_all$Stat.Area)
+unique(harvest_all$Stat.Area)  # **FIX ** need to pull data with current year to run this
+
 # need to create column that does what 'Survey area 3' does in Excel sheet
 # refer to '2014-2015 fish tickets.xlsx'
 harvest_all %>%
