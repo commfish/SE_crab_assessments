@@ -262,23 +262,23 @@ ggplot(poorclutch1, aes(Year, var1))+geom_point() +facet_wrap(~AREA)
 total_health("tanner_rkc", cur_yr)
 
 ## panel figures -----
-panel_figure("EI", 2018, "Excursion Inlet", 2, "include")
-panel_figure("EI", 2018, "Excursion Inlet", 3)
+panel_figure("EI", 2019, "Excursion Inlet", 2, "include")
+panel_figure("EI", 2019, "Excursion Inlet", 3)
 
-panel_figure("SC", 2018, "Seymour Canal", 2, "include")
-panel_figure("SC", 2018, "Seymour Canal", 3)
+panel_figure("SC", 2019, "Seymour Canal", 2, "include")
+panel_figure("SC", 2019, "Seymour Canal", 3)
 
-panel_figure("PB", 2018, "Pybus Bay", 2, "include")
-panel_figure("PB", 2018, "Pybus Bay", 3)
+panel_figure("PB", 2019, "Pybus Bay", 2, "include")
+panel_figure("PB", 2019, "Pybus Bay", 3)
 
-panel_figure("GB", 2018, "Gambier Bay", 2, "include")
-panel_figure("GB", 2018, "Gambier Bay", 3)
+panel_figure("GB", 2019, "Gambier Bay", 2, "include")
+panel_figure("GB", 2019, "Gambier Bay", 3)
 
-panel_figure("PS", 2018, "Peril Strait", 2, "include")
-panel_figure("PS", 2018, "Peril Strait", 3)
+panel_figure("PS", 2019, "Peril Strait", 2, "include")
+panel_figure("PS", 2019, "Peril Strait", 3)
 
-panel_figure("LS", 2018, "Lynn Sisters", 2, "include")
-panel_figure("LS", 2018, "Lynn Sisters", 3)
+panel_figure("LS", 2019, "Lynn Sisters", 2, "include")
+panel_figure("LS", 2019, "Lynn Sisters", 3)
 
 
 # non-confidential areas 2018 ------------
