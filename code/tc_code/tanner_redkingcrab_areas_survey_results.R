@@ -159,7 +159,13 @@ baseline
 areas <- c('PB', 'EI', 'LS', 'GB', 'SC', 'PS')
 
 long_term <- lapply(areas, long_loop_17, curyr = cur_yr)
-write.csv(long_term, paste0('./results/tanner/tanner_rkc/', cur_yr, '/long_term.csv'))
+long_term[[1]] %>% 
+  bind_rows(long_term[[2]]) %>% 
+  bind_rows(long_term[[3]]) %>% 
+  bind_rows(long_term[[4]]) %>% 
+  bind_rows(long_term[[5]]) %>% 
+  bind_rows(long_term[[6]]) -> long_term2
+write.csv(long_term2, paste0('./results/tanner/tanner_rkc/', cur_yr, '/long_term.csv'))
 
 ##### Weights from length - weight relatinship--------------------
 weight_L(Tdat1, cur_yr) # function found in tanner_rkc_functions.R
@@ -231,8 +237,13 @@ poorclutch1 %>%
 #calculate the t.test
 
 Fem_long_term <- lapply(areas, Fem_long_loop)
-Fem_long_term
-write.csv(Fem_long_term, paste0('./results/tanner/tanner_rkc/', cur_yr, '/Female_long_term.csv'))
+Fem_long_term[[1]] %>% 
+  bind_rows(Fem_long_term[[2]]) %>% 
+  bind_rows(Fem_long_term[[3]]) %>% 
+  bind_rows(Fem_long_term[[4]]) %>% 
+  bind_rows(Fem_long_term[[5]]) %>% 
+  bind_rows(Fem_long_term[[6]]) -> Fem_long_term2
+write.csv(Fem_long_term2, paste0('./results/tanner/tanner_rkc/', cur_yr, '/Female_long_term.csv'))
 # need to figure out a way to store these results in a better format
 
 ##### Short term females ------------------------
@@ -246,6 +257,9 @@ poor_clutch_short(poorclutch1, cur_yr)
 
 ggplot(poorclutch1, aes(Year, var1))+geom_point() +facet_wrap(~AREA)
 ###
+
+## stock health -------
+total_health("tanner_rkc", cur_yr)
 
 ## panel figures -----
 panel_figure("EI", 2018, "Excursion Inlet", 2, "include")
