@@ -24,13 +24,13 @@ logb11510 <- read.csv("./results/tanner/logbook_11510_98_18.csv") # from tanner_
 harvest %>% 
   filter(Batch.Year >= cur_yr-1 & Office.Name == 'Petersburg') %>% 
   select(Year = Batch.Year, Date.of.Landing, Fishery, Season, Fish.Ticket.Number, 
-         CFEC, Stat.Area, Number.Of.Animals, Landed.Weight..sum., Effort..sum.) -> harvest2
+         CFEC, Stat.Area, Number.Of.Animals, Whole.Weight..sum., Effort..sum.) -> harvest2
   
 ### current year ----------------------
 unique(harvest2$Stat.Area)
 # need to create column that does what 'Survey area 3' does in Excel sheet
 # refer to '2014-2015 fish tickets.xlsx'
-harvest %>%
+harvest2 %>%
   mutate(survey.area = ifelse(Stat.Area ==11023, 'Gambier Bay', ifelse(Stat.Area == 11423, 'Icy Strait', 
                         ifelse(Stat.Area == 11470, 'Glacier Bay', ifelse(Stat.Area == 11012, 
                         'Thomas Bay', ifelse(Stat.Area == 11150| Stat.Area == 11155, 'North Juneau', 
@@ -52,34 +52,34 @@ harvest %>%
                             'PFred', 
                          ifelse(Stat.Area == 11215, 'Lynn Sisters', 
                          ifelse(Stat.Area == 10940|Stat.Area == 10941|Stat.Area == 10942|Stat.Area == 10943|
-                                Stat.Area ==10532, 'Camden', 'Other')))))))))))))))  -> harvest
+                                Stat.Area ==10532, 'Camden', 'Other')))))))))))))))  -> harvest2
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
-harvest %>%
-  filter(Date.of.Landing != '2018-07-13 00:00:00') %>% 
-  group_by(Season, Stat.Area, survey.area) %>%
+harvest2 %>%
+ # filter(Date.of.Landing != '2018-07-13 00:00:00') %>% # not sure why this was in place last year but not present now
+  group_by(Year, Stat.Area, survey.area) %>% # no season in current year's data - not sure why? **FIX**
   summarise(permits = length(unique(CFEC)), 
                              numbers = sum(Number.Of.Animals), 
-            pounds = sum(Whole.Weight..sum.)) -> harvest2
+            pounds = sum(Whole.Weight..sum.)) -> harvest2a
 
-write.csv(harvest2, paste0('./results/tanner/comm_catch_by_statarea', cur_yr,'.csv'))
+write.csv(harvest2a, paste0('./results/tanner/comm_catch_by_statarea', cur_yr,'.csv'))
 #dat %>%
 #  filter(Stat.Area == 11510, Season == 'Sep2015 - Aug16') %>%
 #  select(Season, CFEC, Stat.Area, )
 
 ### current year by survey area --------------------------
-harvest %>%
-  filter(Date.of.Landing != '2018-07-13 00:00:00') %>% 
-  group_by(Season, survey.area)%>%
+harvest2 %>%
+#  filter(Date.of.Landing != '2018-07-13 00:00:00') %>% 
+  group_by(Year, survey.area)%>%
   summarise(permits = length(unique(CFEC)), numbers = sum(Number.Of.Animals), 
             pounds = sum(Whole.Weight..sum.)) -> comm.catch.sum
 
 # lynn sister and north juneau need to be manually split up in area 115-10
 write.csv(comm.catch.sum, paste0('./results/tanner/tanner_comm_catch', cur_yr,'.csv'))
 ### current year mid-catch date ------------------
-harvest %>%
+harvest2 %>%
   #filter (Season == "Sep2017 - Aug18") %>% 
-  filter(Date.of.Landing != '2018-07-13 00:00:00') %>% 
+ # filter(Date.of.Landing != '2018-07-13 00:00:00') %>% 
   group_by(survey.area, Date.of.Landing) %>%
   summarise(numbers = sum(Number.Of.Animals)) ->mid.catch
 
