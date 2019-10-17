@@ -138,30 +138,30 @@ logb11510 %>%
   filter(survey.area == "North Juneau") %>% 
   select(Year = YEAR, percentNJ = percent) -> logb_merge
 
-harvest2_all %>% 
+harvest_all_update %>% 
   filter(Stat.Area == 11510) %>% 
   left_join(logb_merge) %>% 
   mutate(no_NJ = numbers*percentNJ,
          no_LS = numbers*(1-percentNJ), 
          lb_NJ = pounds*percentNJ,
          lb_LS = pounds*(1-percentNJ)) %>% 
-  select(Year, vessels, people, permits, processor, no_NJ, no_LS, lb_NJ, lb_LS) %>% 
-  gather("label", "value", 8:11) %>% 
+  select(Year, Stat.Area, vessels, people, permits, processor, no_NJ, no_LS, lb_NJ, lb_LS) %>% 
+  gather("label", "value", 7:10) %>% 
   mutate(survey.area = case_when(grepl("NJ", label, ignore.case = TRUE) ~ "North Juneau",
                                  grepl("LS", label, ignore.case = TRUE) ~ "Lynn Sisters"), 
          units = case_when(grepl("no", label, ignore.case = TRUE) ~ "numbers", 
                            grepl("lb", label, ignore.case = TRUE) ~ "pounds")) %>% 
-  select(Season, Stat.Area, survey.area, vessels, people, permits, processor, Year, units, value) %>% 
+  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, units, value) %>% 
   spread(units, value) %>% 
-  select(Season, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds, Year) -> stat_11510
+  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds, Year) -> stat_11510
 
 
 ### Deal with 11510 -----------
 # - take it out manipulate it above and add it back in
-harvest2_all %>%
+harvest_all_update %>%
   filter(Stat.Area != 11510) %>% 
   bind_rows(stat_11510) %>% 
-  group_by(survey.area, Season, Year) %>%
+  group_by(survey.area, Year) %>%
   summarise(vessels = sum(vessels), people = sum(people),
             permits = sum(permits), processors = sum(processor), 
             numbers = sum(numbers), 
@@ -178,10 +178,10 @@ write.csv(comm.catch.sum_all, paste0('./results/tanner/tanner_comm_catch_97_', c
 
 ### all years total annual harvest  ---------------------
 comm.catch.sum_all %>%
-  group_by(Season, Year)%>%
+  group_by(Year)%>%
   summarise(numbers = sum(numbers), pounds = sum(pounds)) -> annual_catch_all
 
-write.csv(annual_catch_all, paste0('./results/tanner/tanner_annual_catch_98_', cur_yr,'.csv'))
+write.csv(annual_catch_all, paste0('./results/tanner/tanner_annual_catch_97_', cur_yr,'.csv'))
 
 
 # percent of total catch current year -----------
