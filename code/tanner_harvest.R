@@ -8,6 +8,7 @@
 # Load ---------------------------
 library(tidyverse)
 cur_yr = 2019
+pr_yr = cur_yr-1
 
 # Data ---------------------------------------------------
 # change input file to most recent year's catch from OceanAK for each
@@ -15,16 +16,16 @@ harvest <- read.csv("./data/harvest/tanner_harvest.csv")
 glimpse(harvest)
 
 #harvest_all <- read.csv("./data/Tanner_Detailed Fish Tickets_98_18.csv")
-harvest_all <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_97_18.csv")
-logb11510 <- read.csv("./results/tanner/logbook_11510_98_18.csv") # from tanner_logbook.R calculations
+harvest_all <- read.csv(paste0('./results/tanner/comm_catch_by_statarea_97_', pr_yr,'.csv'))
+#harvest_all <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_97_18.csv")
+logb11510 <- read.csv("./results/tanner/logbook_11510_all.csv") # from tanner_logbook.R calculations
 
 
 # data clean up --------
 ## need to update this output from OceanAK to be only region 1....**FIX**
 harvest %>% 
-  filter(Batch.Year >= cur_yr-1 & Office.Name == 'Petersburg') %>% 
-  select(Year = Batch.Year, Date.of.Landing, Fishery, Season, Fish.Ticket.Number, 
-         CFEC, Stat.Area, Number.Of.Animals, Whole.Weight..sum., Effort..sum.) -> harvest2
+  filter(Batch.Year == cur_yr & Office.Name == 'Petersburg') %>% 
+  dplyr::rename(Year = Batch.Year) -> harvest2
   
 ### current year ----------------------
 unique(harvest2$Stat.Area)
@@ -101,46 +102,19 @@ write.csv(annual_catch, paste0('./results/tanner/tanner_annual_catch_', cur_yr,'
 
 
 ### all years ----------------------
-unique(harvest_all$Stat.Area)  # **FIX ** need to pull data with current year to run this
+harvest_all <- read.csv(paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
 
-# need to create column that does what 'Survey area 3' does in Excel sheet
-# refer to '2014-2015 fish tickets.xlsx'
-harvest_all %>%
-  mutate(survey.area = ifelse(Stat.Area ==11023, 'Gambier Bay', ifelse(Stat.Area == 11423, 'Icy Strait', 
-                       ifelse(Stat.Area == 11470, 'Glacier Bay', ifelse(Stat.Area == 11012, 
-                        'Thomas Bay', ifelse(Stat.Area == 11150| Stat.Area == 11155, 'North Juneau', 
-                       ifelse(Stat.Area ==11021 | Stat.Area ==11022, 'Pybus Bay', 
-                       ifelse(Stat.Area == 11480 |Stat.Area ==11425, 'Excursion Inlet', 
-                       ifelse(Stat.Area==11120 | Stat.Area ==11121, 'Holkham Bay', 
-                       ifelse(Stat.Area==11140|Stat.Area==11141|Stat.Area==11142|Stat.Area==11143,
-                        'Stephens Passage', 
-                       ifelse(Stat.Area == 11351|Stat.Area == 11352|Stat.Area == 11353|
-                       Stat.Area == 11354|Stat.Area == 11355|Stat.Area == 11356|Stat.Area == 11357|
-                       Stat.Area == 11358, 'Peril Strait', 
-                       ifelse(Stat.Area == 11101|Stat.Area == 11102|Stat.Area == 11103|
-                       Stat.Area == 11104|Stat.Area == 11105|Stat.Area == 11106|
-                       Stat.Area == 11107|Stat.Area == 11108|Stat.Area == 11109|
-                       Stat.Area == 11110|Stat.Area == 11111|Stat.Area == 11112|
-                       Stat.Area == 11113|Stat.Area == 11114|Stat.Area == 11115|Stat.Area == 11116|
-                       Stat.Area == 11117|Stat.Area == 11118, 'Seymour Canal', 
-                       ifelse(Stat.Area == 11431|Stat.Area == 11432|Stat.Area == 11433|Stat.Area == 11434, 
-                       'PFred', 
-                       ifelse(Stat.Area == 11215, 'Lynn Sisters', 
-                       ifelse(Stat.Area == 10940|Stat.Area == 10941|Stat.Area == 10942|Stat.Area == 10943|
-                       Stat.Area ==10532, 'Camden', 'Other')))))))))))))))  -> harvest_all
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
 
-harvest_all %>%
-  group_by(Season, Stat.Area, survey.area) %>%
+harvest2 %>%
+  group_by(Year, Stat.Area, survey.area) %>%
   summarise(vessels = length(unique(ADFG.Number)), 
-            people = length(unique(CFEC.ID)),
-            permits = length(unique(Permit.Serial.Number)), 
+            people = length(unique(CFEC)),
+            permits = length(unique(Permit.Holder.Name)), #permits = length(unique(Permit.Serial.Number)), 
             processor = length(unique(Processor.Code)),
             numbers = sum(Number.Of.Animals, na.rm = TRUE), 
             pounds = sum(Whole.Weight..sum., na.rm = TRUE)) -> harvest2_all
-
-write.csv(harvest2_all, paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
 
 ### all years by survey area --------------------------
 # add year ----
@@ -149,9 +123,14 @@ library(stringr)
 numextract <- function(string){ 
   str_extract(string, "\\-*\\d+\\.*\\d*")
 } 
-harvest2_all %>% 
-  mutate(Year = as.numeric(numextract(Season))) -> harvest2_all
+harvest_all %>% 
+  mutate(Year = as.numeric(numextract(Season))) -> harvest_all
 
+harvest_all %>% 
+  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds) %>% 
+  bind_rows(harvest2_all) -> harvest_all_update
+
+write.csv(harvest_all_update, paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
 ## merge logbook ----
 # this is just to deal with 11510 - which was called "other" above but needs to be divided 
 #     between North Juneau and Lynn Sisters.
