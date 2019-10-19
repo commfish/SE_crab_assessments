@@ -27,8 +27,8 @@ seperate <- read.csv("./data/tanner/nj_stp/2018_sp_pots.csv")
 #     from Kellii using GIS, puts Juneau area pots into density strata
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 
-SP_hist <- read.csv(paste0('./results/nj_stp/', cur_yr-1, '/SP_rawdata_all.csv'))
-NJ_hist <- read.csv(paste0('./results/nj_stp/', cur_yr-1, '/NJ_rawdata_all.csv'))
+SP_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/SP_rawdata_all.csv'))
+NJ_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_rawdata_all.csv'))
 # bring in historic data for each area below.
 #females <- read.csv("./data/Juneau/RKC_11_16_large females_by_pot.csv")
 
