@@ -11,6 +11,7 @@
 
 # Data:
 #     Current year's data from OceanAK pull - 'Juneau_red crab survey for Tanner crab CSA'
+# **FIX** make sure the correct pull from OceanAK is referred here.
 
 # Load -------------
 # source('./code/tanner_functions.R')
