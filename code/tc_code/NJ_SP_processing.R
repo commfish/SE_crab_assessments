@@ -23,7 +23,7 @@ cur_yr <- 2019
 dat <- read.csv("./data/tanner/nj_stp/Juneau_red crab survey for Tanner crab CSA_2019.csv")
 # all current year pots from Juneau and Barlow Cove - OceanAK
 area <- read.csv("./data/tanner/nj_stp/stp_strata_area.csv")  #density strata for tanner stratification in Stephen's Passage area
-seperate <- read.csv("./data/tanner/nj_stp/2018_sp_pots.csv") 
+seperate <- read.csv("./data/tanner/nj_stp/juneau_2019.csv") #**FIX** update annually
 #     from Kellii using GIS, puts Juneau area pots into density strata
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 
@@ -58,6 +58,7 @@ dat1 %>%
 #come back later and add a soak time column - tanner soak time should be between 16-20??? double check this
 
 ##### seperate NJ and Juneau (also known as SP) ---------------------
+head(seperate)
 dat1 %>%
   mutate(area = ifelse(Location == "Barlow Cove", "NJ", 
                        ifelse(Location == "Juneau" & Pot.No %in% seperate$Pot_No, "Juneau", "NJ"))) ->dat1
@@ -79,7 +80,7 @@ glimpse(NJ_hist) # make sure the column names here match those in dat.NJ
 dat.NJ %>% select(- Latitude.Decimal.Degrees, -Longitude.Decimal.Degrees) -> dat.NJ
 NJ_hist %>% select ( -X ) -> NJ_hist
 data.NJ.all <- rbind(NJ_hist, dat.NJ)
-write.csv(data.NJ.all, paste0('./results/nj_stp/', cur_yr,'/NJ_rawdata_all.csv'))
+write.csv(data.NJ.all, paste0('./results/tanner/nj_stp/', cur_yr,'/NJ_rawdata_all.csv'))
 
 ### data manipulations ----------------------
 # easier area since there are NO strata
@@ -125,7 +126,7 @@ dat3 %>%
             SmallF_u = mean(Small.Females), SmallF_SE = (sd(Small.Females)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_ALL
 # check to confirm last years CPUEs match - that's why we use two years.
 # change name and folder for each area
-write.csv(CPUE_ALL, paste0('./results/nj_stp/', cur_yr, '/NJ_CPUE_ALL.csv'))
+write.csv(CPUE_ALL, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_CPUE_ALL.csv'))
 
 ##### Short term trends -------------------------------------
 #look at trend for the last 4 years.  Need a file with last four years
@@ -166,7 +167,7 @@ short_term_results %>%
                               ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
   mutate(score = 0.25*significant) -> short_term_results #estimate is slope from regression
 # final results with score - save here
-write.csv(short_term_results, paste0('./results/nj_stp/', cur_yr, '/NJ_shortterm.csv'))
+write.csv(short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_shortterm.csv'))
 
 dat3_long %>%
   filter(mod_recruit %in% recruit_used) ->st_dat3_long
@@ -181,7 +182,7 @@ baseline %>%
   filter(AREA == 'NJ') -> baseline_NJ
 # long term baseline values are different for each area, I guess make a file for each area?
 #
-# the y = has to be changed for each area but once they are set they are the same from year to year
+# these y = has to be changed for each area but once they are set they are the same from year to year
 t.test(dat3_current$Large.Females, mu = baseline_NJ$Large.Female)
 t.test(dat3_current$Pre_Recruit, mu = baseline_NJ$Pre_Recruit)
 t.test(dat3_current$Recruit, mu = baseline_NJ$Recruit)
@@ -209,7 +210,7 @@ datWL %>%
             prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
                                Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
 
-write.csv(male_weights, paste0('./results/nj_stp/', cur_yr, '/NJ_weights.csv'))
+write.csv(male_weights, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_weights.csv'))
 
 ##### survey mid-date --------------------
 Tdat1 %>%
