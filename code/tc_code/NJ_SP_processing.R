@@ -253,7 +253,7 @@ poorclutch1 %>%
   group_by(Year)%>%
   summarise(Pclutch = mean(var1)*100 , 
             Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
-write.csv(percent_low_clutch, paste0('./results/nj_stp/', cur_yr, '/NJ_precent_low_clutch.csv'))
+write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_precent_low_clutch.csv'))
 
 ##### Long term females -------------------------
 glimpse(poorclutch1)
@@ -294,7 +294,7 @@ F_short_term_results %>%
                               ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
   mutate(score = 0.25*significant) -> F_short_term_results #estimate is slope from regression
 # final results with score - save here
-write.csv(F_short_term_results, paste0('./results/nj_stp/', cur_yr, '/NJ_Fem_shortterm.csv'))
+write.csv(F_short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_Fem_shortterm.csv'))
 ggplot(poorclutch1, aes(Year, var1))+geom_point() 
 
 ##### egg percentage overall -----------------------------------
@@ -307,7 +307,7 @@ clutch_by_pot %>%
   group_by(Year)%>%
   summarise(mean = mean(egg_mean), 
             egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) ->percent_clutch
-write.csv(percent_clutch, paste0('./results/nj_stp/', cur_yr, '/NJ_percent_clutch.csv'))
+write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_clutch.csv'))
 
 #### Stephens Passage  ----------------------
 ###  All these are Juneau so no sub_area (location code 13, 23) 
