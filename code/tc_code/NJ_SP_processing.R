@@ -595,8 +595,8 @@ write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percen
 survey.location = "Juneau"
 area = "Stephens Passage"
 abrv = "SP"
-panel_figure_jnu("Juneau", 2018, "Stephens Passage", "SP", 2)
-panel_figure_jnu("Juneau", 2018, "Stephens Passage", "SP", 3)
+panel_figure_jnu("Juneau", cur_yr, "Stephens Passage", "SP", 2)
+panel_figure_jnu("Juneau", cur_yr, "Stephens Passage", "SP", 3)
 
 # presentation figures----------------
 panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 2)
