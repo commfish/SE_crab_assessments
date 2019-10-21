@@ -334,8 +334,10 @@ glimpse(SP_hist) # make sure the column names here match those in dat.NJ
 
 dat.SP %>% 
   select( -Latitude.Decimal.Degrees, -Longitude.Decimal.Degrees) -> dat.SP
+SP_hist %>% 
+  select(-X) -> SP_hist
 data.SP.all <- rbind(SP_hist, dat.SP)
-write.csv(data.SP.all, paste0('./results/nj_stp/', cur_yr,'/SP_rawdata_all.csv', row.names = FALSE))
+write.csv(data.SP.all, paste0('./results/tanner/nj_stp/', cur_yr,'/SP_rawdata_all.csv', row.names = FALSE))
 
 ### data manipulations ----------------------
 # easier area since there are NO strata
@@ -358,6 +360,10 @@ data.SP.all %>%
 ##### By Pot ----------------------------------------------------
 #Now summarize by pot - only one area - Juneau(also known as SP)
 #Need Number of Specimens by recruit class
+#   ## reomove pots that doesn't have "normal" condition
+Tdat1 %>% 
+  filter(!is.na(area)) -> Tdat1
+
 Tdat1 %>%
   group_by(Year, area, Pot.No, Tanner.Density.Strata.Code,mod_recruit) %>% # use AREA here instead of location due to multiple location names for one survey area
   summarise(crab = sum(Number.Of.Specimens)) -> dat2
@@ -402,7 +408,7 @@ dat5 %>%
                 (sqrt(sum(!is.na(Large.Females)))))) -> CPUE_wt_all
 # check to confirm last years CPUEs match - that's why we use two years.
 # change name and folder here.
-write.csv(CPUE_wt_all, paste0('./results/nj_stp/', cur_yr, '/SP_CPUE_ALL.csv'))
+write.csv(CPUE_wt_all, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_CPUE_ALL.csv'))
 
 ##### Short term trends -------------------------------------
 #look at trend for the last 4 years.  Need a file with last four years
@@ -441,7 +447,7 @@ short_term_results %>%
                               ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
   mutate(score = 0.25*significant) -> short_term_results #estimate is slope from regression
 # final results with score - save here
-write.csv(short_term_results, paste0('./results/nj_stp/', cur_yr, '/SP_shortterm.csv'))
+write.csv(short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_shortterm.csv'))
 
 dat3_long %>%
   filter(mod_recruit %in% recruit_used) ->st_dat3_long
@@ -489,7 +495,7 @@ datWL %>%
                                Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
 # final results with score - save here
 
-write.csv(male_weights, paste0('./results/nj_stp/', cur_yr, '/SP_weights.csv'))
+write.csv(male_weights, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_weights.csv'))
 
 ##### survey mid-date --------------------
 Tdat1 %>%
@@ -531,7 +537,7 @@ poorclutch1 %>%
   group_by(area, Year)%>%
   summarise(Pclutch = mean(var1)*100 , 
             Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
-write.csv(percent_low_clutch, paste0('./results/nj_stp/', cur_yr, '/SP_precent_low_clutch.csv'))
+write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_precent_low_clutch.csv'))
 
 ##### Long term females -------------------------
 glimpse(poorclutch1)
@@ -569,7 +575,7 @@ F_short_term_results %>%
                               ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
   mutate(score = 0.25*significant) -> F_short_term_results #estimate is slope from regression
 # final results with score - save here
-write.csv(F_short_term_results, paste0('./results/nj_stp/', cur_yr, '/SP_Fem_shortterm.csv'))
+write.csv(F_short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_Fem_shortterm.csv'))
 ggplot(poorclutch1, aes(Year, var1))+geom_point() 
 
 ##### egg percentage overall -----------------------------------
@@ -581,7 +587,7 @@ LgF_Tdat1 %>%
 clutch_by_pot %>%
   group_by(Location, Year)%>%
   summarise(mean = mean(egg_mean), egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) ->percent_clutch
-write.csv(percent_clutch, paste0('./results/nj_stp/', cur_yr, '/SP_percent_clutch.csv'))
+write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percent_clutch.csv'))
 
 
 
