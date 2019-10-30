@@ -7,3 +7,7 @@ Tanner crab are assessed from the red king crab survey areas as a non-target or 
 
 see tanner_redkingcrab_areas_survey_results.R
 
+
+## north juneau and stephens passage
+Come from data from the Juneau leg of the red king crab survey. These pots need to be seperated into strata for Stephens Passage - using GIS (need to move instructions in here - currently in OneNote). 
+see NJ_SP_processing.R
