@@ -37,13 +37,13 @@ dat1 %>%
   filter(Recruit.Status == "", Width.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) #-> test1
-# check pot 15, 2013 Holkham Bay - pull again from OceanAK
+# check pot 15, 2013 Holkham Bay - pull again from OceanAK **FIX**
 
-# also need to check soak time and to make sure all crab that were measured have a recruit status
+# **FIX **  calculate soak time 
 #come back later and add a soak time column - tanner soak time should be between 16-20??? double check this
 
 ##### Tanner specific manipulations -----------------------------
-###     Survey areas ONLY 
+###     Tanner Survey areas ONLY 
 #   confirm that only the four surveys areas are present.
 levels(dat1$Location) # 
 
@@ -67,10 +67,12 @@ dat1 %>%
 # confirm this worked
 Tdat1 %>% 
   filter(mod_recruit == "Missing")
+# same issues with pot 15 in HB, 2013 **FIX**
 
+## CPUE calc -----------------
 ##### By Pot ----------------------------------------------------
-#Now summarize by pot - remember to keep areas seperate.
-#Need Number of Specimens by recruit class USE mod_recruit here.
+# Now summarize by pot - remember to keep areas seperate.
+# need Number of Specimens by recruit class USE mod_recruit here.
 Tdat1 %>%
   group_by(Year, Location, Pot.No, Density.Strata.Code, mod_recruit) %>% 
   summarise(crab = sum(Number.Of.Specimens)) %>% 
@@ -81,9 +83,8 @@ dat3 <- dcast(dat2, Year + Location + Pot.No + Density.Strata.Code ~ mod_recruit
 # Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has it's own area file or area per
 #     strata.  This is used to calculating the weighting for weighted CPUE.
 dat3 %>%
-  #select( -`NA`) %>% #remove NA column.  This is due to some data errors that need to be fixed in the entry
   right_join(area) -> tab
-#Calculates the number of pots per strata.  
+# Calculates the number of pots per strata.  
 tab %>%
   group_by(Year, Location, Density.Strata.Code) %>%
   summarise(npots  = length(Pot.No)) -> pots_per_strata
@@ -91,19 +92,17 @@ tab %>%
 ##### Weighted CPUE current year -----------------------------------
 # the weighting is the product of the area for each strata and the inverse (1/n) of the number of pots per strata per year
 # need to combine data sets to accomplish this.
-
 tab %>%
   right_join(pots_per_strata) -> dat4
 
 dat4 %>%
   mutate(inverse_n = 1 / npots, weighting = inverse_n * Area_km) ->dat5
-
 #check to make sure there aren't crab without a assigned recruit class. 
 dat5 %>%
   filter(No_crab > 0)
 
-#This version is ready to calculate CPUE for each recruit class
-#Calculates a weighted mean CPUE and SE for each recruit class
+# This version is ready to calculate CPUE for each recruit class
+# Calculates a weighted mean CPUE and SE for each recruit class
 dat5 %>%
   group_by(Location, Year) %>%
   summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
@@ -113,7 +112,7 @@ dat5 %>%
             SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females))))),
             MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females)))))) -> CPUE_wt_all
 # check to confirm previous years CPUEs match
-write.csv(CPUE_wt_all, paste0('./results/TCS/', cur_yr, '/', cur_yr,'CPUE_all.csv')) # contains last four years of survey data 
+write.csv(CPUE_wt_all, paste0('./results/tanner/tanner_tcs/', cur_yr, '/', cur_yr,'CPUE_all.csv')) # contains last four years of survey data 
 
 # create historic file --------------
 hist_dat %>% 
