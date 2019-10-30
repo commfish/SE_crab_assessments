@@ -14,18 +14,16 @@ dat <- read.csv("./data/tanner/tanner_tcs/tanner crab survey for CSA_13_19.csv")
 # this is input from OceanAK - set up as tanner crab survey for CSA
 area <- read.csv("./data/tanner/tanner_tcs/TCSstrata_area.csv") 
 baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
-# brought in all data since 2013 - this was after survey was stratified.  Older data needs to be imported
-# from data file and NOT OceanAK since it won't have survey strata designations in OceanAK
+# brought in all data since 2013 - this was after survey was stratified.  
 # biomass <- read.csv() # need to bring this in for figures later. **FIX**
 
 ### historic file ---------
-# need to import data from 1997 to 2013 that has post-strata assignments.
 # need this data for biomass and CPUE trend figures
 hist_dat <- read.csv(paste0('./results/tanner/tanner_tcs/',cur_yr-1, '/',cur_yr-1,'_CPUE_historic.csv'))
+# Older data needs to be imported 1997 to 2013 has post-strata asignments. 
+#   DO NOT take from OceanAK since it won't have survey strata designations in OceanAK
 
-
-
-
+## survey data QAC -------
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
 
