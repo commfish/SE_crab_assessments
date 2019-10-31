@@ -223,7 +223,7 @@ poorclutch1 %>%
 poorclutch1 %>%
   group_by(Location, Year)%>%
   summarise(Pclutch = mean(var1)*100 , Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
-write.csv(percent_low_clutch, paste0('./results/tanner/tanner_tcs/', cur_yr, '/TCS_precent_low_clutch.csv'))
+write.csv(percent_low_clutch, paste0('./results/tanner/tanner_tcs/', cur_yr, '/TCS_percent_low_clutch.csv'))
 
 ##### Long term females -------------------------
 glimpse(poorclutch1)
