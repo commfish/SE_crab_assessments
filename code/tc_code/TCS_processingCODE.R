@@ -280,6 +280,10 @@ total_health("tanner_tcs", cur_yr)
 
 ### STOP here and run .Rmd file for these results ------------------------
 
+# need commericial harvest from fish tickets for each area CSA - look in:
+# ./results/tanner/tanner_comm_catch_97_2019.csv and tanner_mid_catch_date2019.csv
+
+# need to update biomass .csv with output from CSA models for all areas
 
 ## panel figures -----
 panel_figure("Icy Strait", 2018, "Icy Strait", 2, "include")
