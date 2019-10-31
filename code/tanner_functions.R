@@ -171,6 +171,53 @@ poor_clutch_short <- function(females_all, year){
   write_csv(short_term_results, paste0('results/tanner/tanner_tcs/', year, '/female_shortterm.csv'))
 }
 
+### total stock health table --------------
+total_health <- function(survey, year){
+  longterm <- read_csv(paste0('results/tanner/', survey, '/', year, '/long_term.csv'))
+  shortterm <- read_csv(paste0('results/tanner/', survey, '/',  year, '/shortterm.csv'))
+  lt_female <- read_csv(paste0('results/tanner/', survey, '/',  year, '/Female_long_term.csv'))
+  short_female <- read_csv(paste0('results/tanner/', survey, '/', year, '/female_shortterm.csv'))
+  
+  longterm %>% 
+    group_by(Location) %>% 
+    summarise(lt_sigf = sum(significant)) -> t1
+  shortterm %>% 
+    group_by(Location) %>% 
+    summarise(sigf = sum(score)) -> t2
+  lt_female %>% 
+    group_by(area) %>% 
+    summarise(lf_sigf = sum(significant)) %>% 
+    mutate(Location = area) %>% 
+    select(Location,lf_sigf) -> t3
+  short_female %>% 
+    group_by(Location) %>% 
+    summarise(sf_sigf = sum(score)) -> t4
+  
+  t1 %>% 
+    left_join(t2) %>% 
+    left_join(t3) %>% 
+    left_join(t4) %>% 
+    group_by(Location) %>% 
+    summarise(score = lt_sigf + sigf + lf_sigf + sf_sigf) -> sum_all
+  
+  # summary score add stock health status
+  sum_all %>%
+    mutate(health_status = ifelse(score < -4.25, "poor", 
+                                  ifelse(score > -4.25 & score<= -1.75, 
+                                         "below average", 
+                                         ifelse(score > -1.75 & score <= 1.5, "moderate", 
+                                                ifelse(score > 1.75 & score <= 4.25, "above average", 
+                                                       ifelse(score > 4.25, "healthy", "unknown")))))) %>% 
+    mutate (harvest_per = ifelse(health_status == "poor", 0, 
+                                 ifelse(health_status == "below average", 0.05, 
+                                        ifelse(health_status == "moderate", 0.10, 
+                                               ifelse(health_status == "above average", 0.15,
+                                                      ifelse(health_status == "healthy", 0.20, "unk")))))) -> stock_health
+  #select ( - score_f) -> stock_health
+  write_csv(stock_health, paste0('results/tanner/', survey, '/', year, '/stock_health.csv'))
+}
+
+
 ## CONF / non-conf panel figure ---------------
 panel_figure <- function(survey.location, cur_yr, area, option, conf){
   # survey.location here are codes: Thomas Bay, Icy Strait, Holkham Bay, and Glacier Bay
