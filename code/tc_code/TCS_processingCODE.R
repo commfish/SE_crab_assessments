@@ -121,10 +121,8 @@ hist_dat %>%
   bind_rows(CPUE_wt_all) -> all_CPUE_data
 write.csv(all_CPUE_data, paste0('./results/tanner/tanner_tcs/', cur_yr, '/', cur_yr,'_CPUE_historic.csv'))
 
-
-
 ##### Short term trends -------------------------------------
-#look at trend for the last 4 years.  Need a file with last four years
+# look at trend for the last 4 years.  Need a file with last four years
 
 # function 
 head(dat3) # make sure this is the file with each recruit class as a column by year, location and pot no
@@ -138,28 +136,26 @@ dat3_long <- gather(dat3, mod_recruit, crab, Juvenile:Small.Females, factor_key 
 
 ggplot(dat3_long, aes(Year, crab, color = mod_recruit))+geom_point() +facet_wrap(~Location)
 
+### specific area/class combos that need a closer looks ------------
 ### just thomas bay Large.Females
-dat3_long %>%
-  filter(Location == 'Thomas Bay', mod_recruit == 'Large.Females') -> graph1
-ggplot(graph1, aes(Year, crab, color = mod_recruit)) + geom_point() +geom_smooth(method = 'lm')
+#dat3_long %>%
+#  filter(Location == 'Thomas Bay', mod_recruit == 'Large.Females') -> graph1
+#ggplot(graph1, aes(Year, crab, color = mod_recruit)) + geom_point() +geom_smooth(method = 'lm')
 ### just holkham bay for recruits
-dat3_long %>%
-  filter(Location == 'Holkham Bay', mod_recruit == 'Recruit') -> graph1
-ggplot(graph1, aes(Year, crab, color = mod_recruit)) + geom_point() +geom_smooth(method ='lm')
+#dat3_long %>%
+#  filter(Location == 'Holkham Bay', mod_recruit == 'Recruit') -> graph1
+#ggplot(graph1, aes(Year, crab, color = mod_recruit)) + geom_point() +geom_smooth(method ='lm')
 
 ##### Long term trends ---------------------
 # compare current year's data to long term mean - for each Location
 # need to use dat5 because the weighting column is needed.
 
-#long_ttest('Thomas Bay', 2017, baseline, dat5)
-
 areas <- c('Icy Strait', 'Glacier Bay', 'Holkham Bay', 'Thomas Bay')
-#areas <- c('Holkham Bay', 'Thomas Bay')
 
 long_term <- lapply(areas, long_loop_17, curyr = cur_yr)
 long_term_all <- bind_rows(long_term)
 
-write.csv(long_term_all, paste0('./results/TCS/', cur_yr,'/long_term.csv'))
+write.csv(long_term_all, paste0('./results/tanner/tanner_tcs/', cur_yr,'/long_term.csv'))
 
 ##### Weights from length - weight relatinship--------------------
 #
@@ -173,8 +169,7 @@ weight_length <- data.frame(AREA =character(),  slope =numeric(), coeff = numeri
 weight_length <- data.frame(Location = unique(dat5$Location), slope = c(3.30, 3.34, 3.29, 3.32),
                             coeff = c(9.48, 9.73, 9.48, 9.67))
 
-# Pybus Bay linear model: exp(3.05*log(length in mm)-8.34)*2.2/1000
-glimpse(Tdat1) # raw data for both 2015 and 2016 
+glimpse(Tdat1) # raw data f 
 Tdat1 %>%
   right_join(weight_length) %>%
   mutate(weight_lb = (exp((slope*log(Width.Millimeters)) - coeff ))*(2.2/1000))-> datWL
@@ -192,7 +187,7 @@ datWL %>%
             prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
                                Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
 # final results with score - save here
-write.csv(male_weights, paste0('./results/TCS/', cur_yr, '/TCS_weights.csv'))
+write.csv(male_weights, paste0('./results/tanner/tanner_tcs/', cur_yr, '/TCS_weights.csv'))
 
 
 ##### Females - large or mature females --------------------------
@@ -200,7 +195,7 @@ write.csv(male_weights, paste0('./results/TCS/', cur_yr, '/TCS_weights.csv'))
 Tdat1 %>%
   filter(Sex.Code == 2, mod_recruit == 'Large.Females') -> LgF_Tdat1
 
-#make sure this does NOT include immature females
+# make sure this does NOT include immature females
 # this is egg_development_code == 4
 LgF_Tdat1 %>%
   filter(Egg.Development.Code == 4)
@@ -228,10 +223,9 @@ poorclutch1 %>%
 poorclutch1 %>%
   group_by(Location, Year)%>%
   summarise(Pclutch = mean(var1)*100 , Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
-write.csv(percent_low_clutch, paste0('./results/TCS/', cur_yr, '/TCS_precent_low_clutch.csv'))
+write.csv(percent_low_clutch, paste0('./results/tanner/tanner_tcs/', cur_yr, '/TCS_precent_low_clutch.csv'))
 
 ##### Long term females -------------------------
-
 glimpse(poorclutch1)
 #compare current year's CPUE distribution to the long term mean
 poorclutch1 %>%
@@ -243,7 +237,7 @@ Fem_long_term <- lapply(areas, Fem_long_loop) #assumes above file is named 'poor
 Fem_long_term
 
 Fem_long_term_all <- bind_rows(Fem_long_term)
-write.csv(Fem_long_term_all, paste0('./results/TCS/', cur_yr,'/Fem_poorclutch_long_term.csv'))
+write.csv(Fem_long_term_all, paste0('./results/tanner/tanner_tcs/', cur_yr,'/Fem_poorclutch_long_term.csv'))
 
 ##### Short term females ------------------------
 #look at trend for the last 4 years. 
@@ -262,24 +256,26 @@ LgF_Tdat1 %>%
 clutch_by_pot %>%
   group_by(Location, Year)%>%
   summarise(mean = mean(egg_mean), egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) ->percent_clutch
-write.csv(percent_clutch, paste0('./results/TCS/', cur_yr,'/TCS_percent_clutch.csv'))
-# these don't match previous calculations in JMP- why ??
+write.csv(percent_clutch, paste0('./results/tanner/tanner_tcs/', cur_yr,'/TCS_percent_clutch.csv'))
 
 ## female historic data combined ----------------
-historic_low <- read.csv('./results/TCS/2018/historic_TCS_precent_low_clutch.csv')
-historic_clutch <- read.csv('./results/TCS/2018/historic_TCS_percent_clutch.csv')
+historic_low <- read.csv('./results/tanner/tanner_tcs/historic_TCS_precent_low_clutch.csv')
+historic_clutch <- read.csv('./results/tanner/tanner_tcs/historic_TCS_percent_clutch.csv')
 
 historic_low %>% 
   filter(Year < 2013) %>% 
   select (-X) %>% 
   bind_rows(percent_low_clutch) %>% 
-  write.csv(paste0('./results/TCS/', cur_yr, '/all_years_percent_low_clutch.csv'))
+  write.csv(paste0('./results/tanner/tanner_tcs/', cur_yr, '/all_years_percent_low_clutch.csv'))
 
 historic_clutch %>% 
   filter(Year < 2013) %>% 
   select (-X) %>% 
   bind_rows(percent_clutch) %>% 
-  write.csv(paste0('./results/TCS/', cur_yr, '/all_years_percent_clutch.csv'))
+  write.csv(paste0('./results/tanner/tanner_tcs/', cur_yr, '/all_years_percent_clutch.csv'))
+
+### STOP here and run .Rmd file for these results ------------------------
+
 
 ## panel figures -----
 panel_figure("Icy Strait", 2018, "Icy Strait", 2, "include")
