@@ -237,7 +237,7 @@ Fem_long_term <- lapply(areas, Fem_long_loop) #assumes above file is named 'poor
 Fem_long_term
 
 Fem_long_term_all <- bind_rows(Fem_long_term)
-write.csv(Fem_long_term_all, paste0('./results/tanner/tanner_tcs/', cur_yr,'/Fem_poorclutch_long_term.csv'))
+write.csv(Fem_long_term_all, paste0('./results/tanner/tanner_tcs/', cur_yr,'/Female_long_term.csv'))
 
 ##### Short term females ------------------------
 #look at trend for the last 4 years. 
@@ -273,6 +273,10 @@ historic_clutch %>%
   select (-X) %>% 
   bind_rows(percent_clutch) %>% 
   write.csv(paste0('./results/tanner/tanner_tcs/', cur_yr, '/all_years_percent_clutch.csv'))
+
+
+## stock health -------------
+total_health("tanner_tcs", cur_yr)
 
 ### STOP here and run .Rmd file for these results ------------------------
 
