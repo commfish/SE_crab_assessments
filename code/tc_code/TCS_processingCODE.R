@@ -286,36 +286,36 @@ total_health("tanner_tcs", cur_yr)
 # need to update biomass .csv with output from CSA models for all areas
 
 ## panel figures -----
-panel_figure("Icy Strait", 2018, "Icy Strait", 2, "include")
-panel_figure("Icy Strait", 2018, "Icy Strait", 3)
+panel_figure("Icy Strait", cur_yr, "Icy Strait", 2, "include")
+panel_figure("Icy Strait", cur_yr, "Icy Strait", 3)
 
-panel_figure("Glacier Bay", 2018, "Glacier Bay", 2, "include")
-panel_figure("Glacier Bay", 2018, "Glacier Bay", 3)
+panel_figure("Glacier Bay", cur_yr, "Glacier Bay", 2, "include")
+panel_figure("Glacier Bay", cur_yr, "Glacier Bay", 3)
 
-panel_figure("Thomas Bay", 2018, "Thomas Bay", 2, "include")
-panel_figure("Thomas Bay", 2018, "Thomas Bay", 3)
+panel_figure("Thomas Bay", cur_yr, "Thomas Bay", 2, "include")
+panel_figure("Thomas Bay", cur_yr, "Thomas Bay", 3)
 
-panel_figure("Holkham Bay", 2018, "Holkham Bay", 2, "include")
-panel_figure("Holkham Bay", 2018, "Holkham Bay", 3)
+panel_figure("Holkham Bay", cur_yr, "Holkham Bay", 2, "include")
+panel_figure("Holkham Bay", cur_yr, "Holkham Bay", 3)
 
 
 # non-confidential areas 2018 ------------
-panel_figure("Icy Strait", 2018, "Icy Strait", 2, "exclude")
-panel_figure("Holkham Bay", 2018, "Holkham Bay", 2, "exclude")
-panel_figure("Thomas Bay", 2018, "Thomas Bay", 2, "exclude")
+panel_figure("Icy Strait", cur_yr, "Icy Strait", 2, "exclude")
+panel_figure("Holkham Bay", cur_yr, "Holkham Bay", 2, "exclude")
+panel_figure("Thomas Bay", cur_yr, "Thomas Bay", 2, "exclude")
 
 
 # presentation figures----------------
-panel_figure_pres("Icy Strait", 2018, "Icy Strait", 2, "exclude")
-panel_figure_pres("Icy Strait", 2018, "Icy Strait", 3, "exclude")
+panel_figure_pres("Icy Strait", cur_yr, "Icy Strait", 2, "exclude")
+panel_figure_pres("Icy Strait", cur_yr, "Icy Strait", 3, "exclude")
 
-panel_figure_pres("Glacier Bay", 2018, "Glacier Bay", 2, "exclude")
-panel_figure_pres("Glacier Bay", 2018, "Glacier Bay", 3, "exclude")
+panel_figure_pres("Glacier Bay", cur_yr, "Glacier Bay", 2, "exclude")
+panel_figure_pres("Glacier Bay", cur_yr, "Glacier Bay", 3, "exclude")
 
-panel_figure_pres("Holkham Bay", 2018, "Holkham Bay", 2, "exclude")
-panel_figure_pres("Holkham Bay", 2018, "Holkham Bay", 3, "exclude")
+panel_figure_pres("Holkham Bay", cur_yr, "Holkham Bay", 2, "exclude")
+panel_figure_pres("Holkham Bay", cur_yr, "Holkham Bay", 3, "exclude")
 
-panel_figure_pres("Thomas Bay", 2018, "Thomas Bay", 2, "exclude")
-panel_figure_pres("Thomas Bay", 2018, "Thomas Bay", 3, "exclude")
+panel_figure_pres("Thomas Bay", cur_yr, "Thomas Bay", 2, "exclude")
+panel_figure_pres("Thomas Bay", cur_yr, "Thomas Bay", 3, "exclude")
 
 
