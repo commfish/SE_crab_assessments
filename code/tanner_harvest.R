@@ -102,7 +102,7 @@ write.csv(annual_catch, paste0('./results/tanner/tanner_annual_catch_', cur_yr,'
 
 
 ### all years ----------------------
-harvest_all <- read.csv(paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
+ harvest_all <- read.csv(paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr-1,'.csv'))
 
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
@@ -123,8 +123,9 @@ library(stringr)
 numextract <- function(string){ 
   str_extract(string, "\\-*\\d+\\.*\\d*")
 } 
-harvest_all %>% 
-  mutate(Year = as.numeric(numextract(Season))) -> harvest_all
+# not needed as current pull will just have year NOT season.
+# harvest_all %>% 
+#  mutate(Year = as.numeric(numextract(Season))) -> harvest_all
 
 harvest_all %>% 
   select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds) %>% 
@@ -139,6 +140,7 @@ logb11510 %>%
   select(Year = YEAR, percentNJ = percent) -> logb_merge
 
 harvest_all_update %>% 
+#harvest_all %>%  # placeholder for updates made in season after initial calcs are done
   filter(Stat.Area == 11510) %>% 
   left_join(logb_merge) %>% 
   mutate(no_NJ = numbers*percentNJ,
@@ -159,6 +161,7 @@ harvest_all_update %>%
 ### Deal with 11510 -----------
 # - take it out manipulate it above and add it back in
 harvest_all_update %>%
+#harvest_all %>%  
   filter(Stat.Area != 11510) %>% 
   bind_rows(stat_11510) %>% 
   group_by(survey.area, Year) %>%
