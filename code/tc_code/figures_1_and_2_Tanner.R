@@ -16,14 +16,14 @@
 source('./code/tanner_functions.R')
 
 # data -----
-cur_yr <- 2018
+cur_yr <- 2019
 #survey_biomass <- read.csv("./data/TCS/survey_areas_biomass.csv") #add to each year
 # above file had point estimates from each year and was kept historically in SigmaPlot. Now this is tracked in 
 # an appendix table in the stock health document. 
 biomass <- read.csv(paste0('./data/rkc_tanner/tanner_', cur_yr, '_biomassmodel.csv'))          
-harvest <- read.csv("./data/Tanner_Detailed Fish Tickets_85_18.csv") 
+harvest <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_ALL_years.csv") 
 # add current years catch to this file or repull all years
-std_cpue <- read.csv("C:/Users/kjpalof/Documents/R projects/tanner-crab/results/std_commericial_cpue.csv")
+std_cpue <- read.csv(paste0("C:/Users/kjpalof/Documents/R projects/tanner-crab/results/std_commericial_cpue", cur_yr, ".csv"))
 #calculated in a seperate project "tanner-crab"
 
 # data prep for Figure 1 ---------------
