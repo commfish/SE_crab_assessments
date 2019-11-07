@@ -142,7 +142,7 @@ tanner1 <- c('FredSnd/Lwr StephPsg Tanner', 'Icy Strait Tanner Crab', 'Lynn Cana
 harvest %>% 
   filter(Fishery %in% tanner1) %>% 
   group_by(Year = Batch.Year) %>%
-  filter(Year >= cur_yr-4) %>% 
+  #filter(Year >= cur_yr-4) %>% 
   summarise(permits = length(unique(CFEC)), 
               numbers = sum(Number.Of.Animals, na.rm = TRUE), 
               pounds = sum(Whole.Weight..sum., na.rm = TRUE)) -> annual_harvest_cur
