@@ -29,7 +29,10 @@ baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 
 SP_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/SP_rawdata_all.csv'))
 NJ_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_rawdata_all.csv'))
+# bring historic NJ for graphing purposes
 NJ_cpue_historic <- read.csv('./results/tanner/nj_stp/2018/NJ_CPUE_all_edited.csv')
+NJ_lowc_historic <- read.csv('./results/tanner/nj_stp/2018/NJ_precent_low_clutch_edited.csv')
+NJ_clutch_historic <- read.csv('./results/tanner/nj_stp/2018/NJ_percent_clutch_edited.csv')
 # bring in historic data for each area below.
 #females <- read.csv("./data/Juneau/RKC_11_16_large females_by_pot.csv")
 
@@ -259,7 +262,12 @@ poorclutch1 %>%
   group_by(Year)%>%
   summarise(Pclutch = mean(var1)*100 , 
             Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
-write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_precent_low_clutch.csv'))
+write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_low_clutch_cur.csv'))
+NJ_lowc_historic %>% 
+  filter(Year < 2009) %>% 
+  bind_rows(percent_low_clutch) %>% 
+  write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_low_clutch.csv'))
+
 
 ##### Long term females -------------------------
 glimpse(poorclutch1)
@@ -313,7 +321,11 @@ clutch_by_pot %>%
   group_by(Year)%>%
   summarise(mean = mean(egg_mean), 
             egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) ->percent_clutch
-write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_clutch.csv'))
+write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_clutch_cur.csv'))
+NJ_clutch_historic %>% 
+  filter(Year < 2009) %>% 
+  bind_rows(percent_clutch) %>% 
+  write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_clutch.csv'))
 
 #### Stephens Passage  ----------------------
 ###  All these are Juneau so no sub_area (location code 13, 23) 
@@ -543,7 +555,7 @@ poorclutch1 %>%
   group_by(area, Year)%>%
   summarise(Pclutch = mean(var1)*100 , 
             Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
-write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_precent_low_clutch.csv'))
+write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percent_low_clutch.csv'))
 
 ##### Long term females -------------------------
 glimpse(poorclutch1)
