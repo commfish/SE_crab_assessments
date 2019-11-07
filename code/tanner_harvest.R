@@ -106,14 +106,17 @@ write.csv(annual_catch, paste0('./results/tanner/tanner_annual_catch_', cur_yr,'
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
 
+# need this year to be the begining of the season year range NOT the end 
+# so in 2018/2019 season - it's 2019 but I need 2018
 harvest2 %>%
+  mutate(Year = Year-1) %>% 
   group_by(Year, Stat.Area, survey.area) %>%
   summarise(vessels = length(unique(ADFG.Number)), 
             people = length(unique(CFEC)),
             permits = length(unique(Permit.Holder.Name)), #permits = length(unique(Permit.Serial.Number)), 
             processor = length(unique(Processor.Code)),
             numbers = sum(Number.Of.Animals, na.rm = TRUE), 
-            pounds = sum(Whole.Weight..sum., na.rm = TRUE)) -> harvest2_cur
+            pounds = sum(Whole.Weight..sum., na.rm = TRUE))  -> harvest2_cur
 
 ### all years by survey area --------------------------
 # add year ----
@@ -124,7 +127,7 @@ numextract <- function(string){
 } 
 
 harvest_all %>% 
-  mutate(Year = as.numeric(numextract(Season))+1) %>% 
+  mutate(Year = as.numeric(numextract(Season))) %>% 
   select(-X, -Season) -> harvest_all2
 
 harvest_all2 %>% 
