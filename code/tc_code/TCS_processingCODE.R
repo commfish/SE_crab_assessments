@@ -287,16 +287,16 @@ total_health("tanner_tcs", cur_yr)
 
 ## panel figures -----
 panel_figure("Icy Strait", cur_yr, "Icy Strait", 2, "include")
-panel_figure("Icy Strait", cur_yr, "Icy Strait", 3)
+panel_figure("Icy Strait", cur_yr, "Icy Strait", 3, "include")
 
 panel_figure("Glacier Bay", cur_yr, "Glacier Bay", 2, "include")
-panel_figure("Glacier Bay", cur_yr, "Glacier Bay", 3)
+panel_figure("Glacier Bay", cur_yr, "Glacier Bay", 3, "include")
 
 panel_figure("Thomas Bay", cur_yr, "Thomas Bay", 2, "include")
-panel_figure("Thomas Bay", cur_yr, "Thomas Bay", 3)
+panel_figure("Thomas Bay", cur_yr, "Thomas Bay", 3, "include")
 
 panel_figure("Holkham Bay", cur_yr, "Holkham Bay", 2, "include")
-panel_figure("Holkham Bay", cur_yr, "Holkham Bay", 3)
+panel_figure("Holkham Bay", cur_yr, "Holkham Bay", 3, "include")
 
 
 # non-confidential areas 2018 ------------
