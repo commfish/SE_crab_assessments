@@ -598,14 +598,12 @@ write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percen
 
 
 # panel figure SP ---------------
-survey.location = "Juneau"
-area = "Stephens Passage"
-abrv = "SP"
+#survey.location = "Juneau"
+#area = "Stephens Passage"
+#abrv = "SP"
 
 panel_figure("Juneau", cur_yr, "Stephens Passage", "SP", 2)
-
-panel_figure_jnu("Juneau", cur_yr, "Stephens Passage", "SP", 2)
-panel_figure_jnu("Juneau", cur_yr, "Stephens Passage", "SP", 3)
+panel_figure("Juneau", cur_yr, "Stephens Passage", "SP", 3)
 
 # presentation figures----------------
 panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 2)
@@ -615,13 +613,11 @@ panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 3)
 # panel figure NJ ----
 # issues is that prior to 2009 don't have good idea of what raw data is used.  Take CPUE/SE and 
 #     female info from Sigma Plot file.
-survey.location = "North Juneau"
-area = "North Juneau"
-abrv = "NJ"
+#survey.location = "North Juneau"
+#area = "North Juneau"
+#abrv = "NJ"
 panel_figure("North Juneau", cur_yr, "North Juneau", "NJ", 2)
-
-panel_figure_nj("North Juneau", 2018, "North Juneau", "NJ", 2)
-panel_figure_nj("North Juneau", 2018, "North Juneau", "NJ", 3)
+panel_figure("North Juneau", cur_yr, "North Juneau", "NJ", 3)
 
 # presentation figures----------------
 panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 2)
