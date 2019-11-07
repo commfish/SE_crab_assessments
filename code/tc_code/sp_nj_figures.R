@@ -5,8 +5,8 @@
 #####Load -------------
 source('./code/tanner_functions.R')
 
-## CONF SP panel figure ---------------
-panel_figure_jnu <- function(survey.location, cur_yr, area, abrv, option){
+## CONF panel figure ---------------
+panel_figure <- function(survey.location, cur_yr, area, abrv, option){
   # survey.location here are codes: Juneau, North Juneau
   # area is used in biomass /harvest file:  Icy Strait, Glacier Bay, 
   # Holkham Bay, Thomas Bay, Stephens Passage, North Juneau, Lynn Sisters, Pybus Bay, 
@@ -18,17 +18,18 @@ panel_figure_jnu <- function(survey.location, cur_yr, area, abrv, option){
   # Option 3 - p2,p3 (females)
   CPUE_wt_graph <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr,
                                    '/', abrv, '_CPUE_ALL.csv'))
-  poorclutch_summary <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/', abrv, '_precent_low_clutch.csv'))
+  poorclutch_summary <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/', abrv, '_percent_low_clutch.csv'))
   egg_mean_all <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr,
                                   '/', abrv, '_percent_clutch.csv'))
   # file with year and mean percent poor clutch and se poor clutch 
   baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
   baseline_rkc <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
-  biomass <- read.csv("./data/tanner/tanner/tanner_rkc/tanner_2019_biomassmodel.csv") 
-  harvest <- read.csv("./results/tanner/tanner_comm_catch_98_2019.csv") # needs to be updated with
+  biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))
+  harvest <- read.csv(paste0('./results/tanner/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
   # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   
+  if(abrv == "SP"){
   # prep data 
   ### Mature males
   # create data frame that has mature males - just means
@@ -62,9 +63,43 @@ panel_figure_jnu <- function(survey.location, cur_yr, area, abrv, option){
     mutate(type = ifelse(recruit.status == "MatF_SE", 
                          "se", "mean"))-> femjuv_long
   femjuv_long %>% select (-recruit.status) %>% spread(type, value1) -> femjuv_graph
+  }
+  
+  if(abrv == "NJ"){
+  CPUE_wt_graph %>% 
+    #filter(Location == survey.location) %>% already selected for specific area using file name
+    select(Year,Pre_Recruit_u, Recruit_u, Post_Recruit_u, 
+           PreR_SE, Rec_SE, PR_SE) -> males
+  males_long <- gather(males, recruit.status, value1, Pre_Recruit_u:PR_SE, factor_key = TRUE)
+  males_long %>% 
+    mutate(recruit.class = ifelse(recruit.status == "Pre_Recruit_u",
+                                  "pre.recruit", ifelse(recruit.status == "Recruit_u", 
+                                                        "recruit", ifelse(recruit.status == "PreR_SE", 
+                                                                          "pre.recruit", ifelse(recruit.status == "Rec_SE", 
+                                                                                                "recruit", "post.recruit "))))) %>% 
+    mutate(type = ifelse(recruit.status == "PreR_SE",
+                         "se", 
+                         ifelse(recruit.status == "Rec_SE", 
+                                "se", ifelse(recruit.status == "PR_SE", 
+                                             "se", "mean"))))-> males_long
+  males_long %>% select (-recruit.status) %>% spread(type, value1) -> males_graph
+  
+  ### females/juv prep ------------
+  # current only mature females is graphed for tanner crab areas - why?  not sure check on this.
+  CPUE_wt_graph %>% 
+    #filter(Location == survey.location) %>% 
+    select(Year, MatF_u, MatF_SE) -> femjuv
+  femjuv_long <- gather(femjuv, recruit.status, value1, MatF_u:MatF_SE, factor_key = TRUE)
+  femjuv_long %>% 
+    mutate(recruit.class = "mature.female") %>% 
+    mutate(type = ifelse(recruit.status == "MatF_SE", 
+                         "se", "mean"))-> femjuv_long
+  femjuv_long %>% select (-recruit.status) %>% spread(type, value1) -> femjuv_graph
+  }
   
   # baseline cpue values -----
   baseline %>% 
+    bind_rows(baseline_rkc) %>% 
     filter(AREA == abrv) -> baseline2
   
   ## poor clutch --------
@@ -94,6 +129,7 @@ panel_figure_jnu <- function(survey.location, cur_yr, area, abrv, option){
   ## biomass manipulations -----------------
   # file for all locations.  Has preR, legal, and mature biomass from CSAs
   harvest %>% 
+    filter(Year >= 1997) %>%
     select(Year, Area = survey.area, pounds) ->harvest_a
   
   biomass %>% 
