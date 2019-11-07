@@ -20,7 +20,8 @@ cur_yr <- 2019
 #survey_biomass <- read.csv("./data/TCS/survey_areas_biomass.csv") #add to each year
 # above file had point estimates from each year and was kept historically in SigmaPlot. Now this is tracked in 
 # an appendix table in the stock health document. 
-biomass <- read.csv(paste0('./data/rkc_tanner/tanner_', cur_yr, '_biomassmodel.csv'))          
+biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))          
+harvest_old <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_85_18.csv")
 harvest <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_ALL_years.csv") 
 # add current years catch to this file or repull all years
 std_cpue <- read.csv(paste0("C:/Users/kjpalof/Documents/R projects/tanner-crab/results/std_commericial_cpue", cur_yr, ".csv"))
@@ -70,7 +71,7 @@ year_totals %>%
   mutate(Legal = ifelse(!is.na(adj_L), Total_L*(1+adj_L), Total_L), 
          Mature = ifelse(!is.na(adj_M), Total_M*(1+adj_M), Total_M)) %>% 
   select(Year, Legal, Mature) -> cur_yr_biomass
-write.csv(cur_yr_biomass, paste0('./results/TCS/', cur_yr, '/surveyed_areas_total_', cur_yr, '_model.csv'))
+write.csv(cur_yr_biomass, paste0('./results/tanner/', cur_yr, '/surveyed_areas_total_', cur_yr, '_model.csv'))
 # these are listed in Table A1 - Appendix in Tanner crab stock health document
 
 ## adjustments using data pre-2007 -------
@@ -134,7 +135,18 @@ cur_yr_biomass %>%
 
 
 # Figure 2 data prep --------------
+# needs to only include region 1 harvest
+# unique(harvest$Fishery)
+# last 4 years harvest ------
+tanner1 <- c('FredSnd/Lwr StephPsg Tanner', 'Icy Strait Tanner Crab', 'Lynn Canal/Upp StephPsg Tanner', 'Other Tanner Crab')
 harvest %>% 
+  filter(Fishery %in% tanner1) %>% 
+  group_by(Year = Batch.Year) %>%
+  filter(Year >= cur_yr-4) %>% 
+  summarise(permits = length(unique(CFEC)), 
+              numbers = sum(Number.Of.Animals, na.rm = TRUE), 
+              pounds = sum(Whole.Weight..sum., na.rm = TRUE)) -> annual_harvest_cur
+harvest_old %>% 
     group_by(Season) %>%
     summarise(permits = length(unique(CFEC)), 
               numbers = sum(Number.Of.Animals, na.rm = TRUE), 
@@ -149,10 +161,21 @@ annual_harvest %>%
   mutate(Year = as.numeric(numextract(Season))+1) -> annual_harvest
 
 annual_harvest %>% 
+  select(-Season) %>% 
+  select(Year, permits, numbers, pounds) %>% 
+  union(annual_harvest_cur) -> annual_harvest_all
+# annual harvest----
+# pull from OceanAK now has year so don't need to create it from season.
+
+annual_harvest_all %>% 
   select(Year, pounds) %>% 
   filter(Year > 1991) %>% 
   left_join(std_cpue) -> figure2
-
+# issues with current pull from OceanAK
+#annual_harvest_cur %>% 
+#  select(Year, pounds) %>% 
+#  filter(Year > 1991) %>% 
+#  left_join(std_cpue) -> figure2c
 
 # Figure 2a ----
 ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
@@ -163,7 +186,7 @@ ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
   xlab(NULL) +
   theme(plot.title = element_text(hjust =0.5)) + 
   scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2)) +
-  scale_y_continuous(labels = comma, limits = c(0,max(figure2$pounds/1000000, 
+  scale_y_continuous(limits = c(0,max(figure2$pounds/1000000, 
                                                       na.rm = TRUE) + 0.5), 
                      breaks= seq(min(0), max(max(figure2$pounds/1000000, 
                                                  na.rm = TRUE)+ 0.5), by = 0.5)) +
