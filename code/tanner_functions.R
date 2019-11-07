@@ -385,22 +385,24 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
   
   
   #### F1c Female eggs graph -----------
-  p3 <- ggplot(female_egg_graph, aes(Year, mean)) + 
-    geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = female.egg), 
-                  width =.4) +
-    geom_line(aes(color = female.egg)) +
+  p3 <- ggplot(female_egg_graph, aes(Year, mean, group = female.egg, fill = female.egg)) + 
+        #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = female.egg), 
+    #              width =.4) +
     geom_point(aes(fill = female.egg, shape = female.egg), size =3) +
-    
-    scale_fill_manual(name = "", values = c("black", "gray100")) +
+    geom_line(aes(color = female.egg, group = female.egg)) +
+    scale_shape_manual(name = "", values = c(21, 1)) +
     scale_colour_manual(name = "", values = c("grey1", "black")) +
-    scale_shape_manual(name = "", values = c(21, 21)) +
-    #scale_fill_discrete(breaks = c("total % clutch", "% poor clutch")) +
-    ylim(0,100) + 
+    scale_fill_manual(name = "", values = c("black", "gray45")) +
     ylab("Percentage") + 
-    xlab(NULL) +
-    geom_hline(yintercept = 10, color = "black") +
     theme(plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+                alpha = 0.2) +
+    
+    #scale_fill_discrete(breaks = c("total % clutch", "% poor clutch")) +
+    ylim(0,100) + 
+    xlab(NULL) +
+    geom_hline(yintercept = 10, color = "black") +
     theme(legend.position = c(0.2,0.5), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) 
