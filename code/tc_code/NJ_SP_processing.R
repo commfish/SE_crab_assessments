@@ -29,6 +29,7 @@ baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 
 SP_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/SP_rawdata_all.csv'))
 NJ_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_rawdata_all.csv'))
+NJ_cpue_historic <- read.csv('./results/tanner/nj_stp/2018/NJ_CPUE_all_edited.csv')
 # bring in historic data for each area below.
 #females <- read.csv("./data/Juneau/RKC_11_16_large females_by_pot.csv")
 
@@ -126,7 +127,12 @@ dat3 %>%
             SmallF_u = mean(Small.Females), SmallF_SE = (sd(Small.Females)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_ALL
 # check to confirm last years CPUEs match - that's why we use two years.
 # change name and folder for each area
-write.csv(CPUE_ALL, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_CPUE_ALL.csv'))
+write.csv(CPUE_ALL, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_CPUE_09_cur.csv'))
+NJ_cpue_historic %>% 
+  filter(Year < 2009) %>% 
+  bind_rows(CPUE_ALL) %>% 
+  write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_CPUE_ALL.csv'))
+
 
 ##### Short term trends -------------------------------------
 #look at trend for the last 4 years.  Need a file with last four years
@@ -595,6 +601,9 @@ write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percen
 survey.location = "Juneau"
 area = "Stephens Passage"
 abrv = "SP"
+
+panel_figure("Juneau", cur_yr, "Stephens Passage", "SP", 2)
+
 panel_figure_jnu("Juneau", cur_yr, "Stephens Passage", "SP", 2)
 panel_figure_jnu("Juneau", cur_yr, "Stephens Passage", "SP", 3)
 
@@ -609,6 +618,8 @@ panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 3)
 survey.location = "North Juneau"
 area = "North Juneau"
 abrv = "NJ"
+panel_figure("North Juneau", cur_yr, "North Juneau", "NJ", 2)
+
 panel_figure_nj("North Juneau", 2018, "North Juneau", "NJ", 2)
 panel_figure_nj("North Juneau", 2018, "North Juneau", "NJ", 3)
 
