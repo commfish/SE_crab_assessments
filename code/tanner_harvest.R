@@ -102,8 +102,7 @@ write.csv(annual_catch, paste0('./results/tanner/tanner_annual_catch_', cur_yr,'
 
 
 ### all years ----------------------
- harvest_all <- read.csv(paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr-1,'.csv'))
-
+ 
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
 
@@ -114,7 +113,7 @@ harvest2 %>%
             permits = length(unique(Permit.Holder.Name)), #permits = length(unique(Permit.Serial.Number)), 
             processor = length(unique(Processor.Code)),
             numbers = sum(Number.Of.Animals, na.rm = TRUE), 
-            pounds = sum(Whole.Weight..sum., na.rm = TRUE)) -> harvest2_all
+            pounds = sum(Whole.Weight..sum., na.rm = TRUE)) -> harvest2_cur
 
 ### all years by survey area --------------------------
 # add year ----
@@ -123,15 +122,18 @@ library(stringr)
 numextract <- function(string){ 
   str_extract(string, "\\-*\\d+\\.*\\d*")
 } 
-# not needed as current pull will just have year NOT season.
-# harvest_all %>% 
-#  mutate(Year = as.numeric(numextract(Season))) -> harvest_all
 
 harvest_all %>% 
-  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds) %>% 
-  bind_rows(harvest2_all) -> harvest_all_update
+  mutate(Year = as.numeric(numextract(Season))+1) %>% 
+  select(-X, -Season) -> harvest_all2
 
-write.csv(harvest_all_update, paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
+harvest_all2 %>% 
+  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds) %>% 
+  bind_rows(harvest2_cur) -> harvest_all_update
+
+# don't save here because need to fix 11510 area ?? **FIX**
+#write.csv(harvest_all_update, paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
+
 ## merge logbook ----
 # this is just to deal with 11510 - which was called "other" above but needs to be divided 
 #     between North Juneau and Lynn Sisters.
