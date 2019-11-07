@@ -190,12 +190,12 @@ write.csv(annual_catch_all, paste0('./results/tanner/tanner_annual_catch_97_', c
 # percent of total catch current year -----------
 comm.catch.sum_all %>% 
   filter(Year > 2015) %>% 
-  select(survey.area, Season, Year, permits, lb_18 = pounds) %>% 
+  select(survey.area, Year, permits, lb_by_yr = pounds) %>% 
   left_join(annual_catch_all) %>% 
-  mutate(percent_total = lb_18/pounds*100) %>% 
+  mutate(percent_total = lb_by_yr/pounds*100) %>% 
   as.data.frame() %>% 
   write_csv(paste0('./results/tanner/proportion_total_harvest_', cur_yr,'.csv'))
-
+# **FIX** year range is off prior to 2019. should be 1 year later.
 
 ## confidential catch -------------
 comm.catch.sum_all %>% 
