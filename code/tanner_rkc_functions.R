@@ -452,7 +452,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
     xlab("Survey Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-    scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds/100000, 
+    scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
                                                         na.rm = TRUE) + 0.25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
                                                    na.rm = TRUE)+0.25000), by = 0.5)) +
