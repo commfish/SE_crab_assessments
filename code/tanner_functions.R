@@ -231,14 +231,14 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
   # confidential - whether to include confidential data, if "include" then include all data, 
   #               if "exclude" then remove confidential data (i.e. Non-conf graphs)
   CPUE_wt_graph <- read.csv(paste0('./results/tanner/tanner_tcs/', cur_yr,
-                                   '/2018_CPUE_historic.csv'))
+                                   '/', cur_yr,'_CPUE_historic.csv'))
   poorclutch_summary <- read.csv(paste0('./results/tanner/tanner_tcs/', cur_yr, '/all_years_percent_low_clutch.csv'))
   egg_mean_all <- read.csv(paste0('./results/tanner/tanner_tcs/', cur_yr,
                                   '/all_years_percent_clutch.csv'))
   # file with year and mean percent poor clutch and se poor clutch 
   baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
-  biomass <- read.csv("./data/rkc_tanner/tanner_2018_biomassmodel.csv") 
-  harvest <- read.csv("./results/tanner/tanner_comm_catch_97_2018_confid.csv") # needs to be updated with
+  biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))
+  harvest <- read.csv(paste0('./results/tanner/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
   # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   
