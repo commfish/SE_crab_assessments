@@ -146,21 +146,28 @@ panel_figure <- function(survey.location, cur_yr, area, abrv, option){
   
   # Figure panel -----
   #### F1a mature male plot -----------
-  p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class))+ 
-    geom_point(aes(color = recruit.class, shape = recruit.class), size =3) +
+  p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
+    geom_point(aes(color = recruit.class, shape = recruit.class, 
+                   fill = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c("grey1", "grey62", "grey34"))+
+    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
+    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
     scale_shape_manual(name = "", values = c(15, 16, 17))+
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
     #                   oob = rescale_none) +
     ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
-    geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
-                  width =.4) +
-    geom_hline(yintercept = baseline2$Pre_Recruit, color = "grey65")+
-    geom_hline(yintercept = baseline2$Recruit, color = "grey34")+
-    geom_hline(yintercept = baseline2$Post_Recruit, color = "black")+
+    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+                alpha = 0.2) +
+    #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
+    #              width =.4) +
+    geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", 
+               linetype = "dotdash", lwd = 0.75)+
+    geom_hline(yintercept = baseline2$Recruit, color = "#56B4E9", 
+               linetype = "longdash", lwd = 0.75)+
+    geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
+               lwd = 0.75)+
     theme(legend.position = c(0.25,0.85), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"), 
@@ -168,20 +175,23 @@ panel_figure <- function(survey.location, cur_yr, area, abrv, option){
   
   
   ### F1b females/juvenile plot ---------------
-  p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class))+ 
+  p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
     geom_point(aes(color = recruit.class, shape = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c( "grey1"))+
+    scale_colour_manual(name = "", values = c( "#56B4E9"))+
     scale_shape_manual(name = "", values = c(15))+
+    scale_fill_manual(name = "", values = c("#56B4E9")) +
     
     #ylim(0,25) + 
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("Mature female CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
-    geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
-                  width =.4) +
-    geom_hline(yintercept = baseline2$Large.Female, color = "black")+
+    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+                alpha = 0.2) +
+    #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
+    #              width =.4) +
+    geom_hline(yintercept = baseline2$Large.Female, color = "#56B4E9")+
     theme(legend.position = c(0.15,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"))
@@ -193,15 +203,14 @@ panel_figure <- function(survey.location, cur_yr, area, abrv, option){
   
   
   #### F1c Female eggs graph -----------
-  p3 <- ggplot(female_egg_graph, aes(Year, mean)) + 
-    geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = female.egg), 
-                  width =.4) +
-    geom_line(aes(color = female.egg)) +
+  p3 <- ggplot(female_egg_graph, aes(Year, mean, group = female.egg, fill = female.egg)) + 
+    #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = female.egg), 
+    #              width =.4) +
     geom_point(aes(fill = female.egg, shape = female.egg), size =3) +
-    
-    scale_fill_manual(name = "", values = c("black", "gray100")) +
+    geom_line(aes(color = female.egg, group = female.egg)) +
+    scale_shape_manual(name = "", values = c(21, 1)) +
     scale_colour_manual(name = "", values = c("grey1", "black")) +
-    scale_shape_manual(name = "", values = c(21, 21)) +
+    scale_fill_manual(name = "", values = c("black", "gray45")) +
     #scale_fill_discrete(breaks = c("total % clutch", "% poor clutch")) +
     ylim(0,100) + 
     ylab("Percentage") + 
@@ -209,6 +218,8 @@ panel_figure <- function(survey.location, cur_yr, area, abrv, option){
     geom_hline(yintercept = 10, color = "black") +
     theme(plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+                alpha = 0.2) +
     theme(legend.position = c(0.2,0.5), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) 
