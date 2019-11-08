@@ -457,11 +457,11 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
   
   if(conf == "exclude"){  
-    ggsave(paste0('./figures/tanner/', survey.location, '_', cur_yr, '_', 
+    ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
                   option, '_nonconf.png'), panel,  
            dpi = 800, width = 8, height = 9.5)}
   if(conf == "include"){
-    ggsave(paste0('./figures/tanner/', survey.location, '_', cur_yr, '_', 
+    ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
                   option, 'confidential.png'), panel,  
            dpi = 800, width = 8, height = 9.5)}
 }
@@ -704,11 +704,11 @@ panel_figure_pres <- function(survey.location, cur_yr, area, option, conf){
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
   
   if(conf == "exclude"){  
-    ggsave(paste0('./figures/tanner/', survey.location, '_', cur_yr, '_', 
+    ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
                   option, '_nonconf_presentation.png'), panel,  
            dpi = 800, width = 8, height = 9.5)}
   if(conf == "include"){
-    ggsave(paste0('./figures/tanner/', survey.location, '_', cur_yr, '_', 
+    ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
                   option, 'confidential_presentation.png'), panel,  
            dpi = 800, width = 8, height = 9.5)}
 }
