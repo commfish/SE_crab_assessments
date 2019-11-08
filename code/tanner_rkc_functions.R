@@ -265,7 +265,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
   # file with year and mean percent poor clutch and se poor clutch 
   baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
   biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))
-  harvest <- read.csv(paste0('./results/tanner/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
+  harvest <- read.csv(paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
                                     # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
 
