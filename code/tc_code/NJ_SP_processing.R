@@ -17,6 +17,11 @@
 # source('./code/tanner_functions.R')
 source('./code/tc_code/sp_nj_figures.R')
 cur_yr <- 2019
+fig_path <- paste0('figures/', YEAR) # folder to hold all figs for a given year
+dir.create(fig_path) # creates YEAR subdirectory inside figures folder
+output_path <- paste0('results/tanner/nj_stp/', YEAR) # output and results
+dir.create(output_path) 
+
 
 # Data ---------------
 # change input file and input folder for each

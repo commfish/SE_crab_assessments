@@ -9,6 +9,10 @@ source('./code/tanner_rkc_functions.R') # need to create versions of this code t
 ## setup global ---------------
 cur_yr <- 2019
 pr_yr <- cur_yr -1
+fig_path <- paste0('figures/tanner/tanner_rkc/', cur_yr) # folder to hold all figs for a given year
+dir.create(fig_path) # creates YEAR subdirectory inside figures folder
+output_path <- paste0('results/tanner/tanner_rkc/', cur_yr) # output and results
+dir.create(output_path) 
 
 ## Data ---------------------------------------------------
 # change input file and input folder for each
