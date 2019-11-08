@@ -9,6 +9,8 @@
 library(tidyverse)
 cur_yr = 2019
 pr_yr = cur_yr-1
+output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
+dir.create(output_path) 
 
 # Data ---------------------------------------------------
 # change input file to most recent year's catch from OceanAK for each
@@ -63,7 +65,7 @@ harvest2 %>%
                              numbers = sum(Number.Of.Animals), 
             pounds = sum(Whole.Weight..sum.)) -> harvest2a
 
-write.csv(harvest2a, paste0('./results/tanner/comm_catch_by_statarea', cur_yr,'.csv'))
+write.csv(harvest2a, paste0('./results/tanner/harvest/', cur_yr,'/comm_catch_by_statarea', cur_yr,'.csv'))
 #dat %>%
 #  filter(Stat.Area == 11510, Season == 'Sep2015 - Aug16') %>%
 #  select(Season, CFEC, Stat.Area, )
@@ -76,7 +78,7 @@ harvest2 %>%
             pounds = sum(Whole.Weight..sum.)) -> comm.catch.sum
 
 # lynn sister and north juneau need to be manually split up in area 115-10
-write.csv(comm.catch.sum, paste0('./results/tanner/tanner_comm_catch', cur_yr,'.csv'))
+write.csv(comm.catch.sum, paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch', cur_yr,'.csv'))
 ### current year mid-catch date ------------------
 harvest2 %>%
   #filter (Season == "Sep2017 - Aug18") %>% 
@@ -91,14 +93,14 @@ mid.catch %>%
   left_join(step1) %>% 
   mutate(ratio_catch = numbers/total) -> mid.catch2
 
-write.csv(mid.catch2, paste0('./results/tanner/tanner_mid_catch_date', cur_yr, '.csv'))
+write.csv(mid.catch2, paste0('./results/tanner/harvest/', cur_yr,'/tanner_mid_catch_date', cur_yr, '.csv'))
 
 ### current year total annual harvest  ---------------------
 comm.catch.sum %>%
   group_by(Year)%>%
   summarise(numbers = sum(numbers), pounds = sum(pounds)) -> annual_catch
 
-write.csv(annual_catch, paste0('./results/tanner/tanner_annual_catch_', cur_yr,'.csv'))
+write.csv(annual_catch, paste0('./results/tanner/harvest/', cur_yr, '/tanner_annual_catch_', cur_yr,'.csv'))
 
 
 ### all years ----------------------
@@ -176,7 +178,7 @@ harvest_all_update %>%
             pounds = sum(pounds)) -> comm.catch.sum_all
 
 # lynn sister and north juneau need to be manually split up in area 115-10
-write.csv(comm.catch.sum_all, paste0('./results/tanner/tanner_comm_catch_97_', cur_yr,'.csv'))
+write.csv(comm.catch.sum_all, paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'.csv'))
 ### !!!!!!  These may not be correct for North Juneau, Stephens Passage and Lynn Sisters due to shared stat areas
 ##                    CHECK these with old excel files before going forward.
 # checked harvest with sigma plot file:
@@ -189,7 +191,7 @@ comm.catch.sum_all %>%
   group_by(Year)%>%
   summarise(numbers = sum(numbers), pounds = sum(pounds)) -> annual_catch_all
 
-write.csv(annual_catch_all, paste0('./results/tanner/tanner_annual_catch_97_', cur_yr,'.csv'))
+write.csv(annual_catch_all, paste0('./results/tanner/harvest/', cur_yr, '/tanner_annual_catch_97_', cur_yr,'.csv'))
 
 
 # percent of total catch current year -----------
@@ -199,7 +201,7 @@ comm.catch.sum_all %>%
   left_join(annual_catch_all) %>% 
   mutate(percent_total = lb_by_yr/pounds*100) %>% 
   as.data.frame() %>% 
-  write_csv(paste0('./results/tanner/proportion_total_harvest_', cur_yr,'.csv'))
+  write_csv(paste0('./results/tanner/harvest/', cur_yr, '/proportion_total_harvest_', cur_yr,'.csv'))
 # **FIX** year range is off prior to 2019. should be 1 year later.
 
 ## confidential catch -------------
@@ -210,4 +212,4 @@ comm.catch.sum_all %>%
 
 comm.catch.sum_all %>% 
   mutate(confidential = ifelse(permits < 3 | vessels < 3 | people < 3, "y", "n")) -> comm.catch.sum_all_C
-write.csv(comm.catch.sum_all_C, paste0('./results/tanner/tanner_comm_catch_97_', cur_yr,'_confid.csv'))
+write.csv(comm.catch.sum_all_C, paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'_confid.csv'))
