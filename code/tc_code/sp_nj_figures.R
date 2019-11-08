@@ -272,7 +272,7 @@ panel_figure <- function(survey.location, cur_yr, area, abrv, option){
                 panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
                 ifelse(option == 3, 
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/tanner/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
                 option, '.png'), panel,  
          dpi = 800, width = 8, height = 9.5)
 }
