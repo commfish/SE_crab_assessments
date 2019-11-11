@@ -145,7 +145,8 @@ harvest %>%
   #filter(Year >= cur_yr-4) %>% 
   summarise(permits = length(unique(CFEC)), 
               numbers = sum(Number.Of.Animals, na.rm = TRUE), 
-              pounds = sum(Whole.Weight..sum., na.rm = TRUE)) -> annual_harvest_cur
+              pounds = sum(Whole.Weight..sum., na.rm = TRUE)) %>% 
+  filter(Year >= 2000) -> annual_harvest_cur
 harvest_old %>% 
     group_by(Season) %>%
     summarise(permits = length(unique(CFEC)), 
@@ -200,10 +201,12 @@ ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
 ggplot(figure2, aes(x = Year, y = avg.cpue)) +
   geom_line(aes(x = Year, y = avg.cpue)) +
   geom_point(aes(x = Year, y = avg.cpue), size =3) +
-  geom_errorbar(aes(x = Year, ymin = avg.cpue - 2*se, ymax = avg.cpue + 2*se), #now displayed as confidence intervals
-              width = 0.2, na.rm = TRUE) +
+  geom_ribbon(aes(ymin = avg.cpue - 2*se, ymax = avg.cpue + 2*se), 
+              alpha = 0.2) +
+  #geom_errorbar(aes(x = Year, ymin = avg.cpue - 2*se, ymax = avg.cpue + 2*se), #now displayed as confidence intervals
+  #            width = 0.2, na.rm = TRUE) +
   expand_limits(y = 0) +
-  ylab("CPUE (crab per pot))") + 
+  ylab("Fishery CPUE (crab per pot)") + 
   xlab("Fishery Year") +
   scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2)) +
   scale_y_continuous(labels = comma, limits = c(0, 40), 
@@ -216,7 +219,7 @@ ggplot(figure2, aes(x = Year, y = avg.cpue)) +
 
 
 plot_grid(fig2a, fig2b, ncol = 1, align = 'v')
-ggsave(paste0('./figures/tanner/', cur_yr,'_figure2.png'), dpi = 800,
+ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 800,
        width = 8, height = 9.0)
 
 
