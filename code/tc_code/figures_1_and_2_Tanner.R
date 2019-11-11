@@ -26,6 +26,8 @@ harvest <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_ALL_years.csv")
 # add current years catch to this file or repull all years
 std_cpue <- read.csv(paste0("C:/Users/kjpalof/Documents/R projects/tanner-crab/results/std_commericial_cpue", cur_yr, ".csv"))
 #calculated in a seperate project "tanner-crab"
+hist_biomass <- read.csv("./data/tanner/tanner_annual_pt_estimate_historic.csv")
+
 
 # data prep for Figure 1 ---------------
 biomass %>% 
@@ -106,7 +108,7 @@ year_totals %>%
   select(Year, Legal, Mature) -> cur_yr_biomass2
 
 # Figure 1 ------------
-# Now is calculated base on the 2018 model output.
+# Now is calculated base on the current years model output.
 # use average contribution in early years with all years data 
 cur_yr_biomass %>% 
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
@@ -130,9 +132,38 @@ cur_yr_biomass %>%
         axis.text.x = element_text(angle = 45, vjust = 0.5),
         axis.title=element_text(size=14,face="bold"))
 
-  ggsave(paste0('./figures/tanner/', cur_yr,'_figure1_curyr_data.png'), dpi = 800,
+  ggsave(paste0('./figures/tanner/',  cur_yr,'/', cur_yr,'_figure1_curyr_data.png'), dpi = 800,
          width = 8, height = 5.75)
 
+# Figure A1 for appendix --------------
+# make sure you update this csv with current year values - or pull from above 
+tail(hist_biomass) 
+# add code to pull in current year from above here and then re-save from the following year
+ hist_biomass %>% 
+    gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
+    ggplot(aes(Year, y = pounds/1000000, group = type)) +
+    geom_line(aes(color = type, linetype = type))+
+    geom_point(aes(fill = type, shape = type), size =3) +
+    scale_fill_manual(name = "", values = c("black", "gray100")) + 
+    scale_colour_manual(name = "", values = c("gray1", "grey48"))+
+    scale_shape_manual(name = "", values = c(21, 21))+
+    scale_linetype_manual(name = "", values = c("solid", "dashed")) +
+    ylab("Biomass (1,000,000 lbs)") + 
+    xlab("Survey Year") +
+    ggtitle("Historic point estimates for surveyed area ONLY") +
+    theme(plot.title = element_text(hjust =0.5)) + 
+    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_y_continuous(labels = comma, limits = c(0,max(cur_yr_biomass$Mature/1000000, 
+                                                        na.rm = TRUE) + 1.5), 
+                       breaks= seq(min(0), max(max(cur_yr_biomass$Mature/1000000, 
+                                                   na.rm = TRUE)+ 1.5), by = 1.0)) +
+    theme(legend.position = c(0.65,0.80), 
+          axis.text = element_text(size = 12),
+          axis.text.x = element_text(angle = 45, vjust = 0.5),
+          axis.title=element_text(size=14,face="bold"))
+  
+  ggsave(paste0('./figures/tanner/', cur_yr,'/', cur_yr, '_figureA1_historic_data.png'), dpi = 800,
+         width = 8, height = 5.75)
 
 # Figure 2 data prep --------------
 # needs to only include region 1 harvest
