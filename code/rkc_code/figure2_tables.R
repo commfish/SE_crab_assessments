@@ -185,13 +185,13 @@ regional.b %>%
                      breaks= seq(min(0), max(max(regional.b$adj_mature, na.rm = TRUE) +100000), 
                                  by = 500000)) +
   scale_x_continuous(breaks = seq(min(1975),max(max(regional.b$Year) + 1), by = 2)) +
-  ggtitle("Biomass of surveyed areas for Southeast Alaska red king crab") + 
+  #ggtitle("Biomass of surveyed areas for Southeast Alaska red king crab") + 
   ylab("Biomass (lb)") + 
   theme(plot.title = element_text(hjust =0.5)) +
   theme(legend.position = c(0.825,0.793), legend.title = element_text(size = 9), 
-        legend.text = element_text(size = 8), axis.text.x = element_text(angle = 45), 
+        legend.text = element_text(size = 14), axis.text.x = element_text(angle = 45), 
         axis.title = element_text(size = 14, face = "bold"), 
-        axis.text = element_text(size = 12)) +
+        axis.text = element_text(size = 14)) +
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
             hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
