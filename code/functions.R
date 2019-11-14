@@ -737,8 +737,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
     scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
     scale_shape_manual(name = "", values = c(15, 16, 17))+
-    scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
-                       oob = rescale_none) +
+    scale_y_continuous(breaks = seq(min(0),max((max(males_graph$mean) + max(males_graph$se))), by = 1)) +
     #ylim(0,(max(males_graph$mean) + max(males_graph$se))) + 
     ggtitle(survey.location) + ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
@@ -898,7 +897,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
   # option refers to output from this function. 
   # Option 1 - all 4 on one file, Option 2 - just p1, p4 (males), 
   # Option 3 - p2,p3 (females), 
-  # scale - created for Seymour Canal scaling issues
+  # scale - created for Seymour Canal scaling issues, 0 means do nothing, 1 is for Seymour, 2 is by 100,000 lbs
   CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                    '/cpue_wt_since_93.csv'))
   poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
@@ -1050,8 +1049,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
     scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
     scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
     scale_shape_manual(name = "", values = c(15, 16, 17))+
-    scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
-                       oob = rescale_none) +
+    scale_y_continuous(breaks = seq(min(0),max((max(males_graph$mean) + max(males_graph$se))), by = 1)) +
     #ylim(0,(max(males_graph$mean) + max(males_graph$se))) + 
     ggtitle(title) + ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
@@ -1067,8 +1065,8 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
     theme(legend.position = c(0.8,0.8),
           legend.text = element_text(size = 20),
           legend.key.size = unit(1.5, 'lines'),
-          axis.text = element_text(size = 16), 
-          axis.title=element_text(size=18,face="bold"), 
+          axis.text = element_text(size = 14), 
+          axis.title=element_text(size=14,face="bold"), 
           plot.title = element_text(size = 24))
   
   
@@ -1095,8 +1093,8 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
     theme(legend.position = c(0.7,0.8), 
           legend.text = element_text(size = 20),
           legend.key.size = unit(1.5, 'lines'),
-          axis.text = element_text(size = 16), 
-          axis.title=element_text(size=18,face="bold"))
+          axis.text = element_text(size = 14), 
+          axis.title=element_text(size=14,face="bold"))
   
   if(option == 3){
     p2 = p2 + #ggtitle(paste0('Female/juvenile CPUE and egg health for ', survey.location)) +
@@ -1123,8 +1121,8 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
     theme(legend.position = c(0.2,0.5), 
           legend.text = element_text(size = 20),
           legend.key.size = unit(1.5, 'lines'),
-          axis.text = element_text(size = 16), 
-          axis.title=element_text(size=18,face="bold")) 
+          axis.text = element_text(size = 14), 
+          axis.title=element_text(size=14,face="bold")) 
   
   if(option ==1){
     p3 = p3 + theme(axis.text.x = element_blank())
@@ -1146,20 +1144,27 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
       scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
-                                                          na.rm = TRUE) + 2.5000),
+                                                          na.rm = TRUE) + .25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
-                                                     na.rm = TRUE)+2.5000), by = 1.5)) +
+                                                     na.rm = TRUE)+.25000), by = 0.5)) +
       theme(legend.position = c(0.8,0.8), 
-            axis.text = element_text(size = 20), 
+            axis.text = element_text(size = 14), 
             legend.text = element_text(size = 20),
             legend.key.size = unit(1.5, 'lines'),
-            axis.title=element_text(size=18,face="bold")) + 
+            axis.title=element_text(size=14,face="bold")) + 
       geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean/100000), color = "grey1")+
       geom_hline(data = baseline_means, aes(yintercept = mature_adj_mean/100000), 
                  color = "grey55", linetype = "dashed")
     if(scale == 1){
       p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1600000/100000),
                                    breaks= seq(min(0), max(1600000/100000), by = 1.5), oob = rescale_none)
+    }
+    
+    if(scale == 2){
+      p4 = p4 + scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
+                                                    na.rm = TRUE) + .25000),
+                                   breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
+                                                               na.rm = TRUE)+.25000), by = 1.0))
     }
   }
     
@@ -1175,14 +1180,14 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
       scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
-                                                          na.rm = TRUE) + 2.5000),
+                                                          na.rm = TRUE) + .25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
-                                                     na.rm = TRUE)+2.5000), by = 1.5)) +
+                                                     na.rm = TRUE)+0.25000), by = 0.5)) +
       theme(legend.position = c(0.8,0.9), 
-            axis.text = element_text(size = 20), 
+            axis.text = element_text(size = 14), 
             legend.text = element_text(size = 20),
             legend.key.size = unit(1.5, 'lines'),
-            axis.title=element_text(size=18,face="bold")) + 
+            axis.title=element_text(size=14,face="bold")) + 
       geom_hline(data = baseline_means, aes(yintercept = legal_mean/100000), color = "grey1")+
       geom_hline(data = baseline_means, aes(yintercept = mature_mean/100000), 
                  color = "grey55", linetype = "dashed")
