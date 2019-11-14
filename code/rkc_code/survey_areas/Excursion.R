@@ -273,16 +273,16 @@ write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/',
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
-panel_figure('Excursion', 2019, 'Excursion', 1, 0) # panel with all 3 figures
-panel_figure('Excursion', 2019, 'Excursion', 2, 0) # male panel
-panel_figure('Excursion', 2019, 'Excursion', 3, 0) # female panel
+panel_figure('Excursion', cur_yr, 'Excursion', 1, 0) # panel with all 3 figures
+panel_figure('Excursion', cur_yr, 'Excursion', 2, 0) # male panel
+panel_figure('Excursion', cur_yr, 'Excursion', 3, 0) # female panel
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
 
 ### NON CONF panel --------------
-panel_figure_NC('Excursion', 2019, 'Excursion', 1, 0) # panel with all 3 figures
-panel_figure_NC('Excursion', 2019, 'Excursion', 2, 0)
+panel_figure_NC('Excursion', cur_yr, 'Excursion', 1, 0) # panel with all 3 figures
+panel_figure_NC('Excursion',  cur_yr, 'Excursion', 2, 0)
 
 ### presentation figure -----
-panel_figure_NC_PRES('Excursion', 2019, 'Excursion', 2, 0)
-panel_figure_NC_PRES('Excursion', 2019, 'Excursion', 3, 0)
+panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 2, 0, 'Excursion Inlet')
+panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 3, 0, 'Excursion Inlet')

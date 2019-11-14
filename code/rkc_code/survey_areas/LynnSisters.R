@@ -290,8 +290,8 @@ panel_figure_NC('LynnSisters', 2019, 'LynnSisters', 1, 0) # panel with all 3 fig
 panel_figure_NC('LynnSisters', 2019, 'LynnSisters', 2, 0)
 
 ### presentation figure -----
-panel_figure_NC_PRES('LynnSisters', 2019, 'LynnSisters', 2, 0)
-panel_figure_NC_PRES('LynnSisters', 2019, 'LynnSisters', 3, 0)
+panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 2, 0, 'Lynn Sisters')
+panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 3, 0, 'Lynn Sisters')
 
 
 

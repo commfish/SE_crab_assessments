@@ -275,8 +275,8 @@ panel_figure_NC('Seymour', 2019, 'Seymour Canal', 1, 1)
 panel_figure_NC('Seymour', 2019, 'Seymour Canal', 2, 1)
 
 ### presentation figure -----
-panel_figure_NC_PRES('Seymour', 2018, 'Seymour Canal', 2, 1)
-panel_figure_NC_PRES('Seymour', 2018, 'Seymour Canal', 3, 1)
+panel_figure_NC_PRES('Seymour', cur_yr, 'Seymour Canal', 2, 1, "Seymour Canal")
+panel_figure_NC_PRES('Seymour', cur_yr, 'Seymour Canal', 3, 1, "Seymour Canal")
 
 ### female file all years -----
 # create females file for all years

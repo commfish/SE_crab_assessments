@@ -296,8 +296,8 @@ panel_figure('Gambier', 2019, 'Gambier', 3, 0) # female panel
 # base.location is the location name in the baseline file, can be different
 
 ### presentation figure -----
-panel_figure_NC_PRES('Gambier', 2019, 'Gambier', 2, 0)
-panel_figure_NC_PRES('Gambier', 2019, 'Gambier', 3, 0)
+panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 2, 0, 'Gambier Bay')
+panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 3, 0, 'Gambier Bay')
 
 ### female file all years -----
 # create females file for all years

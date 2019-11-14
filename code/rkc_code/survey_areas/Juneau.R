@@ -297,5 +297,5 @@ panel_figure('Juneau', 2019, 'Juneau', 3, 0) # female panel
 ### see 'juneau_hindcast_figure.R' file for other figures for the Juneau document
 
 ### presentation figure -----
-panel_figure_NC_PRES('Juneau', 2018, 'Juneau', 2, 0)
-panel_figure_NC_PRES('Juneau', 2018, 'Juneau', 3, 0)
+panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 2, 0, 'Juneau Area')
+panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 3, 0, 'Juneau Area')
