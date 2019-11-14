@@ -891,7 +891,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
 
 
 ## Presentation NC panel figure ---------------
-panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option, scale, label){
+panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option, scale, title){
   # survey.location and baseline.location are the same is most areas.  Check
   # baseline file to see if they differ
   # cur_yr is the current year
@@ -1004,7 +1004,8 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
   
   biomass %>% 
     left_join(mr_adjust2) %>% 
-    mutate(adj.legal = legal.biomass*weighted_ADJ) %>% 
+    mutate(adj.legal = legal.biomass*weighted_ADJ, 
+           adj.mature = mature.biomass*weighted_ADJ) %>% 
     left_join(conf_summary) %>% 
     mutate(confidential = replace_na(confidential, 'no'))-> biomass
   
@@ -1052,7 +1053,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
     scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
                        oob = rescale_none) +
     #ylim(0,(max(males_graph$mean) + max(males_graph$se))) + 
-    ggtitle(label) + ylab("CPUE (number/pot)")+ xlab(NULL)+
+    ggtitle(title) + ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
@@ -1134,7 +1135,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
   
   ### biomass harvest graph --------------
   if(survey.location != "Juneau"){
-    p4 <- ggplot(biomass_graph, aes(Year, pounds, group = type))+ 
+    p4 <- ggplot(biomass_graph, aes(Year, pounds/100000, group = type))+ 
       geom_point(aes(color = type, shape = type), size =3) +
       geom_line(aes(color = type, group = type, linetype = type))+
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
@@ -1144,10 +1145,10 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-      scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
-                                                          na.rm = TRUE) + 25000),
-                         breaks= seq(min(0), max(max(biomass_graph$pounds, 
-                                                     na.rm = TRUE)+25000), by = 50000)) +
+      scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
+                                                          na.rm = TRUE) + 2.5000),
+                         breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
+                                                     na.rm = TRUE)+2.5000), by = 1.5)) +
       theme(legend.position = c(0.8,0.8), 
             axis.text = element_text(size = 20), 
             legend.text = element_text(size = 20),
@@ -1163,7 +1164,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
   }
     
   if(survey.location == "Juneau"){
-    p4 <- ggplot(biomass_graph, aes(Year, pounds, group = type))+ 
+    p4 <- ggplot(biomass_graph, aes(Year, pounds/100000, group = type))+ 
       geom_point(aes(color = type, shape = type), size =3) +
       geom_line(aes(color = type, group = type, linetype = type))+
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
@@ -1173,10 +1174,10 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-      scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
-                                                          na.rm = TRUE) + 25000),
-                         breaks= seq(min(0), max(max(biomass_graph$pounds, 
-                                                     na.rm = TRUE)+25000), by = 50000)) +
+      scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
+                                                          na.rm = TRUE) + 2.5000),
+                         breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
+                                                     na.rm = TRUE)+2.5000), by = 1.5)) +
       theme(legend.position = c(0.8,0.9), 
             axis.text = element_text(size = 20), 
             legend.text = element_text(size = 20),
