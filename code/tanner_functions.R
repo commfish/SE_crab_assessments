@@ -238,7 +238,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
   # file with year and mean percent poor clutch and se poor clutch 
   baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
   biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))
-  harvest <- read.csv(paste0('./results/tanner/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
+  harvest <- read.csv(paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
   # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   
@@ -338,7 +338,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
     scale_shape_manual(name = "", values = c(15, 16, 17))+
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
     #                   oob = rescale_none) +
-    ggtitle(survey.location) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
+    ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
@@ -351,6 +351,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
                linetype = "longdash", lwd = 0.75)+
     geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
                lwd = 0.75)+
+    scale_y_continuous(labels = comma) +
     theme(legend.position = c(0.25,0.85), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"), 
@@ -376,7 +377,8 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
     geom_hline(yintercept = baseline2$Large.Female, color = "#56B4E9")+
     theme(legend.position = c(0.15,0.8), 
           axis.text = element_text(size = 12), 
-          axis.title=element_text(size=14,face="bold"))
+          axis.title=element_text(size=14,face="bold")) +
+    expand_limits(y = 0)
   
   if(option == 3){
     p2 = p2 + ggtitle(paste0(survey.location, ' - Females')) +
@@ -400,6 +402,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
                 alpha = 0.2) +
     
     #scale_fill_discrete(breaks = c("total % clutch", "% poor clutch")) +
+    expand_limits (y = 0) + 
     ylim(0,100) + 
     xlab(NULL) +
     geom_hline(yintercept = 10, color = "black") +
