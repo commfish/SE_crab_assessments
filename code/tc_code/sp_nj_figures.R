@@ -25,7 +25,7 @@ panel_figure <- function(survey.location, cur_yr, area, abrv, option){
   baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
   baseline_rkc <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
   biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))
-  harvest <- read.csv(paste0('./results/tanner/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
+  harvest <- read.csv(paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
   # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   
@@ -171,7 +171,8 @@ panel_figure <- function(survey.location, cur_yr, area, abrv, option){
     theme(legend.position = c(0.25,0.85), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"), 
-          plot.title = element_text(size = 24))
+          plot.title = element_text(size = 24)) +
+    expand_limits(y = 0)
   
   
   ### F1b females/juvenile plot ---------------
@@ -194,7 +195,9 @@ panel_figure <- function(survey.location, cur_yr, area, abrv, option){
     geom_hline(yintercept = baseline2$Large.Female, color = "#56B4E9")+
     theme(legend.position = c(0.15,0.8), 
           axis.text = element_text(size = 12), 
-          axis.title=element_text(size=14,face="bold"))
+          axis.title=element_text(size=14,face="bold")) +
+    expand_limits(y=0) +
+    scale_y_continuous(limits = comma)
   
   if(option == 3){
     p2 = p2 + ggtitle(paste0(area, ' - Females')) +
