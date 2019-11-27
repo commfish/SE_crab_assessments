@@ -378,6 +378,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
                linetype = "longdash", lwd = 0.75)+
     geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
                lwd = 0.75)+
+    scale_y_continuous(labels = comma) +
     theme(legend.position = c(0.3,0.85), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"), 
@@ -403,7 +404,8 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
     geom_hline(yintercept = baseline2$Large.Female, color = "#56B4E9")+
     theme(legend.position = c(0.3,0.8), 
           axis.text = element_text(size = 12), 
-          axis.title=element_text(size=14,face="bold"))
+          axis.title=element_text(size=14,face="bold")) +
+    expand_limits(y = 0)
   
   if(option == 3){
     p2 = p2 + ggtitle(paste0(area, ' - Females')) +
@@ -427,6 +429,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
                 alpha = 0.2) +
     
     #scale_fill_discrete(breaks = c("total % clutch", "% poor clutch")) +
+    expand_limits (y = 0) + 
     ylim(0,100) + 
     xlab(NULL) +
     geom_hline(yintercept = 10, color = "black") +
@@ -455,7 +458,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
     scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
                                                         na.rm = TRUE) + 0.25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
-                                                   na.rm = TRUE)+0.25000), by = 0.5)) +
+                                                   na.rm = TRUE) + 0.25000), by = 0.5)) +
     theme(legend.position = c(0.55,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) + 
