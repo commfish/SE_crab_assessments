@@ -123,7 +123,7 @@ cur_yr_biomass %>%
   xlab("Survey Year") +
   theme(plot.title = element_text(hjust =0.5)) + 
   scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-  scale_y_continuous(labels = comma, limits = c(0,max(cur_yr_biomass$Mature/1000000, 
+  scale_y_continuous(limits = c(0,max(cur_yr_biomass$Mature/1000000, 
                                                       na.rm = TRUE) + 1.5), 
                      breaks= seq(min(0), max(max(cur_yr_biomass$Mature/1000000, 
                                                  na.rm = TRUE)+ 1.5), by = 1.0)) +
@@ -221,7 +221,7 @@ ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
   scale_y_continuous(limits = c(0,max(figure2$pounds/1000000, 
                                                       na.rm = TRUE) + 0.5), 
                      breaks= seq(min(0), max(max(figure2$pounds/1000000, 
-                                                 na.rm = TRUE)+ 0.5), by = 0.5)) +
+                                                 na.rm = TRUE)+ 0.5), by = 1.0)) +
   theme(axis.text.x = element_blank(),
         legend.position = c(0.65,0.80), 
         axis.text = element_text(size = 12),
