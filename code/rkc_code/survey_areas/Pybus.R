@@ -279,7 +279,7 @@ panel_figure('Pybus', 2019, 'Pybus', 3, 0) # female panel
 
 ### presentation figure -----
 panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 2, 2, 'Pybus Bay')
-panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 3, 0, 'Pybus Bay')
+panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 3, 0, 'Pybus Bay') #female panel
 
 ### female file all years -----
 # create females file for all years
