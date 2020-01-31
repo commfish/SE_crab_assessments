@@ -1097,7 +1097,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
           axis.title=element_text(size=14,face="bold"))
   
   if(option == 3){
-    p2 = p2 + #ggtitle(paste0('Female/juvenile CPUE and egg health for ', survey.location)) +
+    p2 = p2 + ggtitle(paste0(title, " cont.")) +
       theme(plot.title = element_text(size = 24))
   }
   
