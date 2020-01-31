@@ -150,7 +150,7 @@ tail(hist_biomass)
     scale_linetype_manual(name = "", values = c("solid", "dashed")) +
     ylab("Biomass (1,000,000 lbs)") + 
     xlab("Survey Year") +
-    ggtitle("Historic point estimates for surveyed area ONLY") +
+    ggtitle("Historic Point Estimates") +
     theme(plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
     scale_y_continuous(labels = comma, limits = c(0,max(cur_yr_biomass$Mature/1000000, 
