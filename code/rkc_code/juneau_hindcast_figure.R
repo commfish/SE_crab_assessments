@@ -145,10 +145,10 @@ hindcast %>%
   scale_x_continuous(breaks = seq(min(1975),max(2019), by = 5)) +
   geom_hline(yintercept =  baseline_mean_curyr$baseline[1], color = "grey1")+
   #geom_hline(yintercept = baseline_mean_curyr$baseline[2], color = "grey44", linetype = "dashed") +
-  theme(legend.position = c(0.725,0.825), legend.title = element_text(size = 9), 
+  theme(legend.position = c(0.845,0.875), legend.title = element_text(size = 9), 
         legend.text = element_text(size = 8)) +
   geom_text(data = baseline_mean_curyr[1, ], aes(x = start_yr, y = baseline, label = label), 
-            hjust = -0.45, vjust = -1.5, nudge_y = 0.05, size = 3.5, show.legend = FALSE) +
+            hjust = -0.45, vjust = -1.0, nudge_y = 0.05, size = 3.5, show.legend = FALSE) +
   guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2))) +
   ggsave(paste0('./figures/rkc/juneau_fig1_presentation_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
