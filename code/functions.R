@@ -898,6 +898,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
   # Option 1 - all 4 on one file, Option 2 - just p1, p4 (males), 
   # Option 3 - p2,p3 (females), 
   # scale - created for Seymour Canal scaling issues, 0 means do nothing, 1 is for Seymour, 2 is by 100,000 lbs
+  # title for the figure. This could be different than the name given in the data files
   CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                    '/cpue_wt_since_93.csv'))
   poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
