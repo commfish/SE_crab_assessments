@@ -1,5 +1,5 @@
 # K. palof 
-# katie.palof@alaska.gov
+# katie.palof@alaska.gov, updated 3-6-20
 
 # Southeast RKC stock panel figures for assessment memo and RIR 
 
