@@ -14,12 +14,12 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2019
+cur_yr <- 2020
 pr_yr <- cur_yr -1
 survey.location <- 'Juneau'
 
 ## data -------------------
-dat <- read.csv("./data/rkc/Juneau/jnu_18_19_oceanAK_out_RAW.csv") # file name will change annually
+dat <- read.csv("./data/rkc/Juneau/jnu_19_20_oceanAK_out_RAW.csv") # file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 #   Juneau area includes Juneau and Barlow
