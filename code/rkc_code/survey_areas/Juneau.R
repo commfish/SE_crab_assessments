@@ -1,5 +1,6 @@
 # K.Palof    katie.palof@alaska.gov
-# ADF&G 7-3-19/ updated for JUNEAU area
+# recent date updated: 7-14-2020
+# ADF&G updated for JUNEAU area
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
