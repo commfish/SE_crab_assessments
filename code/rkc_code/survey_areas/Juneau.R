@@ -286,11 +286,11 @@ write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/',
 
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
-panel_figure('Juneau', 2019, 'Juneau')
 
-panel_figure('Juneau', 2019, 'Juneau', 1, 0) # panel with all 3 figures
-panel_figure('Juneau', 2019, 'Juneau', 2, 0) # male panel
-panel_figure('Juneau', 2019, 'Juneau', 3, 0) # female panel
+
+panel_figure('Juneau', cur_yr, 'Juneau', 1, 0) # panel with all 3 figures
+panel_figure('Juneau', cur_yr, 'Juneau', 2, 0) # male panel
+panel_figure('Juneau', cur_yr, 'Juneau', 3, 0) # female panel
 
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
