@@ -1,16 +1,20 @@
-## AREA:Juneau
-### SPECIES:Red crab
-#### YEAR: 2018
-#Date modified: 7-16-14 / 8-5-14 / 7-9-15/ 9-27-16/7-3-17/7-12-18(clean up for 2018)
+# K.Palof    katie.palof@alaska.gov
+# recent date updated: 7-14-2020
 
-rm(list=ls())
-##Load packages-------------
+# Region: Southeast
+# Area : Juneau 
+# Species: red king crab
+
+# load ----
 library(tidyverse)
-##Load data --------------------------
-#JNUred <- read.csv("./data/Juneau2017RKC.csv")
-JNUred <- read.csv("./data/Juneau2018RKC.csv")
-#file name needs to be changed to reflect area and species
+cur_yr = 2020
 
+# data -----
+JNUred <- read.csv(paste0(here::here(), '/data/rkc/Juneau/Juneau', cur_yr, 'RKC.csv'))
+# **FIX** this pulls from old excel file, need to rework this to pull historic data from a file and recent data 
+#     from data summary coming out of the processing of the survey data **FIX**
+
+# file name needs to be changed to reflect area and species
 str(JNUred)
 
 ##### Load functions --------------------
