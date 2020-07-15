@@ -1,5 +1,5 @@
 # K. palof 
-# katie.palof@alaska.gov, updated 3-6-20
+# katie.palof@alaska.gov, updated 3-6-20/ 7-14-20
 
 # Southeast RKC stock panel figures for assessment memo and RIR 
 
@@ -8,10 +8,16 @@
 
 # load ----------
 source('./code/functions.R')
-cur_yr <- 2019
+cur_yr <- 2020
 
 # Survey areas and associated figure calls:-------
 # Juneau =============================
+
+# confidental figure --------
+panel_figure('Juneau', 2020, 'Juneau', 1, 0) # panel with all 3 figures
+panel_figure('Juneau', cur_yr, 'Juneau', 2, 0) # male panel
+panel_figure('Juneau', cur_yr, 'Juneau', 3, 0) # female panel
+
 ### presentation figure -----
 panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 2, 0, 'Juneau Area')
 panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 3, 0, 'Juneau Area')
