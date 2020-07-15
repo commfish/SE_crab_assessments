@@ -7,6 +7,10 @@ Both Southeast Alaska species have annual pot surveys that results in a weighted
 Ref: Collie and DeLong 1998, Clark et al. 2003, Kruse and Collie 1991, Collie and Kruse 1998, Zheng et al. 1997
 See ROP for red king crab (reference below) for complete reference citations.
 
+see code/CSA_model for running CSA model
+
+CSA model was constructed as a function for redcrab and tanner crab differently. Code for these model configurations will also be found under CSA_model folder
+
 ## red king crab 
 Currently (2019) survey 7 areas: Juneau, Excursion, St.James Bay, Peril Strait, Gambier Bay, Pybus Bay, and Seymour Canal.
 Historically other areas have been surveyed.
