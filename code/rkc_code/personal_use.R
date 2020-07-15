@@ -83,18 +83,20 @@ by_status_current %>%
          est.total.catch.numbers = adjustment*as.numeric(total_c)) -> summary_current
 write.csv(summary_current, paste0('./results/rkc/Juneau/personal_use_estimate_total_', cur_yr, '.csv'), row.names = FALSE)
 
-## **FIX ** 2020 stopped here.
-
 ## can use legal weight from last years to extrapolate this into pounds ***need to have run current survey year data
           #   in JNUprocessingCODE.R 
           # use weight that matches fishery timing i.e. 2018 for 2018 summer
 ## only works IF the male_weights is loaded from the processing code - if not need to bring it in from
 ###     results folder
-male_weights <- read.csv(paste0('./results/redcrab/Juneau', 
+male_weights <- read.csv(paste0('./results/rkc/Juneau', 
                                 '/', cur_yr, '/maleweights.csv'))
-summary_current %>% 
-  mutate(est.catch.lbs = est.total.catch.numbers*male_weights$legal_lbs[1]) -> summary_current
 
-write.csv(summary_current, paste0('./results/redcrab/Juneau/personal_use_estimate_total_', cur_yr, '.csv'), row.names = FALSE)
+male_weights %>% 
+  select(crab_year = Year, legal_lbs) -> male_weights1
+summary_current %>% 
+  right_join(male_weights1) %>% 
+  mutate(est.catch.lbs = est.total.catch.numbers*legal_lbs) -> summary_current
+
+write.csv(summary_current, paste0('./results/rkc/Juneau/personal_use_estimate_total_', cur_yr, '.csv'), row.names = FALSE)
 
 
