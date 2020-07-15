@@ -17,14 +17,13 @@ JNUred <- read.csv(paste0(here::here(), '/data/rkc/Juneau/Juneau', cur_yr, 'RKC.
 # file name needs to be changed to reflect area and species
 str(JNUred)
 
-##### Load functions --------------------
-source("./functions/RKC_RcrabCSA_fnc.R")# sources the file with the model code
-source("./functions/graph_fnc_CSA.R")# sources the file with the graphing function for the bootstrap
-#   OR 
-########STOP and make sure crabCSA function is loaded##########
-## open "RKC_Rcrab CSA fnc.R" and load function 
+# load functions --------------------
+source("./code/CSA_model/RKC_RcrabCSA_fnc.R") # sources the file with the model code
+# **Fix ** get CSA to work look at function
 
-##### Run model ----------------------------------
+source("./code/CSA_model/graph_fnc_CSA.R") # sources the file with the graphing function for the bootstrap
+
+# Run model ----------------------------------
 ## Notes: For RED KING CRAB need to adjust function for weighting variable to be different in each year.
 #### HERE:
 # For other areas  - Name of file and variables will need to be changed, 
@@ -38,7 +37,7 @@ JNU_RKC_fit1 <- RcrabCSA1 (year = JNUred$Year, catch = JNUred$Catch..Number.,
                    recr = JNUred$Recruit, post = JNUred$PostR, csT= JNUred$Catch..Survey.Tau, 
                    sTs =JNUred$Survey.Tau, LegWt=JNUred$Legal.Weight, 
                    PreRWt=JNUred$Prerecruit.Weight, M = 0.32, 
-                   w = JNUred$w, initial = c(1.44, 2.02, 0.907, 103.99, 82.27), 
+                   w = JNUred$w, initial = c(1.44, 2.02, 0.907, 103.99, 85.27), 
                    uprn = 1000000, graph = TRUE)
 
 JNU_RKC_fit1
