@@ -20,18 +20,18 @@ permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2019 2
 # ** in order to get permits not returned that do NOT have catch need to click on "xyz" and select "include rows with only null values"
 # this does NOT translate to .csv output..... **FIX**
 personal_use %>% # *
-  filter(Year == cur_yr | Year == prv_yr) %>%  # remove this to do all years, currently just want current 18/19 season
-  group_by(Personal.Use.Area, Year, Permit.Returned.Status) %>% 
+  filter(Year == cur_yr | Year == prv_yr | Year == prv_yr-1) %>%  # remove this to do all years, currently just want current 18/19 season
+  group_by(Personal.Use.Area, Year, Season, Permit.Returned.Status) %>% 
   summarise(n = length(unique(Permit.Number)), 
             number = sum(Number.of.Crab, na.rm = TRUE), 
             pots = sum(Number.of.Pots.or.Tows)) -> by_status
 
 permit_type %>%  # need this data set to get all the permit status...not returned and did not fish are not accounted above due to lack of crab.
-  group_by(Personal.Use.Area, Year, Permit.Returned.Status) %>% 
-  summarise(n = length(unique(Permit.Number))) ->permit_status
+  group_by(Personal.Use.Area, Year, Season, Permit.Returned.Status) %>% 
+  summarise(n = length(unique(Permit.Number))) -> permit_status
 
 by_status %>% 
-  select(Personal.Use.Area, Year, Permit.Returned.Status, number, pots) %>% 
+  select(Personal.Use.Area, Year, Season, Permit.Returned.Status, number, pots) %>% 
   right_join(permit_status) %>% 
   as.data.frame()-> number_crab_by_status
 
