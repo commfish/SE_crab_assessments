@@ -83,7 +83,7 @@ by_status_current %>%
          est.total.catch.numbers = adjustment*as.numeric(total_c)) -> summary_current
 write.csv(summary_current, paste0('./results/rkc/Juneau/personal_use_estimate_total_', cur_yr, '.csv'), row.names = FALSE)
 
-
+## **FIX ** 2020 stopped here.
 
 ## can use legal weight from last years to extrapolate this into pounds ***need to have run current survey year data
           #   in JNUprocessingCODE.R 
