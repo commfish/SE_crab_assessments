@@ -1,5 +1,5 @@
 # K.Palof  ADF&G
-# 7-11-18, updated 7-8-19
+# 7-11-18, updated 7-8-19 / 7-14-20
 
 # personal use summary for 11-A
 # all years that have permit data available
@@ -8,30 +8,30 @@
 #####Load Packages ---------------------------------
 library(tidyverse)
 library(xlsx)
-cur_yr = 2019 # fsurvey year
+cur_yr = 2020 # survey year
 
 prv_yr = cur_yr-1 # fishery year NOT survey year
 
 #####Load Data ---------------------------------------------------
-personal_use <- read.csv("./data/redcrab/11-A rkc pu_catch.csv")
-permit_type <- read.csv("./data/redcrab/PU RKC Juneau 2018 permit status summary.csv")
+personal_use <- read.csv(paste0(here::here(), "/data/harvest/11-A rkc pu_catch_updated2020.csv"))
+permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2019 2020 permit status summary.csv"))
 
 ## reported number ----
 # ** in order to get permits not returned that do NOT have catch need to click on "xyz" and select "include rows with only null values"
 # this does NOT translate to .csv output..... **FIX**
 personal_use %>% # *
   filter(Year == cur_yr | Year == prv_yr) %>%  # remove this to do all years, currently just want current 18/19 season
-  group_by(Area, Year, Permit.Returned.Status) %>% 
+  group_by(Personal.Use.Area, Year, Permit.Returned.Status) %>% 
   summarise(n = length(unique(Permit.Number)), 
             number = sum(Number.of.Crab, na.rm = TRUE), 
             pots = sum(Number.of.Pots.or.Tows)) -> by_status
 
 permit_type %>%  # need this data set to get all the permit status...not returned and did not fish are not accounted above due to lack of crab.
-  group_by(Area, Year, Permit.Returned.Status) %>% 
+  group_by(Personal.Use.Area, Year, Permit.Returned.Status) %>% 
   summarise(n = length(unique(Permit.Number))) ->permit_status
 
 by_status %>% 
-  select(Area, Year, Permit.Returned.Status, number, pots) %>% 
+  select(Personal.Use.Area, Year, Permit.Returned.Status, number, pots) %>% 
   right_join(permit_status) %>% 
   as.data.frame()-> number_crab_by_status
 
