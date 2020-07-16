@@ -19,7 +19,6 @@ str(JNUred)
 
 # load functions --------------------
 source("./code/CSA_model/RKC_RcrabCSA_fnc.R") # sources the file with the model code
-# **Fix ** get CSA to work look at function
 
 source("./code/CSA_model/graph_fnc_CSA.R") # sources the file with the graphing function for the bootstrap
 
@@ -28,7 +27,7 @@ source("./code/CSA_model/graph_fnc_CSA.R") # sources the file with the graphing 
 #### HERE:
 # For other areas  - Name of file and variables will need to be changed, 
 #   initial(PreR initial each year, R in the 1st year, Post in the first year, q scaled by 100, 
-        #          s scaled by 1,000,000)
+        #          s scaled by 1,000,000) , c(1.44, 2.02, 0.907, 103.99, 85.27)
         # M = 0.30 for Tanner crab AND M = 0.32 for Red Crab
         # w is a vector of weigthings found in the data file. 
 # use input initial and M from Excel spreadsheet
@@ -37,16 +36,16 @@ JNU_RKC_fit1 <- RcrabCSA1 (year = JNUred$Year, catch = JNUred$Catch..Number.,
                    recr = JNUred$Recruit, post = JNUred$PostR, csT= JNUred$Catch..Survey.Tau, 
                    sTs =JNUred$Survey.Tau, LegWt=JNUred$Legal.Weight, 
                    PreRWt=JNUred$Prerecruit.Weight, M = 0.32, 
-                   w = JNUred$w, initial = c(1.44, 2.02, 0.907, 103.99, 85.27), 
+                   w = JNUred$w, initial = c(1.44, 2.03, 0.909, 104.2, 82.54), 
                    uprn = 1000000, graph = TRUE)
 
 JNU_RKC_fit1
 JNU_RKC_fit1$estimates
 # save model output
-write.csv(JNU_RKC_fit1$estimates, './output/2018/JNU_RKC_fit1_estimates.csv')
+write.csv(JNU_RKC_fit1$estimates, './results/rkc/Juneau/2020/csa/JNU_RKC_fit1_estimates.csv')
 
-write.csv(JNU_RKC_fit1$CI, './output/2018/JNU_RKC_fit1_par&CI.csv')
-write(JNU_RKC_fit1$SSQ, file = './output/2018/JNU_SSQ.txt')
+write.csv(JNU_RKC_fit1$CI, './results/rkc/Juneau/2020/csa/JNU_RKC_fit1_par&CI.csv')
+write(JNU_RKC_fit1$SSQ, file = './results/rkc/Juneau/2020/csa/JNU_SSQ.txt')
 ### save graphical output also - DO THIS manually, I have NOT automated this step.
 
 #########STOP  --------------------------
