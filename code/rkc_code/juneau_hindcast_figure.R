@@ -1,5 +1,5 @@
 # K.Palof
-# 7-10-19n updated
+# 7-10-19n updated / 7-15-2020
 
 # Juneau area RKC forecast / hindcast figures
 # Current figures used for stock health memo 
@@ -21,7 +21,7 @@ theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
 
 # global --------
 # update each year
-cur_yr = 2019
+cur_yr = 2020
 
 #Load data ----------------
 #biomass <- read.csv("./data/redcrab/biomass.csv") no record of historic mature biomass point estimates
@@ -72,7 +72,7 @@ jnu_rkc_fig1 <- hindcast %>%
   geom_text(data = baseline_mean_curyr, aes(x = start_yr, y = baseline, label = label), 
             hjust = -0.45, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
   guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2))) +
-  ggsave(paste0('./figures/redcrab/juneau_fig1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/2020/juneau_fig1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 # Figure A1 ---old Figure 1 - move to Appendix --------
@@ -101,7 +101,7 @@ jnu_rkc_annual_fore <- hindcast %>%
   geom_text(data = baseline_mean_forecast, aes(x = start_yr, y = baseline, label = label), 
             hjust = -0.55, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
   guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2))) +
-  ggsave(paste0('./figures/redcrab/juneau_figA1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/2020/juneau_figA1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 #  select(year, legal_2018)figure of 2018 model with forecast in each year -----
