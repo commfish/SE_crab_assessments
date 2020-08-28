@@ -64,7 +64,7 @@ jnu_rkc_fig1 <- hindcast %>%
 
   ggtitle(paste0("Juneau ", cur_yr," model")) + ylab("Estimated Biomass (lbs)")+ xlab("Year")+
   theme(plot.title = element_text(hjust =0.5)) +
-  scale_x_continuous(breaks = seq(min(1975),max(2019), by = 5)) +
+  scale_x_continuous(breaks = seq(min(1975),max(cur_yr), by = 5)) +
   geom_hline(yintercept =  baseline_mean_curyr$baseline[1], color = "grey1")+
   geom_hline(yintercept = baseline_mean_curyr$baseline[2], color = "grey44", linetype = "dashed") +
   theme(legend.position = c(0.125,0.793), legend.title = element_text(size = 9), 
@@ -92,7 +92,7 @@ jnu_rkc_annual_fore <- hindcast %>%
   
   ggtitle("Juneau annual forecast reported") + ylab("Estimated Biomass (lbs)")+ xlab("Year")+
   theme(plot.title = element_text(hjust =0.5)) +
-  scale_x_continuous(breaks = seq(min(1975),max(2019), by = 5)) +
+  scale_x_continuous(breaks = seq(min(1975),max(cur_yr), by = 5)) +
   geom_hline(yintercept = baseline_mean_forecast$baseline[1], color = "grey1")+
   geom_hline(yintercept = baseline_mean_forecast$baseline[2], color = "grey44", linetype = "dashed") +
   theme(legend.position = c(0.125,0.798), legend.title = element_text(size = 9), 
