@@ -280,6 +280,8 @@ panel_figure('Excursion', cur_yr, 'Excursion', 3, 0) # female panel
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
 
+
+# STOP HERE....come back to this ---
 ### NON CONF panel --------------
 panel_figure_NC('Excursion', cur_yr, 'Excursion', 1, 0) # panel with all 3 figures
 panel_figure_NC('Excursion',  cur_yr, 'Excursion', 2, 0)
