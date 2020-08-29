@@ -1,5 +1,6 @@
 # K.Palof  katie.palof@alaska.gov
-# ADF&G 8-1-16 updated for Excursion Inlet  / updated 8-3-17/7-30-18/7-24-19
+# ADF&G 8-1-16 updated for Excursion Inlet  / 
+# updated 8-3-17/7-30-18/7-24-19/ 8-28-20
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
 
@@ -11,13 +12,13 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2019
+cur_yr <- 2020
 pr_yr <- cur_yr -1
 survey.location <- 'Excursion'
 
 #####Load Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKC survey CSA_EI_18_19.csv'))
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKC survey CSA_EI_19_20.csv'))
                   # this is input from OceanAK - set up as red crab survey data for CSA
                   # Year = 2018,2019, project code 007, Location - Excursion Inlet, species - red king crab
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Excursion_strata_area.csv')) 
