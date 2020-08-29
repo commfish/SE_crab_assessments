@@ -23,7 +23,13 @@ panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 2, 0, 'Juneau Area')
 panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 3, 0, 'Juneau Area')
 
 # Excursion ==========================
+# confidental figure 
+panel_figure('Excursion', cur_yr, 'Excursion', 1, 0) # panel with all 3 figures
+panel_figure('Excursion', cur_yr, 'Excursion', 2, 0) # male panel
+panel_figure('Excursion', cur_yr, 'Excursion', 3, 0) # female panel
+
 ### NON CONF panel --------------
+# **FIX ** not working
 panel_figure_NC('Excursion', cur_yr, 'Excursion', 1, 0) # panel with all 3 figures
 panel_figure_NC('Excursion',  cur_yr, 'Excursion', 2, 0)
 
