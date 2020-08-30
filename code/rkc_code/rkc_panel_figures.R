@@ -47,6 +47,10 @@ panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 2, 0, 'Lynn Sisters')
 panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 3, 0, 'Lynn Sisters')
 
 # Peril ==============================
+panel_figure('Peril', cur_yr, 'Deadman Reach', 1, 0) # panel with all 3 figures
+panel_figure('Peril', cur_yr, 'Deadman Reach', 2, 0) # male panel
+panel_figure('Peril', cur_yr, 'Deadman Reach', 3, 0) # female panel
+
 ### presentation figure -----
 panel_figure_NC_PRES('Peril', cur_yr, 'Deadman Reach', 2, 0, 'Peril Strait')
 panel_figure_NC_PRES('Peril', cur_yr, 'Deadman Reach', 3, 0, 'Peril Strait')
