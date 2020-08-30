@@ -12,12 +12,12 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2019
+cur_yr <- 2020
 pr_yr <- cur_yr -1
 survey.location <- 'Pybus'
 
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PB_18_19.csv'))# file name will change annually
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PB_19_20.csv'))# file name will change annually
               # this is input from OceanAK - set up as red crab survey data for CSA
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Pybus_strata_area.csv')) 
               #this file is the same every year.  Unless the survey methods change
@@ -270,9 +270,9 @@ write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/',
 
 ### note !!! need to update bimoass.csv file with current yr CSA estiamte before running 
 #   this function.
-panel_figure('Pybus', 2019, 'Pybus', 1, 0) # panel with all 3 figures
-panel_figure('Pybus', 2019, 'Pybus', 2, 0) # male panel
-panel_figure('Pybus', 2019, 'Pybus', 3, 0) # female panel
+panel_figure('Pybus', cur_yr, 'Pybus', 1, 0) # panel with all 3 figures
+panel_figure('Pybus', cur_yr, 'Pybus', 2, 0) # male panel
+panel_figure('Pybus', cur_yr, 'Pybus', 3, 0) # female panel
 
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
