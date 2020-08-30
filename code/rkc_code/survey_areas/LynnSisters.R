@@ -7,13 +7,13 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2019
+cur_yr <- 2020
 pr_yr <- cur_yr -1
 survey.location <- 'LynnSisters'
 
 #####Load Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_LS_18_19.csv'))
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_LS_19_20.csv'))
     # this is input from OceanAK - set up as 'red crab survey data for CSA'
     # Year is cur_yr and pr_yr, project code 007, !! Location = Lynn Sisters and St.James Bay !! (make sure you check both), Species = red king crab 
 area <- read.csv(paste0('./data/rkc/', survey.location, '/LynnCanal_strata_area.csv')) 
@@ -110,7 +110,6 @@ dat5 %>%
             MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
             SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/
                                                                           (sqrt(sum(!is.na(Small.Females)))))) 
-(sqrt(sum(!is.na(Small.Females)))))) 
 # look at results to see the spread between stratas...in high biomass years even low strata 1,2 had higher CPUE. >1 or 2
 
 #### survey mid date -----  
@@ -192,6 +191,7 @@ dat1 %>%
 # if these rows have a egg. development code and egg condition code then the egg percentage should be there
 # if developement = 3 and condition is 4 or 5 then egg percentage should be 0.
 LgF_dat1[is.na(LgF_dat1$Egg.Percent),]
+
 #LgF_dat1 %>%
   # mutate(Egg.Percent =ifelse(is.na(Egg.Percent), 0, Egg.Percent)) -> LgF_dat1
   #need to remove if missing data
