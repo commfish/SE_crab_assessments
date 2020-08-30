@@ -12,12 +12,12 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2019
+cur_yr <- 2020
 pr_yr <- cur_yr -1
 survey.location <- 'Gambier'
 
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_GB_18_19.csv'))# file name will change annually
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_GB_19_20.csv'))# file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Gambier_strata_area.csv')) 
@@ -288,9 +288,9 @@ write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/',
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
-panel_figure('Gambier', 2019, 'Gambier', 1, 0) # panel with all 3 figures
-panel_figure('Gambier', 2019, 'Gambier', 2, 0) # male panel
-panel_figure('Gambier', 2019, 'Gambier', 3, 0) # female panel
+panel_figure('Gambier', cur_yr, 'Gambier', 1, 0) # panel with all 3 figures
+panel_figure('Gambier', cur_yr, 'Gambier', 2, 0) # male panel
+panel_figure('Gambier', cur_yr, 'Gambier', 3, 0) # female panel
 
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
