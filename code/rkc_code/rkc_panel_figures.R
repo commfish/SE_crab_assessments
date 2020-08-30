@@ -74,6 +74,9 @@ panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 2, 0, 'Gambier Bay')
 panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 3, 0, 'Gambier Bay')
 
 # Seymour ============================
+panel_figure('Seymour', cur_yr, 'Seymour Canal', 1, 1) # panel with all 3 figures
+panel_figure('Seymour', cur_yr, 'Seymour Canal', 2, 1) # male panel
+panel_figure('Seymour', cur_yr, 'Seymour Canal', 3, 1) # female panel
 ### presentation figure -----
 panel_figure_NC_PRES('Seymour', cur_yr, 'Seymour Canal', 2, 1, "Seymour Canal")
 panel_figure_NC_PRES('Seymour', cur_yr, 'Seymour Canal', 3, 1, "Seymour Canal")
