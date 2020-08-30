@@ -38,6 +38,10 @@ panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 2, 0, 'Excursion Inlet')
 panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 3, 0, 'Excursion Inlet')
 
 # Lynn Sisters =======================
+panel_figure('LynnSisters', cur_yr, 'LynnSisters', 1, 0) # panel with all 3 figures
+panel_figure('LynnSisters', cur_yr, 'LynnSisters', 2, 0) # male panel
+panel_figure('LynnSisters', cur_yr, 'LynnSisters', 3, 0) # female panel
+
 ### presentation figure -----
 panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 2, 0, 'Lynn Sisters')
 panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 3, 0, 'Lynn Sisters')
