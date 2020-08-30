@@ -11,12 +11,12 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2019
+cur_yr <- 2020
 pr_yr <- cur_yr -1
 survey.location <- 'Seymour'
 
 #####Load Data ---------------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_SC_18_19.csv'))
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_SC_19_20.csv'))
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Seymour_strata_area.csv')) 
@@ -41,6 +41,7 @@ sapply(dat, unique)
 levels(dat$Pot.Condition)
 dat %>%
   filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> dat1
+# should have removed experimetal ones here. 
 dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
@@ -264,9 +265,9 @@ write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/',
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
-panel_figure('Seymour', 2019, 'Seymour Canal', 1, 1) # panel with all 3 figures
-panel_figure('Seymour', 2019, 'Seymour Canal', 2, 1) # male panel
-panel_figure('Seymour', 2019, 'Seymour Canal', 3, 1) # female panel
+panel_figure('Seymour', cur_yr, 'Seymour Canal', 1, 1) # panel with all 3 figures
+panel_figure('Seymour', cur_yr, 'Seymour Canal', 2, 1) # male panel
+panel_figure('Seymour', cur_yr, 'Seymour Canal', 3, 1) # female panel
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
 
