@@ -278,16 +278,16 @@ write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/',
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
 #panel_figure('LynnSisters', 2018, 'LynnSisters')
-panel_figure('LynnSisters', 2019, 'LynnSisters', 1, 0) # panel with all 3 figures
-panel_figure('LynnSisters', 2019, 'LynnSisters', 2, 0) # male panel
-panel_figure('LynnSisters', 2019, 'LynnSisters', 3, 0) # female panel
+panel_figure('LynnSisters', 2020, 'LynnSisters', 1, 0) # panel with all 3 figures
+panel_figure('LynnSisters', 2020, 'LynnSisters', 2, 0) # male panel
+panel_figure('LynnSisters', 2020, 'LynnSisters', 3, 0) # female panel
 
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
 
 ### NON CONF panel --------------
-panel_figure_NC('LynnSisters', 2019, 'LynnSisters', 1, 0) # panel with all 3 figures
-panel_figure_NC('LynnSisters', 2019, 'LynnSisters', 2, 0)
+panel_figure_NC('LynnSisters', 2020, 'LynnSisters', 1, 0) # panel with all 3 figures
+panel_figure_NC('LynnSisters', 2020, 'LynnSisters', 2, 0)
 
 ### presentation figure -----
 panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 2, 0, 'Lynn Sisters')
