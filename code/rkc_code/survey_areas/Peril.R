@@ -11,12 +11,12 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2019
+cur_yr <- 2020
 pr_yr <- cur_yr -1
 survey.location <- 'Peril'   # area is Peril but in data files it's Deadman Reach
 
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PS_18_19.csv'))# file name will change annually
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PS_19_20.csv'))# file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file; Deadmans Reach
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Peril_strata_area.csv')) # same every year
@@ -285,9 +285,9 @@ write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/',
 
 #panel_figure('Peril', 2019, 'Deadman Reach')
 
-panel_figure('Peril', 2019, 'Deadman Reach', 1, 0) # panel with all 3 figures
-panel_figure('Peril', 2019, 'Deadman Reach', 2, 0) # male panel
-panel_figure('Peril', 2019, 'Deadman Reach', 3, 0) # female panel
+panel_figure('Peril', cur_yr, 'Deadman Reach', 1, 0) # panel with all 3 figures
+panel_figure('Peril', cur_yr, 'Deadman Reach', 2, 0) # male panel
+panel_figure('Peril', cur_yr, 'Deadman Reach', 3, 0) # female panel
 
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
