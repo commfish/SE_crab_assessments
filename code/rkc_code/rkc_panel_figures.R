@@ -56,11 +56,19 @@ panel_figure_NC_PRES('Peril', cur_yr, 'Deadman Reach', 2, 0, 'Peril Strait')
 panel_figure_NC_PRES('Peril', cur_yr, 'Deadman Reach', 3, 0, 'Peril Strait')
 
 # Pybus ==============================
+panel_figure('Pybus', cur_yr, 'Pybus', 1, 0) # panel with all 3 figures
+panel_figure('Pybus', cur_yr, 'Pybus', 2, 0) # male panel
+panel_figure('Pybus', cur_yr, 'Pybus', 3, 0) # female panel
+
 ### presentation figure -----
 panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 2, 2, 'Pybus Bay')
 panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 3, 0, 'Pybus Bay') #female panel
 
 # Gambier  ===========================
+panel_figure('Gambier', cur_yr, 'Gambier', 1, 0) # panel with all 3 figures
+panel_figure('Gambier', cur_yr, 'Gambier', 2, 0) # male panel
+panel_figure('Gambier', cur_yr, 'Gambier', 3, 0) # female panel
+
 ### presentation figure -----
 panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 2, 0, 'Gambier Bay')
 panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 3, 0, 'Gambier Bay')
