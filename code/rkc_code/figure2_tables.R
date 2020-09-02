@@ -1,6 +1,6 @@
 # K.Palof
 # katie.palof@alaska.gov
-# 08/03/2018 / 9-4-19
+# 08/03/2018 / 9-4-19 / 8-30-20
 
 # notes ----
 # This script is a work in progress to develop figures like those currently used to view the 
@@ -11,7 +11,7 @@
 source('./code/functions.R')
 
 # data -----
-cur_yr <- 2019
+cur_yr <- 2020
 mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
 fishery.status <- read.csv('./data/rkc/Juneau/hind_fore_cast_JNU_current.csv') # has fishery status
 #                     may want to save this information somewhere else in the future
@@ -50,7 +50,8 @@ fishery.status %>%
    
 regional.b %>% 
   left_join(fishery.status.update) -> regional.b
-write.csv(regional.b, paste0('./results/rkc/Region1/', cur_yr, '/regional_biomass_', cur_yr, '.csv'))
+write.csv(regional.b, paste0('./results/rkc/Region1/', cur_yr, '/regional_biomass_', cur_yr, '.csv'), 
+          row.names = FALSE)
 # use these values for table A1 in stock health document 
 
 # change in biomass estimation ----
@@ -59,8 +60,9 @@ regional.b %>%
   gather(type, pounds, legal:adj_mature, factor_key = TRUE) %>% 
   select(-status) %>% 
   spread(key = Year, value = pounds) %>% 
-  mutate(change = 100*(`2019`-`2018`)/`2018`) -> change# report these values in stock health doc
-write.csv(change, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_regional_biomass_', cur_yr, '.csv'))
+  mutate(change = 100*(`2020`-`2019`)/`2019`) -> change# report these values in stock health doc
+write.csv(change, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_regional_biomass_', cur_yr, '.csv'), 
+          row.names = FALSE)
 # these values go in regional overview section, other values from last years forecast
 #     come from excel sheet "Figure 1, table 2019"
 
@@ -69,7 +71,7 @@ biomass %>%
   select(-harvest, -weighted_ADJ) %>% 
   gather(type, pounds, legal.biomass:adj.mature, factor_key = TRUE) %>% 
   spread(key = Year, value = pounds) %>% 
-  mutate(change = 100*(`2019`-`2018`)/`2018`) -> change2
+  mutate(change = 100*(`2020`-`2019`)/`2019`) -> change2
 write.csv(change2, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_area_biomasses_', cur_yr, '.csv'))
 #
 
@@ -269,7 +271,7 @@ biomass %>%
 # raw sample sizes
 survey.locations <- c("Pybus", "Excursion", "Gambier", "Juneau", 
                       "LynnSisters", "Peril", "Seymour")
-cur_yr <- 2019
+cur_yr <- 2020
 
 files <- c(paste0(here::here(),"/results/rkc/Pybus/", cur_yr, "/raw_sample.csv"), 
            paste0(here::here(),"/results/rkc/Excursion/", cur_yr, "/raw_sample.csv"),
@@ -286,7 +288,7 @@ raw_samp <- files %>%
 raw_samp
 
 raw_samp %>% 
-  filter(Year == 2019) %>% 
+  filter(Year == 2020) %>% 
   select(Year, Location, effective_no_pots, Juvenile, Small.Females, 
          Large.Females, Pre_Recruit, Recruit, Post_Recruit) %>% 
   gather(recruit.class, numbers, effective_no_pots:Post_Recruit, factor_key = TRUE) %>% 
@@ -305,11 +307,11 @@ biomass %>%
   select(Location, mature_baseline, adj.mature.base) -> baseline.bay
 
 biomass %>% 
-  filter(Year == 2019) %>% 
-  select(Location, mature19 = mature.biomass, adj.mature19 = adj.mature) -> curyr.area.mature
+  filter(Year == cur_yr) %>% 
+  select(Location, mature_cur = mature.biomass, adj.mature_cur = adj.mature) -> curyr.area.mature
 
 baseline.bay %>% 
   left_join(curyr.area.mature) %>% 
-  mutate(pct.19 = 100*(mature19 - mature_baseline)/mature_baseline, 
-         pct.adj.19 = 100*(adj.mature19 - adj.mature.base)/adj.mature.base)
+  mutate(pct.cur = 100*(mature_cur - mature_baseline)/mature_baseline, 
+         pct.adj.cur = 100*(adj.mature_cur - adj.mature.base)/adj.mature.base)
            
