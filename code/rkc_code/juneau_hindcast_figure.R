@@ -152,3 +152,39 @@ hindcast %>%
   guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2))) +
   ggsave(paste0('./figures/rkc/juneau_fig1_presentation_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
+
+# Figure 1 BOF doc  ---------
+# legal and matureonly
+# should have current year's model with longterm baselines (1993-2007) and closure status. 
+#   also show current year's forecast as distinct from model output 
+hindcast %>% 
+  select(year, legal_curyr, mature_curyr, status) %>% 
+  dplyr::rename(legal_lb = legal_curyr, mature_lb = mature_curyr) %>% 
+  mutate(status = ifelse(status == "TBD", "PU only", as.character(status))) %>% 
+  gather(type, pounds, legal_lb:mature_lb, factor_key = TRUE) %>% 
+  ggplot(aes(year, pounds, group = type)) +
+  geom_point(aes(color = type, shape = status), size =3) +
+  geom_line(aes(color = type, group = type, linetype = type), show.legend = FALSE)+
+  scale_colour_manual(name = "", values = c("black", "grey44"), guide = FALSE)+
+  scale_shape_manual(name = "Fishery Status", values = c(0, 16, 2, 8), 
+                     labels = c("closed to comm and PU", "open to comm and PU", 
+                                "PU open only"))+
+  scale_linetype_manual(name = "", values = c("solid", "dashed")) +
+  scale_y_continuous(labels = comma, limits = c(0,600000),
+                     breaks= seq(min(0), max(600000), by = 100000)) +
+  ggtitle(paste0("Juneau Area Legal Biomass")) + 
+  ylab("Estimated Legal Biomass (lbs)") +
+  xlab("Year") +
+  theme(plot.title = element_text(hjust =0.5)) +
+  scale_x_continuous(breaks = seq(min(1975),max(2019), by = 5)) +
+  geom_hline(yintercept =  baseline_mean_curyr$baseline[1], color = "grey1")+
+  geom_hline(yintercept = baseline_mean_curyr$baseline[2], color = "grey44", linetype = "dashed") +
+  theme(legend.position = c(0.845,0.875), legend.title = element_text(size = 9), 
+        legend.text = element_text(size = 8)) +
+  geom_text(data = baseline_mean_curyr, aes(x = start_yr, y = baseline, label = label), 
+            hjust = -0.45, vjust = -1.0, nudge_y = 0.05, size = 3.5, show.legend = FALSE) +
+  guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2))) +
+  ggsave(paste0('./figures/rkc/2020/juneau_fig1_presentation2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+
+  
+ 
