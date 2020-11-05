@@ -1,32 +1,40 @@
 #K.Palof 
 # ADF&G 9-21-18 updated and reworked similar to RKC code
-# Areas: RKCS areas for Tanner crab - EXCLUDES north juneau and stephens passage
+# Areas: RKCS areas for Tanner crab - EXCLUDES north juneau and stephens passage (see readme.md for reason)
 # includes: Excursion, Seymour Canal, Pybus Bay, Gambier Bay, Peril Strait, and Lynn Sisters
 # code to process data from Ocean AK to use in crab CSA models.  
 
 ## Load ---------------------------------
 source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with mutiple areas at once.
+
 ## setup global ---------------
-cur_yr <- 2019
+cur_yr <- 2020
 pr_yr <- cur_yr -1
 fig_path <- paste0('figures/tanner/tanner_rkc/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
 output_path <- paste0('results/tanner/tanner_rkc/', cur_yr) # output and results
 dir.create(output_path) 
 
-## Data ---------------------------------------------------
+## Data -----------------------------------------------
 # change input file and input folder for each
-dat <- read.csv("./data/tanner/tanner_rkc/red crab survey for Tanner crab CSA_19.csv")
-                  # this is input from OceanAK - set up as red crab survey data for CSA has all years
+dat1 <- read.csv("./data/tanner/tanner_rkc/red crab survey for Tanner crab CSA_96_13.csv")
+dat2 <- read.csv(paste0("./data/tanner/tanner_rkc/red crab survey for Tanner crab CSA_14_", cur_yr,".csv"))
+
+              # this is input from OceanAK - set up as red crab survey data for CSA has all years
                   # 1997 to present 
                   # all data in this file do not need area, historic or female files here
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
-biomass <- read.csv("./data/tanner/tanner_rkc/tanner_2019_biomassmodel.csv") 
+biomass <- read.csv("./data/tanner/tanner_2020_biomassmodel.csv") 
 # this file should be updated with current year model output.
 
 # survey data QAC -------
-head(dat)
-glimpse(dat) # confirm that data was read in correctly.
+head(dat1)
+glimpse(dat1) # confirm that data was read in correctly.
+glimpse(dat2) # confirm that data was read in correctly.
+
+# merge 2 data files 
+dat1 %>% 
+  bind_rows(dat2) -> dat
 
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
@@ -61,7 +69,7 @@ dat1 %>%
 
   # need to confirm that rkcs area tagging pots in 2019 - seymour and excusion are NOT included
 dat1a %>% 
-  filter(Year == 2019) %>% 
+  filter(Year == 2020) %>% 
   group_by(Location) %>% 
   summarise(n = max(Pot.No)) # confirm 2019 pot removed.  **FIX** this for future
 
@@ -264,6 +272,9 @@ ggplot(poorclutch1, aes(Year, var1))+geom_point() +facet_wrap(~AREA)
 
 ## stock health -------
 total_health("tanner_rkc", cur_yr)
+
+
+## STOP here and run R markdown with summary of rkc areas ----
 
 ## panel figures -----
 panel_figure("EI", cur_yr, "Excursion Inlet", 2, "include")
