@@ -17,6 +17,9 @@ R code for CPUE and short/long term trends:
 tanner_redkingcrab_areas_survey_results.R
 
 
+Biomass file -
+tanner_2020_biomassmodel.csv - udpated manually for each area from CSA model runs (this needs to be made more efficient)
+
 ## north juneau and stephens passage
 Come from data from the Juneau leg of the red king crab survey. These pots need to be seperated into strata for Stephens Passage - using GIS (need to move instructions in here - currently in OneNote). 
 see NJ_SP_processing.R

@@ -26,3 +26,11 @@ ROP.CF.1J.2019.02, Douglas.
 Currently (2019) survey 4 areas in October: Icy Strait, Glacier Bay, Holkham Bay, and Thomas Bay. 
 Data from the red king crab survey areas is also used to assess the Tanner crab populations in those bays.  
 Tanner crab regionally consists of 11 areas, 4 Tanner survey areas and 7 rkc survey areas. 
+
+data for tanner crab:
+RKCS: data is pulled from red king crab surveys in southeast stored in /data/tanner/tanner_rkc/red crab survey for Tanner crab CSA_'cur_yr'.csv
+SP or Juneau area: data is pulled for the current year and stored in /data/tanner/nj_stp
+- data needs to be divided into pots from NJ and pots in SP. 
+
+see readme.md in /code/tc_code/ for more details.
+
