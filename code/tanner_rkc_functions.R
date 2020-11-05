@@ -16,7 +16,7 @@ library(plotrix)
 library(SDMTools)
 library(grid)
 library(gridExtra)
-library(FNGr)
+#library(FNGr)
 library(scales)
 library(cowplot)
 
@@ -25,7 +25,7 @@ library(cowplot)
 loadfonts(device="win")
 windowsFonts(Times=windowsFont("TT Times New Roman"))
 
-theme_set(theme_sleek())
+#theme_set(theme_sleek())
 
 ### short term function ----------------
 #input is file with last four years of data summarized by pot
