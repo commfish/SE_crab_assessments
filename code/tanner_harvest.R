@@ -1,5 +1,5 @@
 #K.Palof 
-# ADF&G 11-2-16 / 10-4-18 / 10-16-19
+# ADF&G 11-2-16 / 10-4-18 / 10-16-19 / 11-9-2020
 # data from OceanAK summarize for use in Tanner CSA's 
 # have to modify the output from "detailed fish tickets" need to add "Number of Animals...sum" to this.
 
@@ -7,7 +7,7 @@
 
 # Load ---------------------------
 library(tidyverse)
-cur_yr = 2019
+cur_yr = 2020
 pr_yr = cur_yr-1
 output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
 dir.create(output_path) 
@@ -18,9 +18,9 @@ harvest <- read.csv("./data/harvest/tanner_harvest.csv")
 glimpse(harvest)
 
 #harvest_all <- read.csv("./data/Tanner_Detailed Fish Tickets_98_18.csv")
-harvest_all <- read.csv(paste0('./results/tanner/comm_catch_by_statarea_97_', pr_yr,'.csv'))
+harvest_all <- read.csv(paste0('./results/tanner/harvest/', pr_yr, '/comm_catch_by_statarea_97_', pr_yr,'.csv'))
 #harvest_all <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_97_18.csv")
-logb11510 <- read.csv("./results/tanner/logbook_11510_all.csv") # from tanner_logbook.R calculations
+logb11510 <- read.csv(paste0('./results/tanner/harvest/', cur_yr,'/logbook_11510_all.csv')) # from tanner_logbook.R calculations
 
 
 # data clean up --------
@@ -108,10 +108,10 @@ write.csv(annual_catch, paste0('./results/tanner/harvest/', cur_yr, '/tanner_ann
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
 
-# need this year to be the begining of the season year range NOT the end 
-# so in 2018/2019 season - it's 2019 but I need 2018
+# !! old !! need this year to be the begining of the season year range NOT the end 
+# !! does not appear to be needed with new pull !! so in 2018/2019 season - it's 2019 but I need 2018
 harvest2 %>%
-  mutate(Year = Year-1) %>% 
+  #mutate(Year = Year-1) %>% 
   group_by(Year, Stat.Area, survey.area) %>%
   summarise(vessels = length(unique(ADFG.Number)), 
             people = length(unique(CFEC)),
@@ -121,6 +121,8 @@ harvest2 %>%
             pounds = sum(Whole.Weight..sum., na.rm = TRUE))  -> harvest2_cur
 
 ### all years by survey area --------------------------
+
+# SKIP only need to run this if pulling data from OceanAK and not from previous year's file ----
 # add year ----
 # need a season reference column in terms of years
 library(stringr)
@@ -136,6 +138,10 @@ harvest_all2 %>%
   select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds) %>% 
   bind_rows(harvest2_cur) -> harvest_all_update
 
+# Combine current year ---------
+harvest_all %>% 
+  select(-X) %>% 
+  bind_rows(harvest2_cur) -> harvest_all_update
 # don't save here because need to fix 11510 area ?? **FIX**
 #write.csv(harvest_all_update, paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
 
@@ -202,13 +208,14 @@ comm.catch.sum_all %>%
   mutate(percent_total = lb_by_yr/pounds*100) %>% 
   as.data.frame() %>% 
   write_csv(paste0('./results/tanner/harvest/', cur_yr, '/proportion_total_harvest_', cur_yr,'.csv'))
-# **FIX** year range is off prior to 2019. should be 1 year later.
+# **NOTE** year range was off prior to 2019. should be 1 year later - this was fixed previous. Now is OK if used summarized file.
 
 ## confidential catch -------------
 comm.catch.sum_all %>% 
   filter(survey.area != "Camden", survey.area != "PFred") %>% 
   filter(permits < 3 | vessels < 3 | people < 3) %>% 
   as.data.frame()
+
 
 comm.catch.sum_all %>% 
   mutate(confidential = ifelse(permits < 3 | vessels < 3 | people < 3, "y", "n")) -> comm.catch.sum_all_C
