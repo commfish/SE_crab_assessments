@@ -1,4 +1,4 @@
-# K.Palof 10-16-18 updated / 10-16-19
+# K.Palof 10-16-18 updated / 10-16-19 / 11-9-2020
 # Code to review logbook data for Tanner crab fishery.
 # needed to seperate out catch for Lynn Sisters and North Juneau, previously done in .JMP and Excel
 
@@ -11,12 +11,16 @@ library(tidyverse)
 library(readxl)
 
 ## global ------
-cur_yr <- 2019
+cur_yr <- 2020
 
 #####Load Data -------------------------------------
 # change input file and input folder for each
-logb <- read_excel(path = "./data/harvest/tanner_logbook_19.xlsx", sheet = "tanner_115_2019")
-logb_all <- read.csv("./data/harvest/logbook_11510_98_18.csv")
+logb <- read_excel(path = "./data/harvest/tanner_logbook_cur_yr.xlsx", sheet = "tanner_115")
+# take the current year logbook data and seperate out only district 115 -could also do this in here....
+#logb_all <- read.csv("./data/harvest/logbook_11510_98_18.csv") # bring in previous yrs percentages
+logb_all <- read.csv(paste0('./results/tanner/harvest/', cur_yr-1, '/logbook_11510_all.csv')) # bring in previous yrs percentages
+# This is the master file with the percentage of catch in each year that is attributed to NJ or LS - it is added to and saved at the end 
+#    of this file for the following year
 glimpse(logb)
 
 # need data and comments from stat area 115-10
@@ -51,6 +55,7 @@ log11510 %>%
 # 1) looking at permit holder and effort date -
 # 2) other knowledge - pers comm with shellfish group
 
+
 # % from each by year -------
 # total per year 
 log11510 %>% 
@@ -64,11 +69,11 @@ log11510 %>%
   left_join(total_no) %>% 
   mutate(percent = crabs/total_no) -> percent_assigned_cur
 
-write.csv(percent_assigned_cur, paste0('./results/tanner/logbook_11510_', cur_yr,'.csv'))
+write.csv(percent_assigned_cur, paste0('./results/tanner/harvest/', cur_yr,'/logbook_11510_', cur_yr,'.csv'))
 
 
 # merge with previous years -------------
 logb_all %>% 
   select(-X) %>% 
   bind_rows(percent_assigned_cur) -> log_all
-write.csv(log_all, './results/tanner/logbook_11510_all.csv')
+write.csv(log_all, paste0('./results/tanner/harvest/', cur_yr, '/logbook_11510_all.csv'))
