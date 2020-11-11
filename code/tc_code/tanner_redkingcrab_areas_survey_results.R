@@ -276,6 +276,10 @@ total_health("tanner_rkc", cur_yr)
 
 ## STOP here and run R markdown with summary of rkc areas ----
 
+# READ ME: 
+# need to run CSA models and put into biomass file before creating figures
+# need to run 'tanner_harvest.R' code to produce file with catch for last season prior to figure creation.
+
 ## panel figures -----
 panel_figure("EI", cur_yr, "Excursion Inlet", 2, "include")
 panel_figure("EI", cur_yr, "Excursion Inlet", 3, "include")
