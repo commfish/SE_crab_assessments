@@ -16,7 +16,7 @@ library(plotrix)
 library(SDMTools)
 library(grid)
 library(gridExtra)
-library(FNGr)
+#library(FNGr)
 library(scales)
 library(cowplot)
 library(readxl)
@@ -24,10 +24,10 @@ library(readxl)
 loadfonts(device="win")
 windowsFonts(Times=windowsFont("TT Times New Roman"))
 
-theme_set(theme_sleek())
-#theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
-#            theme(panel.grid.major = element_blank(),
-#                  panel.grid.minor = element_blank()))
+#theme_set(theme_sleek())
+theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
+            theme(panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank()))
 
 
 ### short term function ----------------
