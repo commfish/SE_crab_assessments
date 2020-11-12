@@ -1,12 +1,12 @@
 #K.Palof 
-# ADF&G 11-4-16 / 10-17-17 / 10-26-18 / 10-29-19
+# ADF&G 11-4-16 / 10-17-17 / 10-26-18 / 10-29-19 / 11-11-20
 # Areas: Tanner crab survey areas - includes Holkham, Thomas, Glacier Bay and Icy Strait
 # code to process data from Ocean AK to use in crab CSA models.  
 # Prior to 2016 this was done in excel then JMP
 
 #####Load ------------
 source('./code/tanner_functions.R')
-cur_yr <- 2019
+cur_yr <- 2020
 fig_path <- paste0('figures/tanner/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
 output_path <- paste0('results/tanner/tanner_tcs/', cur_yr) # output and results
@@ -14,7 +14,8 @@ dir.create(output_path)
 
 # Load Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv("./data/tanner/tanner_tcs/tanner crab survey for CSA_13_19.csv")
+dat <- read.csv("./data/tanner/tanner_tcs/tanner crab survey for CSA_13_20.csv")
+# file name changes annually - maybe should change this??? need to update end date
 # this is input from OceanAK - set up as tanner crab survey for CSA
 area <- read.csv("./data/tanner/tanner_tcs/TCSstrata_area.csv") 
 baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
@@ -123,7 +124,8 @@ hist_dat %>%
   select(-X) %>% 
   filter(Year < 2013) %>% 
   bind_rows(CPUE_wt_all) -> all_CPUE_data
-write.csv(all_CPUE_data, paste0('./results/tanner/tanner_tcs/', cur_yr, '/', cur_yr,'_CPUE_historic.csv'))
+write.csv(all_CPUE_data, paste0('./results/tanner/tanner_tcs/', cur_yr, '/', cur_yr,'_CPUE_historic.csv'), 
+          row.names = FALSE)
 
 ##### Short term trends -------------------------------------
 # look at trend for the last 4 years.  Need a file with last four years
