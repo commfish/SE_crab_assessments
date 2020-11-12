@@ -278,6 +278,7 @@ total_health("tanner_rkc", cur_yr)
 
 # READ ME: 
 # need to run CSA models and put into biomass file before creating figures
+# make sure biomass file is updated.....
 # need to run 'tanner_harvest.R' code to produce file with catch for last season prior to figure creation.
 
 ## panel figures -----
