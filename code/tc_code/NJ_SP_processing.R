@@ -1,5 +1,5 @@
 #K.Palof 
-# ADF&G 11-15-16 / 10-11-17 / 11-2-18 /10-10-19
+# ADF&G 11-15-16 / 10-11-17 / 11-2-18 /10-10-19/ 11-12-20
 # Areas: tanner crab assessment of red crab areas : North Juneau and Stephens Passage
 #   done seperately because they need to be divided into these two areas based on the pot locations, 
 #   division is done in ArcGIS using shape files for survey strata
@@ -16,28 +16,28 @@
 # Load -------------
 # source('./code/tanner_functions.R')
 source('./code/tc_code/sp_nj_figures.R')
-cur_yr <- 2019
-fig_path <- paste0('figures/', YEAR) # folder to hold all figs for a given year
+cur_yr <- 2020
+fig_path <- paste0('figures/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
-output_path <- paste0('results/tanner/nj_stp/', YEAR) # output and results
+output_path <- paste0('results/tanner/nj_stp/', cur_yr) # output and results
 dir.create(output_path) 
 
 
 # Data ---------------
 # change input file and input folder for each
-dat <- read.csv("./data/tanner/nj_stp/Juneau_red crab survey for Tanner crab CSA_2019.csv")
+dat <- read.csv(paste0('./data/tanner/nj_stp/Juneau_red crab survey for Tanner crab CSA_', cur_yr,'.csv'))
 # all current year pots from Juneau and Barlow Cove - OceanAK
 area <- read.csv("./data/tanner/nj_stp/stp_strata_area.csv")  #density strata for tanner stratification in Stephen's Passage area
-seperate <- read.csv("./data/tanner/nj_stp/juneau_2019.csv") #**FIX** update annually
+seperate <- read.csv(paste0('./data/tanner/nj_stp/juneau_', cur_yr,'.csv')) #**FIX** update annually
 #     from Kellii using GIS, puts Juneau area pots into density strata
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 
 SP_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/SP_rawdata_all.csv'))
 NJ_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_rawdata_all.csv'))
 # bring historic NJ for graphing purposes
-NJ_cpue_historic <- read.csv('./results/tanner/nj_stp/2018/NJ_CPUE_all_edited.csv')
-NJ_lowc_historic <- read.csv('./results/tanner/nj_stp/2018/NJ_precent_low_clutch_edited.csv')
-NJ_clutch_historic <- read.csv('./results/tanner/nj_stp/2018/NJ_percent_clutch_edited.csv')
+NJ_cpue_historic <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_CPUE_ALL.csv'))
+NJ_lowc_historic <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1,'/NJ_percent_low_clutch.csv'))
+NJ_clutch_historic <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_percent_clutch.csv'))
 # bring in historic data for each area below.
 #females <- read.csv("./data/Juneau/RKC_11_16_large females_by_pot.csv")
 
@@ -135,11 +135,11 @@ dat3 %>%
             SmallF_u = mean(Small.Females), SmallF_SE = (sd(Small.Females)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_ALL
 # check to confirm last years CPUEs match - that's why we use two years.
 # change name and folder for each area
-write.csv(CPUE_ALL, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_CPUE_09_cur.csv'))
+write.csv(CPUE_ALL, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_CPUE_09_cur.csv'), row.names = FALSE)
 NJ_cpue_historic %>% 
   filter(Year < 2009) %>% 
   bind_rows(CPUE_ALL) %>% 
-  write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_CPUE_ALL.csv'))
+  write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_CPUE_ALL.csv'), row.names = FALSE)
 
 
 ##### Short term trends -------------------------------------
@@ -267,11 +267,12 @@ poorclutch1 %>%
   group_by(Year)%>%
   summarise(Pclutch = mean(var1)*100 , 
             Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
-write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_low_clutch_cur.csv'))
+write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_low_clutch_cur.csv'), 
+          row.names = FALSE)
 NJ_lowc_historic %>% 
   filter(Year < 2009) %>% 
   bind_rows(percent_low_clutch) %>% 
-  write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_low_clutch.csv'))
+  write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_low_clutch.csv'), row.names = FALSE)
 
 
 ##### Long term females -------------------------
@@ -326,11 +327,13 @@ clutch_by_pot %>%
   group_by(Year)%>%
   summarise(mean = mean(egg_mean), 
             egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) ->percent_clutch
-write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_clutch_cur.csv'))
+write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_clutch_cur.csv'), 
+          row.names = FALSE)
 NJ_clutch_historic %>% 
   filter(Year < 2009) %>% 
   bind_rows(percent_clutch) %>% 
-  write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_clutch.csv'))
+  write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_clutch.csv'), 
+            row.names = FALSE)
 
 #### Stephens Passage  ----------------------
 ###  All these are Juneau so no sub_area (location code 13, 23) 
