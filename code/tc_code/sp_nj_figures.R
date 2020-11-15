@@ -6,7 +6,7 @@
 source('./code/tanner_functions.R')
 
 ## CONF panel figure ---------------
-panel_figure <- function(survey.location, cur_yr, area, abrv, option){
+panel_figure_J <- function(survey.location, cur_yr, area, abrv, option){
   # survey.location here are codes: Juneau, North Juneau
   # area is used in biomass /harvest file:  Icy Strait, Glacier Bay, 
   # Holkham Bay, Thomas Bay, Stephens Passage, North Juneau, Lynn Sisters, Pybus Bay, 
@@ -196,8 +196,8 @@ panel_figure <- function(survey.location, cur_yr, area, abrv, option){
     theme(legend.position = c(0.15,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) +
-    expand_limits(y=0) +
-    scale_y_continuous(limits = comma)
+    expand_limits(y=0) #+
+    #scale_y_continuous(limits = comma)
   
   if(option == 3){
     p2 = p2 + ggtitle(paste0(area, ' - Females')) +
