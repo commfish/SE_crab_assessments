@@ -23,3 +23,22 @@ tanner_2020_biomassmodel.csv - udpated manually for each area from CSA model run
 ## north juneau and stephens passage
 Come from data from the Juneau leg of the red king crab survey. These pots need to be seperated into strata for Stephens Passage - using GIS (need to move instructions in here - currently in OneNote). 
 see NJ_SP_processing.R
+
+seperate function for graphing these found in 'sp_nj_figures.R'
+
+
+## Steps to complete assessment:
+Prior to the assessment the harvest / logbook files need to be run for that year. The fishery is in the spring so it is completed by March-ish.
+Run 'tanner_harvest.R' and 'tanner_logbook.R'
+
+1) Run the "processing code.R" files for both Tanner areas and RKC survey areas.
+These should produce results from CPUE calcs from survey, long term and short term comparisons - see Excel sheet for summary of these.
+**fix** these need to be summarized in R - mostly likely a markdown/ .csv file.
+Excel file is 'Tanner Matrix 2020(21).xlsx'
+
+2) Results from 1) found in .rmd file need to be translated into the CSA files - these are still in Excel sheet and run with solver in Excel. Work has been made towards translating these to R (see separate git hub repo). 
+CSA models are run with solver and results - biomass are copied into '...biomass_2020.csv' for graphing purposes.
+
+3) See Excel file for summary of 2020 estimates of biomass for each area - taken from individual CSA excel file - Region GHL Summary tab.
+
+4) Look at word file - tanner crab asessment for other figures/ tables needed. start with 'figures_1_and_2_Tanner.R'
