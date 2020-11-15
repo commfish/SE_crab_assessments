@@ -203,6 +203,7 @@ t.test(dat3_current$Recruit, mu = baseline_NJ$Recruit)
 t.test(dat3_current$Post_Recruit, mu = baseline_NJ$Post_Recruit)
 
 # **FIX** need to summarize these to save the results - see function for red crab
+# currently these have to be copied into Excel sheet - 'Tanner Matrix 2020(21).xlsx'
 
 ##### Weights from length - weight relatinship--------------------
 # Linear model is changed for each area
@@ -282,7 +283,7 @@ poorclutch1 %>%
   filter(Year == cur_yr) ->poorclutch1_current
 #make sure you have a file with only current year's data
 #calculate the t.test
-t.test(poorclutch1_current$var1, mu = 0.10)
+t.test(poorclutch1_current$var1, mu = 0.10) # manually move to Excel sheet
 
 ##### Short term females ------------------------
 
@@ -363,7 +364,7 @@ dat.SP %>%
 SP_hist %>% 
   select(-X) -> SP_hist
 data.SP.all <- rbind(SP_hist, dat.SP)
-write.csv(data.SP.all, paste0('./results/tanner/nj_stp/', cur_yr,'/SP_rawdata_all.csv', row.names = FALSE))
+write.csv(data.SP.all, paste0('./results/tanner/nj_stp/', cur_yr,'/SP_rawdata_all.csv'), row.names = FALSE)
 
 ### data manipulations ----------------------
 # easier area since there are NO strata
@@ -622,12 +623,13 @@ write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percen
 #area = "Stephens Passage"
 #abrv = "SP"
 
-panel_figure("Juneau", cur_yr, "Stephens Passage", "SP", 2)
-panel_figure("Juneau", cur_yr, "Stephens Passage", "SP", 3)
+panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 2)
+panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 3)
 
 # presentation figures----------------
-panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 2)
-panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 3)
+# old function - needs to be updated.
+#panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 2)
+#panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 3)
 
 
 # panel figure NJ ----
@@ -636,8 +638,8 @@ panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 3)
 #survey.location = "North Juneau"
 #area = "North Juneau"
 #abrv = "NJ"
-panel_figure("North Juneau", cur_yr, "North Juneau", "NJ", 2)
-panel_figure("North Juneau", cur_yr, "North Juneau", "NJ", 3)
+panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 2)
+panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 3)
 
 # presentation figures----------------
 panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 2)
