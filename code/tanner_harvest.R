@@ -108,10 +108,10 @@ write.csv(annual_catch, paste0('./results/tanner/harvest/', cur_yr, '/tanner_ann
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
 
-# !! old !! need this year to be the begining of the season year range NOT the end 
-# !! does not appear to be needed with new pull !! so in 2018/2019 season - it's 2019 but I need 2018
+# need this year to (be the begining of the season year range NOT the end 
+#  so in 2018/2019 season - it's 2019 but I need 2018
 harvest2 %>%
-  #mutate(Year = Year-1) %>% 
+  mutate(Year = Year-1) %>% 
   group_by(Year, Stat.Area, survey.area) %>%
   summarise(vessels = length(unique(ADFG.Number)), 
             people = length(unique(CFEC)),
@@ -123,25 +123,29 @@ harvest2 %>%
 ### all years by survey area --------------------------
 
 # SKIP only need to run this if pulling data from OceanAK and not from previous year's file ----
-# add year ----
+#  This is needed if you have season....current file has year caught...need to adjust this.
 # need a season reference column in terms of years
-library(stringr)
-numextract <- function(string){ 
-  str_extract(string, "\\-*\\d+\\.*\\d*")
-} 
+#library(stringr)
+#numextract <- function(string){ 
+#  str_extract(string, "\\-*\\d+\\.*\\d*")
+#} 
 
+#harvest_all %>% 
+#  mutate(Year = as.numeric(numextract(Season))) %>% 
+#  select(-X, -Season) -> harvest_all2
+
+#harvest_all2 %>% 
+#  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds) %>% 
+#  bind_rows(harvest2_cur) -> harvest_all_update
+# add correct year ----
+# Combine current year ---------
 harvest_all %>% 
-  mutate(Year = as.numeric(numextract(Season))) %>% 
-  select(-X, -Season) -> harvest_all2
-
-harvest_all2 %>% 
-  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds) %>% 
+  mutate(year_caught = Year, Year = Year - 1) %>% # check here and make sure end year is cur_yr above -2, i.e. cur_yr = 2020, end year is 2018
+  select(-X) %>% 
   bind_rows(harvest2_cur) -> harvest_all_update
 
 # Combine current year ---------
-harvest_all %>% 
-  select(-X) %>% 
-  bind_rows(harvest2_cur) -> harvest_all_update
+
 # don't save here because need to fix 11510 area ?? **FIX**
 #write.csv(harvest_all_update, paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
 
