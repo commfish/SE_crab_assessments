@@ -10,19 +10,19 @@
 
 # K.Palof
 # katie.palof@alaska.gov
-# 11/07/2018
+# 11/07/2018 / 11-15-2020
 
 # load -----
 source('./code/tanner_functions.R')
 
 # data -----
-cur_yr <- 2019
+cur_yr <- 2020
 #survey_biomass <- read.csv("./data/TCS/survey_areas_biomass.csv") #add to each year
 # above file had point estimates from each year and was kept historically in SigmaPlot. Now this is tracked in 
 # an appendix table in the stock health document. 
 biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))          
 harvest_old <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_85_18.csv")
-harvest <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_ALL_years.csv") 
+harvest <- read.csv(paste0('./data/harvest/Tanner_Detailed Fish Tickets_ALL_years_', cur_yr, '.csv'))
 # add current years catch to this file or repull all years
 std_cpue <- read.csv(paste0("C:/Users/kjpalof/Documents/R projects/tanner-crab/results/std_commericial_cpue", cur_yr, ".csv"))
 #calculated in a seperate project "tanner-crab"
@@ -138,6 +138,9 @@ cur_yr_biomass %>%
 # Figure A1 for appendix --------------
 # make sure you update this csv with current year values - or pull from above 
 tail(hist_biomass) 
+  
+# these are projected biomass for each end year - old data/years here are NOT updated.
+  
 # add code to pull in current year from above here and then re-save from the following year
  hist_biomass %>% 
     gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
