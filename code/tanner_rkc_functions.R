@@ -343,7 +343,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
   
   harvest %>% 
     filter(Year >= 1997) %>% 
-    select(Year, Area = survey.area, pounds) ->harvest_a
+    select(Year, Area = survey.area, pounds) -> harvest_a
   
   biomass %>% 
     left_join(harvest_a) %>% 
