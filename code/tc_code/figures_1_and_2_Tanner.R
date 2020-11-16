@@ -78,6 +78,7 @@ write.csv(cur_yr_biomass, paste0('./results/tanner/', cur_yr, '/surveyed_areas_t
 
 ## adjustments using data pre-2007 -------
 # first survey year up to 2007 - uses 2007 data
+# NOT CURRENTLY used was done for an exercise to determine difference.
 biomass %>% 
   left_join(year_totals) %>% 
   filter(Area == "Thomas Bay"| Area == "Glacier Bay"| Area == "Holkham Bay") %>% 
@@ -182,6 +183,7 @@ harvest %>%
               pounds = sum(Whole.Weight..sum., na.rm = TRUE)) %>% 
   filter(Year >= 2000) -> annual_harvest_cur
 harvest_old %>% 
+    filter(Fishery %in% tanner1) %>% 
     group_by(Season) %>%
     summarise(permits = length(unique(CFEC)), 
               numbers = sum(Number.Of.Animals, na.rm = TRUE), 
@@ -257,6 +259,22 @@ ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 80
        width = 8, height = 9.0)
 
 
+### biomass vs. harvest annual ------
+# biomass is just regional and does not include non-surveyed areas. 
+# for simplicity use current % survey/non here...note this does NOT reflect changes to survey areas historically
+# i.e. those survey areas that were added or removed.
+cur_yr_biomass %>% 
+  mutate(Regional_Legal = Legal/.66, Regional_Mature = Mature/0.66) %>% 
+  left_join(annual_harvest_all) %>% 
+  mutate(hrate = pounds/Regional_Mature*100) -> biomass_harvest
+
+biomass_harvest %>% 
+  select(Year, Regional_Mature, harvest = pounds) %>% 
+  gather(type, pounds, Regional_Mature:harvest, factor_key = TRUE) %>% 
+  ggplot(aes(Year, y = pounds/1000000, group = type)) +
+  geom_bar(stat = "identity", 
+           fill = "grey75", colour = "black")
+  
 # Old with point estimates Figure 1 ------------
 survey_biomass %>% 
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
