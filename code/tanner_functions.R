@@ -219,7 +219,7 @@ total_health <- function(survey, year){
 
 
 ## CONF / non-conf panel figure ---------------
-panel_figure <- function(survey.location, cur_yr, area, option, conf){
+panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   # survey.location here are codes: Thomas Bay, Icy Strait, Holkham Bay, and Glacier Bay
   # area is used in biomass /harvest file:  Icy Strait, Glacier Bay, 
   # Holkham Bay, Thomas Bay, Stephens Passage, North Juneau, Lynn Sisters, Pybus Bay, 
@@ -432,7 +432,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf){
                                                         na.rm = TRUE) + 0.25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
                                                   na.rm = TRUE)+0.25000), by = 1.0)) +
-    theme(legend.position = c(0.55,0.8), 
+    theme(legend.position = c(l1, l2), #c(0.55,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) + 
     geom_hline(data = baseline_means, aes(yintercept = legal_mean/100000), color = "grey1", 
