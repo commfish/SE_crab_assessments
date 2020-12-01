@@ -10,7 +10,7 @@
 *.docx
 *.html
 /data
-/results
+#/results
 
 /instructions
 
