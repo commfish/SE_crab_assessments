@@ -1,6 +1,21 @@
-# tanner crab assessment 
-
+# Southeast Tanner crab 
 The southeast alaska tanner crab asssessment is performed on both the red king crab and the tanner crab survey areas. Analysis is different for each of these surveys, so instructions should be followed for each.
+
+data is not on repo but data folder structure is as follows:
+
+/data/tanner/tanner_rkc 
+/data/tanner/tanner_tcs
+/data/tanner/nj_stp
+
+results are currently not on repo either:
+
+/results/rkc
+/results/tanner
+ (under tanner subfolders: "2020", "harvest", "nj_stp", "tanner_rkc", "tanner_tcs")
+
+# tanner crab survey areas
+
+
 Use file: TCS_processingCODE.R
 Need file in data portion of this file, also need to create results folder (results/tanner/tanner_tcs/cur_yr)
 
