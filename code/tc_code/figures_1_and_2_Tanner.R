@@ -10,7 +10,7 @@
 
 # K.Palof
 # katie.palof@alaska.gov
-# 11/07/2018 / 11-15-2020
+# 11/07/2018 / 11-15-2020 / 3-2-21
 
 # load -----
 source('./code/tanner_functions.R')
@@ -219,8 +219,9 @@ figure2 %>%
   mutate(season = paste0(Year-1, "/", Year)) -> figure2s
 
 breaks = seq(min(1991),max(cur_yr), by =2)
-b_labels = paste0(breaks-1, "/", breaks)
+b_labels = paste0(breaks-1, "/", substr(breaks, 3, 4))
 
+substr(breaks, 3, 4)
 # Figure 2a ----
 ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
   geom_bar(stat = "identity", 
