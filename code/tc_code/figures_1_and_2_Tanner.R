@@ -214,6 +214,13 @@ annual_harvest_all %>%
 #  filter(Year > 1991) %>% 
 #  left_join(std_cpue) -> figure2c
 
+# add season label instead of year ---
+figure2 %>% 
+  mutate(season = paste0(Year-1, "/", Year)) -> figure2s
+
+breaks = seq(min(1991),max(cur_yr), by =2)
+b_labels = paste0(breaks-1, "/", breaks)
+
 # Figure 2a ----
 ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
   geom_bar(stat = "identity", 
@@ -234,7 +241,7 @@ ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
         axis.title=element_text(size=14,face="bold")) -> fig2a
 
 # Figure 2b --------------
-ggplot(figure2, aes(x = Year, y = avg.cpue)) +
+ggplot(figure2s, aes(x = Year, y = avg.cpue)) +
   geom_line(aes(x = Year, y = avg.cpue)) +
   geom_point(aes(x = Year, y = avg.cpue), size =3) +
   geom_ribbon(aes(ymin = avg.cpue - 2*se, ymax = avg.cpue + 2*se), 
@@ -243,13 +250,14 @@ ggplot(figure2, aes(x = Year, y = avg.cpue)) +
   #            width = 0.2, na.rm = TRUE) +
   expand_limits(y = 0) +
   ylab("Fishery CPUE (crab per pot)") + 
-  xlab("Fishery Year") +
-  scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2)) +
+  xlab("Season") +
+  scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2), 
+                     labels = b_labels) +
   scale_y_continuous(labels = comma, limits = c(0, 40), 
                      breaks= seq(min(0), max(40), by = 10)) +
   theme(legend.position = c(0.65,0.80), 
         axis.text = element_text(size = 12),
-        #axis.text.x = element_text(angle = 45, vjust = 0.5),
+        axis.text.x = element_text(angle = 45, vjust = 0.5),
         axis.title=element_text(size=14,face="bold")) -> fig2b#+
   #geom_hline(yintercept = mean(figure2$avg.cpue, na.rm = TRUE)) 
 
