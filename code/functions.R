@@ -15,7 +15,7 @@ library(reshape2)
 library(extrafont)
 library(ggthemes)
 library(plotrix)
-library(SDMTools)
+#library(SDMTools)
 library(grid)
 library(gridExtra)
 #install.packages("devtools")
@@ -26,7 +26,8 @@ library(cowplot)
 library(here)
 library(TeachingDemos)
 library(purrr)
-
+library(TMB)
+library(radiant.data)
 #font_import()
 loadfonts(device="win")
 windowsFonts(Times=windowsFont("TT Times New Roman"))
@@ -47,14 +48,23 @@ short_t <- function(bypot_st, year, area) {
     group_by(recruit.status) %>% 
     do(fit = lm(crab ~ Year, data = ., weights = weighting)) ->short_term
   
-  short_term %>%
-    tidy(fit) -> short_term_slope
-  
-  short_term %>%
-    glance(fit) ->short_term_out
+  bypot_st_long %>% 
+    group_by(recruit.status) %>% 
+    do(fit3 = glance(lm(crab ~ Year, data = ., weights = weighting))) %>% 
+    unnest(fit3) -> short_term_out
+  #short_term %>%
+  #  glance(fit) ->short_term_out
   
   short_term_out %>%
     select(recruit.status, r.squared, p.value)->short_term_out2
+  
+  bypot_st_long %>% 
+    group_by(recruit.status) %>% 
+    do(fit2 = tidy(lm(crab ~ Year, data = ., weights = weighting))) %>% 
+    unnest(fit2) -> short_term_slope
+  
+  #short_term %>%
+  #  tidy(fit) -> short_term_slope
   
   short_term_slope %>%
     select(recruit.status, term,  estimate) %>%
@@ -133,11 +143,11 @@ weights <- function(dat1, slope, intercept, area, year){
   dat1 %>% 
     group_by(Year) %>% 
     filter(Sex.Code == 1) %>% 
-    summarise(mature_lbs = wt.mean(weight_lb[Recruit.Status %in% Mature], 
+    summarise(mature_lbs = weighted.mean(weight_lb[Recruit.Status %in% Mature], 
                                    Number.Of.Specimens[Recruit.Status %in% Mature]), 
-              legal_lbs = wt.mean(weight_lb[Recruit.Status %in% Legal], 
+              legal_lbs = weighted.mean(weight_lb[Recruit.Status %in% Legal], 
                                   Number.Of.Specimens[Recruit.Status %in% Legal]), 
-              prer_lbs = wt.mean(weight_lb[Recruit.Status == "Pre_Recruit"], 
+              prer_lbs = weighted.mean(weight_lb[Recruit.Status == "Pre_Recruit"], 
                                  Number.Of.Specimens[Recruit.Status == "Pre_Recruit"])) -> male_weights
   # final results with score - save here
   write_csv(male_weights, paste0('results/rkc/', area, '/', year, '/maleweights.csv'))
@@ -236,7 +246,7 @@ poor_clutch_short <- function(females_all, area, year){
 egg_percent <-function(LgF_dat1, area, year){
   LgF_dat1 %>%
     group_by(Year, Location, Pot.No) %>% filter(!is.na(Egg.Percent)) %>% 
-    summarise (egg_mean = wt.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
+    summarise (egg_mean = weighted.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
   
   clutch_by_pot %>%
     group_by(Year) %>% 
@@ -265,7 +275,7 @@ stock_health[1,1] <- area
 stock_health[1,2] <- total_health
 stock_health <- as.data.frame(stock_health)
 stock_health %>% 
-  mutate(score = as.numeric(levels(score_f))) -> stock_health
+  mutate(score = as.numeric((score_f))) -> stock_health
 stock_health %>% 
   mutate(health_status = ifelse(score < -4.25, "poor", ifelse(score > -4.25 & score<= -1.75, "below average", 
                                                               ifelse(score > -1.75 & score <= 1.5, "moderate", 
