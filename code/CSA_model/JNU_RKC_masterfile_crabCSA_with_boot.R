@@ -1,5 +1,5 @@
 # K.Palof    katie.palof@alaska.gov
-# recent date updated: 7-14-2020
+# recent date updated: 7-14-2020 / 7-18-2021
 
 # Region: Southeast
 # Area : Juneau 
@@ -7,7 +7,8 @@
 
 # load ----
 library(tidyverse)
-cur_yr = 2020
+cur_yr = 2021
+dir.create(file.path(paste0('results/rkc/Juneau/', cur_yr), '/csa')) # creates csa folder in current year results
 
 # data -----
 JNUred <- read.csv(paste0(here::here(), '/data/rkc/Juneau/Juneau', cur_yr, 'RKC.csv'))
@@ -42,10 +43,10 @@ JNU_RKC_fit1 <- RcrabCSA1 (year = JNUred$Year, catch = JNUred$Catch..Number.,
 JNU_RKC_fit1
 JNU_RKC_fit1$estimates
 # save model output
-write.csv(JNU_RKC_fit1$estimates, './results/rkc/Juneau/2020/csa/JNU_RKC_fit1_estimates.csv')
+write.csv(JNU_RKC_fit1$estimates, paste0('./results/rkc/Juneau/', cur_yr, '/csa/JNU_RKC_fit1_estimates.csv'))
 
-write.csv(JNU_RKC_fit1$CI, './results/rkc/Juneau/2020/csa/JNU_RKC_fit1_par&CI.csv')
-write(JNU_RKC_fit1$SSQ, file = './results/rkc/Juneau/2020/csa/JNU_SSQ.txt')
+write.csv(JNU_RKC_fit1$CI, paste0('./results/rkc/Juneau/', cur_yr, '/csa/JNU_RKC_fit1_par&CI.csv'))
+write(JNU_RKC_fit1$SSQ, file = paste0('./results/rkc/Juneau/', cur_yr, '/csa/JNU_SSQ.txt'))
 ### save graphical output also - DO THIS manually, I have NOT automated this step.
 
 #########STOP  --------------------------
