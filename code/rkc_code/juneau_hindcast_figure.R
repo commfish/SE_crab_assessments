@@ -1,5 +1,5 @@
 # K.Palof
-# 7-10-19n updated / 7-15-2020
+# 7-10-19n updated / 7-15-2020 / 7-14-2021
 
 # Juneau area RKC forecast / hindcast figures
 # Current figures used for stock health memo 
@@ -21,7 +21,7 @@ theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
 
 # global --------
 # update each year
-cur_yr = 2020
+cur_yr = 2021
 
 #Load data ----------------
 #biomass <- read.csv("./data/redcrab/biomass.csv") no record of historic mature biomass point estimates
@@ -29,8 +29,9 @@ cur_yr = 2020
 
 hindcast <- read.csv("./data/rkc/Juneau/hind_fore_cast_JNU_current.csv") 
     # **FIX** currently needs manual updating...fix this.
-    # these are historic estimates while "forecast" columns are the current years model estimates
-    # needs to be updated with current years CSA model ouput for all years in "forecast columns" and current year in other columns
+    # "these "forecast" are historic estimates in the "forecast" columns 
+    # "cur_yr" needs to be updated with current years CSA model output for all years  
+    # and only update the current year in the "forecast" columns
 
 
 hindcast_long <- gather(hindcast, type, pounds, legal_curyr:mature_forecast, factor_key = TRUE)
@@ -72,7 +73,7 @@ jnu_rkc_fig1 <- hindcast %>%
   geom_text(data = baseline_mean_curyr, aes(x = start_yr, y = baseline, label = label), 
             hjust = -0.45, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
   guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2))) +
-  ggsave(paste0('./figures/rkc/2020/juneau_fig1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/', cur_yr, '/juneau_fig1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 # Figure A1 ---old Figure 1 - move to Appendix --------
@@ -101,7 +102,7 @@ jnu_rkc_annual_fore <- hindcast %>%
   geom_text(data = baseline_mean_forecast, aes(x = start_yr, y = baseline, label = label), 
             hjust = -0.55, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
   guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2))) +
-  ggsave(paste0('./figures/rkc/2020/juneau_figA1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/', cur_yr, '/juneau_figA1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 #  select(year, legal_2018)figure of 2018 model with forecast in each year -----
@@ -150,7 +151,7 @@ hindcast %>%
   geom_text(data = baseline_mean_curyr[1, ], aes(x = start_yr, y = baseline, label = label), 
             hjust = -0.45, vjust = -1.0, nudge_y = 0.05, size = 3.5, show.legend = FALSE) +
   guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2))) +
-  ggsave(paste0('./figures/rkc/juneau_fig1_presentation_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  ggsave(paste0('./figures/rkc/', cur_yr,'/juneau_fig1_presentation_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 # Figure 1 BOF doc  ---------
