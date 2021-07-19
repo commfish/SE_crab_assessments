@@ -14,4 +14,4 @@ Performed in mid-July. This area is done as it's own memo to inform a summer per
 ### Juneau personal use
 Harvest is calculated in 'personal_use.R' - see output from OceanAK, at this time you still need 2 calls from data - one with harvest "no of crab" and one that gives "permit returned status designation"
 
-Actualized harvest rate for the Juneau area, see tab in Excel file. 
+Actualized harvest rate for the Juneau area, see tab in Excel file. All tables and calculations are in the main excel sheet for Juneau "Juneau XXXX new weighting.xlsx"
