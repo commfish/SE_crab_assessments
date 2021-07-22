@@ -58,6 +58,33 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
 
+## juvenile molt ?-------------
+head(dat1)
+dat1 %>% 
+  filter(Year == 2021, Recruit.Status == "Juvenile", Length.Millimeters >= 40) %>% 
+  mutate(cohort = ifelse(Length.Millimeters >=113, "A", 
+                         ifelse(Length.Millimeters < 113 & Length.Millimeters >= 97, "B", "C")))-> juvies
+# juneau pot 25, specimen #4 length is recorded as 16 ?? is this correct
+ggplot(juvies, aes(Length.Millimeters)) +
+  geom_histogram(binwidth = .5)
+
+# growth increment of 16mm
+# 129, 113, 97
+ggplot(juvies, aes(x = Length.Millimeters, fill = cohort)) +
+  geom_histogram(binwidth=.5, alpha=.5, position="identity")
+
+ggplot(juvies, aes(x = Length.Millimeters, fill = cohort)) + geom_density(alpha=.3)
+
+dat1 %>% 
+  filter(Year == 2020, Recruit.Status == "Juvenile", Length.Millimeters >= 40) %>% 
+  mutate(cohort = ifelse(Length.Millimeters >=113, "A", 
+                         ifelse(Length.Millimeters < 113 & Length.Millimeters >= 97, "B", "C")))-> juvies20
+
+ggplot(juvies20, aes(Length.Millimeters)) +
+  geom_histogram(binwidth = .5)
+
+ggplot(juvies20, aes(x = Length.Millimeters, fill = cohort)) +
+  geom_histogram(binwidth=.5, alpha=.5, position="identity")
 ## CPUE calc --------------
 ##### By Pot -------------------------------
 # Now summarize by pot - remember to keep areas seperate.
