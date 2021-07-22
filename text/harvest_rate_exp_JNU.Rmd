@@ -1,0 +1,73 @@
+---
+title: 'Draft: appropriate harvest rate exploration for Juneau'
+author: "Katie Palof"
+date: "7/21/2021"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Autocorrelation 
+The equilibrium harvest rate analysis that has been performed previously (2012, 2018) did not explore the strong autocorrelation issues in the residuals from this regression in the Juneau area. This relationship was acknowledged last year but not explored. This year is was preliminary explored to assist with setting the appropriate harvest rate for the Juneau area. Further exploration of the best parameterization of this predictive model for the Juneau area is needed and preliminary exploration of this potential issue with the other RKC areas should also be addressed.
+
+This preliminary analysis acknowledges the AR1 relationship and uses two methods in an attempt to correct/ model this relationship to allow for the linear regression to be used in a more predictive manner. Further work is needed to explore additional model parmeterization (i.e. gam, ARIMA, etc.) that may be better suited to assist in determining the most appropriate harvest rate on an annual basis. 
+The two methods explored here are 1) an AR1 model parameterized in the general linear modeling framework and 2) a multivariate linear model that includes Year as a co-variate.
+
+The base linear relationship between the mature population change and associated mature harvest rate is highly variable, and some of the variability is due to the correlation of the change in population over time (Figure 2) 
+
+\newpage
+
+Figure 1: Linear regression of mature population change and harvest rate
+
+![](../figures/rkc/2021/hr/linear_regression.png)
+
+
+Figure 2: ACF and PACF correlation of the residuals from the linear regression of mature population change and harvest rate
+
+![](../figures/rkc/2021/hr/ACF_PACF_linear_regress_base.png)
+
+## Method 1: AR1 model, phi term
+One method to deal with the autocorrelation of the residuals is to estimate an AR(1) model for the linear regression. This involves estimating a parameter (phi) and estimating the model to account for a lag 1 autoregressive pattern. 
+This model does eliminate the correlated residual issues however, as the figure suggests it is fairly similar to the base linear model (Figure 3). To determine an appropriate harvest rate for the Juneau area a range of HR were used to predict a proportion change in the mature population (see below). These predicted values were very similar to those predicted with the base linear model and still don't appear to fully consider the time based  correlations of this data set. Further work is needed to determine if a different parameterization of a time series model (ARIMA) would be more appropriate for the purpose of prediction.
+
+  HR        predict_prop_change
+  ----      ------------------------
+ 0.02         0.16
+ 0.04         0.13
+ 0.06         0.11
+ 0.07         0.10
+ 0.10         0.06
+ 0.17        -0.025
+
+------        --------           ---------------
+
+Figure 3: AR1 model for the linear regression. Red line represents the AR1 model, black line the base regression, blue points are predicted change in mature population with harvest rates in table above.
+
+![](../figures/rkc/2021/hr/AR1_model.png)
+
+## Method 2: Reparameterize linear regression to include Year
+Another method to account for the time dependency of this relationship is to include Year as a co-variate in the linear model. This allows for a more realistic prediction of the population change over a range of harvest rates for 2021 (see below) but does not fully deal with the autocorrelative nature of the residuals. Year is a significant co-variate in this model suggesting, as we've already acknowledged, that time does play a significant role in the appropriate harvest rate in a given year. The figures depict the multi-linear relationship and the predicted change in mature population with associated harvest rates for 2021 (red points). 
+
+
+ HR     Year       pop_change
+-----   -----     ---------------
+0.02    2021        0.06
+0.04    2021        0.05
+0.06    2021        0.01
+0.07    2021        -0.001
+0.10    2021        -0.04
+0.17    2021        -0.13
+
+\newpage
+Figure 4: Multi-variate linear regression with year and harvest rate, harvest rate is depicted on the x-axis here. Solid black line is the linear relationship between population change and harvest rate, while the red line is the predicted multi-variate relationship. Red points are predictions for 2021.
+
+![](../figures/rkc/2021/hr/year_linear_reg.png)
+
+
+Figure 5: Multi-variate linear regression with year and harvest rate, year is depicted on the x-axis here. Solid black line is the linear relationship between population change and year, while the red line is the predicted multi-variate relationship. Red points are predictions for 2021.
+
+![](../figures/rkc/2021/hr/year_linear_reg2.png)
