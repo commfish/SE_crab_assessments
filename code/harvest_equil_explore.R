@@ -33,11 +33,15 @@ summary(fitA)
 
 par(mfrow = c(2,2))
 plot(fitA)
+acf2(residuals(fitA))
 
 #plot(fitA$residuals)
 ggplot(biomassH2, aes(HR, pop_change)) +
   geom_point() +
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm") +
+  ggtitle("Linear regression of mature pop change and harvest rate")
+ggsave(paste0('./figures/rkc/2021/hr/linear_regression.png'), 
+              dpi = 400, width = 6, height = 4.5)
 
 biomassH2$predlm = predict(fitA)
 
@@ -75,7 +79,10 @@ ggplot(biomassH2, aes(HR, pop_change)) +
   #geom_line(aes(y=predlm), size = 1) +
   geom_smooth(method = "lm", color = "black") +
   geom_line(aes(y=predlm2), size = 1, color = "red") +
-  geom_point(data = predict2, aes(HR, temp), color = "blue", size = 2.5)
+  geom_point(data = predict2, aes(HR, temp), color = "blue", size = 2.5) +
+  ggtitle("AR1 model (red)")
+ggsave(paste0('./figures/rkc/2021/hr/AR1_model.png'), 
+       dpi = 800, width = 8, height = 6.5)
 
 # linear regression with Year -----
 fit_yr = lm(pop_change~HR +Year, data = biomassH2)
@@ -83,6 +90,7 @@ summary(fit_yr)
 
 par(mfrow = c(2,2))
 plot(fit_yr)
+acf2(residuals(fit_yr))
 
 #plot(fitA$residuals)
 biomassH2$predlm_yr = predict(fit_yr)
@@ -107,11 +115,20 @@ ggplot(biomassH2, aes(HR, pop_change)) +
   geom_point() +
   geom_line(aes(y=predlm_yr), size = 1, color = "red", linetype = "dotted") +
   geom_smooth(method = "lm", color = "black") +
-  geom_point(data = predict_yr, aes(HR, pop_change), color = "red", size = 2.5)
+  geom_point(data = predict_yr, aes(HR, pop_change), color = "red", size = 2.5) +
+  ggtitle("Linear regression with Year as a co-variate (red dashed, red dot predicted for 2021")
+ggsave(paste0('./figures/rkc/2021/hr/year_linear_reg.png'), 
+       dpi = 800, width = 8, height = 6.5)
 
-
-
-
+#plot with year as x 
+ggplot(biomassH2, aes(Year, pop_change)) +
+  geom_point() +
+  geom_line(aes(y=predlm_yr), size = 1, color = "red", linetype = "dotted") +
+  geom_smooth(method = "lm", color = "black") +
+  geom_point(data = predict_yr, aes(Year, pop_change), color = "red", size = 2.5) +
+  ggtitle("X variable of Year in multi-variate linear regression")
+ggsave(paste0('./figures/rkc/2021/hr/year_linear_reg2.png'), 
+       dpi = 800, width = 8, height = 6.5)
 
 
 ### removing 2020 data ------
@@ -140,7 +157,8 @@ x1 = seq(1,length(fitA$residuals))
 y1 = fitA$residuals
 p = ggplot() + 
   geom_line(aes(x = x1, y = y1), color = "red") +
-  geom_hline(yintercept=0, linetype="dashed", color='blue')
+  geom_hline(yintercept=0, linetype="dashed", color='blue') +
+  xlab("Sequence (year)") + ylab("Residuals")
 print(p)
 
 # durbin-watson test --
@@ -158,6 +176,7 @@ summary(fitAR)
 acf2(residuals(fitAR))
 
 ar1res = sarima (residuals(fitAR), 1,0,0, no.constant=T) #AR(1)
+ar1res2 = sarima (residuals(fit_yr), 1,0,0, no.constant=T) #AR(1)
 
 xl = ts.intersect(x, lag(x,-1)) # Create matrix with x and lag 1 x as elements
 xnew=xl[,1] - 0.73*xl[,2] # Create x variable for adjustment regression
