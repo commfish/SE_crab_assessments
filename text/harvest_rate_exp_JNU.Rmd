@@ -3,8 +3,8 @@ title: 'Draft: appropriate harvest rate exploration for Juneau'
 author: "Katie Palof"
 date: "7/21/2021"
 output:
-  word_document: default
   html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
