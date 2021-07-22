@@ -182,6 +182,12 @@ write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/',
                                  survey.location, '/', cur_yr, '/JNU_perpot_all_', cur_yr,'.csv'), 
                                  row.names = FALSE)
 
+# number of pots per year --
+CPUE_ALL_YEARS %>% 
+  group_by(Year) %>% 
+  summarize(n = n())
+
+CPUE_ALL_YEARS %>% count(Year)
 
 ## Trends - short and long and female stats for stock health weighting ---------------
 ### Short term trends -------------------
