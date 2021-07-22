@@ -1,0 +1,42 @@
+---
+title: "Appropriate harvest rate exploration for Juneau"
+author: "Katie Palof"
+date: "7/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Autocorrelation 
+The equilbrium harvest rate analysis that has been performed previously (2011, 2018) did not explore the strong autocorrelation issues in the residuals from this regression in the Juneau area. This relationship was acknowledged last year but not explored. This year is was preliminarily explored to assist with setting the appropriate harvest rate for the Juneau area. Further exploration of the best parameterization of this predictive model for the Juneau area is needed and preliminary exploration of this potential issue with the other RKC areas should also be addressed.
+
+This preliminary analysis acknowledges the AR1 relationship and uses two methods in an attempt to correct/ model this relationship to allow for the linear regression to be used in a more predictive manner. Further work is needed to explore additional model parmeterization (i.e. gam, ARIMA, etc.) that may be better suited to assist in determining the most appropriate harvest rate on an annual basis. 
+The two methods explored here are 1) an AR1 model parameterized in the general linear modeling framework and 2) a multivariate linear model that includes Year as a co-variate.
+
+The base linear relationship between the mature population change and associated mature harvest rate is variable 
+
+## Method 1: AR1 model, phi term
+
+## Method 2: reparameterize linear regression to include Year
+
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
