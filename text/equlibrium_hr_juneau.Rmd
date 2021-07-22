@@ -17,26 +17,45 @@ The two methods explored here are 1) an AR1 model parameterized in the general l
 
 The base linear relationship between the mature population change and associated mature harvest rate is variable 
 
+
+Figure 1: Regional biomass of surveyed areas from 2020 models
+
+![](../figures/rkc/2021/hr/linear_regression.png)
+
+
+(insert graph here)
+(insert ACF figure)
+
 ## Method 1: AR1 model, phi term
+One method to deal with the autocorrelation of the residuals is to estimate an AR(1) model for the linear regression. This involves estimating a parameter (phi) and estimating the model to account for a lag 1 autoregressive pattern. 
+This model does eliminate the correlated residual issues however, as the figure suggests it is fairly similar to the base linear model. To determine an appropriate harvest rate for the Juneau area a range of HR were used to predict a proportion change in the mature population (see below). These predicted values were very similar to those predicted with the base linear model and still don't appear to fully consider the time based  correlations of this data set. Further work is needed to determine if a different parameterization of a time series model (ARIMA) would be more appropriate for the purpose of prediction.
+
+  HR        predict_prop_change
+ 0.02         0.16
+ 0.04         0.13
+ 0.06         0.11
+ 0.07         0.10
+ 0.10         0.06
+ 0.17        -0.025
+
+(insert AR1 model figure)
 
 ## Method 2: reparameterize linear regression to include Year
 
 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+ HR     Year      pop_change
+0.02    2021      0.06
+0.04    2021      0.05
+0.06    2021      0.01
+0.07    2021     -0.001
+0.10    2021     -0.04
+0.17    2021     -0.13
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
 
 ```{r cars}
 summary(cars)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
