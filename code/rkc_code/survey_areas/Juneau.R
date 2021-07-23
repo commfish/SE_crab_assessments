@@ -324,6 +324,11 @@ write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/',
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
+## baseline calc redo without 93/94 ----
+CPUE_wt_from93 %>% 
+  filter(Year >=1995 & Year <= 2007) %>% 
+  summarise_all(mean, na.rm = TRUE)
+
 
 panel_figure('Juneau', cur_yr, 'Juneau', 1, 0) # panel with all 3 figures
 panel_figure('Juneau', cur_yr, 'Juneau', 2, 0) # male panel
