@@ -38,11 +38,11 @@ hindcast_long <- gather(hindcast, type, pounds, legal_curyr:mature_forecast, fac
 
 # Baseline ----
 hindcast %>%
-  filter(year > 1992 & year < 2008) %>% 
+  filter(year > 1994 & year < 2008) %>% #updated to remove 93, 94 from these calcs due to spatial inconsistancies in sampling
   gather(type, pounds, legal_curyr:mature_forecast, factor_key = TRUE) %>%
   group_by(type) %>% 
   summarise(baseline = mean(pounds)) %>% 
-  mutate(label = c("Legal (1993-2007)", "Mature (1993-2007)", "Legal (1993-2007)", "Mature (1993-2007)"), 
+  mutate(label = c("Legal (1995-2007)", "Mature (1995-2007)", "Legal (1995-2007)", "Mature (1995-2007)"), 
          start_yr = c(1979, 1979, 1979, 1979)) -> baseline_mean
 baseline_mean_curyr <- as.data.frame(baseline_mean[1:2,])
 baseline_mean_forecast <- as.data.frame(baseline_mean[3:4,])  
