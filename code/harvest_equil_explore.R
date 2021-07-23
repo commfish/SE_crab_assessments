@@ -27,6 +27,13 @@ biomassH %>%
          pop_change = (lead(mature.biomass) - (mature.biomass))/ (mature.biomass)) %>% 
   filter(Year < 2021) -> biomassH2
 
+
+ggplot(biomassH2, aes(x = Year)) +
+  #geom_point(aes(y = pop_change)) +
+  geom_line(aes(y = pop_change), linetype = "dashed", color = "black") +
+  geom_line(aes(y = mature.biomass/1000000), color = "red") +
+  scale_y_continuous(sec.axis = sec_axis( ~./1000000, name = "mature biomass"))
+
 # linear regression -----
 fitA = lm(pop_change~HR, data = biomassH2)
 summary(fitA)
@@ -82,7 +89,7 @@ ggplot(biomassH2, aes(HR, pop_change)) +
   geom_point(data = predict2, aes(HR, temp), color = "blue", size = 2.5) +
   ggtitle("AR1 model (red)")
 ggsave(paste0('./figures/rkc/2021/hr/AR1_model.png'), 
-       dpi = 800, width = 8, height = 6.5)
+       dpi = 500, width = 4, height = 3.25)
 
 # linear regression with Year -----
 fit_yr = lm(pop_change~HR +Year, data = biomassH2)
@@ -118,7 +125,7 @@ ggplot(biomassH2, aes(HR, pop_change)) +
   geom_point(data = predict_yr, aes(HR, pop_change), color = "red", size = 2.5) +
   ggtitle("Linear regression with Year as a co-variate (red dashed, red dot predicted for 2021")
 ggsave(paste0('./figures/rkc/2021/hr/year_linear_reg.png'), 
-       dpi = 800, width = 8, height = 6.5)
+       dpi = 400, width = 4, height = 3.25)
 
 #plot with year as x 
 ggplot(biomassH2, aes(Year, pop_change)) +
@@ -128,7 +135,7 @@ ggplot(biomassH2, aes(Year, pop_change)) +
   geom_point(data = predict_yr, aes(Year, pop_change), color = "red", size = 2.5) +
   ggtitle("X variable of Year in multi-variate linear regression")
 ggsave(paste0('./figures/rkc/2021/hr/year_linear_reg2.png'), 
-       dpi = 800, width = 8, height = 6.5)
+       dpi = 400, width = 4, height = 3.25)
 
 
 ### removing 2020 data ------
