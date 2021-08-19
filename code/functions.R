@@ -412,9 +412,9 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       select(-weighted_ADJ, -adj.legal, -adj.mature) %>% 
       gather(type, pounds, harvest:mature.biomass, factor_key = TRUE) %>% 
       filter(Location == survey.location) %>% 
-      filter(Year >= 1995) -> biomass_graph
+      filter(Year >= 1993) -> biomass_graph
     biomass_graph %>% 
-      filter(Year <= 2007) %>% 
+      filter(Year <= 2007 & Year >=1995) %>% 
       spread(type, pounds) %>% 
       summarise(mature_mean = mean(mature.biomass), 
                 legal_mean = mean(legal.biomass)) -> baseline_means
