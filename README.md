@@ -18,6 +18,14 @@ Data from these surveys is stored in OceanAK.
 These data are also used to assess the Tanner crab populations in each of these bays. 
 
 
+Code: see code/rkc_code/survey_areas for each area that is surveyed. 
+code for regional figures, etc. is in 'code/rkc_code'
+
+Area instructions:
+- Juneau areas is usually done on it's own, there's a specific memo for this area to address Juneau (11-A) personal use openings - usually in August. 
+- Each survey area is processed seperately due to the historic differences between them.
+
+
 Stratman, J., A. Messmer, K. Wood, T. Bergmann, and K. Palof. 2019. Operational plan: Southeast Alaska red
 king crab pot survey, 2018–2022. Alaska Department of Fish and Game, Regional Operational Plan
 ROP.CF.1J.2019.02, Douglas.
