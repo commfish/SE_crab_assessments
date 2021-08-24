@@ -18,7 +18,7 @@ cur_yr <- 2021 # change this upon receiving new data
 pr_yr <- cur_yr -1
 survey.location <- 'Juneau'
 
-dir.create(file.path(paste0('results/rkc/', area), cur_yr))
+dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
 
 ## data -------------------
