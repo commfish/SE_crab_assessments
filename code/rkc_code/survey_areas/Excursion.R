@@ -244,6 +244,10 @@ total_health('Excursion', cur_yr)
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+### !!! 
+# Run CSA model - either excel or here --
+# Put Biomass estimates for this area in 'data/biomass.csv'. this contains this years estimates.
+
 ### raw sample size -----------
 head(dat5)
 dat5 %>% group_by(Year, Location) %>%  select(Year, Location, Juvenile, Small.Females, 
