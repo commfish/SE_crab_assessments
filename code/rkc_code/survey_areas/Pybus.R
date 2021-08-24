@@ -1,5 +1,5 @@
 # K.Palof 
-# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18/ 9-4-19
+# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18/ 9-4-19/8-23-21
 # R script contains code to process data from Ocean AK to use in crab CSA models, 
 #      code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -12,12 +12,15 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2020
+cur_yr <- 2021
 pr_yr <- cur_yr -1
 survey.location <- 'Pybus'
 
+dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
+dir.create(file.path(paste0('text'), cur_yr))
+
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PB_19_20.csv'))# file name will change annually
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PB_20_21.csv'))# file name will change annually
               # this is input from OceanAK - set up as red crab survey data for CSA
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Pybus_strata_area.csv')) 
               #this file is the same every year.  Unless the survey methods change
@@ -40,7 +43,7 @@ glimpse(dat) # confirm that data was read in correctly.
 sapply(dat, unique)
 
 # remove pots with Pot condition code that's not "normal" or 1 
-levels(dat$Pot.Condition)
+unique(dat$Pot.Condition)
 dat %>%
   filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> dat1
 dat1 %>%
@@ -89,12 +92,12 @@ dat5 %>%
 # Calculates a weighted mean CPUE and SE for each recruit class
 dat5 %>%
   group_by(Year) %>%
-  summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
-            Recruit_wt = wt.mean(Recruit, weighting), Rec_SE = (wt.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
-            Post_Recruit_wt = wt.mean(Post_Recruit, weighting), PR_SE = (wt.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
-            Juvenile_wt = wt.mean(Juvenile, weighting), Juv_SE = (wt.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
-            MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
-            SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt
+  summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
+            Recruit_wt = weighted.mean(Recruit, weighting), Rec_SE = (weighted.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
+            Post_Recruit_wt = weighted.mean(Post_Recruit, weighting), PR_SE = (weighted.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
+            Juvenile_wt = weighted.mean(Juvenile, weighting), Juv_SE = (weighted.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
+            MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
+            SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt
 CPUE_wt
 # check to confirm last years CPUEs match - that's why we use two years.
 write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/PB_CPUE_',cur_yr, '.csv'), 
@@ -103,12 +106,12 @@ write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/PB_C
 # weighted cpue by strata --- just for comparison
 dat5 %>%
   group_by(Year, Density.Strata.Code) %>%
-  summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
-            Recruit_wt = wt.mean(Recruit, weighting), Rec_SE = (wt.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
-            Post_Recruit_wt = wt.mean(Post_Recruit, weighting), PR_SE = (wt.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
-            Juvenile_wt = wt.mean(Juvenile, weighting), Juv_SE = (wt.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
-            MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
-            SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/
+  summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
+            Recruit_wt = weighted.mean(Recruit, weighting), Rec_SE = (weighted.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
+            Post_Recruit_wt = weighted.mean(Post_Recruit, weighting), PR_SE = (weighted.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
+            Juvenile_wt = weighted.mean(Juvenile, weighting), Juv_SE = (weighted.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
+            MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
+            SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/
                                                                           (sqrt(sum(!is.na(Small.Females)))))) 
 # look at results to see the spread between stratas...in high biomass years even low strata 1,2 had higher CPUE. >1 or 2
 
@@ -235,6 +238,10 @@ total_health('Pybus', cur_yr)
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+### !!! 
+# Run CSA model - either excel or here --
+# Put Biomass estimates for this area in 'data/biomass.csv'. this contains this years estimates.
+
 ### raw sample size -----------
 head(dat5)
 dat5 %>% group_by(Year, Location) %>%  select(Year, Location, Juvenile, Small.Females, 
@@ -254,12 +261,12 @@ write.csv(raw_samp, paste0('./results/rkc/', survey.location, '/', cur_yr, '/raw
 head(CPUE_ALL_YEARS)
 CPUE_ALL_YEARS %>%
   group_by(Year) %>%
-  summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
-            Recruit_wt = wt.mean(Recruit, weighting), Rec_SE = (wt.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
-            Post_Recruit_wt = wt.mean(Post_Recruit, weighting), PR_SE = (wt.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
-            Juvenile_wt = wt.mean(Juvenile, weighting), Juv_SE = (wt.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
-            MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
-            SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt_all
+  summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
+            Recruit_wt = weighted.mean(Recruit, weighting), Rec_SE = (weighted.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
+            Post_Recruit_wt = weighted.mean(Post_Recruit, weighting), PR_SE = (weighted.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
+            Juvenile_wt = weighted.mean(Juvenile, weighting), Juv_SE = (weighted.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
+            MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
+            SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt_all
 CPUE_wt_all  
 CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
 
