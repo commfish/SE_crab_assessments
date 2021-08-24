@@ -1,7 +1,7 @@
 ---
 title: "Pybus Bay area survey results"
 author: "Katie Palof"
-date: "August 29, 2020"
+date: "August 23, 2021"
 output: html_document
 ---
 
@@ -9,7 +9,7 @@ output: html_document
 library(knitr)
 library(tidyverse)
 #dat <- read.csv("../data/rkc/Juneau/jnu_16_17_oceanAK_out_RAW.csv")
-cur_yr = 2020
+cur_yr = 2021
 survey.location = 'Pybus'
 cur_yr
 ```
