@@ -27,7 +27,10 @@ biomass <- read.csv(paste0(here::here(),'/data/rkc/biomass.csv'))
 
 # Summary of Stock {-}
   - Regionally legal and mature biomass have been declining since 2017
-  - 
+  - Juneau area is above average stock health, Lynn Sisters is moderate stock health, and the other areas are divided between poor and below average. Stock health considers all aspects of the population (mature males, juveniles, and females).
+  - Lynn Sisters and Juneau are the only areas with an increase in both legal and mature biomass from 2020. Lynn Sister is a small contributor to the regional biomass compared to most of the survey areas. 
+  - None of the three harvest rate options (low, neutral, or high risk) reach a harvestable surplus of the 200,000 lb threshold.
+
 
 # Overview {-}
 The Alaska Department of Fish and Game (ADF&G) annually evaluates stock status and establishes the guideline harvest levels (GHLs) for the Southeast red (RKC) and blue king crab (BKC) fishery using data from fishery independent surveys (pot gear), commercial fishery catch per unit of effort (CPUE), and biological data (length, weight, and shell condition) from the surveys and fishery. The Southeast Alaska management area (Registration Area A) consists of all waters defined in 5 AAC 34.100 (Figure 1). 
