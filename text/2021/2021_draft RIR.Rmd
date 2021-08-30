@@ -14,15 +14,70 @@ output:
 
 ```{r global_options, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
 library(knitr)
+source(paste0(here::here(),'/code/functions.R'))
 cur_yr = 2021
 pr_yr = cur_yr-1
+fut_yr = cur_yr+1
 opts_chunk$set(fig.width = 12, fig.height = 7, echo = FALSE, warning = FALSE, message = FALSE,  dpi=300)
 #\pagenumbering{gobble}
 ```
 
 ```{r exesum, echo = FALSE}
+mr_adjust <- read.csv(paste0(here::here(),'/data/rkc/adj_final_stock_assessment.csv'))
+fishery.status <- read.csv(paste0(here::here(),'/data/rkc/Juneau/hind_fore_cast_JNU_current.csv')) # has fishery status
+#                     may want to save this information somewhere else in the future
 biomass <- read.csv(paste0(here::here(),'/data/rkc/biomass.csv'))
+# file for all locations.  Has legal and mature biomass from current year CSA & harvest
+# mr adjustments can be made in the function using mr_adjust file.
+exploit_rate <- read.csv(paste0(here::here(),"/data/rkc/table3.csv"))
 
+###
+## clean up figure 2-------
+# add in mr adjustments
+mr_adjust %>% 
+  select(-X) %>% 
+  mutate(Location = ifelse(area == "St_James", "LynnSisters", as.character(area))) %>% 
+  select(-area) -> mr_adjust2
+biomass %>% 
+  left_join(mr_adjust2) %>% 
+  mutate(adj.legal = ifelse(Location == "Juneau", legal.biomass, 
+                            legal.biomass*weighted_ADJ), 
+         adj.mature = ifelse(Location == "Juneau", mature.biomass, 
+                            mature.biomass*weighted_ADJ))-> biomass
+#write.csv(biomass, paste0('./results/rkc/Region1/', cur_yr, '/biomass_', cur_yr, '.csv'))
+# use these values for Table A2 in stock health document
+
+# regional biomass ----
+biomass %>% 
+  group_by(Year) %>% 
+  summarise(legal = sum(legal.biomass), mature = sum(mature.biomass), 
+            adj_legal = sum(adj.legal), adj_mature = sum(adj.mature)) %>% 
+  as.data.frame() -> regional.b
+fishery.status %>% 
+  select(Year = year, status) %>% 
+  mutate(status = ifelse(status == "PU only", "closed", as.character(status))) -> fishery.status.update
+  # add next line to deal with current year which is TBD in file but will most 
+  # likely be closed in current year (2018)
+  # %>% mutate(status = ifelse(status == "TBD", "closed", as.character(status))) -> fishery.status.update
+   
+regional.b %>% 
+  left_join(fishery.status.update) -> regional.b
+
+## expansion factor for non-surveyed areas ----
+regional.b %>% 
+  mutate(non_sur_legal = (legal/.528) - legal, 
+         non_sur_mature = (mature/0.528) - mature, 
+         non_sur_adj_legal = (adj_legal/.528) - adj_legal, 
+         non_sur_adj_mature = (adj_mature/0.528) - adj_mature, 
+         bkc_leg = legal*0.0106, 
+         bkc_mat = mature*0.0106, 
+         bkc_adj_leg = adj_legal*0.0106, 
+         bkc_adj_mat = adj_mature*0.0106, 
+         TOTAL_leg = (adj_legal + non_sur_adj_legal + bkc_adj_leg), 
+         TOTAL_mat = (adj_mature + non_sur_adj_mature + bkc_adj_mat)) -> regional.b_table
+
+
+regional.b_table %>% filter(Year == cur_yr) -> b_cur_yr
 ````
 
 # Summary of Stock {-}
@@ -35,15 +90,18 @@ biomass <- read.csv(paste0(here::here(),'/data/rkc/biomass.csv'))
 # Overview {-}
 The Alaska Department of Fish and Game (ADF&G) annually evaluates stock status and establishes the guideline harvest levels (GHLs) for the Southeast red (RKC) and blue king crab (BKC) fishery using data from fishery independent surveys (pot gear), commercial fishery catch per unit of effort (CPUE), and biological data (length, weight, and shell condition) from the surveys and fishery. The Southeast Alaska management area (Registration Area A) consists of all waters defined in 5 AAC 34.100 (Figure 1). 
 
-Projected estimates of regional mature male biomass for the `cur_yr`/`pr_yr` season are 1.87 million lb, using the mark-recapture adjustments and the historical expansion factor applied to the non-surveyed areas. However, this value is substantially below the baseline level (defined as the average biomass from 1993–2007), suggesting the regional stock remains in a low or depressed state.
-The 2020/2021 Southeast commercial RKC fishery season GHL is 97,881 lb and is less than the 200,000 lb minimum threshold [5 AAC 34.113]; therefore, the fishery did not open for the 2020/2021 season. The personal use RKC and BKC fishery opened July 1, 2020 in Excursion Inlet and non-surveyed areas with bag and possession limits of one RKC or BKC per person per day. Results from the annual stock assessment survey in the Juneau Area (Section 11-A) showed overall stock health to be at moderate levels, with legal biomass estimated to be above the long-term average and mature biomass estimated to be below the long-term average. The personal use summer fishery in Section 11-A opened on August 21, 2020 for three and a half days with a seasonal household limit of two crab and daily bag and possession limit of two crab (Table 2) to target 12,635 lb (1,527 crab) in the summer fishery.
+Projected estimates of regional mature male biomass for the `r cur_yr`/`r fut_yr` season are `r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb, using the mark-recapture adjustments and the historical expansion factor applied to the non-surveyed areas. However, this value is substantially below the baseline level (defined as the average biomass from 1993–2007), suggesting the regional stock remains in a low or depressed state.
+The `r cur_yr`/`r fut_yr` Southeast commercial RKC fishery season GHL is XXXXX lb and is less than the 200,000 lb minimum threshold [5 AAC 34.113]; therefore, the fishery did not open for the `r cur_yr`/`r fut_yr` season. The personal use RKC and BKC fishery opened July 1, 2020 in Excursion Inlet and non-surveyed areas with bag and possession limits of one RKC or BKC per person per day. Results from the annual stock assessment survey in the Juneau Area (Section 11-A) showed overall stock health to be at above average levels, with legal biomass estimated to be above the long-term average and mature biomass estimated to be below the long-term average. The personal use summer fishery in Section 11-A opened on August XX, 2021 for three and a half days with a seasonal household limit of two crab and daily bag and possession limit of two crab (Table 2) to target XXXXX lb (XXXX crab) in the summer fishery.
 The RKC and BKC commercial fishery and personal use fishery outside of Section 11-A are managed separately and there are no regulatory thresholds or allocations that combine estimated harvest for both user groups. Personal use harvest outside of Section 11-A is not considered when calculating the commercial GHLs for each area to determine whether the total commercial GHL meets the 200,000 lb threshold in regulation for a commercial fishery. A personal use permit requirement was implemented in 2018 for the outside Section 11-A personal use fishery and will improve catch accounting, future stock assessments, and management decisions.
 
-# `cur_yr` Southeast red king crab stock asessment {-}
+# `r cur_yr` Southeast red king crab stock asessment {-}
 
 ## Summary of stock status {-}
-The Southeast RKC stock assessment regional biomass estimates for the 2020/2021 season are 1.62 million lb of legal crab and 1.87 million lb of mature crab, using the historical expansion factor (Tables 2–4). The legal biomass estimate decreased 8.4% from the previous year using the 2020 model estimates (Figure 3). The mature biomass estimate decreased 9.4% from 2019 using the 2020 model estimates. 
-Survey area biomass is estimated using a 3-stage catch survey analysis model (CSA) and adjusted using the mark-recapture expansions  when available (Stratman et al. 2019). Port Frederick and Holkham Bay have not been surveyed since 2015 due to reductions in survey funding and therefore are no longer included in determining survey biomass estimates. The legal crab component is composed of both recruit and post-recruitpostrecruit crab and defined as those greater than 178 mm in carapace width, whereas mature crab are pre-recruitprerecruit  , recruit and post-recruitpostrecruit crab, or those greater than 129 mm in carapace length. Biomass estimates from the survey areas (Table 2, Figure 2) are then expanded based on assumptions of how representative these areas are to the entire population in Southeast.  
-Both mature and legal survey biomasses have declined an average of 7.0% annually from 2001–2013 (Figure 3). Legal and mature biomass had shownshowed region-wideregionwide   increases for the first time in 2015 since 2008, however, this year only two of the seven survey areas (Lynn Sisters and Pybus Bay) had increases in either legal and mature biomass (Figures 4–17). 
-Compared to historical levels in most areas (with the exception of Juneau and Lynn Sisters), CPUE of juvenile and females size and sex classes are at below average levels, suggesting that either this portion of the population is declining or that the current year’s survey did not adequately capture them. The CPUE of some portions of the mature male size and sex classes are still below average for all the survey areas except Lynn Sisters. Gambier had significantly low values in all mature male CPUEs, where Seymour, Peril, Juneau, and Excursion had 2 two of three3 mature male recruit classes below their long-term averages. Overall, recruitment, in the form of pre-recruitprerecruit CPUE, is significantly below average levels for six of the seven   surveys areas, with only Lynn Sisters being at the long termlong-term average for pre-recruitprerecruit CPUE, suggesting that region-wideregionwide improvements to mature and legal male biomass are still underway and may take a few more years even with the absence of fishing in most of the survey areas. In the majority of survey areas pre-recruitprerecruit biomass is still lacking compared to the 1990s and early 2000s and is visualized as the small difference between mature and legal biomass in the area figures (Figures 4–17). A matrix of stock health indicators provides an objective and repeatable evaluation of the survey data; a five-year summary of matrix results is therefore presented here (Table 5).  Specific stock health by survey area (Table 6) is discussed below.  
+The Southeast RKC stock assessment regional biomass estimates for the `r cur_yr`/`r fut_yr` season are `r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb of legal crab and `r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb of mature crab, using the historical expansion factor (Tables 2–4). The legal biomass estimate decreased 5.32% from the previous year using the `r cur_yr` model estimates (Figure 3). The mature biomass estimate decreased 3.0% from `r pr_yr` using the `r cur_yr` model estimates. 
+Survey area biomass is estimated using a 3-stage catch survey analysis model (CSA) and adjusted using the mark-recapture expansions  when available (Stratman et al. 2019). Port Frederick and Holkham Bay have not been surveyed since 2015 due to reductions in survey funding and therefore are no longer included in determining survey biomass estimates. The legal crab component is composed of both recruit and postrecruit crab and defined as those greater than 178 mm in carapace width, whereas mature crab are prerecruit, recruit and postrecruit crab, or those greater than 129 mm in carapace length. Biomass estimates from the survey areas (Table 2, Figure 2) are then expanded based on assumptions of how representative these areas are to the entire population in Southeast.  
+
+Both mature and legal survey biomasses declined an average of 7.0% annually from 2001–2013 (Figure 3). Legal and mature biomass showed regionwide increases for the first time in 2015 since 2008, however, this year only three of the seven survey areas (Lynn Sisters, Juneau, and Peril Strait) had increases in either legal and mature biomass (Figures 4–17). 
+Compared to historical levels in most areas (with the exception of Juneau and Lynn Sisters), CPUE of juvenile and females size and sex classes are at below average levels, suggesting that either this portion of the population is declining or that the current year’s survey did not adequately capture them. 
+The CPUE of some portions of the mature male size and sex classes are still below average for all the survey areas except Lynn Sisters. 
+Gambier had significantly low values in all mature male CPUEs, where Seymour, Peril, Juneau, and Excursion had 2 two of three3 mature male recruit classes below their long-term averages. Overall, recruitment, in the form of pre-recruitprerecruit CPUE, is significantly below average levels for six of the seven   surveys areas, with only Lynn Sisters being at the long termlong-term average for pre-recruitprerecruit CPUE, suggesting that region-wideregionwide improvements to mature and legal male biomass are still underway and may take a few more years even with the absence of fishing in most of the survey areas. In the majority of survey areas pre-recruitprerecruit biomass is still lacking compared to the 1990s and early 2000s and is visualized as the small difference between mature and legal biomass in the area figures (Figures 4–17). A matrix of stock health indicators provides an objective and repeatable evaluation of the survey data; a five-year summary of matrix results is therefore presented here (Table 5).  Specific stock health by survey area (Table 6) is discussed below.  
 
