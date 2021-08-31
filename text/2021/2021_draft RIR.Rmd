@@ -31,6 +31,7 @@ biomass <- read.csv(paste0(here::here(),'/data/rkc/biomass.csv'))
 # mr adjustments can be made in the function using mr_adjust file.
 exploit_rate <- read.csv(paste0(here::here(),"/data/rkc/table3.csv"))
 
+baseline_rel <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/relative_to_baseline_2021.csv'))
 ###
 ## clean up figure 2-------
 # add in mr adjustments
@@ -85,6 +86,7 @@ exploit_rate %>%
   mutate(equ.er.adj = round(equ.er.adj, 2), avg.inc.hr = round(avg.inc.hr, 2), 
          alt.equ.hr = round(alt.equ.hr, 2), 
          hr_cur_yr = ifelse(area == 'Juneau', 0.07, 0)) -> exploit_rate2
+## look into doing these calcs in figure2_tables instead and brining in csv here
 ````
 
 # Summary of Stock {-}
@@ -147,12 +149,25 @@ Regional biomass levels have decreased from 2019 and are still below the baselin
 Slow recovery since 2001, which may be due to poor or inconsistent recruitment, and declines in the survey areas after the last commercial fishery opening (2017/2018 fishing season), suggest that harvesting at the equilibrium harvest levels (those used in the 2017/2018 GHL calculations, option 1 here) from these areas would increase the probability of continued population declines or stunt population growth. Thus, removals at the levels presented in options 1 and 3 (Tables 2 and 4) are not recommended for the upcoming season. Of the three harvest options presented none resulted in a GHL that is above the 200,000 lb threshold required for a fishery opening [5 AAC 34.113]. 
 
 
-#SURVEY AREA STOCK STATUS AND HARVEST RATE RECOMMENDATION {-}
-##STOCK STATUS BY SURVEY AREA (TABLE 5, FIGS. 4–17) {-}
+# SURVEY AREA STOCK STATUS AND HARVEST RATE RECOMMENDATION {-}
+
+## STOCK STATUS BY SURVEY AREA (TABLE 5, FIGS. 4–17) {-}
+Significance in long-term or short-term trends is defined as a p-value <0.05. Long-term trends compare the current year’s mean to the long-term baseline value (1993–2007); short-term trends regress the last four years of survey data to determine if a significant increasing or decreasing trend is present. Estimates of legal and mature mark-recapture biomass (adj.legal / adj.mature) for the entire biomass time series for each area were added to the legal biomass graphs, along with their associated long-term baseline (1993–2007; solid black line for legal and grey dotted line for mature) estimates (Figures 4–17). Raw sample sizes for each area are reported in Table 5. Graphs for each area reflect biomass estimates from the `r cur_yr` CSA model.
+
+## Pybus Bay (below average) {-}
+Pybus Bay stock health decreased but remained in below average status. Mature female CPUE is below the long-term average, but not significantly so. Postrecruit, recruit, prerecruit, juvenile male and juvenile female CPUEs are significantly below their long-term averages. 
+There are no significant short-term trends in CPUEs. 
+Legal biomass decreased 25% from the `r pr_yr` model and mature biomass decreased 31%. 
+Both decreased and remain low compared to historical levels in this area. Egg percentage is at a normal level and the percentage of poor clutches is significantly below the baseline value. 
+The mature biomass estimate is `r round((baseline_rel %>% filter(Location == 'Pybus'))$pct.adj.cur, 0)`% below the baseline value. 
+
+Due to the aforementioned concerns and the low level of the stock biomass in Pybus Bay, no harvestable surplus is recommended for the 2020/2021 season.
 
 
 
 # TABLES AND FIGURES {-}
+
+
 
 
 
