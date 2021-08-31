@@ -1,17 +1,19 @@
 # K.Palof
 # katie.palof@alaska.gov
-# 08/03/2018 / 9-4-19 / 8-30-20
+# 08/03/2018 / 9-4-19 / 8-30-20/ 8-29-21
 
 # notes ----
 # This script is a work in progress to develop figures like those currently used to view the 
-#     stock health of crab species in Southeast.  Current figures are in SigmaPlot. 
+#     stock health of crab species in Southeast.  Previous figures were in SigmaPlot. 
 #     Figure 2 is regional biomass from CSA estimate - use current year's model
 
 # load -----
 source('./code/functions.R')
+dir.create(file.path(paste0('results/rkc/Region1'), cur_yr))
 
 # data -----
-cur_yr <- 2020
+cur_yr <- 2021
+pry_yr <- cur_yr-1
 mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
 fishery.status <- read.csv('./data/rkc/Juneau/hind_fore_cast_JNU_current.csv') # has fishery status
 #                     may want to save this information somewhere else in the future
@@ -60,7 +62,7 @@ regional.b %>%
   gather(type, pounds, legal:adj_mature, factor_key = TRUE) %>% 
   select(-status) %>% 
   spread(key = Year, value = pounds) %>% 
-  mutate(change = 100*(`2020`-`2019`)/`2019`) -> change# report these values in stock health doc
+  mutate(change = 100*(`2021`-`2020`)/`2020`) -> change# report these values in stock health doc
 write.csv(change, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_regional_biomass_', cur_yr, '.csv'), 
           row.names = FALSE)
 # these values go in regional overview section, other values from last years forecast
@@ -71,7 +73,7 @@ biomass %>%
   select(-harvest, -weighted_ADJ) %>% 
   gather(type, pounds, legal.biomass:adj.mature, factor_key = TRUE) %>% 
   spread(key = Year, value = pounds) %>% 
-  mutate(change = 100*(`2020`-`2019`)/`2019`) -> change2
+  mutate(change = 100*(`2021`-`2020`)/`2020`) -> change2
 write.csv(change2, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_area_biomasses_', cur_yr, '.csv'))
 #
 
@@ -313,5 +315,7 @@ biomass %>%
 baseline.bay %>% 
   left_join(curyr.area.mature) %>% 
   mutate(pct.cur = 100*(mature_cur - mature_baseline)/mature_baseline, 
-         pct.adj.cur = 100*(adj.mature_cur - adj.mature.base)/adj.mature.base)
+         pct.adj.cur = 100*(adj.mature_cur - adj.mature.base)/adj.mature.base) %>% 
+  write.csv(paste0('./results/rkc/Region1/', cur_yr, '/relative_to_baseline_', cur_yr, '.csv'), row.names = FALSE) -> biomass_rate
+
            
