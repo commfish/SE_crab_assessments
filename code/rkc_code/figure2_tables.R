@@ -206,22 +206,26 @@ regional.b %>%
 # clean up tables --------
 # equlibrium exploitation rate -----
 exploit_rate %>%  # exploitation rats for other areas as weighted means from surveyed areas
-  summarise(equ.er.adj = weighted.mean(equ.er.adj, mature.lb.avg), 
-            avg.inc.hr = weighted.mean(avg.inc.hr, mature.lb.avg), 
-            alt.equ.hr = weighted.mean(alt.equ.hr, mature.lb.avg)) %>% 
+  summarise(equ.er.adj = round(weighted.mean(equ.er.adj, mature.lb.avg),2), 
+            avg.inc.hr = round(weighted.mean(avg.inc.hr, mature.lb.avg), 2), 
+            alt.equ.hr = round(weighted.mean(alt.equ.hr, mature.lb.avg), 2)) %>% 
   mutate(Location = "other.areas") -> exploit_other
 
 exploit_rate %>% 
   dplyr::select(area, equ.er.adj, avg.inc.hr, alt.equ.hr) %>% 
-  mutate(Location = case_when(area == 'pybus' ~ 'Pybus', 
-                              area == 'gambier' ~ 'Gambier', 
-                              area == 'seymour' ~ 'Seymour', 
-                              area == 'peril' ~ 'Peril', 
-                              area == 'lynn' ~ 'LynnSisters', 
-                              area == 'excursion' ~ 'Excursion', 
-                              area == 'juneau' ~ 'Juneau')) %>% 
-  dplyr::select(-area) %>% 
-  bind_rows(exploit_other) -> equ_rate
+  #mutate(Location = case_when(area == 'pybus' ~ 'Pybus', 
+  #                            area == 'gambier' ~ 'Gambier', 
+  #                            area == 'seymour' ~ 'Seymour', 
+  #                            area == 'peril' ~ 'Peril', 
+  #                            area == 'lynn' ~ 'LynnSisters', 
+  #                            area == 'excursion' ~ 'Excursion', 
+  #                            area == 'juneau' ~ 'Juneau')) %>% 
+  mutate(Location = area, 
+         equ.er.adj = round(equ.er.adj, 2), avg.inc.hr = round(avg.inc.hr, 2), 
+         alt.equ.hr = round(alt.equ.hr, 2)) %>% 
+  dplyr::select(Location, equ.er.adj, avg.inc.hr, alt.equ.hr) %>% 
+  bind_rows(exploit_other) %>% 
+  mutate(hr_cur_yr = ifelse(Location == 'Juneau', 0.07, 0)) -> equ_rate # Juneau area HR set in July, edit in each year
 
 mr_adjust %>% 
   select(-X) %>% 
@@ -230,20 +234,19 @@ mr_adjust %>%
 
 # setup blue king crab and other areas 
 bkc <- 0.0106
-expasion <- 0.628
+expasion <- 0.528
 
 biomass %>% 
   filter(Year == cur_yr) %>% 
-  dplyr::select(-harvest) %>%  # add mr_adjust2 so that I can calculate biomass
+  dplyr::select(Year, Location, adj.legal, adj.mature) %>%  # add mr_adjust2 so that I can calculate biomass
   # that is expanded from surveyed and adjusted biomass values 
-  left_join(mr_adjust2) %>% 
-  replace_na(list(legal.biomass = 0, mature.biomass = 0, weighted_ADJ = 1)) %>% 
-  mutate(legal.adj = legal.biomass*weighted_ADJ, 
-         mature.adj = mature.biomass*weighted_ADJ) %>% 
+  #left_join(mr_adjust2) %>% 
+  #replace_na(list(legal.biomass = 0, mature.biomass = 0, weighted_ADJ = 1)) %>% 
+  #mutate(legal.adj = legal.biomass*weighted_ADJ, 
+  #       mature.adj = mature.biomass*weighted_ADJ) %>% 
   group_by(Year) %>% 
-  summarise(legal.biomass = sum(legal.biomass), mature.biomass = sum(mature.biomass), 
-            legal.adj = sum(legal.adj), mature.adj = sum(mature.adj)) %>% 
-  gather(type, surveyed, legal.biomass:mature.adj, factor_key = TRUE) %>% 
+  summarise(adj.legal = sum(adj.legal), adj.mature = sum(adj.mature)) %>% 
+  gather(type, surveyed, adj.legal:adj.mature, factor_key = TRUE) %>% 
   mutate(other.areas = surveyed/expasion - surveyed, 
          bkc = surveyed*bkc, 
          total = surveyed + other.areas + bkc) %>% 
@@ -253,13 +256,12 @@ biomass %>%
 # data frame with biomass, adjusted biomass, er possiblities
 biomass %>% 
   filter(Year == cur_yr) %>% 
-  dplyr::select(-harvest) %>% 
-  
-  left_join(mr_adjust2) %>%
-  replace_na(list(legal.biomass = 0, mature.biomass = 0, weighted_ADJ = 1)) %>% 
-  mutate(legal.adj = legal.biomass*weighted_ADJ, 
-         mature.adj = mature.biomass*weighted_ADJ) %>% 
-  select(-weighted_ADJ) %>% 
+  dplyr::select(Year, Location, adj.legal, adj.mature) %>% 
+  #left_join(mr_adjust2) %>%
+  #replace_na(list(legal.biomass = 0, mature.biomass = 0, weighted_ADJ = 1)) %>% 
+  #mutate(legal.adj = legal.biomass*weighted_ADJ, 
+  #       mature.adj = mature.biomass*weighted_ADJ) %>% 
+  #select(-weighted_ADJ) %>% 
   bind_rows(regional_totals) %>% 
   left_join(equ_rate) %>% 
   write.csv(paste0('./results/rkc/Region1/', cur_yr, '/regional_', cur_yr, '.csv'), row.names = FALSE) -> biomass_rate
