@@ -323,9 +323,8 @@ biomass_rate %>%
 write.csv(table4_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table4_regional_', cur_yr, '.csv'), row.names = FALSE) 
 
 
-# Table 5 ---------
+# Table 7 RIR ---------
 # raw sample sizes
-
 #cur_yr <- 2021
 
 files <- c(paste0(here::here(),"/results/rkc/Pybus/", cur_yr, "/raw_sample.csv"), 
@@ -343,13 +342,22 @@ raw_samp <- files %>%
 raw_samp
 
 raw_samp %>% 
+  filter(Year == cur_yr) %>%
+  select(Year, Location, effective_no_pots) %>% 
+  filter(Location != "Barlow Cove") %>% 
+  gather(recruit.class, numbers, effective_no_pots, factor_key = TRUE) %>% 
+  spread(key = Location, value = numbers)-> effect_pots
+
+raw_samp %>% 
   filter(Year == cur_yr) %>% 
-  select(Year, Location, effective_no_pots, Juvenile, Small.Females, 
+  select(Year, Location, Juvenile, Small.Females, 
          Large.Females, Pre_Recruit, Recruit, Post_Recruit) %>% 
-  gather(recruit.class, numbers, effective_no_pots:Post_Recruit, factor_key = TRUE) %>% 
-  spread(key = Location, value = numbers) %>% #-> test # %>% 
+  gather(recruit.class, numbers, Juvenile:Post_Recruit, factor_key = TRUE) %>% 
+  spread(key = Location, value = numbers) %>%#-> test # %>% 
   mutate(Juneau = `Barlow Cove` + `Juneau`) %>% 
-  select(-`Barlow Cove`)
+  select(-`Barlow Cove`) %>% 
+  bind_rows(effect_pots) -> table7_csv
+write.csv(table7_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table7_raw_samp_', cur_yr, '.csv'), row.names = FALSE) 
 
 
 ## area biomass compared to baseline ---------
