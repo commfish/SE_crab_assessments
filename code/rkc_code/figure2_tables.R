@@ -304,6 +304,24 @@ biomass_rate %>%
   dplyr::select(-bkc_temp, - total_temp) -> table3_csv
 write.csv(table3_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table3_regional_', cur_yr, '.csv'), row.names = FALSE) 
 
+# Table 4 --
+biomass_rate %>% 
+  mutate(Avg.HR_Avg.change = ifelse(Location == "Juneau", hr_cur_yr, 
+                             ifelse(Location == "Seymour", 0.04, alt.equ.hr))) %>% 
+  dplyr::select(-avg.inc.hr, -alt.equ.hr, -equ.er.adj, -hr_cur_yr) %>% 
+  mutate(GHL = round(adj.mature*Avg.HR_Avg.change, 0), 
+         Legal.HR = round(GHL/adj.legal, 2), 
+         PU.catch = round(ifelse(Location == "Juneau", (GHL*.6), ifelse(Location == "other.areas", 
+                                                                        1000, 0)), 0), 
+         Comm.GHL = ifelse(Location == "Juneau"|Location == "other.areas", (GHL - PU.catch),
+                           ifelse(Legal.HR <= 0.40, GHL, 0)), 
+         bkc_temp = round(sum(Comm.GHL[Location%in%survey.locations], na.rm = TRUE)*0.0106, 0), 
+         Comm.GHL = ifelse(Location == "bkc", bkc_temp, Comm.GHL), 
+         total_temp = sum(Comm.GHL, na.rm = TRUE), 
+         Comm.GHL = ifelse(Location == "total", total_temp, Comm.GHL)) %>% 
+  dplyr::select(-bkc_temp, - total_temp) -> table4_csv
+write.csv(table4_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table4_regional_', cur_yr, '.csv'), row.names = FALSE) 
+
 
 # Table 5 ---------
 # raw sample sizes
