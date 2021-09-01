@@ -267,6 +267,8 @@ biomass %>%
 write.csv(biomass_rate, paste0('./results/rkc/Region1/', cur_yr, '/regional_', cur_yr, '.csv'), row.names = FALSE) 
 
 # Table 2 to 4 - bioamss, adj, Equ.er.adj -----------
+survey.locations <- c("Pybus", "Excursion", "Gambier", "Juneau", 
+                      "LynnSisters", "Peril", "Seymour")
 # Table 2 --
 biomass_rate %>% 
   mutate(Equilibrium.HR = ifelse(Location == "Juneau", hr_cur_yr, equ.er.adj)) %>% 
@@ -284,12 +286,28 @@ biomass_rate %>%
   dplyr::select(-bkc_temp, - total_temp) -> table2_csv
 write.csv(table2_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table2_regional_', cur_yr, '.csv'), row.names = FALSE) 
 
+# Table 3 --
+biomass_rate %>% 
+  mutate(Avg.Inc.HR = ifelse(Location == "Juneau", hr_cur_yr, 
+                             ifelse(Location == "Seymour", 0.005, avg.inc.hr))) %>% 
+  dplyr::select(-avg.inc.hr, -alt.equ.hr, -equ.er.adj, -hr_cur_yr) %>% 
+  mutate(GHL = round(adj.mature*Avg.Inc.HR, 0), 
+         Legal.HR = round(GHL/adj.legal, 2), 
+         PU.catch = round(ifelse(Location == "Juneau", (GHL*.6), ifelse(Location == "other.areas", 
+                                                                        1000, 0)), 0), 
+         Comm.GHL = ifelse(Location == "Juneau"|Location == "other.areas", (GHL - PU.catch),
+                           ifelse(Legal.HR <= 0.40, GHL, 0)), 
+         bkc_temp = round(sum(Comm.GHL[Location%in%survey.locations], na.rm = TRUE)*0.0106, 0), 
+         Comm.GHL = ifelse(Location == "bkc", bkc_temp, Comm.GHL), 
+         total_temp = sum(Comm.GHL, na.rm = TRUE), 
+         Comm.GHL = ifelse(Location == "total", total_temp, Comm.GHL)) %>% 
+  dplyr::select(-bkc_temp, - total_temp) -> table3_csv
+write.csv(table3_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table3_regional_', cur_yr, '.csv'), row.names = FALSE) 
 
 
 # Table 5 ---------
 # raw sample sizes
-survey.locations <- c("Pybus", "Excursion", "Gambier", "Juneau", 
-                      "LynnSisters", "Peril", "Seymour")
+
 #cur_yr <- 2021
 
 files <- c(paste0(here::here(),"/results/rkc/Pybus/", cur_yr, "/raw_sample.csv"), 
