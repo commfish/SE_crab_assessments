@@ -222,8 +222,11 @@ TBD
 
 # TABLES AND FIGURES {-}
 ```{r explain, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
-# Table 1 is the same every year, bring in from word doc 'Tables RIR.docx"
+# Table 1, 6 is the same every year, bring into this word doc after knitting from word doc 'Tables RIR.docx"
 
+# Table 5 is updated from excel sheet in 'Tables RIR.docx' and brought into this document after it's knit
+
+# Tables 2 to 4, and 7 should be created here....look at .csv files in results/rkc/Region1
 ```
 
 
@@ -243,6 +246,13 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture2.jpg'), dpi = 
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/MRregional_biomass2021.png'), dpi = 125)
 ```
 
+```{r pybus2, fig.cap = "Pybus Bay CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1993–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. There are no significant short-term trends this year."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_2021_2.png'), dpi = 125)
+```
+
+```{r pybus3, fig.cap = "Pybus Bay CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1993–2007). There are no significant short-term trends this year."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_2021_3.png'), dpi = 125)
+```
 
 # Appendix A {-}
 
