@@ -116,9 +116,9 @@ exploit_rate %>%
 The Alaska Department of Fish and Game (ADF&G) annually evaluates stock status and establishes the guideline harvest levels (GHLs) for the Southeast red (RKC) and blue king crab (BKC) fishery using data from fishery independent surveys (pot gear), commercial fishery catch per unit of effort (CPUE), and biological data (length, weight, and shell condition) from the surveys and fishery. The Southeast Alaska management area (Registration Area A) consists of all waters defined in 5 AAC 34.100 (Figure \@ref(fig:distribution)). 
 
 Projected estimates of regional mature male biomass for the `r cur_yr`/`r fut_yr` season are `r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb, using the mark-recapture adjustments and the historical expansion factor applied to the non-surveyed areas. However, this value is substantially below the baseline level (defined as the average biomass from 1993–2007), suggesting the regional stock remains in a low or depressed state.
-The `r cur_yr`/`r fut_yr` Southeast commercial RKC fishery season GHL is XXXXX lb and is less than the 200,000 lb minimum threshold [5 AAC 34.113]; therefore, the fishery did not open for the `r cur_yr`/`r fut_yr` season. 
+*The `r cur_yr`/`r fut_yr` Southeast commercial RKC fishery season GHL is XXXXX lb and is less than the 200,000 lb minimum threshold [5 AAC 34.113]; therefore, the fishery did not open for the `r cur_yr`/`r fut_yr` season.* 
 
-The personal use RKC and BKC fishery opened July 1, 2021 in Excursion Inlet and non-surveyed areas with bag and possession limits of one RKC or BKC per person per day. Results from the annual stock assessment survey in the Juneau Area (Section 11-A) showed overall stock health to be at above average levels, with legal biomass estimated to be above the long-term average and mature biomass estimated to be below the long-term average. The personal use summer fishery in Section 11-A opened on August XX, 2021 for three and a half days with a seasonal household limit of two crab and daily bag and possession limit of two crab (Table 2) to target XXXXX lb (XXXX crab) in the summer fishery.
+The personal use RKC and BKC fishery opened July 1, 2021 in Excursion Inlet and non-surveyed areas with bag and possession limits of one RKC or BKC per person per day. Results from the annual stock assessment survey in the Juneau Area (Section 11-A) showed overall stock health to be at above average levels, with legal biomass estimated to be above the long-term average and mature biomass estimated to be below the long-term average. *The personal use summer fishery in Section 11-A opened on August XX, 2021 for three and a half days with a seasonal household limit of two crab and daily bag and possession limit of two crab (Table 2) to target XXXXX lb (XXXX crab) in the summer fishery.*
 
 The RKC and BKC commercial fishery and personal use fishery outside of Section 11-A are managed separately and there are no regulatory thresholds or allocations that combine estimated harvest for both user groups. Personal use harvest outside of Section 11-A is not considered when calculating the commercial GHLs for each area to determine whether the total commercial GHL meets the 200,000 lb threshold in regulation for a commercial fishery. A personal use permit requirement was implemented in 2018 for the outside Section 11-A personal use fishery and will improve catch accounting, future stock assessments, and management decisions.
 
@@ -359,6 +359,8 @@ ft <- flextable(df)
 #ft
 set_table_properties(ft, layout = "autofit")
 ```
+
+
 
 
 ### Table 8. Summary of `r cur_yr` commercial red king crab fishery GHL calculations (in pounds) and harvest rate recommendations for the 7 surveyed areas and non-surveyed areas. Mature biomass is adjusted with the mark recapture experiment. Biomass of non-surveyed areas was expanded to be 47.2% of the region. {-}
