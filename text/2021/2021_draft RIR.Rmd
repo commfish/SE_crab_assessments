@@ -24,9 +24,10 @@ opts_chunk$set(fig.width = 12, fig.height = 7, echo = FALSE, warning = FALSE, me
 
 set_flextable_defaults(
   font.family = "Arial", 
-  font.size = 10,
+  font.size = 9,
   font.color = "black",
   table.layout = "autofit",
+  text.align = "center"
   #digits = 1,
   #theme_fun = "theme_box"
   )
@@ -268,6 +269,7 @@ TBD
 # FISHERY MANAGEMENT CONCERNS {-}
 TBD
 
+\newpage
 # TABLES AND FIGURES {-}
 ```{r explain, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
 # Table 1, 6 is the same every year, bring into this word doc after knitting from word doc 'Tables RIR.docx"
@@ -279,7 +281,7 @@ TBD
 
 
 ### Table 2. Option 1: risk neutral – model-based equilibrium harvest rates {-}
-Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for the seven surveyed areas and other areas. Risk neutral option based on 2018 calculated equilibrium exploitation rates (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979-2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historic years (1974 - 1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use catch for “Other Areas” is mean catch estimated from 2008-2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage.
+### Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for the seven surveyed areas and other areas. Risk neutral option based on 2018 calculated equilibrium exploitation rates (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979-2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historic years (1974 - 1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use catch for “Other Areas” is mean catch estimated from 2008-2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage.{-}
 
 
 ```{r table2, results = "asis"}
@@ -297,16 +299,51 @@ ft <- flextable(df)
 set_table_properties(ft, layout = "autofit")
 ```
 
-a The Juneau area was open to personal use harvest in summer 2020 at a harvest rate of 7%. “n/a” represents data that is not available or readily estimable from the other bays.
+### ~a~ The Juneau area was open to personal use harvest in summer `r cur_yr` at a harvest rate of 7%. “n/a” represents data that is not available or readily estimable from the other bays.{-}
 
-### Table 3. Table 3. Option 2: risk adverse – high probability of mature male biomass increasing  {-}
-Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for the seven surveyed areas and other areas. Risk adverse option based on 2018 calculated average harvest rates when the mature male biomass was increasing (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979-2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historic years (1974 - 1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use catch for “Other Areas” is mean catch estimated from 2008-2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage.
+\newpage
+### Table 3. Option 2: risk adverse – high probability of mature male biomass increasing  {-}
+### Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for the seven surveyed areas and other areas. Risk adverse option based on 2018 calculated average harvest rates when the mature male biomass was increasing (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979-2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historic years (1974 - 1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use catch for “Other Areas” is mean catch estimated from 2008-2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage.{-}
+```{r table3, results = "asis"}
+df <- table3
+df %>% 
+  mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
+  select(-Year, -Legal.HR) %>% 
+  filter(Location != "surveyed") -> df
+names(df) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Equilibrium HR", 
+               "Total GHL", "PU catch", paste0(cur_yr, " Commercial GHL(lb)"))
+#knitr::kable((df), booktabs = T, caption = "Table 2")
+ft <- flextable(df)
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
 
+### ~a~ The Juneau area was open to personal use harvest in summer `r cur_yr` at a harvest rate of 7%. “n/a” represents data that is not available or readily estimable from the other bays.{-}
 
+\newpage
 ### Table 4. Option 3: risky option – data based, using a sum of the average harvest rate and average change in mature male biomass {-}
-Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for the seven surveyed areas and other areas. This harvest rate option is based on 2018 calculated combination of average harvest rate and average change in mature male biomass for each area (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979-2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historic years (1974 - 1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use catch for “Other Areas” is mean catch estimated from 2008-2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage.
+### Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for the seven surveyed areas and other areas. This harvest rate option is based on 2018 calculated combination of average harvest rate and average change in mature male biomass for each area (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979-2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historic years (1974 - 1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use catch for “Other Areas” is mean catch estimated from 2008-2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage.{-}
+```{r table4, results = "asis"}
+df <- table4
+df %>% 
+  mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
+  select(-Year, -Legal.HR) %>% 
+  filter(Location != "surveyed") -> df
+names(df) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Equilibrium HR", 
+               "Total GHL", "PU catch", paste0(cur_yr, " Commercial GHL(lb)"))
+#knitr::kable((df), booktabs = T, caption = "Table 2")
+ft <- flextable(df)
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
 
+### ~a~ The Juneau area was open to personal use harvest in summer `r cur_yr` at a harvest rate of 7%. “n/a” represents data that is not available or readily estimable from the other bays.{-}
+
+\newpage
 ### Table 7. Sample sizes for the `r cur_yr` survey by area {-}
+
 ```{r table7, results = "asis"}
 df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table7_raw_samp_2021.csv'))
 df %>% 
@@ -321,7 +358,7 @@ set_table_properties(ft, layout = "autofit")
 ```
 
 
-
+\newpage
 ```{r distribution, fig.cap = "Map of Southeast Alaska (Registration Area A)."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture1.jpg'), dpi = 125)
 ```
@@ -392,7 +429,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion
 ```
 
 
-
+\newpage
 # Appendix A {-}
 
 ## Biometric recommendations {-}
