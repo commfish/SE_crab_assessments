@@ -19,6 +19,15 @@ cur_yr = 2021
 pr_yr = cur_yr-1
 fut_yr = cur_yr+1
 opts_chunk$set(fig.width = 12, fig.height = 7, echo = FALSE, warning = FALSE, message = FALSE,  dpi=300)
+
+set_flextable_defaults(
+  font.family = "Arial", 
+  font.size = 10,
+  font.color = "black",
+  table.layout = "autofit",
+  #digits = 1,
+  #theme_fun = "theme_box"
+  )
 #\pagenumbering{gobble}
 ```
 
@@ -204,7 +213,26 @@ Indicators of female stock health remain good as indicated by the low proportion
 The annual 11-A red king crab stock assessment survey found both the legal and mature biomass had small increases compared to last year. All sex/size class CPUEs, with the exception of postrecruit CPUE, increased from the `r pr_yr` survey. Due to stable trends in the mature size/sex classes, the decision was made in July to set the harvest rate at 7.0% for the `r cur_yr`/`r fut_yr` season.
 
 ## Lynn Sisters (moderate) {-}
-## Excursion Inlet {-}
+Stock health in the Lynn Sister’s area remained at a moderate status in `r cur_yr`. CPUEs for all size and sex classes are near their long-term averages. 
+There is a significant increasing short-term trend in postrecruit CPUE. 
+Indicators of female stock health were good, as seen by the low proportion of poor clutches and high clutch fullness. 
+Legal biomass increased 20%, while mature biomass increased 17% from the `r pr_yr` model estimates. 
+Both legal and mature biomass are above their long-term baseline values, with mature biomass `r round((baseline_rel %>% filter(Location == 'LynnSisters'))$pct.adj.cur, 0)`% above the baseline value. 
+
+Positive trends in stock health are evident. Legal and mature biomass estimates are above long-term baselines for the third time in nine years. The majority of size/sex classes are at or above long-term averages. 
+Positive trends in stock health have become evident after an eight-year closure to all fishing, but the adjusted legal biomass estimate is smaller than seen in all other survey areas with the exception of Peril Strait (Table 2). 
+
+
+## Excursion Inlet (poor) {-}
+The stock health of Excursion Inlet did not improve from poor status. CPUEs of all sex/size classes are significantly below their long-term averages. 
+There are significant are no significant short term trends. 
+The percentage of poor clutches is significantly lower than the 10% baseline, suggesting an improvement in female health compared to last season. 
+Overall clutch fullness rebounded this year from low levels the last two years, indicates potential improvement in female reproductive capacity. 
+Estimated legal biomass decreased 11%, while mature biomass decreased 16% from the `r pr_yr` model estimates. 
+The mature biomass estimate is `r round((baseline_rel %>% filter(Location == 'Excursion'))$pct.adj.cur, 0)`% below the baseline value. 
+
+Stock health has declined in Excursion Inlet as evident from negative trends in stock health. CPUEs of all mature male sex/size classes have dropped below long-term baselines for the third consecutive season. Mature and legal biomass estimates have decreased, and both are now below long-term baselines. There are no short-term increasing trends. Considering these trends in Excursion Inlet, there is not a harvestable surplus of RKC for the `r cur_yr`/`r fut_yr` season. 
+
  
 ## Port Frederick (unknown since 2014) {-}
 Port Frederick was removed as a survey area in 2015 due to budget constraints and is now considered part of the non-surveyed areas in Tables 2–4. From 1979 to 2004 (the years used to expand the survey biomass to the non-surveyed areas), Port Frederick contributed to 2.4% of the harvest. The previous percent expansion of 65.2% survey areas and 34.8 % non-surveyed areas was adjusted. Excluding Port Frederick, 62.8% of the harvest is from survey areas and 37.2% from non-surveyed areas. Adjusting the expansion factor allows for consistency between previous year estimates and the current year, all comparisons regionally were performed with a time series of estimates that were adjusted to not include Port Frederick. For the purposes of assessing the upcoming commercial fishery, Port Frederick is considered part of the non-surveyed areas.
@@ -256,7 +284,7 @@ Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for
 ### Table 4. Option 3: risky option – data based, using a sum of the average harvest rate and average change in mature male biomass {-}
 Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for the seven surveyed areas and other areas. This harvest rate option is based on 2018 calculated combination of average harvest rate and average change in mature male biomass for each area (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979-2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historic years (1974 - 1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use catch for “Other Areas” is mean catch estimated from 2008-2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage.
 
-### Table 7. Sample sizes for the `r cur_yr` survey by area
+### Table 7. Sample sizes for the `r cur_yr` survey by area {-}
 ```{r table7, results = "asis"}
 df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table7_raw_samp_2021.csv'))
 df %>% 
@@ -351,7 +379,32 @@ It is statistically significantly non-random (probability of 3%) that all five a
 Slow recovery since 2001, which may be due to poor or inconsistent recruitment, and declines in the survey areas after the last commercial fishery opening (2017/2018 fishing season), suggest that harvesting at the equilibrium harvest levels (those used in the 2017/2018 GHL calculations, option 1 here) from these areas would increase the probability of continued population declines or stunt population growth. Thus, removals at the levels presented in options 1 and 3 (Tables 2 and 4) are not recommended for the upcoming season. Of the three harvest options presented none resulted in a GHL that is above the 200,000 lb threshold required for a fishery opening.   
 
 ## Figures and Tables {-}
-Table A1: regional_biomass_2021.csv
+### Table A1: Regional biomass estimates of surveyed areas (used in Figure 2) using `r cur_yr` mark-recapture CSA adjusted biomasses in areas where they are available.{-}
+```{r tableA1, results = "asis"}
+df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/regional_biomass_2021.csv'))
+df %>% 
+  select(Year, adj_legal, adj_mature) -> df
+df %>% filter(Year <= 2000) -> df1  
+df %>% filter(Year > 2000) %>% 
+  mutate(Year.cont = Year, 
+         adj.Legal2 = adj_legal, adj.Mature2 = adj_mature) %>% 
+  select(Year.cont, adj.Legal2, adj.Mature2) -> df2
+df2[nrow(df2)+ 1, ] <- NA
+df1 %>% 
+  bind_cols(df2) %>% 
+  mutate(Year = as.character(Year), 
+         Year.cont = as.character(Year.cont)) -> df3
+names(df3) <- c("Year", "Legal", "Mature", "Year(cont)", "Legal(cont)", "Mature(cont)")
+#knitr::kable((df), booktabs = T, caption = "Table 2")
+flextable(df3) %>% 
+    colformat_double(
+       digits = 0,
+       na_str = "na") -> ft
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
+
 Table A2: biomass_2021.csv
 
 # References {-}
