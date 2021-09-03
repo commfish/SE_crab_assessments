@@ -464,8 +464,59 @@ flextable(df3) %>%
 set_table_properties(ft, layout = "autofit")
 ```
 
-Table A2: biomass_2021.csv
+### Table A2: Biomass estimates (lb) for each survey area (used in Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)) using `r cur_yr` mark-recapture CSA adjusted biomasses in areas where they are available {-}
+```{r tableA2, results = "asis"}
+df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/biomass_2021.csv'))
+df %>% 
+  select(Year, Location, adj.legal, adj.mature) %>% 
+  mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) -> df
+df %>% filter(Location == "Pybus") %>%  
+  mutate(legal.pybus = adj.legal, mature.pybus = adj.mature ) %>% 
+  select(-Location, -adj.legal, -adj.mature) -> df1
+#names(df1) <- c("Year", "Pybus", "Legal", "Mature")
+df %>% filter(Location == "Gambier") %>% 
+  mutate(legal.gambier = adj.legal, mature.gambier = adj.mature ) %>% 
+  select(-Location, -adj.legal, -adj.mature)-> df2
+#names(df2) <- c("Year", "Gambier", "Legal", "Mature")
+df %>% filter(Location == "Seymour") %>% 
+  mutate(legal.seymour = adj.legal, mature.seymour = adj.mature ) %>% 
+  select(-Location, -adj.legal, -adj.mature)-> df3
+#names(df3) <- c("Year", "Seymour", "Legal", "Mature")
+df %>% filter(Location == "Peril") %>% 
+  mutate(legal.peril = adj.legal, mature.peril = adj.mature ) %>% 
+  select(-Location, -adj.legal, -adj.mature)-> df4 
+#names(df4) <- c("Year", "Peril", "Legal", "Mature")
+df %>% filter(Location == "Juneau") %>% 
+  mutate(legal.juneau = adj.legal, mature.juneau = adj.mature ) %>% 
+  select(-Location, -adj.legal, -adj.mature) -> df5
+#names(df5) <- c("Year", "Juneau", "Legal", "Mature")
+df %>% filter(Location == "LynnSisters") %>% 
+  mutate(legal.lynn = adj.legal, mature.lynn = adj.mature ) %>% 
+  select(-Location, -adj.legal, -adj.mature) -> df6
+#names(df6) <- c("Year", "LynnSisters", "Legal", "Mature")
+df %>% filter(Location == "Excursion") %>% 
+  mutate(legal.excursion = adj.legal, mature.excursion = adj.mature ) %>% 
+  select(-Location, -adj.legal, -adj.mature) -> df7
+#names(df7) <- c("Year", "Excursion", "Legal", "Mature")
 
+df1 %>% 
+  left_join(df2) %>% 
+  left_join(df3) %>% 
+  left_join(df4) %>% 
+  left_join(df5) %>% 
+  left_join(df6) %>% 
+  left_join(df7) %>% 
+  mutate(Year = as.character(Year)) -> df_all 
+
+#knitr::kable((df), booktabs = T, caption = "Table 2")
+flextable(df_all) %>% 
+    colformat_double(
+       digits = 0,
+       na_str = "na") -> ft
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
 # References {-}
 Robson DS, and HA Regier. (1964) Sample Size in Petersen Mark-Recapture Experiments. Transactions of the American Fisheries Society 93 (3): 215-226.
 
