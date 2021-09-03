@@ -1,5 +1,5 @@
 ---
-title: "Southeast red king crab assessment 2021 draft "
+title: "Southeast red king crab assessment 2021 CONFIDENTIAL draft "
 author: "Katie Palof, katie.palof@alaska.gov"
 date: "`r format(Sys.time(), '%B %Y')`"
 output:
@@ -230,6 +230,24 @@ TBD
 ```
 
 
+### Table 2. Option 1: risk neutral – model-based equilibrium harvest rates {-}
+Summary of `r cur_yr`` commercial red king crab fishery GHL calculations (lb) for the seven surveyed areas and other areas. Risk neutral option based on 2018 calculated equilibrium exploitation rates (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979-2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass presented here. Biomass of “other areas” was expanded based on the year ranges show below, two options are presented. Personal use catch for “Other Areas” is mean catch estimated from 2008-2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage.
+
+
+```{r table2, results = "asis"}
+df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_2021.csv'))
+df %>% 
+  mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
+  select(-Year, -Legal.HR) %>% 
+  filter(Location != "surveyed") -> df
+names(df) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Equilibrium HR", 
+               "Total GHL", "PU catch", paste0(cur_yr, " Commercial GHL(lb)"))
+#knitr::kable((df), booktabs = T, caption = "Table 2")
+ft <- flextable(df)
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
 
 
 
@@ -257,4 +275,15 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_202
 # Appendix A {-}
 
 ## Biometric recommendations {-}
+Recovery in most of the survey areas, except for the Juneau area, Lynn Sister and Excursion, appears to be slow. Most areas, except for Peril, had increasing biomass estimates from 2015-2017. Last year there was a decrease in both legal and mature biomass in all the survey areas that had commercial harvest in the last open season (2017/2018). The impact of the commercial opening in 2017/2018 is confounded by potential increased personal use (PU) harvest in the survey areas since PU also opened in many survey areas during this season, but this is hard to quantify since we do not currently have an estimate of personal use harvest in any area except Juneau (11-A), although estimates of personal use harvest are currently being collected with the implementation of the regional king crab personal use harvest permit. Regional biomass levels have decreased from 2019 and are still below the baseline levels (Figure 2). Juneau and Lynn Sisters are the only survey areas where legal or mature biomass are above the baseline levels. 
+It is statistically significantly non-random (probability of 3%) that all five areas with harvest in 2017/18 would decline in the subsequent year if the equilibrium harvest rates were appropriate under current conditions. The results suggest that at this time the equilibrium harvest rates are not a risk neutral option but would most likely lead to further population declines. If the goal is to grow populations in the survey areas to average or baseline values, then the only harvest option recommended is option 2 (Table 3).  
+Slow recovery since 2001, which may be due to poor or inconsistent recruitment, and declines in the survey areas after the last commercial fishery opening (2017/2018 fishing season), suggest that harvesting at the equilibrium harvest levels (those used in the 2017/2018 GHL calculations, option 1 here) from these areas would increase the probability of continued population declines or stunt population growth. Thus, removals at the levels presented in options 1 and 3 (Tables 2 and 4) are not recommended for the upcoming season. Of the three harvest options presented none resulted in a GHL that is above the 200,000 lb threshold required for a fishery opening.   
 
+## Figures and Tables {-}
+Table A1: regional_biomass_2021.csv
+Table A2: biomass_2021.csv
+
+# References {-}
+Robson DS, and HA Regier. (1964) Sample Size in Petersen Mark-Recapture Experiments. Transactions of the American Fisheries Society 93 (3): 215-226.
+
+Palof KJ (2018) WIP RKC harvest rate determination memo Sept. 2018
