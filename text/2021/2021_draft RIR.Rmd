@@ -105,11 +105,8 @@ exploit_rate %>%
 ## look into doing these calcs in figure2_tables instead and brining in csv here
 ````
 
-<<<<<<< HEAD
 FYI *italics* information is not completed yet, this is a draft of the RIR for both research(biometrics) and management. Managment sections are also labeled TBD in this draft.
-=======
-FYI *italics* information is not completed yet, this is a draft of the RIR for both research(biometrics) and management. Managment sections are also labeled TBD in this draft.
->>>>>>> 1d36e98fd9fb8d60c587a219bb52bb38ee5b59fe
+
 
 # `r cur_yr` QUICK SUMMARY {-}
   - Regional legal and mature biomass decreased again in `r cur_yr`, and have been declining since 2017
