@@ -464,6 +464,7 @@ flextable(df3) %>%
 set_table_properties(ft, layout = "autofit")
 ```
 
+\newpage
 ### Table A2: Biomass estimates (lb) for each survey area (used in Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)) using `r cur_yr` mark-recapture CSA adjusted biomasses in areas where they are available {-}
 ```{r tableA2, results = "asis"}
 df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/biomass_2021.csv'))
@@ -503,20 +504,41 @@ df1 %>%
   left_join(df2) %>% 
   left_join(df3) %>% 
   left_join(df4) %>% 
-  left_join(df5) %>% 
+  mutate(Year = as.character(Year)) -> df_all1
+df5 %>% 
   left_join(df6) %>% 
   left_join(df7) %>% 
-  mutate(Year = as.character(Year)) -> df_all 
+  mutate(Year = as.character(Year)) -> df_all2 
 
 #knitr::kable((df), booktabs = T, caption = "Table 2")
-flextable(df_all) %>% 
+flextable(df_all1) %>% 
     colformat_double(
        digits = 0,
-       na_str = "na") -> ft
+       na_str = "na") %>% 
+  fontsize(size = 7) %>% 
+  fontsize(size = 7, part = "header") -> ft
 #ft <- autofit(ft)
 #ft
 set_table_properties(ft, layout = "autofit")
+
+
 ```
+
+
+### Table A2 cont. {-}
+```{r tableA2cont, results = "asis"}
+flextable(df_all2) %>% 
+    colformat_double(
+       digits = 0,
+       na_str = "na") %>% 
+  fontsize(size = 7) %>% 
+  fontsize(size = 7, part = "header")-> ft2
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft2, layout = "autofit")
+
+``` 
+
 # References {-}
 Robson DS, and HA Regier. (1964) Sample Size in Petersen Mark-Recapture Experiments. Transactions of the American Fisheries Society 93 (3): 215-226.
 

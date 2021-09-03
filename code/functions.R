@@ -8,6 +8,9 @@ library(reshape)
 library(tidyverse)
 library(weights)
 library(broom)
+library(kableExtra)
+library(xtable)
+library(flextable)
 
 
 library(stringr)
