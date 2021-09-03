@@ -105,17 +105,19 @@ exploit_rate %>%
 ## look into doing these calcs in figure2_tables instead and brining in csv here
 ````
 
+FYI: *italics* information is not completed yet, this is a draft of the RIR for both research(biometrics) and management. Managment sections are also labeled TBD in this draft.
+
 # `r cur_yr` QUICK SUMMARY {-}
   - Regional legal and mature biomass decreased again in `r cur_yr`, and have been declining since 2017
   - Juneau area is at above average stock health, Lynn Sisters is at moderate stock health, and the other areas are divided between poor and below average. Stock health considers all aspects of the population (mature males, juveniles, and females).
   - Lynn Sisters and Juneau are the only areas with an increase in both legal and mature biomass from `r pr_yr`. Lynn Sister is a small contributor to the regional biomass compared to most of the survey areas. 
-  - None of the three harvest rate options (low, neutral, or high risk) reach a harvestable surplus of the 200,000 lb threshold.
+  - None of the three harvest rate options (low, neutral, or high risk) reach a harvestable surplus above the 200,000 lb threshold (Table 2 - 4).
 
 
 # OVERVIEW {-}
 The Alaska Department of Fish and Game (ADF&G) annually evaluates stock status and establishes the guideline harvest levels (GHLs) for the Southeast red (RKC) and blue king crab (BKC) fishery using data from fishery independent surveys (pot gear), commercial fishery catch per unit of effort (CPUE), and biological data (length, weight, and shell condition) from the surveys and fishery. The Southeast Alaska management area (Registration Area A) consists of all waters defined in 5 AAC 34.100 (Figure \@ref(fig:distribution)). 
 
-Projected estimates of regional mature male biomass for the `r cur_yr`/`r fut_yr` season are `r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb, using the mark-recapture adjustments and the historical expansion factor applied to the non-surveyed areas. However, this value is substantially below the baseline level (defined as the average biomass from 1993–2007), suggesting the regional stock remains in a low or depressed state.
+Projected estimates of regional mature male biomass for the `r cur_yr`/`r fut_yr` season are **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb**, using the mark-recapture adjustments and the historical expansion factor applied to the non-surveyed areas. However, this value is substantially below the baseline level (defined as the average biomass from 1993–2007), suggesting the regional stock remains in a low or depressed state.
 *The `r cur_yr`/`r fut_yr` Southeast commercial RKC fishery season GHL is XXXXX lb and is less than the 200,000 lb minimum threshold [5 AAC 34.113]; therefore, the fishery did not open for the `r cur_yr`/`r fut_yr` season.* 
 
 The personal use RKC and BKC fishery opened July 1, 2021 in Excursion Inlet and non-surveyed areas with bag and possession limits of one RKC or BKC per person per day. Results from the annual stock assessment survey in the Juneau Area (Section 11-A) showed overall stock health to be at above average levels, with legal biomass estimated to be above the long-term average and mature biomass estimated to be below the long-term average. *The personal use summer fishery in Section 11-A opened on August XX, 2021 for three and a half days with a seasonal household limit of two crab and daily bag and possession limit of two crab (Table 2) to target XXXXX lb (XXXX crab) in the summer fishery.*
