@@ -41,6 +41,10 @@ biomass <- read.csv(paste0(here::here(),'/data/rkc/biomass.csv'))
 exploit_rate <- read.csv(paste0(here::here(),"/data/rkc/table3.csv"))
 
 baseline_rel <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/relative_to_baseline_2021.csv'))
+
+table2 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_2021.csv'))
+table3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table3_regional_2021.csv'))
+table4 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table4_regional_2021.csv'))
 ###
 ## clean up figure 2-------
 # add in mr adjustments
@@ -99,9 +103,9 @@ exploit_rate %>%
 ````
 
 # Summary of Stock {-}
-  - Regionally legal and mature biomass have been declining since 2017
-  - Juneau area is above average stock health, Lynn Sisters is moderate stock health, and the other areas are divided between poor and below average. Stock health considers all aspects of the population (mature males, juveniles, and females).
-  - Lynn Sisters and Juneau are the only areas with an increase in both legal and mature biomass from 2020. Lynn Sister is a small contributor to the regional biomass compared to most of the survey areas. 
+  - Regional legal and mature biomass decreased again in `r cur_yr`, and have been declining since 2017
+  - Juneau area is at above average stock health, Lynn Sisters is at moderate stock health, and the other areas are divided between poor and below average. Stock health considers all aspects of the population (mature males, juveniles, and females).
+  - Lynn Sisters and Juneau are the only areas with an increase in both legal and mature biomass from `r pr_yr`. Lynn Sister is a small contributor to the regional biomass compared to most of the survey areas. 
   - None of the three harvest rate options (low, neutral, or high risk) reach a harvestable surplus of the 200,000 lb threshold.
 
 
@@ -118,12 +122,13 @@ The RKC and BKC commercial fishery and personal use fishery outside of Section 1
 The Southeast RKC stock assessment regional biomass estimates for the `r cur_yr`/`r fut_yr` season are `r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb of legal crab and `r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb of mature crab, using the historical expansion factor (Tables 2–4). The legal biomass estimate decreased 5.32% from the previous year using the `r cur_yr` model estimates (Figure \@ref(fig:regionalbio)). The mature biomass estimate decreased 3.0% from `r pr_yr` using the `r cur_yr` model estimates. 
 Survey area biomass is estimated using a 3-stage catch survey analysis model (CSA) and adjusted using the mark-recapture expansions  when available (Stratman et al. 2019). Port Frederick and Holkham Bay have not been surveyed since 2015 due to reductions in survey funding and therefore are no longer included in determining survey biomass estimates. The legal crab component is composed of both recruit and postrecruit crab and defined as those greater than 178 mm in carapace width, whereas mature crab are prerecruit, recruit, and postrecruit crab, or those greater than 129 mm in carapace length. Biomass estimates from the survey areas (Table 2, Figure \@ref(fig:distcur)) are then expanded based on assumptions of how representative these areas are to the entire population in Southeast.  
 
-Both mature and legal survey biomasses declined an average of 7.0% annually from 2001–2013 (Figure \@ref(fig:regionalbio)). Legal and mature biomass showed regionwide increases for the first time in 2015 since 2008, however, this year only three of the seven survey areas (Lynn Sisters, Juneau, and Peril Strait) had increases in either legal and mature biomass (Figures 4–17). 
+Both mature and legal survey biomass declined an average of 7.0% annually from 2001–2013 (Figure \@ref(fig:regionalbio)). Legal and mature biomass showed region-wide increases for the first time in 2015 since 2008, however, this year only three of the seven survey areas (Lynn Sisters, Juneau, and Peril Strait) had increases in either legal and mature biomass (Figures \@ref(fig:Pybus2) – \@ref(fig:Excursion3)). 
+Since 2017, in the absence of a commercial fishery, legal biomass has declined an average of 2% annually and mature biomass has declined an average of 6% annually.
 Compared to historical levels in most areas (with the exception of Juneau, Lynn Sisters and Gambier), CPUE of juvenile and females size and sex classes are at below average levels, suggesting that either this portion of the population is declining or that the current year’s survey did not adequately capture them. 
 The CPUE of some portions of the mature male size and sex classes are still below average for all the survey areas except Lynn Sisters. 
 Pybus, Seymour, and Excursion had significantly low values in all mature male CPUEs, Gambier had two of three mature male recruit classes below their long-term averages, and Peril and Juneau had one of three mature male recruit classes below the long-term average. 
-Overall, recruitment, in the form of prerecruit CPUE, is significantly below average levels for five of the seven   surveys areas, with only Lynn Sisters  and Peril being at the long-term average for prerecruit CPUE, suggesting that regionwide improvements to mature and legal male biomass are still underway and may take a few more years even with the absence of fishing in most of the survey areas. 
-In the majority of survey areas prerecruit biomass is still lacking compared to the 1990s and early 2000s and is visualized as the small difference between mature and legal biomass in the area figures (Figures 4–17). A matrix of stock health indicators provides an objective and repeatable evaluation of the survey data; a five-year summary of matrix results is therefore presented here (Table 5).  Specific stock health by survey area (Table 6) is discussed below.  
+Overall, recruitment, in the form of prerecruit CPUE, is significantly below average levels for five of the seven surveys areas, with only Lynn Sisters and Peril being at the long-term average for prerecruit CPUE, suggesting that regionwide improvements to mature and legal male biomass are still underway and may take a few more years even with the absence of fishing in most of the survey areas. 
+In the majority of survey areas prerecruit biomass is still lacking compared to the 1990s and early 2000s and is visualized as the small difference between mature and legal biomass in the area figures (Figures \@ref(fig:Pybus2) – \@ref(fig:Excursion3)). A matrix of stock health indicators provides an objective and repeatable evaluation of the survey data; a five-year summary of matrix results is therefore presented here (Table 5).  Specific stock health by survey area (Table 6) is discussed below.  
 
 ## MARK-RECAPTURE EXPERIMENT ADJUSTMENTS {-}
 All survey areas (Excursion Inlet, Lynn Sisters, Peril Strait, Pybus Bay, Gambier Bay, and Seymour Canal; Figure \@ref(fig:distcur)), except Juneau, due to its expansive area, have a biomass adjustment that is calculated from mark-recapture studies (Table 1). 
@@ -145,11 +150,11 @@ Expanding to the non-surveyed areas using the historical harvest time frame resu
 ## HARVEST RATES {-}
 Determining an appropriate harvest rate for RKC in Southeast Alaska has been challenging due to inconsistent recruitment and varying levels of population health. As a result, in 2018, Palof and Stratman (2020) reviewed and implemented harvest rate strategies that yielded three options for appropriate harvest rates that can be applied to mature male biomass, each having its own associated risk.   
 Option 1, using the equilibrium harvest rates, is considered the most risk neutral option with an equal probability of the mature male biomass decreasing or increasing in the following year after applying this level of harvest pressure. This option uses a regression model and therefore incorporates both the variability in the harvest rates and their associated change in mature male biomass. In theory, these harvest levels will maintain the equilibrium population size when the population is at equilibrium. However, a disadvantage to this method as currently applied is that it does not account for time-varying trends in survival or other factors such as environmental change, temperature, etc. that affect biomass. For our purposes, equilibrium could be defined as the average baseline population size (Figure \@ref(fig:regionalbio)) or a biomass that is sustainable over time. When the population is below equilibrium, harvesting at these rates will either maintain low population levels or, more likely, cause a decrease in population size. 
-The resulting GHL for option 1 is XXXXXX lb (Table 2). 
+The resulting GHL for option 1 is `r (table2 %>% filter(Location == 'total'))$Comm.GHL` lb (Table 2). 
 Option 2, using the average harvest rate for years in which the mature male biomass increased, is considered the lowest risk option with a high probability of the mature male biomass increasing in the following year after applying this level of harvest pressure. This option only uses the average of the harvest rates that resulted in population increases, and therefore does not incorporate variability as well as option 1. In theory, these harvest levels will increase the population size regardless of health of the stocks. However, during depressed stock health conditions, where biomass levels are below baseline values, even small harvest levels may still result in a decrease in population size. 
-The resulting GHL for option 2 is XXXXX lb (Table 3). 
+The resulting GHL for option 2 is `r (table3 %>% filter(Location == 'total'))$Comm.GHL` lb (Table 3). 
 Option 3, using an alternative approach to an equilibrium harvest rate, which is the sum of the average harvest rate and the average change in mature male biomass, is considered the highest risk option. This option is most appropriate when there is not a significant relationship between the harvest rate and the change in the mature population. In theory this option should have an equal probability of the mature male biomass decreasing or increasing in the following year after applying this level of harvest pressure when the population is at equilibrium levels. However, this option only uses the averages of the harvest rates and the changes in mature male biomass over the entire time range, and therefore does not incorporate variability as well as the model output does in option 1. Similar to option 1 these harvest rates will maintain the equilibrium population size when the population is at equilibrium or baseline levels, but when the population is below equilibrium, harvesting at these rates will either maintain low population levels or, more likely, cause a decrease in population size. 
-The resulting GHL for option 3 is XXXXXX lb (Table 4). 
+The resulting GHL for option 3 is `r (table4 %>% filter(Location == 'total'))$Comm.GHL` lb (Table 4). 
 
 ## STOCK ASSESSMENT CONCERNS AND RECOMMENDATIONS {-}
 Recovery in most of the survey areas, except for the Juneau area and Lynn Sisters area, appears to be slow. Most areas, except for Peril Strait, had increasing biomass estimates from 2015–2017, however, in 2018 a decrease in both legal and mature biomass occurred in all survey areas that experienced personal use and commercial harvest in the previous season (2017/2018). The impact of the commercial fishery opening in the 2017/2018 season is confounded by potential increased personal use harvest in the survey areas, but this is hard to quantify since we do not currently have an estimate of personal use harvest in any area except Section 11-A, although estimates of personal use harvest are currently being collected with the implementation of the regional king crab personal use harvest permit in 2018 with a database system to query and analyze harvest still in progress.
@@ -185,7 +190,7 @@ Stock health has been low in Gambier Bay the last three years and is categorized
 ## Seymour Canal (poor) {-}
 The overall stock health for Seymour Canal decreased from below average to poor. All of the sex/size classes were significantly below their long-term averages, and there were no prerecruit or recruit male crab sampled in the survey pots in `r cur_yr`. 
 There are no significant short-term trends. 
-In general portions of this populations have been undersampled in the last few years of the survey, this year specifically no juvenile females, prerecruit or recruits were caught (Table 5), and therefore caution should be taken in interpreting any of the indicators of stock health. Based on the survey results for the past few years it may be appropriate to rexamine the survey footprint and methods for this area.
+In general portions of this populations have been undersampled in the last few years of the survey, this year specifically no juvenile females, prerecruit or recruits were caught (Table 5), and therefore caution should be taken in interpreting any of the indicators of stock health. Based on the survey results for the past few years it may be appropriate to reexamine the survey footprint and methods for this area.
 The estimate of legal biomass decreased 28% and the mature biomass decreased 29% from the `r pr_yr` model estimates. 
 The mature biomass estimate is `r round((baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0)`% below the baseline value.   
 
@@ -263,7 +268,7 @@ Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for
 
 
 ```{r table2, results = "asis"}
-df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_2021.csv'))
+df <- table2
 df %>% 
   mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
   select(-Year, -Legal.HR) %>% 
