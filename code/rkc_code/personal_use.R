@@ -1,7 +1,8 @@
 # K.Palof  ADF&G
-# 7-11-18, updated 7-8-19 / 7-14-20
+# 7-11-18, updated 7-8-19 / 7-14-20 / 9-6-21
 
-# personal use summary for 11-A
+# PU data for 11-A Juneau area -- see line 17
+## PU data for regionwide permit - see below starting at line 105
 # all years that have permit data available
 
 
@@ -12,6 +13,8 @@ cur_yr = 2021 # survey year
 
 prv_yr = cur_yr-1 # fishery year NOT survey year
 
+
+# 11-A personal use summary for 11-A -----------------
 #####Load Data ---------------------------------------------------
 personal_use <- read.csv(paste0(here::here(), "/data/harvest/11-A rkc pu_catch_updated2021.csv"))
 permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2019 2020 2021 permit status summary.csv"))
@@ -99,4 +102,28 @@ summary_current2 %>%
 
 write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_total2_', cur_yr, '.csv'), row.names = FALSE)
 
+## regionwide PU data ----------
+# load data -----
+personal_use <- read.csv(paste0(here::here(), "/data/harvest/King Crab Personal Use Permit Details-2018-2021.csv"))
 
+
+head(personal_use)
+personal_use %>% 
+  select(Year, Permit.Number, Permit.Returned.Status, Harvest.Reported, Did.Not.Fish, Is.Done.Fishing, 
+         Location, Personal.Use.District, Location.Code) -> pu_sum
+head(pu_sum)
+pu_sum %>% 
+  group_by(Year, Permit.Returned.Status, Location, Personal.Use.District, Location.Code) %>% 
+  summarise(harvest = sum(Harvest.Reported), not_fish = sum(Did.Not.Fish))
+
+pu_sum %>% 
+  group_by(Year, Location, Personal.Use.District, Location.Code) %>% 
+  summarise(harvest = sum(Harvest.Reported), not_fish = sum(Did.Not.Fish)) -> step1
+
+write.csv(step1, paste0(here::here(), "/results/rkc/Region1/", cur_yr, "/pu_regional_harvest.csv"))
+
+pu_sum %>% 
+  group_by(Year, Personal.Use.District, Location) %>% 
+  summarise(harvest = sum(Harvest.Reported), not_fish = sum(Did.Not.Fish)) -> step2
+
+write.csv(step2, paste0(here::here(), "/results/rkc/Region1/", cur_yr, "/pu_regional_harvest2.csv"))
