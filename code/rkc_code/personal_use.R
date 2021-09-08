@@ -106,6 +106,8 @@ write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_t
 # load data -----
 personal_use <- read.csv(paste0(here::here(), "/data/harvest/King Crab Personal Use Permit Details-2018-2021.csv"))
 
+personal_use %>% 
+  summarise(total = sum(Harvest.Reported))
 
 head(personal_use)
 personal_use %>% 
@@ -127,3 +129,22 @@ pu_sum %>%
   summarise(harvest = sum(Harvest.Reported), not_fish = sum(Did.Not.Fish)) -> step2
 
 write.csv(step2, paste0(here::here(), "/results/rkc/Region1/", cur_yr, "/pu_regional_harvest2.csv"))
+
+step2 %>% 
+  sort(harvest)
+
+## summary of catch by survey area --------------------
+survey.area <- c("Pybus Bay", "Seymour Canal", "East Peril Strait", "West Peril Strait", "Excursion Inlet", 
+                 "St. James Bay", "Gambier Bay")
+pu_sum %>% 
+  filter(Location %in% survey.area) %>%
+  mutate(Location = ifelse(Location == "East Peril Strait" | Location == "West Peril Strait", "Peril Strait", Location)) %>% 
+  group_by(Location, Year) %>% 
+  summarise(harvest = sum(Harvest.Reported), not_fish = sum(Did.Not.Fish)) -> survey.area1
+write.csv(survey.area1, paste0(here::here(), "/results/rkc/Region1/", cur_yr, "/pu_regional_survey_areas.csv"), row.names = F)
+
+## total crab per year ----------
+pu_sum %>% 
+  group_by(Year) %>% 
+  summarise(harvest = sum(Harvest.Reported)) %>% 
+  mutate(crab_lbs = harvest *8.5) # using an average legal weight of 8.5 lbs
