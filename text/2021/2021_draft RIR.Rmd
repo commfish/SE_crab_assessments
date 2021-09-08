@@ -47,7 +47,7 @@ baseline_rel <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/
 
 table2 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_2021.csv'))
 table3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table3_regional_2021.csv'))
-table4 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table4_regional_2021.csv'))
+#table4 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table4_regional_2021.csv'))
 ###
 ## clean up figure 2-------
 # add in mr adjustments
@@ -112,7 +112,7 @@ FYI: *italics* information is not completed yet, this is a draft of the RIR for 
   - Regional legal and mature biomass decreased again in `r cur_yr`, and have been declining since 2017
   - Juneau area is at above average stock health, Lynn Sisters is at moderate stock health, and the other areas are divided between poor and below average. Stock health considers all aspects of the population (mature males, juveniles, and females).
   - Lynn Sisters and Juneau are the only areas with an increase in both legal and mature biomass from `r pr_yr`. Lynn Sister is a small contributor to the regional biomass compared to most of the survey areas. 
-  - None of the three harvest rate options (low, neutral, or high risk) reach a harvestable surplus above the 200,000 lb threshold (Table 2 - 4).
+  - None of the harvest rate options (low risk HR or max appropriate HR) reach a harvestable surplus above the 200,000 lb threshold (Table 2, 3).
 
 
 # OVERVIEW {-}
@@ -163,12 +163,12 @@ Expanding to the non-surveyed areas using the historical harvest time frame resu
 
 
 ## HARVEST RATES {-}
-Determining an appropriate harvest rate for RKC in Southeast Alaska has been challenging due to inconsistent recruitment and varying levels of population health. As a result, in 2018, Palof and Stratman (2020) reviewed and implemented harvest rate strategies that yielded three options for appropriate harvest rates that can be applied to mature male biomass, each having its own associated risk.   
+Determining an appropriate harvest rate for RKC in Southeast Alaska has been challenging due to inconsistent recruitment and varying levels of population health. As a result, in 2018, Palof and Stratman (2020) reviewed and implemented harvest rate strategies that yielded two options for appropriate harvest rates that can be applied to mature male biomass, each having its own associated risk.   
 
-Option 1, using the equilibrium harvest rates, is considered the most risk neutral option with an equal probability of the mature male biomass decreasing or increasing in the following year after applying this level of harvest pressure. This option uses a regression model and therefore incorporates both the variability in the harvest rates and their associated change in mature male biomass. In theory, these harvest levels will maintain the equilibrium population size when the population is at equilibrium. However, a disadvantage to this method as currently applied is that it does not account for time-varying trends in survival or other factors such as environmental change, temperature, etc. that affect biomass. For our purposes, equilibrium could be defined as the average baseline population size (Figure \@ref(fig:regionalbio)) or a biomass that is sustainable over time. When the population is below equilibrium, harvesting at these rates will either maintain low population levels or, more likely, cause a decrease in population size. 
+Option 1, using the equilibrium harvest rates, is considered the most risk neutral option with an equal probability of the mature male biomass decreasing or increasing in the following year after applying this level of harvest pressure when the population is at average or above average stock health. For a sustainable population these should be considered maximum appropriate harvest rates for each of the surveyed areas. This option uses a regression model and therefore incorporates both the variability in the harvest rates and their associated change in mature male biomass. In theory, these harvest levels will maintain the equilibrium population size when the population is at equilibrium, or more realistically at average stock health levels (> moderate, Tables 5, 6). However, a disadvantage to this method as currently applied is that it does not account for time-varying trends in survival or other factors such as environmental change, temperature, etc. that affect biomass. For our purposes, equilibrium could be defined as the average baseline population size (Figure \@ref(fig:regionalbio)) or a biomass that is sustainable over time. When the population is below equilibrium, harvesting at these rates will either maintain low population levels or, more likely, cause a decrease in population size. 
 The resulting GHL for option 1 is **`r format((table2 %>% filter(Location == 'total'))$Comm.GHL, big.mark = ",")` lb** (Table 2). 
 
-Option 2, using the average harvest rate for years in which the mature male biomass increased, is considered the lowest risk option with a high probability of the mature male biomass increasing in the following year after applying this level of harvest pressure. This option only uses the average of the harvest rates that resulted in population increases, and therefore does not incorporate variability as well as option 1. In theory, these harvest levels will increase the population size regardless of health of the stocks. However, during depressed stock health conditions, where biomass levels are below baseline values, even small harvest levels may still result in a decrease in population size. 
+Option 2, using the average harvest rate for years in which the mature male biomass increased, is considered a lower risk option with a high probability of the mature male biomass increasing in the following year after applying this level of harvest pressure. This option only uses the average of the harvest rates that resulted in population increases, and therefore does not incorporate variability as well as option 1. In theory, these harvest levels will increase the population size regardless of health of the stocks. However, during depressed stock health conditions, where biomass levels are below baseline values, even small harvest levels may still result in a decrease in population size. 
 The resulting GHL for option 2 is **`r format((table3 %>% filter(Location == 'total'))$Comm.GHL, big.mark = ",")` lb** (Table 3). 
 
 
@@ -178,7 +178,7 @@ The impact of the commercial fishery opening in the 2017/2018 season is confound
 
 Regional biomass levels have decreased from `r pr_yr` and are still below the baseline levels (Figure \@ref(fig:regionalbio)). The Juneau Area and Lynn Sisters area the only survey areas where legal or mature biomass are above their baseline levels. 
 
-Slow recovery since 2001, which may be due to poor or inconsistent recruitment, and declines in the survey areas after the last commercial fishery opening (2017/2018 fishing season), suggest that harvesting at the equilibrium harvest levels (those used in the 2017/2018 GHL calculations, option 1 here) from these areas would increase the probability of continued population declines or stunt population growth. Thus, removals at the levels presented in options 1 and 3 (Tables 2 and 4) are not recommended for the upcoming season. Of the three harvest options presented none resulted in a GHL that is above the 200,000 lb threshold required for a fishery opening [5 AAC 34.113]. 
+Slow recovery since 2001, which may be due to poor or inconsistent recruitment, and declines in the survey areas after the last commercial fishery opening (2017/2018 fishing season), suggest that harvesting at the equilibrium harvest levels (those used in the 2017/2018 GHL calculations, option 1 here) from these areas would increase the probability of continued population declines or stunt population growth. Thus, removals at the levels presented in options 1 and 2 (Tables 2 and 3) are not recommended for the upcoming season. None of the harvest options presented here resulted in a GHL that is above the 200,000 lb threshold required for a fishery opening [5 AAC 34.113]. 
 
 
 # SURVEY AREA STOCK STATUS AND HARVEST RATE RECOMMENDATION {-}
@@ -275,17 +275,17 @@ TBD
 \newpage
 # TABLES AND FIGURES {-}
 ```{r explain, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
-# Table 1, 6 is the same every year, bring into this word doc after knitting from word doc 'Tables RIR.docx"
+# Table 1, 5 is the same every year, bring into this word doc after knitting from word doc 'Tables RIR.docx"
 
-# Table 5 is updated from excel sheet in 'Tables RIR.docx' and brought into this document after it's knit
+# Table 4 is updated from excel sheet in 'Tables RIR.docx' and brought into this document after it's knit
 
-# Tables 2 to 4, and 7 should be created here....look at .csv files in results/rkc/Region1
+# Tables 2 to 3, and 6 should be created here....look at .csv files in results/rkc/Region1
 
 # when bring in tables not created here add page numbers and header
 ```
 
 
-### Table 2. Option 1: risk neutral – model-based equilibrium harvest rates {-}
+### Table 2. Option 1: Maximum appropriate / risk neutral – model-based equilibrium harvest rates {-}
 ### Summary of `r cur_yr` commercial red king crab fishery GHL calculations (lb) for the seven surveyed areas and other areas. Risk neutral option based on 2018 calculated equilibrium exploitation rates (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979-2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historic years (1974 - 1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use catch for “Other Areas” is mean catch estimated from 2008-2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage.{-}
 
 
@@ -304,7 +304,6 @@ ft <- flextable(df)
 set_table_properties(ft, layout = "autofit")
 ```
 
-### ~a~ The Juneau area was open to personal use harvest in summer `r cur_yr` at a harvest rate of 7%. “n/a” represents data that is not available or readily estimable from the other bays.{-}
 
 \newpage
 ### Table 3. Option 2: risk adverse – high probability of mature male biomass increasing  {-}
@@ -324,13 +323,11 @@ ft <- flextable(df)
 set_table_properties(ft, layout = "autofit")
 ```
 
-### ~a~ The Juneau area was open to personal use harvest in summer `r cur_yr` at a harvest rate of 7%. “n/a” represents data that is not available or readily estimable from the other bays.{-}
-
 
 \newpage
-### Table 7. Sample sizes for the `r cur_yr` survey by area {-}
+### Table 6. Sample sizes for the `r cur_yr` survey by area {-}
 
-```{r table7, results = "asis"}
+```{r table6, results = "asis"}
 df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table7_raw_samp_2021.csv'))
 df %>% 
   select(-Year) -> df
@@ -345,10 +342,12 @@ set_table_properties(ft, layout = "autofit")
 
 
 
+\newpage
+### Table 7. Summary of `r cur_yr` commercial red king crab fishery GHL calculations (in pounds) and harvest rate recommendations for the 7 surveyed areas and non-surveyed areas. Mature biomass is adjusted with the mark recapture experiment. Biomass of non-surveyed areas was expanded to be 47.2% of the region. {-}
 
-### Table 8. Summary of `r cur_yr` commercial red king crab fishery GHL calculations (in pounds) and harvest rate recommendations for the 7 surveyed areas and non-surveyed areas. Mature biomass is adjusted with the mark recapture experiment. Biomass of non-surveyed areas was expanded to be 47.2% of the region. {-}
-
-```{r table8, results = "asis"}
+```{r table7, results = "asis"}
+survey.locations <- c("Pybus", "Excursion", "Gambier", "Juneau", 
+                      "LynnSisters", "Peril", "Seymour")
 df <- table2
 df %>% 
   mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
@@ -357,8 +356,13 @@ df %>%
 
 df %>% 
   mutate(Mature.HR = c(0, 0, 0, 0, 0.07, 0.09, 0, 0, 0.10, 0)) %>% # from stock health & previous years results
-  mutate(Total.GHL = adj.mature*Mature.HR, 
-         Comm.GHL.adj = Total.GHL - PU.catch) -> df2
+  mutate(Total.GHL = round(adj.mature*Mature.HR,0), 
+         PU.catch = ifelse(Location == "Juneau", 
+                           round(0.6*Total.GHL,0), ifelse(Location == "other.areas", 1000, 0)),
+         Comm.GHL.adj = round(Total.GHL - PU.catch, 0), 
+         bkc_temp = round(sum(Comm.GHL.adj[Location%in%survey.locations], na.rm = TRUE)*0.0106, 0), 
+         Comm.GHL.adj = ifelse(Location == "bkc", bkc_temp, Comm.GHL.adj)) %>% 
+  select(-bkc_temp) -> df2
 df2 %>% 
   mutate(Comm.GHL.adj = ifelse(Location == "total", (sum(df2$Comm.GHL.adj)), Comm.GHL.adj)) %>% 
   select(Location, adj.legal, adj.mature, Mature.HR, Total.GHL, PU.catch, Comm.GHL.adj) ->df3
@@ -374,6 +378,8 @@ flextable(df3) %>%
 #ft
 set_table_properties(ft, layout = "autofit")
 ```
+
+### ~a~ The Juneau area was open to personal use harvest in summer `r cur_yr` at a harvest rate of 7%. “n/a” represents data that is not available or readily estimable from the other bays.{-}
 
 \newpage
 ```{r distribution, fig.cap = "Map of Southeast Alaska (Registration Area A)."}
