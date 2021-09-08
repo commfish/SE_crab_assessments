@@ -47,6 +47,7 @@ baseline_rel <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/
 
 table2 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_2021.csv'))
 table3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table3_regional_2021.csv'))
+tableA3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/TableA3_regional_2021.csv'))
 #table4 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table4_regional_2021.csv'))
 ###
 ## clean up figure 2-------
@@ -140,7 +141,7 @@ The CPUE of some portions of the mature male size and sex classes are still belo
 Pybus, Seymour, and Excursion had significantly low values in all mature male CPUEs, Gambier had two of three mature male recruit classes below their long-term averages, and Peril and Juneau had one of three mature male recruit classes below the long-term average. 
 
 Overall, recruitment, in the form of prerecruit CPUE, is significantly below average levels for five of the seven surveys areas, with only Lynn Sisters and Peril being at the long-term average for prerecruit CPUE, suggesting that regionwide improvements to mature and legal male biomass are still underway and may take a few more years even with the absence of fishing in most of the survey areas. 
-In the majority of survey areas prerecruit biomass is still lacking compared to the 1990s and early 2000s and is visualized as the small difference between mature and legal biomass in the area figures (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). A matrix of stock health indicators provides an objective and repeatable evaluation of the survey data; a five-year summary of matrix results is therefore presented here (Table 5).  Specific stock health by survey area (Table 6) is discussed below.  
+In the majority of survey areas prerecruit biomass is still lacking compared to the 1990s and early 2000s and is visualized as the small difference between mature and legal biomass in the area figures (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). A matrix of stock health indicators provides an objective and repeatable evaluation of the survey data; a five-year summary of matrix results is therefore presented here (Table 4).  Specific stock health by survey area (Table 5) is discussed below.  
 
 ## MARK-RECAPTURE EXPERIMENT ADJUSTMENTS {-}
 All survey areas (Excursion Inlet, Lynn Sisters, Peril Strait, Pybus Bay, Gambier Bay, and Seymour Canal; Figure \@ref(fig:distcur)), except Juneau, due to its expansive area, have a biomass adjustment that is calculated from mark-recapture studies (Table 1). Two of the six survey areas have a single mark-recapture event, while the other four have two events; therefore, the estimate of biomass using this method does not take into account extensive inter-annual variability or variability in population size for all areas and should be applied with caution. 
@@ -183,8 +184,8 @@ Slow recovery since 2001, which may be due to poor or inconsistent recruitment, 
 
 # SURVEY AREA STOCK STATUS AND HARVEST RATE RECOMMENDATION {-}
 
-## STOCK STATUS BY SURVEY AREA (TABLE 5, FIGS. \@ref(fig:pybus2) – \@ref(fig:excursion3)) {-}
-Significance in long-term or short-term trends is defined as a p-value <0.05. Long-term trends compare the current year’s mean to the long-term baseline value (1993–2007); short-term trends regress the last four years of survey data to determine if a significant increasing or decreasing trend is present. Estimates of legal and mature mark-recapture biomass (adj.legal / adj.mature) for the entire biomass time series for each area were added to the legal biomass graphs, along with their associated long-term baseline (1993–2007; solid black line for legal and grey dotted line for mature) estimates (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). Raw sample sizes for each area are reported in Table 5. Graphs for each area reflect biomass estimates from the `r cur_yr` CSA model.
+## STOCK STATUS BY SURVEY AREA (TABLE 4, FIGS. \@ref(fig:pybus2) – \@ref(fig:excursion3)) {-}
+Significance in long-term or short-term trends is defined as a p-value <0.05. Long-term trends compare the current year’s mean to the long-term baseline value (1993–2007); short-term trends regress the last four years of survey data to determine if a significant increasing or decreasing trend is present. Estimates of legal and mature mark-recapture biomass (adj.legal / adj.mature) for the entire biomass time series for each area were added to the legal biomass graphs, along with their associated long-term baseline (1993–2007; solid black line for legal and grey dotted line for mature) estimates (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). Raw sample sizes for each area are reported in Table 6. Graphs for each area reflect biomass estimates from the `r cur_yr` CSA model.
 
 ## Pybus Bay (below average) {-}
 Pybus Bay stock health decreased but remained in below average status (Figures \@ref(fig:pybus2), \@ref(fig:pybus3)). Mature female CPUE is below the long-term average, but not significantly so. Postrecruit, recruit, prerecruit, juvenile male and juvenile female CPUEs are significantly below their long-term averages. 
@@ -208,7 +209,7 @@ Stock health has been low in Gambier Bay the last three years and is categorized
 ## Seymour Canal (poor) {-}
 The overall stock health for Seymour Canal decreased from below average to poor (Figures \@ref(fig:seymour2), \@ref(fig:seymour3)). All of the sex/size classes were significantly below their long-term averages, and there were no prerecruit or recruit male crab sampled in the survey pots in `r cur_yr`. 
 There are no significant short-term trends. 
-In general portions of this populations have been undersampled in the last few years of the survey, this year specifically no juvenile females, prerecruit or recruits were caught (Table 5), and therefore caution should be taken in interpreting any of the indicators of stock health. Based on the survey results for the past few years it may be appropriate to reexamine the survey footprint and methods for this area.
+In general portions of this populations have been undersampled in the last few years of the survey, this year specifically no juvenile females, prerecruit or recruits were caught (Table 6), and therefore caution should be taken in interpreting any of the indicators of stock health. Based on the survey results for the past few years it may be appropriate to reexamine the survey footprint and methods for this area.
 The estimate of legal biomass decreased 28% and the mature biomass decreased 29% from the `r pr_yr` model estimates. 
 The mature biomass estimate is `r round((baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0)`% below the baseline value.   
 
@@ -558,6 +559,37 @@ set_table_properties(ft2, layout = "autofit")
 
 ``` 
 
+
+### Table A3 `r cur_yr` regional biomass CSA and mark recapture adjusted {-}
+```{r tableA3, results = "asis"}
+df <- tableA3
+df %>% 
+  select(-Year) -> df
+
+names(df) <- c("Survey area", "Legal biomass(CSA)", "Mature biomass(CSA)", 
+               "MR adjustment", "Legal biomass (adj)", "Mature biomass (adj)")
+
+flextable(df) -> ft#%>% 
+    #colformat_double(
+    #   digits = 0,
+    #   na_str = "na")
+    
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
+
+flextable(df_all2) %>% 
+    colformat_double(
+       digits = 0,
+       na_str = "na") %>% 
+  fontsize(size = 7) %>% 
+  fontsize(size = 7, part = "header")-> ft2
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft2, layout = "autofit")
+
+``` 
 # References {-}
 Robson DS, and HA Regier. (1964) Sample Size in Petersen Mark-Recapture Experiments. Transactions of the American Fisheries Society 93 (3): 215-226.
 
