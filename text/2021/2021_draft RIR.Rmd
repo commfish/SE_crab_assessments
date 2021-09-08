@@ -315,7 +315,7 @@ df %>%
   mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
   select(-Year, -Legal.HR) %>% 
   filter(Location != "surveyed") -> df
-names(df) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Equilibrium HR", 
+names(df) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Avg Inc HR", 
                "Total GHL", "PU catch", paste0(cur_yr, " Commercial GHL(lb)"))
 #knitr::kable((df), booktabs = T, caption = "Table 2")
 ft <- flextable(df)
@@ -326,7 +326,6 @@ set_table_properties(ft, layout = "autofit")
 
 ### ~a~ The Juneau area was open to personal use harvest in summer `r cur_yr` at a harvest rate of 7%. “n/a” represents data that is not available or readily estimable from the other bays.{-}
 
-\newpage
 
 \newpage
 ### Table 7. Sample sizes for the `r cur_yr` survey by area {-}
