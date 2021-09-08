@@ -271,7 +271,8 @@ survey.locations <- c("Pybus", "Excursion", "Gambier", "Juneau",
                       "LynnSisters", "Peril", "Seymour")
 # Table 2 --
 biomass_rate %>% 
-  mutate(Equilibrium.HR = ifelse(Location == "Juneau", hr_cur_yr, equ.er.adj)) %>% 
+  #mutate(Equilibrium.HR = ifelse(Location == "Juneau", hr_cur_yr, equ.er.adj)) %>% 
+  mutate(Equilibrium.HR = equ.er.adj) %>% 
   dplyr::select(-avg.inc.hr, -alt.equ.hr, -equ.er.adj, -hr_cur_yr) %>% 
   mutate(GHL = round(adj.mature*Equilibrium.HR, 0), 
          Legal.HR = round(GHL/adj.legal, 2), 
@@ -304,7 +305,7 @@ biomass_rate %>%
   dplyr::select(-bkc_temp, - total_temp) -> table3_csv
 write.csv(table3_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table3_regional_', cur_yr, '.csv'), row.names = FALSE) 
 
-# Table 4 --
+# Table X -- table 4 removed from 2021 doc.
 biomass_rate %>% 
   mutate(Avg.HR_Avg.change = ifelse(Location == "Juneau", hr_cur_yr, 
                              ifelse(Location == "Seymour", 0.04, alt.equ.hr))) %>% 
