@@ -323,6 +323,35 @@ biomass_rate %>%
   dplyr::select(-bkc_temp, - total_temp) -> table4_csv
 write.csv(table4_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table4_regional_', cur_yr, '.csv'), row.names = FALSE) 
 
+# Table A3 -------
+biomass %>% 
+  filter(Year == cur_yr) %>% 
+  dplyr::select(-harvest) %>%  # add mr_adjust2 so that I can calculate biomass
+  # that is expanded from surveyed and adjusted biomass values 
+  #left_join(mr_adjust2) %>% 
+  #replace_na(list(legal.biomass = 0, mature.biomass = 0, weighted_ADJ = 1)) %>% 
+  #mutate(legal.adj = legal.biomass*weighted_ADJ, 
+  #       mature.adj = mature.biomass*weighted_ADJ) %>% 
+  group_by(Year) %>% 
+  summarise(legal.biomass = sum(legal.biomass), 
+            mature.biomass = sum(mature.biomass), 
+            adj.legal = sum(adj.legal), adj.mature = sum(adj.mature)) %>% 
+  gather(type, surveyed, legal.biomass:adj.mature, factor_key = TRUE) %>% 
+  mutate(other.areas = surveyed/expasion - surveyed, 
+         bkc = surveyed*bkc, 
+         total = surveyed + other.areas + bkc) %>% 
+  gather(Location, pounds, surveyed:total) %>% 
+  cast(Year+Location~type) -> regional_totals2
+
+biomass %>% 
+  filter(Year == cur_yr) %>% 
+  dplyr::select(Year, Location, legal.biomass, mature.biomass, weighted_ADJ, adj.legal, adj.mature) %>% 
+  mutate(weighted_ADJ = round(weighted_ADJ, 2)) %>% 
+  bind_rows(regional_totals2) %>% 
+  mutate_at(3:4, round, 0) %>% 
+  mutate_at(6:7, round, 0) -> tableA3
+write.csv(tableA3, paste0('./results/rkc/Region1/', cur_yr, '/TableA3_regional_', cur_yr, '.csv'), row.names = FALSE) 
+
 
 # Table 7 RIR ---------
 # raw sample sizes
