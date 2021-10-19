@@ -492,31 +492,31 @@ df %>%
   select(Year, Location, adj.legal, adj.mature) %>% 
   mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) -> df
 df %>% filter(Location == "Pybus") %>%  
-  mutate(legal.pybus = adj.legal, mature.pybus = adj.mature ) %>% 
+  mutate(pybus.legal = adj.legal, pybus.mature = adj.mature ) %>% 
   select(-Location, -adj.legal, -adj.mature) -> df1
 #names(df1) <- c("Year", "Pybus", "Legal", "Mature")
 df %>% filter(Location == "Gambier") %>% 
-  mutate(legal.gambier = adj.legal, mature.gambier = adj.mature ) %>% 
+  mutate(gambier.legal = adj.legal, gambier.mature = adj.mature ) %>% 
   select(-Location, -adj.legal, -adj.mature)-> df2
 #names(df2) <- c("Year", "Gambier", "Legal", "Mature")
 df %>% filter(Location == "Seymour") %>% 
-  mutate(legal.seymour = adj.legal, mature.seymour = adj.mature ) %>% 
+  mutate(seymour.legal = adj.legal, seymour.mature = adj.mature ) %>% 
   select(-Location, -adj.legal, -adj.mature)-> df3
 #names(df3) <- c("Year", "Seymour", "Legal", "Mature")
 df %>% filter(Location == "Peril") %>% 
-  mutate(legal.peril = adj.legal, mature.peril = adj.mature ) %>% 
+  mutate(peril.legal = adj.legal, peril.mature = adj.mature ) %>% 
   select(-Location, -adj.legal, -adj.mature)-> df4 
 #names(df4) <- c("Year", "Peril", "Legal", "Mature")
 df %>% filter(Location == "Juneau") %>% 
-  mutate(legal.juneau = adj.legal, mature.juneau = adj.mature ) %>% 
+  mutate(juneau.legal = adj.legal, juneau.mature = adj.mature ) %>% 
   select(-Location, -adj.legal, -adj.mature) -> df5
 #names(df5) <- c("Year", "Juneau", "Legal", "Mature")
 df %>% filter(Location == "LynnSisters") %>% 
-  mutate(legal.lynn = adj.legal, mature.lynn = adj.mature ) %>% 
+  mutate(lynn.legal = adj.legal, lynn.mature = adj.mature ) %>% 
   select(-Location, -adj.legal, -adj.mature) -> df6
 #names(df6) <- c("Year", "LynnSisters", "Legal", "Mature")
 df %>% filter(Location == "Excursion") %>% 
-  mutate(legal.excursion = adj.legal, mature.excursion = adj.mature ) %>% 
+  mutate(excursion.legal = adj.legal, excursion.mature = adj.mature ) %>% 
   select(-Location, -adj.legal, -adj.mature) -> df7
 #names(df7) <- c("Year", "Excursion", "Legal", "Mature")
 
