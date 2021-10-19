@@ -168,6 +168,8 @@ regional.b %>%
 # Figure 2 **CLOSED** regional biomass M/R adjusted biomass---------
 # should have 2018 model with longterm baselines (1993-2007) and closure status. 
 #   also show 2018 forecast as distinct from model output
+
+
 regional.b %>% 
   select(Year, adj_legal, adj_mature, status) %>%
   gather(type, pounds, adj_legal:adj_mature, factor_key = TRUE) %>%
@@ -200,6 +202,48 @@ regional.b %>%
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
             hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
   ggsave(paste0('./figures/rkc/', cur_yr, '/MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+
+# Figure 2 **CLOSED** EXPANDED regional biomass M/R adjusted biomass---------
+# should have 2018 model with longterm baselines (1993-2007) and closure status. 
+#   also show 2018 forecast as distinct from model output
+expansion <- 0.528
+regional.b %>% 
+  mutate(expanded_legal = adj_legal/expansion, 
+         expanded_mature = adj_mature/expansion) -> regional.b.expand
+
+
+regional.b.expand %>% 
+  select(Year, expanded_legal, expanded_mature, status) %>%
+  gather(type, pounds, expanded_legal:expanded_mature, factor_key = TRUE) %>%
+  mutate(status = replace(status, which(status == "TBD"), "closed")) %>% # can replace the TBD with open or closed
+  ggplot(aes(Year, pounds, group = type)) +
+  geom_line(aes(colour = type, group = type, linetype = type))+
+  geom_point(aes(colour = type, shape = status, fill = type), size =3) +
+  geom_hline(data = reg_baseline_MR, aes(yintercept = pounds/expansion, 
+                                         linetype = type, colour = type)) +
+  scale_colour_manual(name = "", values = c("black", "grey60", "black", "grey60"), 
+                      guide = FALSE)+
+  scale_shape_manual(name = "Fishery Status", values = c(25, 21, 8))+
+  scale_linetype_manual(name = "", values = c("solid", "dashed", "solid", "dashed"), 
+                        guide = FALSE) +
+  scale_fill_manual(name = "", values = c("black", "gray75"), 
+                    guide = FALSE) +
+  scale_y_continuous(labels = comma, limits = c(0,(max(regional.b.expand$expanded_mature,
+                                                       na.rm = TRUE) + 100000)),
+                     breaks= seq(min(0), max(max(regional.b.expand$expanded_mature, na.rm = TRUE) +100000), 
+                                 by = 500000)) +
+  scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) +
+  #ggtitle("Biomass of surveyed areas for Southeast Alaska red king crab") + 
+  ylab("Biomass (lb)") + 
+  theme(plot.title = element_text(hjust =0.5)) +
+  theme(legend.position = c(0.825,0.793), legend.title = element_text(size = 9), 
+        legend.text = element_text(size = 14), axis.text.x = element_text(angle = 45), 
+        axis.title = element_text(size = 14, face = "bold"), 
+        axis.text = element_text(size = 14)) +
+  theme(axis.text.x = element_text(vjust = 0.50)) +
+  geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds/expansion, label = label), 
+            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
+  ggsave(paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 
