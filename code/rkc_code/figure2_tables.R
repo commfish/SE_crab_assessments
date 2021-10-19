@@ -193,6 +193,7 @@ regional.b %>%
   scale_x_continuous(breaks = seq(min(1975),max(max(regional.b$Year) + 1), by = 2)) +
   #ggtitle("Biomass of surveyed areas for Southeast Alaska red king crab") + 
   ylab("Biomass (lb)") + 
+  ggtitle("Biomass of surveyed areas for Southeast Alaska red king crab") +
   theme(plot.title = element_text(hjust =0.5)) +
   theme(legend.position = c(0.825,0.793), legend.title = element_text(size = 9), 
         legend.text = element_text(size = 14), axis.text.x = element_text(angle = 45), 
@@ -231,10 +232,11 @@ regional.b.expand %>%
   scale_y_continuous(labels = comma, limits = c(0,(max(regional.b.expand$expanded_mature,
                                                        na.rm = TRUE) + 100000)),
                      breaks= seq(min(0), max(max(regional.b.expand$expanded_mature, na.rm = TRUE) +100000), 
-                                 by = 500000)) +
+                                 by = 1000000)) +
   scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) +
   #ggtitle("Biomass of surveyed areas for Southeast Alaska red king crab") + 
   ylab("Biomass (lb)") + 
+  ggtitle("Regional biomass estimates for Southeast Alaska red king crab") +
   theme(plot.title = element_text(hjust =0.5)) +
   theme(legend.position = c(0.825,0.793), legend.title = element_text(size = 9), 
         legend.text = element_text(size = 14), axis.text.x = element_text(angle = 45), 
