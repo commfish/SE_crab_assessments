@@ -7,11 +7,11 @@
 # load ----
 
 ## libraries and functions
-source("./code/SE_csa_tmb_R_functions.R")
+source("./code/SE_csa_tmb_Rfunctions.R")
 
 ## compile and load model
-compile("./code/SE_csa_tmb.cpp")
-dyn.load(dynlib("./code/SE_csa_tmb"))
+compile("./code/tanner_csa_tmb.cpp")
+dyn.load(dynlib("./code/tanner_csa_tmb"))
   
 # load data ----
 
@@ -29,7 +29,7 @@ csa_data <- list(
   nstage = 3,
   
   ## retain catch in numbers
-  ret_cat_lbs = glacier_bay %>%
+  ret_cat_num = glacier_bay %>%
                     filter(survey_year %in% 1999:2020) %>%
                     pull(catch_num) %>% .[!is.na(.)],
   
@@ -51,9 +51,10 @@ csa_data <- list(
   
   # natural mortality on recruits
   M = 0.3,
-  
+  # pre_recruit molt probability
+  molt = rep(1, nrow(glacier_bay)-1),
   # data weighting on annual survey index
-  wt_survey = rep(10, length(1999:2020))
+  wt_survey = rep(10, 3)
 )
 
 
@@ -66,7 +67,7 @@ par_start <- list(ln_index_init = rep(5, 3),
                   ln_q = -8)
 
 ## builds and fit model
-obj <- MakeADFun(csa_data, par_start, DLL = "SE_casa_tmb")
+obj <- MakeADFun(csa_data, par_start, DLL = "tanner_csa_tmb")
 opt <- nlminb(start = obj$par, obj = obj$fn, gr = obj$gr)
 
 
