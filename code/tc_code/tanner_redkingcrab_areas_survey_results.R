@@ -1,5 +1,6 @@
 #K.Palof 
 # ADF&G 9-21-18 updated and reworked similar to RKC code
+# 10-19-2021
 # Areas: RKCS areas for Tanner crab - EXCLUDES north juneau and stephens passage (see readme.md for reason)
 # includes: Excursion, Seymour Canal, Pybus Bay, Gambier Bay, Peril Strait, and Lynn Sisters
 # code to process data from Ocean AK to use in crab CSA models.  
@@ -8,7 +9,7 @@
 source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with mutiple areas at once.
 
 ## setup global ---------------
-cur_yr <- 2020
+cur_yr <- 2021
 pr_yr <- cur_yr -1
 fig_path <- paste0('figures/tanner/tanner_rkc/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
@@ -24,7 +25,7 @@ dat2 <- read.csv(paste0("./data/tanner/tanner_rkc/red crab survey for Tanner cra
                   # 1997 to present 
                   # all data in this file do not need area, historic or female files here
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
-biomass <- read.csv("./data/tanner/tanner_2020_biomassmodel.csv") 
+biomass <- read.csv(paste0("./data/tanner/tanner_", cur_yr, "_biomassmodel.csv")) 
 # this file should be updated with current year model output.
 
 # survey data QAC -------
