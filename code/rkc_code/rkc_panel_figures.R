@@ -20,7 +20,7 @@ panel_figure('Juneau', cur_yr, 'Juneau', 3, 0) # female panel
 
 ### presentation figure -----
 legend_panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 2, 0, 'Juneau Area', 0.65, 0.844)
-  ]panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 3, 0, 'Juneau Area')
+panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 3, 0, 'Juneau Area')
 
 # Excursion ==========================
 # confidental figure 
