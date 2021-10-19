@@ -46,6 +46,7 @@ exploit_rate <- read.csv(paste0(here::here(),"/data/rkc/table3.csv"))
 baseline_rel <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/relative_to_baseline_2021.csv'))
 
 table2 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_2021.csv'))
+# these are created in 'figure2_tables.R'
 table3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table3_regional_2021.csv'))
 tableA3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/TableA3_regional_2021.csv'))
 #table4 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table4_regional_2021.csv'))
@@ -391,7 +392,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture1.jpg'), dpi = 
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture2.jpg'), dpi = 125)
 ```
 
-```{r regionalbio, fig.cap = "Total biomass estimates of mature (gray points and line) and legal (black points and line) red king crab for surveyed areas in Southeast Alaska. Estimates based on Catch-Survey Analysis (CSA) methodologies adjusted using mark-recapture study results (Table 1). This does not include Holkham Bay, Port Frederick, or non-surveyed areas.  Reference lines represent long-term (1993–2007) average of legal and mature biomass estimates.  Triangles represent years without a commercial harvest."}
+```{r regionalbio, fig.cap = "Total biomass estimates (expanded regional estimates) of mature (gray points and line) and legal (black points and line) red king crab in Southeast Alaska. Estimates based on Catch-Survey Analysis (CSA) methodologies adjusted using mark-recapture study results (Table 1) then further expanded to include non-survey areas. Reference lines represent long-term (1993–2007) average of legal and mature biomass estimates.  Triangles represent years without a commercial harvest."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/MRregional_biomass2021.png'), dpi = 125)
 ```
 
