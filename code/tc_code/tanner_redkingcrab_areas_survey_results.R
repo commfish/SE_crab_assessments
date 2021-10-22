@@ -39,7 +39,8 @@ dat1 %>%
 
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
-levels(dat$Pot.Condition)
+#levels(dat$Pot.Condition)
+unique(dat$Pot.Condition)
 dat %>%
   filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> dat1
 
@@ -57,7 +58,8 @@ write.csv(test1, "./results/tanner/tanner_rkc/data_issues.csv")
 ####Survey areas ONLY 
 # remove Juneau and Barlow - do these seperately due to needing GIS to seperate the areas.
 # also need to remove other "experimental" areas - simplify to areas used in the assessment
-levels(dat1$Location)
+#levels(dat1$Location)
+unique(dat1$Location)
 rkc_usable_areas <- c("Deadman Reach", "Excursion Inlet", "Gambier Bay", "Lynn Sisters", "Pybus Bay", 
                       "Seymour Canal", "St. James Bay")
 dat1 %>%
@@ -70,7 +72,7 @@ dat1 %>%
 
   # need to confirm that rkcs area tagging pots in 2019 - seymour and excusion are NOT included
 dat1a %>% 
-  filter(Year == 2020) %>% 
+  filter(Year == 2021) %>% 
   group_by(Location) %>% 
   summarise(n = max(Pot.No)) # confirm 2019 pot removed.  **FIX** this for future
 
@@ -228,7 +230,7 @@ write.csv(percent_low_clutch, paste0('./results/tanner/tanner_rkc/', cur_yr, '/R
 ##### egg percentage overall -----------------------------------
 LgF_Tdat1 %>%
   group_by(Year, AREA, Pot.No) %>%
-  summarise (egg_mean = wt.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
+  summarise (egg_mean = weighted.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
 
 clutch_by_pot %>%
   group_by(AREA, Year)%>%
