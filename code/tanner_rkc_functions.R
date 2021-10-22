@@ -7,19 +7,26 @@
 library(tidyverse)
 library(weights)
 library(broom)
+library(kableExtra)
+library(xtable)
+library(flextable)
 
 library(stringr)
 library(reshape2)
 library(extrafont)
 library(ggthemes)
 library(plotrix)
-library(SDMTools)
+#library(SDMTools)
 library(grid)
 library(gridExtra)
 #library(FNGr)
 library(scales)
 library(cowplot)
-
+library(here)
+library(TeachingDemos)
+library(purrr)
+library(TMB)
+library(radiant.data)
 
 #font_import()
 loadfonts(device="win")
@@ -40,16 +47,24 @@ short_t_tanner <- function(bypot_st, year) {
     group_by(AREA, mod_recruit) %>% 
     do(fit = lm(crab ~ Year, data = .)) ->short_term
   
-  short_term %>%
-    tidy(fit) -> short_term_slope
-  
-  short_term %>%
-    glance(fit) ->short_term_out
+  #short_term %>%
+  #  tidy(fit) -> short_term_slope
+  bypot_st_long %>% 
+    group_by(AREA, mod_recruit) %>% 
+    do(fit3 = glance(lm(crab ~ Year, data = .))) %>% 
+    unnest(fit3) -> short_term_out
+  #short_term %>%
+  #  glance(fit) ->short_term_out
   
   recruit_used <- c("Large.Females",  "Pre_Recruit", "Recruit","Post_Recruit")
   short_term_out %>%
     filter(mod_recruit %in% recruit_used) %>%
     select(AREA, mod_recruit, r.squared, p.value)->short_term_out2
+  
+  bypot_st_long %>% 
+    group_by(AREA, mod_recruit) %>% 
+    do(fit2 = tidy(lm(crab ~ Year, data = .))) %>% 
+    unnest(fit2) -> short_term_slope
   
   short_term_slope %>%
     filter(mod_recruit %in% recruit_used, term == 'Year') %>%
@@ -131,11 +146,11 @@ weight_L <- function(Tdat1, cur_yr){
   datWL %>% 
     group_by(AREA, Year) %>% 
     filter(Sex.Code == 1) %>% 
-    summarise(mature_lbs = wt.mean(weight_lb[mod_recruit %in% Mature], 
+    summarise(mature_lbs = weighted.mean(weight_lb[mod_recruit %in% Mature], 
                                    Number.Of.Specimens[mod_recruit %in% Mature]), 
-              legal_lbs = wt.mean(weight_lb[mod_recruit %in% Legal], 
+              legal_lbs = weighted.mean(weight_lb[mod_recruit %in% Legal], 
                                   Number.Of.Specimens[mod_recruit %in% Legal]), 
-              prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
+              prer_lbs = weighted.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
                                  Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
   
   write.csv(male_weights, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_weights.csv'))
