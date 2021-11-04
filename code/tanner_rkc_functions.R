@@ -190,22 +190,40 @@ poor_clutch_short <- function(females_all, year){
     filter(Year >= (year-3)) -> LgF_short # short term file has last 4 years in it
   #output this file as .csv to add to next year
   #write_csv(females_all, paste0('results/redcrab/', area,'/poorclutch_females_all.csv'))
+  LgF_short %>% 
+    mutate(per_poorclt = var1)  -> LgF_short
   
   LgF_short %>% 
     group_by(AREA) %>% 
-    do(fit = lm(var1 ~ Year, data =.)) -> fem_short
-  fem_short %>% 
-    tidy(fit) -> fem_short_slope
-  fem_short %>% 
-    glance(fit) -> fem_short_out
+    do(fit = glance(lm(var1 ~ Year, data =.))) %>% 
+    unnest(fit) -> fem_short
   
-  fem_short_out %>% 
-    select(AREA, r.squared, p.value) -> fem_short_term_out
+  fem_short %>% 
+    select(AREA, r.squared, p.value) -> fem_short_out
+  
+  LgF_short %>% 
+    group_by(AREA) %>% 
+    do(fit2 = tidy(lm(var1 ~ Year, data =.))) %>% 
+    unnest(fit2) -> fem_short_slope
+  
   fem_short_slope %>% 
+    select(AREA, term, estimate) %>% 
     filter(term == 'Year') %>% 
-    rename(slope = estimate) %>% 
-    select(AREA, slope) %>% 
-    right_join(fem_short_term_out) -> fem_short_results
+    spread(term, estimate) %>% 
+    dplyr::rename(slope = Year) %>% 
+    right_join(fem_short_out) -> fem_short_results
+  #fem_short %>% 
+  #  tidy(fit) -> fem_short_slope
+  #fem_short %>% 
+  #  glance(fit) -> fem_short_out
+  
+  #fem_short_out %>% 
+  #  select(AREA, r.squared, p.value) -> fem_short_term_out
+  #fem_short_slope %>% 
+  #  filter(term == 'Year') %>% 
+  #  rename(slope = estimate) %>% 
+  #  select(AREA, slope) %>% 
+  #  right_join(fem_short_term_out) -> fem_short_results
   
   #Now need to add column for significance and score
   fem_short_results %>%
