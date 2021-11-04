@@ -280,6 +280,12 @@ total_health("tanner_rkc", cur_yr)
 ## STOP here and run R markdown with summary of rkc areas ----
 
 # READ ME: 
+# put cpue from this markdown into CSA excel files or R input files.
+# need harvest for each survey area from 'tanner_harvest.R' file created: 
+# 'tanner_comm_catch'cur_yr'.csv' (catch in numbers) & 'tanner_catch_mid_date'cur_yr'.csv' (mid-catch date)
+# Run CSA - put resulting biomass 'cur_yr' values into 
+# 'tanner_cur_yr_biomassmodel.csv'
+
 # need to run CSA models and put into biomass file before creating figures
 # make sure biomass file is updated.....
 # need to run 'tanner_harvest.R' code to produce file with catch for last season prior to figure creation.
