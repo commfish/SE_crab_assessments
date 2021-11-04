@@ -119,7 +119,8 @@ harvest2 %>%
             permits = length(unique(Permit.Holder.Name)), #permits = length(unique(Permit.Serial.Number)), 
             processor = length(unique(Processor.Code)),
             numbers = sum(Number.Of.Animals, na.rm = TRUE), 
-            pounds = sum(Whole.Weight..sum., na.rm = TRUE))  -> harvest2_cur
+            pounds = sum(Whole.Weight..sum., na.rm = TRUE)) %>% 
+  mutate(year_caught = Year +1) -> harvest2_cur
 
 ### all years by survey area --------------------------
 
@@ -142,14 +143,15 @@ harvest2 %>%
 # Combine current year ---------
 harvest_all %>% 
   mutate(year_caught = Year, Year = Year - 1) %>% # check here and make sure end year is cur_yr above -2, i.e. cur_yr = 2020, end year is 2018
-  select(-X) %>% 
+  #select(-X) %>% 
   bind_rows(harvest2_cur) -> harvest_all_update
 
 # Combine current year ---------
 
 # !!!! I think I need this come back to this after get logbook data !!!!!
 # don't save here because need to fix 11510 area ?? **FIX**
-#write.csv(harvest_all_update, paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
+write.csv(harvest_all_update, 
+          paste0('./results/tanner/harvest/', cur_yr, '/comm_catch_by_statarea_97_', cur_yr,'.csv'), row.names = F)
 
 ## merge logbook ----
 # this is just to deal with 11510 - which was called "other" above but needs to be divided 
