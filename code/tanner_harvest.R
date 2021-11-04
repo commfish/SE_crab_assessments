@@ -1,13 +1,14 @@
 #K.Palof 
-# ADF&G 11-2-16 / 10-4-18 / 10-16-19 / 11-9-2020
+# ADF&G 11-2-16 / 10-4-18 / 10-16-19 / 11-9-2020/ 11-2-21
 # data from OceanAK summarize for use in Tanner CSA's 
 # have to modify the output from "detailed fish tickets" need to add "Number of Animals...sum" to this.
 
-# commercial catch
+# commercial catch - report called 'tanner_harvest'
+# need to run 'tanner_logbook.R' prior to this script
 
 # Load ---------------------------
 library(tidyverse)
-cur_yr = 2020
+cur_yr = 2021
 pr_yr = cur_yr-1
 output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
 dir.create(output_path) 
@@ -108,7 +109,7 @@ write.csv(annual_catch, paste0('./results/tanner/harvest/', cur_yr, '/tanner_ann
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
 
-# need this year to (be the begining of the season year range NOT the end 
+# need this year to (be the beginning of the season year range NOT the end 
 #  so in 2018/2019 season - it's 2019 but I need 2018
 harvest2 %>%
   mutate(Year = Year-1) %>% 
@@ -146,6 +147,7 @@ harvest_all %>%
 
 # Combine current year ---------
 
+# !!!! I think I need this come back to this after get logbook data !!!!!
 # don't save here because need to fix 11510 area ?? **FIX**
 #write.csv(harvest_all_update, paste0('./results/tanner/comm_catch_by_statarea_97_', cur_yr,'.csv'))
 
