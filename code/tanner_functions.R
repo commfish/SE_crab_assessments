@@ -13,13 +13,19 @@ library(reshape2)
 library(extrafont)
 library(ggthemes)
 library(plotrix)
-library(SDMTools)
+#library(SDMTools)
 library(grid)
 library(gridExtra)
 #library(FNGr)
 library(scales)
 library(cowplot)
 library(readxl)
+
+library(here)
+library(TeachingDemos)
+library(purrr)
+library(TMB)
+library(radiant.data)
 
 loadfonts(device="win")
 windowsFonts(Times=windowsFont("TT Times New Roman"))
@@ -36,29 +42,36 @@ theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
 # year
 short_t_tanner <- function(bypot_st, year) {
   bypot_st_long <- gather(bypot_st, mod_recruit, crab, Juvenile:Small.Females, factor_key = TRUE) 
+  recruit_used <- c("Large.Females",  "Pre_Recruit", "Recruit","Post_Recruit")
+  
+  #bypot_st_long %>% 
+  #  group_by(Location, mod_recruit) %>% 
+  #  do(fit = lm(crab ~ Year, data = .)) ->short_term
   
   bypot_st_long %>% 
     group_by(Location, mod_recruit) %>% 
-    do(fit = lm(crab ~ Year, data = .)) ->short_term
-  
-  short_term %>%
-    tidy(fit) -> short_term_slope
-  
-  short_term %>%
-    glance(fit) ->short_term_out
-  
-  recruit_used <- c("Large.Females",  "Pre_Recruit", "Recruit","Post_Recruit")
+    do(fit3 = glance(lm(crab ~ Year, data = ., weights = weighting))) %>% 
+    unnest(fit3) -> short_term_out
   short_term_out %>%
-    filter(mod_recruit %in% recruit_used) %>%
+    filter(mod_recruit %in% recruit_used) %>% 
     select(Location, mod_recruit, r.squared, p.value)->short_term_out2
-  
+  #short_term %>%
+  #  glance(fit) ->short_term_out
+ 
+  bypot_st_long %>% 
+    group_by(Location, mod_recruit) %>% 
+    do(fit2 = tidy(lm(crab ~ Year, data = ., weights = weighting))) %>% 
+    unnest(fit2) -> short_term_slope
+#  short_term %>%
+#    tidy(fit) -> short_term_slope
   short_term_slope %>%
     filter(mod_recruit %in% recruit_used, term == 'Year') %>%
     rename(slope = estimate) %>% 
     select(Location, mod_recruit, slope) %>%
+    #spread(term, estimate) %>% 
     right_join(short_term_out2)->short_term_results # estimate here is slope from regression
   
-  #Now need to add column for significance and score
+    #Now need to add column for significance and score
   short_term_results %>%
     mutate(significant = ifelse(p.value < 0.05 & slope > 0, 1,
                                 ifelse(p.value <0.05 & slope <0, -1, 0))) %>%
