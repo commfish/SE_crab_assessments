@@ -1,12 +1,12 @@
 #K.Palof 
-# ADF&G 11-4-16 / 10-17-17 / 10-26-18 / 10-29-19 / 11-11-20
+# ADF&G 11-4-16 / 10-17-17 / 10-26-18 / 10-29-19 / 11-11-20 / 11-3-21
 # Areas: Tanner crab survey areas - includes Holkham, Thomas, Glacier Bay and Icy Strait
 # code to process data from Ocean AK to use in crab CSA models.  
 # Prior to 2016 this was done in excel then JMP
 
 #####Load ------------
 source('./code/tanner_functions.R')
-cur_yr <- 2020
+cur_yr <- 2021
 fig_path <- paste0('figures/tanner/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
 output_path <- paste0('results/tanner/tanner_tcs/', cur_yr) # output and results
@@ -14,7 +14,7 @@ dir.create(output_path)
 
 # Load Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv("./data/tanner/tanner_tcs/tanner crab survey for CSA_13_20.csv")
+dat <- read.csv("./data/tanner/tanner_tcs/tanner crab survey for CSA_13_21.csv")
 # file name changes annually - maybe should change this??? need to update end date
 # this is input from OceanAK - set up as tanner crab survey for CSA
 area <- read.csv("./data/tanner/tanner_tcs/TCSstrata_area.csv") 
@@ -34,7 +34,7 @@ glimpse(dat) # confirm that data was read in correctly.
 
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
-levels(dat$Pot.Condition)
+unique(dat$Pot.Condition)
 dat %>%
   filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> dat1
 
@@ -50,7 +50,7 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) #-> test1
 ##### Tanner specific manipulations -----------------------------
 ###     Tanner Survey areas ONLY 
 #   confirm that only the four surveys areas are present.
-levels(dat1$Location) # 
+unique(dat1$Location) # 
 
 ### add columns used later 
 dat1 %>%
@@ -110,18 +110,18 @@ dat5 %>%
 # Calculates a weighted mean CPUE and SE for each recruit class
 dat5 %>%
   group_by(Location, Year) %>%
-  summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
-            Recruit_wt = wt.mean(Recruit, weighting), Rec_SE = (wt.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
-            Post_Recruit_wt = wt.mean(Post_Recruit, weighting), PR_SE = (wt.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
-            Juvenile_wt = wt.mean(Juvenile, weighting), Juv_SE = (wt.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
-            SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females))))),
-            MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females)))))) -> CPUE_wt_all
+  summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
+            Recruit_wt = weighted.mean(Recruit, weighting), Rec_SE = (weighted.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
+            Post_Recruit_wt = weighted.mean(Post_Recruit, weighting), PR_SE = (weighted.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
+            Juvenile_wt = weighted.mean(Juvenile, weighting), Juv_SE = (weighted.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
+            SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females))))),
+            MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females)))))) -> CPUE_wt_all
 # check to confirm previous years CPUEs match
 write.csv(CPUE_wt_all, paste0('./results/tanner/tanner_tcs/', cur_yr, '/', cur_yr,'CPUE_all.csv')) # contains last four years of survey data 
 
 # create historic file --------------
 hist_dat %>% 
-  select(-X) %>% 
+  #select(-X) %>% 
   filter(Year < 2013) %>% 
   bind_rows(CPUE_wt_all) -> all_CPUE_data
 write.csv(all_CPUE_data, paste0('./results/tanner/tanner_tcs/', cur_yr, '/', cur_yr,'_CPUE_historic.csv'), 
@@ -131,16 +131,16 @@ write.csv(all_CPUE_data, paste0('./results/tanner/tanner_tcs/', cur_yr, '/', cur
 # look at trend for the last 4 years.  Need a file with last four years
 
 # function 
-head(dat3) # make sure this is the file with each recruit class as a column by year, location and pot no
-dat3 %>%
+head(dat5) # make sure this is the file with each recruit class as a column by year, location and pot no
+dat5 %>%
   #select (- `NA`) %>% 
-  filter(Year >= (cur_yr -3)) -> dat3 # confirm that is only contains the last 4 years.  This year needs to be changed every year
+  filter(Year >= (cur_yr -3)) -> dat5 # confirm that is only contains the last 4 years.  This year needs to be changed every year
 
-short_t_tanner(dat3, cur_yr)
+short_t_tanner(dat5, cur_yr)
 
-dat3_long <- gather(dat3, mod_recruit, crab, Juvenile:Small.Females, factor_key = TRUE)
+dat5_long <- gather(dat5, mod_recruit, crab, Juvenile:Small.Females, factor_key = TRUE)
 
-ggplot(dat3_long, aes(Year, crab, color = mod_recruit))+geom_point() +facet_wrap(~Location)
+ggplot(dat5_long, aes(Year, crab, color = mod_recruit))+geom_point() +facet_wrap(~Location)
 
 ### specific area/class combos that need a closer looks ------------
 ### just thomas bay Large.Females
@@ -158,7 +158,7 @@ ggplot(dat3_long, aes(Year, crab, color = mod_recruit))+geom_point() +facet_wrap
 
 areas <- c('Icy Strait', 'Glacier Bay', 'Holkham Bay', 'Thomas Bay')
 
-long_term <- lapply(areas, long_loop_17, curyr = cur_yr)
+long_term <- lapply(areas, long_loop_17, curyr = cur_yr) # uses dat5 data
 long_term_all <- bind_rows(long_term)
 
 write.csv(long_term_all, paste0('./results/tanner/tanner_tcs/', cur_yr,'/long_term.csv'))
@@ -186,11 +186,11 @@ Legal =c("Recruit", "Post_Recruit")
 datWL %>% 
   group_by(Location, Year) %>% 
   filter(Sex.Code == 1) %>% 
-  summarise(mature_lbs = wt.mean(weight_lb[mod_recruit %in% Mature], 
+  summarise(mature_lbs = weighted.mean(weight_lb[mod_recruit %in% Mature], 
                                  Number.Of.Specimens[mod_recruit %in% Mature]), 
-            legal_lbs = wt.mean(weight_lb[mod_recruit %in% Legal], 
+            legal_lbs = weighted.mean(weight_lb[mod_recruit %in% Legal], 
                                 Number.Of.Specimens[mod_recruit %in% Legal]), 
-            prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
+            prer_lbs = weighted.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
                                Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
 # final results with score - save here
 write.csv(male_weights, paste0('./results/tanner/tanner_tcs/', cur_yr, '/TCS_weights.csv'))
@@ -257,7 +257,7 @@ ggplot(poorclutch1, aes(Year, var1))+geom_point() +facet_wrap(~Location)
 LgF_Tdat1 %>%
   filter(!is.na(Egg.Percent)) %>% 
   group_by(Year, Location, Pot.No) %>%
-  summarise (egg_mean = wt.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
+  summarise (egg_mean = weighted.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
 
 clutch_by_pot %>%
   group_by(Location, Year)%>%
