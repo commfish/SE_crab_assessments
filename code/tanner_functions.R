@@ -156,25 +156,31 @@ Fem_long_loop <- function(x){
 ### female percent poor clutch short term -------------
 poor_clutch_short <- function(females_all, year){
   females_all %>%
-    filter(Year >= (year-3)) -> LgF_short # short term file has last 4 years in it
+    filter(Year >= (year-3)) %>% 
+    mutate(per_poorclt = var1) %>% 
+    select(-var1) -> LgF_short # short term file has last 4 years in it
   #output this file as .csv to add to next year
   #write_csv(females_all, paste0('results/redcrab/', area,'/poorclutch_females_all.csv'))
   
   LgF_short %>% 
     group_by(Location) %>% 
-    do(fit = lm(var1 ~ Year, data =.)) -> fem_short
-  fem_short %>% 
-    tidy(fit) -> fem_short_slope
-  fem_short %>% 
-    glance(fit) -> fem_short_out
+    do(fit = glance(lm(per_poorclt ~ Year, data =.))) %>% 
+    unnest(fit) -> fem_short
   
-  fem_short_out %>% 
-    select(Location, r.squared, p.value) -> fem_short_term_out
+  fem_short %>% 
+    select(Location, r.squared, p.value) -> fem_short_out
+  
+  LgF_short %>% 
+    group_by(Location) %>% 
+    do(fit2 = tidy(lm(per_poorclt ~ Year, data =.))) %>% 
+    unnest(fit2) -> fem_short_slope
+ 
+  
   fem_short_slope %>% 
     filter(term == 'Year') %>% 
     rename(slope = estimate) %>% 
     select(Location, slope) %>% 
-    right_join(fem_short_term_out) -> fem_short_results
+    right_join(fem_short_out) -> fem_short_results
   
   #Now need to add column for significance and score
   fem_short_results %>%
