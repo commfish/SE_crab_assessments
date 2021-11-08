@@ -148,11 +148,6 @@ harvest_all %>%
 
 # Combine current year ---------
 
-# !!!! I think I need this come back to this after get logbook data !!!!!
-# don't save here because need to fix 11510 area ?? **FIX**
-write.csv(harvest_all_update, 
-          paste0('./results/tanner/harvest/', cur_yr, '/comm_catch_by_statarea_97_', cur_yr,'.csv'), row.names = F)
-
 ## merge logbook ----
 # this is just to deal with 11510 - which was called "other" above but needs to be divided 
 #     between North Juneau and Lynn Sisters.
@@ -176,7 +171,8 @@ harvest_all_update %>%
                            grepl("lb", label, ignore.case = TRUE) ~ "pounds")) %>% 
   select(Year, Stat.Area, survey.area, vessels, people, permits, processor, units, value) %>% 
   spread(units, value) %>% 
-  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds, Year) -> stat_11510
+  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds, Year) %>% 
+  mutate(year_caught = Year + 1) -> stat_11510
 
 
 ### Deal with 11510 -----------
@@ -184,14 +180,20 @@ harvest_all_update %>%
 harvest_all_update %>%
 #harvest_all %>%  
   filter(Stat.Area != 11510) %>% 
-  bind_rows(stat_11510) %>% 
+  bind_rows(stat_11510) -> harvest_all_update2
+
+# !! this has update catch distribution between LS and NJ for stat area 11510
+write.csv(harvest_all_update, 
+          paste0('./results/tanner/harvest/', cur_yr, '/comm_catch_by_statarea_97_', cur_yr,'.csv'), row.names = F)
+
+harvest_all_update2 %>% 
   group_by(survey.area, Year) %>%
   summarise(vessels = sum(vessels), people = sum(people),
             permits = sum(permits), processors = sum(processor), 
             numbers = sum(numbers), 
             pounds = sum(pounds)) -> comm.catch.sum_all
 
-# lynn sister and north juneau need to be manually split up in area 115-10
+# lynn sister and north juneau need to be manually split up in area 115-10 (see above done prior)
 write.csv(comm.catch.sum_all, paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'.csv'))
 ### !!!!!!  These may not be correct for North Juneau, Stephens Passage and Lynn Sisters due to shared stat areas
 ##                    CHECK these with old excel files before going forward.
