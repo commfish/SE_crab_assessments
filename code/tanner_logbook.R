@@ -1,4 +1,4 @@
-# K.Palof 10-16-18 updated / 10-16-19 / 11-9-2020
+# K.Palof 10-16-18 updated / 10-16-19 / 11-9-2020 / 11-3-2021
 # Code to review logbook data for Tanner crab fishery.
 # needed to seperate out catch for Lynn Sisters and North Juneau, previously done in .JMP and Excel
 
@@ -11,12 +11,13 @@ library(tidyverse)
 library(readxl)
 
 ## global ------
-cur_yr <- 2020
+cur_yr <- 2021 # update annually
 
 #####Load Data -------------------------------------
 # change input file and input folder for each
-logb <- read_excel(path = "./data/harvest/tanner_logbook_cur_yr.xlsx", sheet = "tanner_115")
+#logb <- read_excel(path = "./data/harvest/tanner_logbook_cur_yr.xlsx", sheet = "tanner_115")
 # take the current year logbook data and seperate out only district 115 -could also do this in here....
+logb <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr, '.csv')) # all data (2021)
 #logb_all <- read.csv("./data/harvest/logbook_11510_98_18.csv") # bring in previous yrs percentages
 logb_all <- read.csv(paste0('./results/tanner/harvest/', cur_yr-1, '/logbook_11510_all.csv')) # bring in previous yrs percentages
 # This is the master file with the percentage of catch in each year that is attributed to NJ or LS - it is added to and saved at the end 
