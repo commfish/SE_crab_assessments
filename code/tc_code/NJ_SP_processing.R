@@ -1,5 +1,5 @@
 #K.Palof 
-# ADF&G 11-15-16 / 10-11-17 / 11-2-18 /10-10-19/ 11-12-20
+# ADF&G 11-15-16 / 10-11-17 / 11-2-18 /10-10-19/ 11-12-20 / 11-7-21
 # Areas: tanner crab assessment of red crab areas : North Juneau and Stephens Passage
 #   done seperately because they need to be divided into these two areas based on the pot locations, 
 #   division is done in ArcGIS using shape files for survey strata
@@ -16,7 +16,7 @@
 # Load -------------
 # source('./code/tanner_functions.R')
 source('./code/tc_code/sp_nj_figures.R')
-cur_yr <- 2020
+cur_yr <- 2021
 fig_path <- paste0('figures/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
 output_path <- paste0('results/tanner/nj_stp/', cur_yr) # output and results
@@ -27,19 +27,7 @@ dir.create(output_path)
 # change input file and input folder for each
 dat <- read.csv(paste0('./data/tanner/nj_stp/Juneau_red crab survey for Tanner crab CSA_', cur_yr,'.csv'))
 # all current year pots from Juneau and Barlow Cove - OceanAK
-area <- read.csv("./data/tanner/nj_stp/stp_strata_area.csv")  #density strata for tanner stratification in Stephen's Passage area
-seperate <- read.csv(paste0('./data/tanner/nj_stp/juneau_', cur_yr,'.csv')) #**FIX** update annually
-#     from Kellii using GIS, puts Juneau area pots into density strata
-baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 
-SP_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/SP_rawdata_all.csv'))
-NJ_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_rawdata_all.csv'))
-# bring historic NJ for graphing purposes
-NJ_cpue_historic <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_CPUE_ALL.csv'))
-NJ_lowc_historic <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1,'/NJ_percent_low_clutch.csv'))
-NJ_clutch_historic <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_percent_clutch.csv'))
-# bring in historic data for each area below.
-#females <- read.csv("./data/Juneau/RKC_11_16_large females_by_pot.csv")
 
 ## data processing -------------------
 head(dat)
@@ -53,9 +41,27 @@ dat %>% select(Year, Location.Code, Location, Pot.No, Depth.Fathoms, Latitude.De
             Longitude.Decimal.Degrees = mean(Longitude.Decimal.Degrees)) -> juneau_pot_info
 write.csv(juneau_pot_info, paste0('./data/tanner/nj_stp/juneau_pot_info_', cur_yr,'.csv'))
 
+## rest of data -------------
+area <- read.csv("./data/tanner/nj_stp/stp_strata_area.csv")  #density strata for tanner stratification in Stephen's Passage area
+seperate <- read.csv(paste0('./data/tanner/nj_stp/juneau_', cur_yr,'_results.csv')) #**FIX** update annually
+#     from Kellii using GIS, puts Juneau area pots into density strata
+# run lines above "prep for GIS" then follow onenote instructinos for GIS. Then move this resulting file above
+# to this folder here for the seperation.
+baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
+
+SP_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/SP_rawdata_all.csv'))
+NJ_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_rawdata_all.csv'))
+# bring historic NJ for graphing purposes
+NJ_cpue_historic <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_CPUE_ALL.csv'))
+NJ_lowc_historic <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1,'/NJ_percent_low_clutch.csv'))
+NJ_clutch_historic <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/NJ_percent_clutch.csv'))
+# bring in historic data for each area below.
+#females <- read.csv("./data/Juneau/RKC_11_16_large females_by_pot.csv")
+
+
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
-levels(dat$Pot.Condition)
+unique(dat$Pot.Condition)
 dat %>%
   filter(Pot.Condition == "Normal") -> dat1
 
@@ -71,7 +77,7 @@ head(seperate)
 dat1 %>%
   mutate(area = ifelse(Location == "Barlow Cove", "NJ", 
                        ifelse(Location == "Juneau" & Pot.No %in% seperate$Pot_No, "Juneau", "NJ"))) ->dat1
-#seperating the areas since North Juneau does not have density strata - since it's a red crab area
+# seperating the areas since North Juneau does not have density strata - since it's a red crab area
 # and Juneau does since it's based on the Tanner Stephens Passage strata.
 dat1 %>% 
   filter(area == "NJ") ->dat.NJ
@@ -157,28 +163,30 @@ dat3 %>%
 
 dat3_long <- gather(dat3a, mod_recruit, crab, Juvenile:Small.Females, factor_key = TRUE) # need the long version for this.
 
+recruit_used <- c("Large.Females",  "Pre_Recruit", "Recruit","Post_Recruit")
 dat3_long %>% # doesn't work with dat2 data because there are no 0's for missing data
   group_by(mod_recruit) %>%
-  do(fit = lm(crab ~ Year, data =.)) -> short_term
-
-short_term %>%
-  tidy(fit) -> short_term_slope
-
-short_term %>%
-  glance(fit) ->short_term_out
-
-recruit_used <- c("Large.Females",  "Pre_Recruit", "Recruit","Post_Recruit")
-short_term_out %>%
+  do(fit = tidy(lm(crab ~ Year, data =.))) %>% 
+  unnest(fit) %>% 
+  select(mod_recruit, term, estimate) %>% 
   filter(mod_recruit %in% recruit_used) %>%
-  select(mod_recruit, r.squared, p.value)->short_term_out2
+  spread(term, estimate) %>% 
+  dplyr::rename(slope = Year) %>% 
+  select(mod_recruit, slope) -> short_term_slope
+
+dat3_long %>% # doesn't work with dat2 data because there are no 0's for missing data
+  group_by(mod_recruit) %>%
+  do(fit2 = glance(lm(crab ~ Year, data =.))) %>% 
+  unnest(fit2) %>% 
+  filter(mod_recruit %in% recruit_used) %>%
+  select(mod_recruit, r.squared, p.value)-> short_term_out2
+
 short_term_slope %>%
-  filter(mod_recruit %in% recruit_used, term == 'Year') %>%
-  select(mod_recruit, estimate) %>%
   right_join(short_term_out2)->short_term_results # estimate here is slope from regression
 #Now need to add column for significance and score
 short_term_results %>%
-  mutate(significant = ifelse(p.value < 0.05 & estimate > 0, 1,
-                              ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
+  mutate(significant = ifelse(p.value < 0.05 & slope > 0, 1,
+                              ifelse(p.value <0.05 & slope <0, -1, 0))) %>%
   mutate(score = 0.25*significant) -> short_term_results #estimate is slope from regression
 # final results with score - save here
 write.csv(short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_shortterm.csv'))
@@ -218,11 +226,11 @@ Legal =c("Recruit", "Post_Recruit")
 datWL %>% 
   group_by(Year) %>% 
   filter(Sex.Code == 1) %>% 
-  summarise(mature_lbs = wt.mean(weight_lb[mod_recruit %in% Mature], 
+  summarise(mature_lbs = weighted.mean(weight_lb[mod_recruit %in% Mature], 
                                  Number.Of.Specimens[mod_recruit %in% Mature]), 
-            legal_lbs = wt.mean(weight_lb[mod_recruit %in% Legal], 
+            legal_lbs = weighted.mean(weight_lb[mod_recruit %in% Legal], 
                                 Number.Of.Specimens[mod_recruit %in% Legal]), 
-            prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
+            prer_lbs = weighted.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
                                Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
 
 write.csv(male_weights, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_weights.csv'))
@@ -297,15 +305,16 @@ poorclutch1 %>%
 LgF_short %>% 
   mutate(Location = 'North Juneau')%>%
   group_by(Location) %>%
-  do(fit = lm(var1 ~ Year, data =.)) %>%
-  tidy(fit) %>% 
+  do(fit = tidy(lm(var1 ~ Year, data =.))) %>%
+  unnest(fit) %>% 
   filter(term == "Year") %>% 
   select(Location, estimate) -> one
 LgF_short %>% 
   mutate(Location = 'North Juneau')%>%
   group_by(Location) %>%
-  do(fit = lm(var1 ~ Year, data =.)) %>%
-  glance(fit) %>% select(Location, r.squared, p.value) ->two
+  do(fit = glance(lm(var1 ~ Year, data =.))) %>%
+  unnest(fit) %>% 
+  select(Location, r.squared, p.value) ->two
 one %>%
   right_join(two) -> F_short_term_results # estimate here is slope from regression
 
@@ -322,7 +331,7 @@ ggplot(poorclutch1, aes(Year, var1))+geom_point()
 LgF_Tdat1 %>%
   filter(!is.na(Egg.Percent)) %>% 
   group_by(Year, sub_area, Pot.No) %>%
-  summarise (egg_mean = wt.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
+  summarise (egg_mean = weighted.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
 
 clutch_by_pot %>%
   group_by(Year)%>%
@@ -426,12 +435,12 @@ dat5 %>%
 #Calculates a weighted mean CPUE and SE for each recruit class
 dat5 %>%
   group_by(area, Year) %>%
-  summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
-            Recruit_wt = wt.mean(Recruit, weighting), Rec_SE = (wt.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
-            Post_Recruit_wt = wt.mean(Post_Recruit, weighting), PR_SE = (wt.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
-            Juvenile_wt = wt.mean(Juvenile, weighting), Juv_SE = (wt.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
-            SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females))))),
-            MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/
+  summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
+            Recruit_wt = weighted.mean(Recruit, weighting), Rec_SE = (weighted.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
+            Post_Recruit_wt = weighted.mean(Post_Recruit, weighting), PR_SE = (weighted.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
+            Juvenile_wt = weighted.mean(Juvenile, weighting), Juv_SE = (weighted.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
+            SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females))))),
+            MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/
                 (sqrt(sum(!is.na(Large.Females)))))) -> CPUE_wt_all
 # check to confirm last years CPUEs match - that's why we use two years.
 # change name and folder here.
@@ -450,28 +459,30 @@ dat3 %>%
 
 dat3_long <- gather(dat3, mod_recruit, crab, Juvenile:Small.Females, factor_key = TRUE) # need the long version for this.
 
+recruit_used <- c("Large.Females",  "Pre_Recruit", "Recruit","Post_Recruit")
 dat3_long %>% # doesn't work with dat2 data because there are no 0's for missing data
   group_by(mod_recruit) %>%
-  do(fit = lm(crab ~ Year, data =.)) -> short_term
-
-short_term %>%
-  tidy(fit) -> short_term_slope
-
-short_term %>%
-  glance(fit) ->short_term_out
-
-recruit_used <- c("Large.Females",  "Pre_Recruit", "Recruit","Post_Recruit")
-short_term_out %>%
+  do(fit = tidy(lm(crab ~ Year, data =.))) %>% 
+  unnest(fit) %>% 
+  select(mod_recruit, term, estimate) %>% 
   filter(mod_recruit %in% recruit_used) %>%
-  select(mod_recruit, r.squared, p.value)->short_term_out2
+  spread(term, estimate) %>% 
+  dplyr::rename(slope = Year) %>% 
+  select(mod_recruit, slope) -> short_term_slope
+
+dat3_long %>% # doesn't work with dat2 data because there are no 0's for missing data
+  group_by(mod_recruit) %>%
+  do(fit2 = glance(lm(crab ~ Year, data =.))) %>% 
+  unnest(fit2) %>% 
+  filter(mod_recruit %in% recruit_used) %>%
+  select(mod_recruit, r.squared, p.value)-> short_term_out2
+
 short_term_slope %>%
-  filter(mod_recruit %in% recruit_used, term == 'Year') %>%
-  select(mod_recruit, estimate) %>%
   right_join(short_term_out2)->short_term_results # estimate here is slope from regression
 #Now need to add column for significance and score
 short_term_results %>%
-  mutate(significant = ifelse(p.value < 0.05 & estimate > 0, 1,
-                              ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
+  mutate(significant = ifelse(p.value < 0.05 & slope > 0, 1,
+                              ifelse(p.value <0.05 & slope <0, -1, 0))) %>%
   mutate(score = 0.25*significant) -> short_term_results #estimate is slope from regression
 # final results with score - save here
 write.csv(short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_shortterm.csv'))
@@ -514,11 +525,11 @@ Legal =c("Recruit", "Post_Recruit")
 datWL %>% 
   group_by(Year) %>% 
   filter(Sex.Code == 1) %>% 
-  summarise(mature_lbs = wt.mean(weight_lb[mod_recruit %in% Mature], 
+  summarise(mature_lbs = weighted.mean(weight_lb[mod_recruit %in% Mature], 
                                  Number.Of.Specimens[mod_recruit %in% Mature]), 
-            legal_lbs = wt.mean(weight_lb[mod_recruit %in% Legal], 
+            legal_lbs = weighted.mean(weight_lb[mod_recruit %in% Legal], 
                                 Number.Of.Specimens[mod_recruit %in% Legal]), 
-            prer_lbs = wt.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
+            prer_lbs = weighted.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
                                Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
 # final results with score - save here
 
@@ -585,14 +596,15 @@ poorclutch1 %>%
 # need to run the regression for each area.
 LgF_short %>% 
   group_by(area) %>%
-  do(fit = lm(var1 ~ Year, data =.)) %>%
-  tidy(fit) %>% 
+  do(fit = tidy(lm(var1 ~ Year, data =.))) %>%
+  unnest(fit) %>% 
   filter(term == "Year") %>%
   select(area, estimate) -> one
 LgF_short %>% 
   group_by(area) %>%
-  do(fit = lm(var1 ~ Year, data =.)) %>%
-  glance(fit) %>% select(area, r.squared, p.value) ->two
+  do(fit2 = glance(lm(var1 ~ Year, data =.))) %>%
+  unnest(fit2) %>% 
+  select(area, r.squared, p.value) ->two
 one %>%
   right_join(two) -> F_short_term_results # estimate here is slope from regression
 
@@ -609,7 +621,7 @@ ggplot(poorclutch1, aes(Year, var1))+geom_point()
 LgF_Tdat1 %>%
   filter(!is.na(Egg.Percent)) %>% 
   group_by(Year, Location, Pot.No) %>%
-  summarise (egg_mean = wt.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
+  summarise (egg_mean = weighted.mean(Egg.Percent, Number.Of.Specimens)) -> clutch_by_pot
 
 clutch_by_pot %>%
   group_by(Location, Year)%>%
@@ -617,6 +629,8 @@ clutch_by_pot %>%
 write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percent_clutch.csv'))
 
 
+## !!!!!!!!!!!!! update biomass.csv file before running figure creation 
+# this needs to be updated from CSA runs for 2021 for SP and NJ
 
 # panel figure SP ---------------
 #survey.location = "Juneau"
