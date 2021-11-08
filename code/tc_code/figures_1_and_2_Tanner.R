@@ -10,24 +10,27 @@
 
 # K.Palof
 # katie.palof@alaska.gov
-# 11/07/2018 / 11-15-2020 / 3-2-21
+# 11/07/2018 / 11-15-2020 / 3-2-21 / 11-8-21
 
 # load -----
 source('./code/tanner_functions.R')
+output_path <- paste0('results/tanner/', cur_yr) # output and results
+dir.create(output_path) 
 
 # data -----
-cur_yr <- 2020
+cur_yr <- 2021
 #survey_biomass <- read.csv("./data/TCS/survey_areas_biomass.csv") #add to each year
 # above file had point estimates from each year and was kept historically in SigmaPlot. Now this is tracked in 
 # an appendix table in the stock health document. 
 biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))          
 harvest_old <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_85_18.csv")
-harvest <- read.csv(paste0('./data/harvest/Tanner_Detailed Fish Tickets_ALL_years_', cur_yr, '.csv'))
+#harvest <- read.csv(paste0('./data/harvest/Tanner_Detailed Fish Tickets_ALL_years_', cur_yr, '.csv'))
+harvest <- read.csv("./data/harvest/tanner_harvest.csv") # harvest harvest since 2017
 # add current years catch to this file or repull all years
 std_cpue <- read.csv(paste0("C:/Users/kjpalof/Documents/R projects/tanner-crab/results/std_commericial_cpue", cur_yr, ".csv"))
-#calculated in a seperate project "tanner-crab"
+#calculated in a separate project "tanner-crab" - need to calc this first so go to "tanner-crab"
 hist_biomass <- read.csv("./data/tanner/tanner_annual_pt_estimate_historic.csv")
-
+# !! where is this updated????
 
 # data prep for Figure 1 ---------------
 biomass %>% 
@@ -307,5 +310,5 @@ survey_biomass %>%
         axis.text.x = element_text(angle = 45, vjust = 0.5),
         axis.title=element_text(size=14,face="bold"))
 
-ggsave(paste0('./figures/tanner/', cur_yr,'_figure1.png'), dpi = 800,
-       width = 8, height = 5.75)
+#ggsave(paste0('./figures/tanner/', cur_yr,'_figure1.png'), dpi = 800,
+#       width = 8, height = 5.75)
