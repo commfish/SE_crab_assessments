@@ -142,7 +142,7 @@ harvest2 %>%
 # add correct year ----
 # Combine current year ---------
 harvest_all %>% 
-  mutate(year_caught = Year, Year = Year - 1) %>% # check here and make sure end year is cur_yr above -2, i.e. cur_yr = 2020, end year is 2018
+  #mutate(year_caught = Year, Year = Year - 1) %>% # check here and make sure end year is cur_yr above -2, i.e. cur_yr = 2020, end year is 2018
   #select(-X) %>% 
   bind_rows(harvest2_cur) -> harvest_all_update
 
