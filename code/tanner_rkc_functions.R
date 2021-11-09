@@ -11,6 +11,7 @@ library(kableExtra)
 library(xtable)
 library(flextable)
 
+library(reshape)
 library(stringr)
 library(reshape2)
 library(extrafont)
