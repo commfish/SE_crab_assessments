@@ -94,7 +94,7 @@ FYI: CONFIDENTIAL biometrics draft
 
 # `r cur_yr` QUICK SUMMARY {-}
   - Generally regional biomass has been steady or increasing under the current effort-based management framework, allowing for a stable population and a consistent annual harvest (Figure \@ref(fig:regionalbio), \@ref(fig:stdcpue), and \@ref(fig:regionalbio2)).  
-  - The trends in legal and mature male biomass have been generally increasing since 2010, this year's projection has both legal and mature biomass increasing from the previous year. However, historic point estimate show a divergent trajectory for this stock, but both have the stock at lhealth levels (Figure \@ref(fig:regionalbio) and \@ref(fig:regionalbio2)). 
+  - The trends in legal and mature male biomass have been generally increasing since 2010, with this year's projection has both legal and mature biomass increasing from the previous year. However, historic point estimate show a divergent trajectory for this stock, but both have the stock at healthy levels (Figure \@ref(fig:regionalbio) and \@ref(fig:regionalbio2)). 
   - Overall stock health is mixed with some areas improving and others declining from last year. Stock health is “Poor” in one areas, “Below Average” in one areas, “Moderate” in four areas, “Above Average” in two areas, and “Healthy” in four areas (Tables 2 and 3).
 
 # SUMMARY {-}
