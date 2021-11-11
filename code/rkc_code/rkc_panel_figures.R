@@ -11,6 +11,8 @@ source('./code/functions.R')
 cur_yr <- 2021
 
 # Survey areas and associated figure calls:-------
+# as of 2017 fishery, areas that need non-conf figs: seymour, peril, lynnsisters, excursion
+
 # Juneau =============================
 
 # confidental figure --------
