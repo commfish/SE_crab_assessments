@@ -271,7 +271,7 @@ ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 80
        width = 8, height = 9.0)
 
 
-### biomass vs. harvest annual ------
+# Biomass vs. harvest annual ------
 # biomass is just regional and does not include non-surveyed areas. 
 # for simplicity use current % survey/non here...note this does NOT reflect changes to survey areas historically
 # i.e. those survey areas that were added or removed.
@@ -280,13 +280,70 @@ cur_yr_biomass %>%
   left_join(annual_harvest_all) %>% 
   mutate(hrate = pounds/Regional_Mature*100) -> biomass_harvest
 
-biomass_harvest %>% 
-  select(Year, Regional_Mature, harvest = pounds) %>% 
-  gather(type, pounds, Regional_Mature:harvest, factor_key = TRUE) %>% 
-  ggplot(aes(Year, y = pounds/1000000, group = type)) +
-  geom_bar(stat = "identity", 
-           fill = "grey75", colour = "black")
+#biomass_harvest %>% 
+#  select(Year, Regional_Mature, Regional_Legal, harvest = pounds) %>% 
+#  gather(type, pounds, Regional_Mature:harvest, factor_key = TRUE) %>% 
+#  ggplot(aes(Year, y = pounds/1000000, group = type)) +
+#  geom_line(aes(color = type, linetype = type))+
+#  geom_point(aes(fill = type, shape = type), size =3) +
+#  scale_fill_manual(name = "", values = c("black", "gray100", "white")) + 
+#  scale_colour_manual(name = "", values = c("gray1", "grey48", "grey20"))+
+#  scale_shape_manual(name = "", values = c(21, 21, 15))
   
+  
+#  geom_bar(stat = "identity", 
+           fill = "grey75", colour = "black")
+
+## this version has survey year but this isn't matched with comm harvest year. 
+  ## harvest 2021 is really 2020/2021 season
+biomass_harvest %>% 
+    select(Year, Regional_Mature, Regional_Legal, harvest = pounds) %>% 
+    #gather(type, pounds, Regional_Mature:Regional_Legal, factor_key = TRUE) %>% 
+    ggplot() +
+    geom_line(aes(x = Year, y = Regional_Mature/1000000), stat = "identity", color = "gray48", 
+              linetype = "dashed", size = 1.5) +
+    geom_line(aes(x = Year, y = Regional_Legal/1000000), stat = "identity", color = "black") +
+    geom_point(aes(x = Year, y = Regional_Legal/1000000), stat = "identity", shape = 21, 
+               fill = "black", size = 3) +
+    geom_bar(aes(x=Year, y=harvest/1000000),stat="identity", fill="gray",colour="black") +
+   labs(title= "Southeast Alaska Tanner crab regional biomass (survey and non areas)",
+     x="Survey Year",y="Biomass (1,000,000 lb)") +
+  geom_label(label = "Mature biomass", x = 2002, y = 4.5, color = "gray48") +
+  geom_label(label = "Legal biomass", x = 2002, y = 2.5, color = "black") +
+  geom_label(label = "Commercial harvest", x = 2005, y = 1.25, color = "black", fill = "gray") +
+ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_survey_yr.png'), dpi = 800,
+       width = 8.5, height = 6.0)
+
+# NEW Figure 1 - regional bio with harvest matching survey year and harvest year - need to lag harvest by one ---------------
+annual_harvest_all %>% 
+  mutate(Survey_year = Year -1) %>% 
+  select(Survey_year, pounds, numbers, permits) -> annual_harvest_all_lag
+cur_yr_biomass %>% 
+  mutate(Regional_Legal = Legal/.66, Regional_Mature = Mature/0.66, Survey_year = Year) %>% 
+  left_join(annual_harvest_all_lag) %>% 
+  mutate(hrate = pounds/Regional_Mature*100) -> biomass_harvest2
+
+biomass_harvest2 %>% 
+  select(Survey_year, Regional_Mature, Regional_Legal, harvest = pounds) %>% 
+  #gather(type, pounds, Regional_Mature:Regional_Legal, factor_key = TRUE) %>% 
+  ggplot() +
+  geom_line(aes(x = Survey_year, y = Regional_Mature/1000000), stat = "identity", color = "gray48", 
+            linetype = "dashed", size = 1.5) +
+  geom_line(aes(x = Survey_year, y = Regional_Legal/1000000), stat = "identity", color = "black") +
+  geom_point(aes(x = Survey_year, y = Regional_Legal/1000000), stat = "identity", shape = 21, 
+             fill = "black", size = 3) +
+  geom_bar(aes(x=Survey_year, y=harvest/1000000),stat="identity", fill="gray",colour="black") +
+  labs(title= "Southeast Alaska Tanner crab regional biomass (survey and non areas)",
+       x="Survey Year",y="Biomass (1,000,000 lb)") +
+  geom_label(label = "Mature biomass", x = 2002, y = 4.5, color = "gray48") +
+  geom_label(label = "Legal biomass", x = 2002, y = 2.5, color = "black") +
+  geom_label(label = "Commercial harvest", x = 2005, y = 1.25, color = "black", fill = "gray") +
+  scale_y_continuous(limits = c(0,max(biomass_harvest2$Regional_Mature/1000000, 
+                                      na.rm = TRUE) + .5), 
+                     breaks= seq(min(0), max(max(biomass_harvest2$Regional_Mature/1000000, 
+                                                 na.rm = TRUE)+ .5), by = 1.0)) +
+  ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_comm_catch_yr.png'), dpi = 800,
+         width = 8.5, height = 6.0)
 # Old with point estimates Figure 1 ------------
 survey_biomass %>% 
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
