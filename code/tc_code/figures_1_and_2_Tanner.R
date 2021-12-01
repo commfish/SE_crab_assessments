@@ -335,13 +335,20 @@ biomass_harvest2 %>%
   geom_bar(aes(x=Survey_year, y=harvest/1000000),stat="identity", fill="gray",colour="black") +
   labs(title= "Southeast Alaska Tanner crab regional biomass (survey and non areas)",
        x="Survey Year",y="Biomass (1,000,000 lb)") +
-  geom_label(label = "Mature biomass", x = 2002, y = 4.5, color = "gray48") +
-  geom_label(label = "Legal biomass", x = 2002, y = 2.5, color = "black") +
+  geom_label(label = "Mature biomass", x = 2002, y = 4.5, label.size = NA, color = "gray48") +
+  geom_label(label = "Legal biomass", x = 2002, y = 2.65, label.size = NA, color = "black") +
   geom_label(label = "Commercial harvest", x = 2005, y = 1.25, color = "black", fill = "gray") +
+  geom_hline(yintercept = 2.3, color = "#D55E00", 
+             linetype = "longdash", lwd = 0.75) +
+  geom_label(label = "Lower threshold", x = 2014, y = 2.3, label.size = NA, vjust = +1.25, color = "#D55E00")+
+  geom_hline(yintercept = 5.5, color = "chartreuse4", 
+             linetype = "longdash", lwd = 0.75) +
+  geom_label(label = "Upper threshold", x = 2014, y = 5.5, label.size = NA, vjust = +1.15, color = "chartreuse4")+
   scale_y_continuous(limits = c(0,max(biomass_harvest2$Regional_Mature/1000000, 
                                       na.rm = TRUE) + .5), 
                      breaks= seq(min(0), max(max(biomass_harvest2$Regional_Mature/1000000, 
                                                  na.rm = TRUE)+ .5), by = 1.0)) +
+  scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
   ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_comm_catch_yr.png'), dpi = 800,
          width = 8.5, height = 6.0)
 # Old with point estimates Figure 1 ------------
