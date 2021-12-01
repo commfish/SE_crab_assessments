@@ -309,8 +309,9 @@ panel_figure("Holkham Bay", cur_yr, "Holkham Bay", 3, "include", 0.55, 0.8)
 panel_figure("Icy Strait", cur_yr, "Icy Strait", 2, "exclude", 0.55, 0.8)
 panel_figure("Holkham Bay", cur_yr, "Holkham Bay", 2, "exclude", 0.35, 0.8)
 panel_figure("Thomas Bay", cur_yr, "Thomas Bay", 2, "exclude", 0.55, 0.8)
+panel_figure("Glacier Bay", cur_yr, "Glacier Bay", 2, "exclude", 0.55, 0.8)
 
-
+## these are NOT up to date DO NOT USE without fixing input files.
 # presentation figures----------------
 panel_figure_pres("Icy Strait", cur_yr, "Icy Strait", 2, "exclude")
 panel_figure_pres("Icy Strait", cur_yr, "Icy Strait", 3, "exclude")
