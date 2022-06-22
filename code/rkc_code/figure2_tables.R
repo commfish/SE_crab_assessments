@@ -211,7 +211,8 @@ expansion <- 0.528
 regional.b %>% 
   mutate(expanded_legal = adj_legal/expansion, 
          expanded_mature = adj_mature/expansion) -> regional.b.expand
-
+write.csv(regional.b.expand, paste0('./results/rkc/Region1/', cur_yr, '/regional_biomass_', cur_yr, '.csv'), 
+          row.names = FALSE)
 
 regional.b.expand %>% 
   select(Year, expanded_legal, expanded_mature, status) %>%
