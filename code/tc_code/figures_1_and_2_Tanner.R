@@ -333,7 +333,7 @@ biomass_harvest2 %>%
   geom_point(aes(x = Survey_year, y = Regional_Legal/1000000), stat = "identity", shape = 21, 
              fill = "black", size = 3) +
   geom_bar(aes(x=Survey_year, y=harvest/1000000),stat="identity", fill="gray",colour="black") +
-  labs(title= "Southeast Alaska Tanner crab regional biomass (survey and non areas)",
+  labs(title= "Southeast Alaska Tanner crab regional biomass (survey and non survey areas)",
        x="Survey Year",y="Biomass (1,000,000 lb)") +
   geom_label(label = "Mature biomass", x = 2002, y = 4.5, label.size = NA, color = "gray48") +
   geom_label(label = "Legal biomass", x = 2002, y = 2.65, label.size = NA, color = "black") +
