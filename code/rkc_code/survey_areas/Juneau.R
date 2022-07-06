@@ -14,7 +14,7 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2021 # change this upon receiving new data
+cur_yr <- 2022 # change this upon receiving new data
 pr_yr <- cur_yr -1
 survey.location <- 'Juneau'
 
@@ -22,7 +22,7 @@ dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
 
 ## data -------------------
-dat <- read.csv("./data/rkc/Juneau/jnu_20_21_oceanAK_out_RAW.csv") # file name will change annually
+dat <- read.csv("./data/rkc/Juneau/jnu_21_22_oceanAK_out_RAW.csv") # file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 #   Juneau area includes Juneau and Barlow
