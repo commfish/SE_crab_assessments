@@ -1,5 +1,5 @@
 # K.Palof  ADF&G
-# 7-11-18, updated 7-8-19 / 7-14-20 / 9-6-21
+# 7-11-18, updated 7-8-19 / 7-14-20 / 9-6-21/ 7-6-22
 
 # PU data for 11-A Juneau area -- see line 17
 ## PU data for regionwide permit - see below starting at line 105
@@ -9,15 +9,15 @@
 #####Load Packages ---------------------------------
 library(tidyverse)
 library(xlsx)
-cur_yr = 2021 # survey year
+cur_yr = 2022 # survey year
 
 prv_yr = cur_yr-1 # fishery year NOT survey year
 
 
 # 11-A personal use summary for 11-A -----------------
 #####Load Data ---------------------------------------------------
-personal_use <- read.csv(paste0(here::here(), "/data/harvest/11-A rkc pu_catch_updated2021.csv"))
-permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2019 2020 2021 permit status summary.csv"))
+personal_use <- read.csv(paste0(here::here(), "/data/harvest/11-A rkc pu_catch_updated2022.csv"))
+permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2020 2021 2022 permit status summary.csv"))
 # **FIX** get biologist to help summarize this in future...way to time consuming for me and they have to do it already.
 
 ## reported number ----
@@ -55,7 +55,7 @@ number_crab_by_status %>%
   group_by(crab_year, Season, status, status_desc) %>% 
   summarise(number = sum(number, na.rm = T), pots = sum(pots, na.rm = T), n = sum(n))%>% 
   mutate(cpue = number/pots, cpue_permits = number/n) -> by_status_current2
-write.csv(by_status_current, paste0('./results/rkc/Juneau/personal_use_raw_summary2_', cur_yr,'.csv'), row.names = FALSE)
+write.csv(by_status_current2, paste0('./results/rkc/Juneau/personal_use_raw_summary2_', cur_yr,'.csv'), row.names = FALSE)
 
 by_status_current2 %>% 
   group_by(crab_year, Season) %>% 
@@ -99,6 +99,9 @@ male_weights %>%
 summary_current2 %>% 
   right_join(male_weights1) %>% 
   mutate(est.catch.lbs = est.total.catch.numbers*legal_lbs) -> summary_current2
+summary_current2 %>% 
+  group_by(crab_year) %>% 
+  summarise(est.total.numbers = sum(est.total.catch.numbers, na.rm = TRUE)) ### This value is put into the spreadsheet for the CSA for personal use catch for Juneau
 
 write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_total2_', cur_yr, '.csv'), row.names = FALSE)
 

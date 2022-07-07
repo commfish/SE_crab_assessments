@@ -52,9 +52,11 @@ dat %>%
 dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
-dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
-#**FIX ** issues with recruit class 2021 pot# 191
+dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1, Year == 2022) -> temp
 
+#**FIX ** issues with recruit class 2021 pot# 191
+#write.csv(temp, paste0('./results/rkc/', survey.location,'/', 
+                          cur_yr, '/data_issues' , cur_yr, '.csv'), row.names = FALSE)
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
 
@@ -76,7 +78,7 @@ ggplot(juvies, aes(x = Length.Millimeters, fill = cohort)) +
 ggplot(juvies, aes(x = Length.Millimeters, fill = cohort)) + geom_density(alpha=.3)
 
 dat1 %>% 
-  filter(Year == 2020, Recruit.Status == "Juvenile", Length.Millimeters >= 40) %>% 
+  filter(Year == 2022, Recruit.Status == "Juvenile", Length.Millimeters >= 40) %>% 
   mutate(cohort = ifelse(Length.Millimeters >=113, "A", 
                          ifelse(Length.Millimeters < 113 & Length.Millimeters >= 97, "B", "C")))-> juvies20
 
