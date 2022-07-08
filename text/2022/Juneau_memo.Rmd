@@ -105,6 +105,8 @@ The harvest rate of 10% that was applied in 2017 was enacted with the goal of al
 
 The 2019 and 2020 harvest rate (7%) produced a relatively stable biomass estimate for legal and mature crab, with small (less than 8% decrease or increase) fluctuation in both legal and mature biomass estimates depending on which model they were compared to, but the CPUEs of most mature male recruit classes showed an increase. Setting a harvest rate of 7%, the same level the last few seasona, would likely provide allow for some growth or stability in mature male biomass for the following season, which would be effective if the goal is to maintain the population at the current level. A harvest rate of less than 7% may allow for growth in the coming year. Harvest rates exceeding this would likely result in further population declines, with the probability of decrease and magnitude of the decline increasing proportional to the harvest rate. This population has only shown substantial improvements from 2013 to 2017, even though harvest has been severely reduced since 2008 (0, 0, 3%, 10%, 0, 0, 0, 0, 0, and 10% respectively). To encourage sustainability and population growth, a **7% or less harvest rate is recommended for the `r cur_yr/fut_yr` personal use season**. A GHL allocation table for multiple harvest rate strategies was constructed (Table 3). Although harvest rates of 20%, 17%, 10%, 8%, 7%, 6%, and 5% are shown, the data do not currently support the higher end of this range with the goal of sustaining average baseline population levels.
 
+\newpage
+
 # TABLES AND FIGURES {-}
 ```{r explain, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
 # Table 1 is updated from excel sheet (stock health matrix) in 'Tables RIR.docx' and brought into this document after it's knit
@@ -114,6 +116,8 @@ The 2019 and 2020 harvest rate (7%) produced a relatively stable biomass estimat
 # when bring in tables not created here add page numbers and header
 
 # Figure 4 is also carried over each year in JNU_t_and_f.docx
+
+# appendix A - figures created here but tables in docx.
 ```
 
 
@@ -134,6 +138,15 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr,'/Juneau_', 
 
 ```{r panel3, fig.cap = "Survey CPUE for female and juvenile size/sex classes of red king crab along with female percentage of poor clutches (% poor clutch) and overall clutch fullness (total % clutch).  Reference lines indicate long-term averages, defined as the average CPUEs from 1995–2007.  There are significant short-term trends increasing trends for juvenile male and female CPUEs."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr,'/Juneau_', cur_yr, '_3.png'), dpi = 125)
+```
+
+
+\newpage
+
+# Appendix A. Historic record of annual model forecast {-}
+
+```{r afig1, fig.cap = "Annual forecasts1 of Juneau Area biomass estimates for legal (black points) and mature (gray points) red king crab as annual point estimates (forecasts) from the 3-stage catch-survey analysis model. Black and grey (dashed) reference lines represent mean estimates during baseline years (1995–2007). Fishery status is reported in symbol type; closed status is when both commercial and personal use fishery are closed and PU only status indicates that only a PU fishery occurred (commercial fishery was closed in that year)."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr,'/juneau_figA1_', cur_yr, '.png'), dpi = 125)
 ```
 
 
