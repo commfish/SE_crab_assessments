@@ -1,5 +1,5 @@
 # K. palof 
-# katie.palof@alaska.gov, updated 3-6-20/ 7-14-20 / 7-18-21
+# katie.palof@alaska.gov, updated 3-6-20/ 7-14-20 / 7-18-21/ 7-7-22
 
 # Southeast RKC stock panel figures for assessment memo and RIR 
 
@@ -8,7 +8,7 @@
 
 # load ----------
 source('./code/functions.R')
-cur_yr <- 2021
+cur_yr <- 2022
 
 # Survey areas and associated figure calls:-------
 # as of 2017 fishery, areas that need non-conf figs: seymour, peril, lynnsisters, excursion
