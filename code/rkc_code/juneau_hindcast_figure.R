@@ -1,5 +1,5 @@
 # K.Palof
-# 7-10-19n updated / 7-15-2020 / 7-14-2021
+# 7-10-19n updated / 7-15-2020 / 7-14-2021/7-7-22
 
 # Juneau area RKC forecast / hindcast figures
 # Current figures used for stock health memo 
@@ -21,7 +21,7 @@ theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
 
 # global --------
 # update each year
-cur_yr = 2021
+cur_yr = 2022
 
 #Load data ----------------
 #biomass <- read.csv("./data/redcrab/biomass.csv") no record of historic mature biomass point estimates
