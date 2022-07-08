@@ -39,36 +39,51 @@ set_flextable_defaults(
 biomass <- read.csv(paste0(here::here(),'/data/rkc/biomass.csv'))
 biomass %>% 
   filter(Location == "Juneau") -> jnu_biomass
+hindcast <- read.csv(paste0(here::here(), "./data/rkc/Juneau/hind_fore_cast_JNU_current.csv")) 
+
 cpue <- read.csv(paste0(here::here(), '/results/rkc/Juneau/', cur_yr, '/JNU_CPUE_', cur_yr,'.csv'))
 
+# change from previous year's forecasted values 
+hindcast %>% 
+  filter(year >= pr_yr) %>% 
+  mutate(leg_change = round((legal_forecast - lag(legal_forecast))/ lag(legal_forecast)*100, 1), 
+         mat_change = round((mature_forecast - lag(mature_forecast))/ lag(mature_forecast)*100, 1), 
+         leg_cur_change = round((legal_curyr - lag(legal_curyr))/ lag(legal_curyr)*100, 1), 
+         mat_cur_change = round((mature_curyr - lag(mature_curyr))/ lag(mature_curyr)*100, 1)) -> change_forecast
+
+# cpue and change in cpue from last year
 #cpue %>% 
 #  gather(Rclass, cpue, Pre_Recruit_wt:SmallF_SE)
-
-#cpue %>% 
-#  gather(key =c("Rclass", "Year"), value = Pre_Recruit_wt:SmallF_SE)
-
 cpue_short <- as.data.frame(t(cpue))
-#cpue_short %>% 
-#  selec
+cpue_short[2:13, ] -> cpue_short
+colnames(cpue_short) <- c("2021", "2022")
+cpue_short %>% 
+  mutate(change = ((`2022` - `2021`)/`2021`)*100) -> cpue_short
+
 cpue %>% 
   filter(Year == cur_yr) -> cpue2
 ```
 
 
 # `r cur_yr` SUMMARY POINTS {-}
-- A harvest rate of xx% was implemented for the 2021/2022 personal use and commercial fisheries; estimated actual harvest rate was xx% due to lack of a commercial fishery opening. In the prior three seasons similar harvest rates were implemented and the commercial fishery was closed resulting in an estimated actual harvest rate of 3.6% in 2020/2021, 3.7% in 2019/2020 and 5.0% in 2018/2019 (this season had an 8% intended harvest rate). 
+- A harvest rate of xx% was implemented for the `r pr_yr`/`r cur_yr` personal use and commercial fisheries; estimated actual harvest rate was xx% due to lack of a commercial fishery opening. In the prior three seasons similar harvest rates were implemented and the commercial fishery was closed resulting in an estimated actual harvest rate of 3.6% in 2020/2021, 3.7% in 2019/2020 and 5.0% in 2018/2019 (this season had an 8% intended harvest rate). 
 
-- Estimated legal (up 2.5%) and mature (up 4.5%) biomass both increased compared to 2020 predicted values. Legal biomass remains slightly above the long-term average (using baseline years), while mature biomass increased (small increase) for the first time since 2017. 
-- Pre-recruit and recruit CPUEs increased from 2020 (16% and 45% respectively). Pre-recruit CPUE is still significantly below its long-term average, while recruit CPUE is at the long-term average. Post-recruit CPUE decreased (14% decrease from 2020) but is still significantly above its long-term average. 
-- Juvenile CPUE is `r cpue2$Juvenile_wt`, the highest value on record since the early 2000s, suggesting promise for future population growth given these crab continue to flourish. 
-- A harvest rate of 7% for the 2021/2022 season will likely allow for a small increase (similar to the 2020/2021 season) in the abundance, while a harvest rate of 8% would likely allow for a steady state of abundance. Harvest rates above these would likely produce a decrease in abundance. These potential likelihoods are based on the recent population trajectory and the outcome of the last four years fisheries.
+- Estimated legal (up `r change_forecast$leg_change[2]`%) and mature (up `r change_forecast$mat_change[2]`%) biomass both increased compared to `r pr_yr` predicted values. Legal biomass remains slightly above the long-term average (using baseline years) and mature biomass is now above the long-term average after two consecutive years of increasing biomass.
+
+- Pre-recruit CPUE increased substantially from `r pr_yr` (`r round(cpue_short$change[1], 1)` %), and is significantly above its long-term average. Both recruit and post-recruit CPUE decreased from `r pr_yr` (`r round(cpue_short$change[3], 1)` % and `r round(cpue_short$change[5], 1)` % respectively), with recruit CPUE falling significantly below the long-term average, and post-recruit CPUE at the long-term average. 
+
+- Juvenile CPUE is `r cpue2$Juvenile_wt`, the highest value on record since the early 2000s, following a high CPUE in `r pr_yr`, which both suggest promise for future population growth given these crab continue to flourish. 
+
+- A harvest rate of 7% for the `r cur_yr`/`r fut_yr` season will likely allow for a small increase (similar to the `r pr_yr`/`r cur_yr` season) in the abundance, while a harvest rate of 8% would likely allow for a steady state of abundance. Harvest rates above these would likely produce a decrease in abundance. These potential likelihoods are based on the recent population trajectory and the outcome of the last four years fisheries.
+
 - It is recommended that harvest pressure not be increased until all male CPUEs increase to at least their long-term averages (using baseline years).   
 
 
 # STOCK ASSESSMENT {-}
 The following is a summary of the biomass estimates and stock status of red king crab (RKC) for the Juneau Area (Section 11-A) for the `r cur_yr`/`r fut_yr` season. Stock assessment methods for `r cur_yr` are identical to those used since 2012; however, in 2017 adjustments to historic (1993–2004) catch-per-unit-effort (CPUE) calculations were performed so that all CPUEs are now calculated using a stratified, weighted mean.  This corrected the long-term baseline (1993–2007) values used to determine stock health (Figs. 2a and 2b, Table 1), which in turn more accurately depicted the stock health status over time; this was specifically relevant for juvenile males and females. 
 
-The biomass estimates for legal and mature RKC from a 3-stage catch-survey analysis (CSA) for the Juneau area are 308,746 lb and 377,095 lb respectively for the 2021 season (Fig. 1). This is a 2.5% increase in legal biomass and 4.5% increase in mature biomass from the 2020 predicted biomass levels (Fig. A1). However, using the 2021 model, where estimates of the historic biomass are calculated with data that includes up to the current year, there was an 4% increase in legal biomass and a 2% increase in mature biomass (Fig. 1). There were increases in pre-recruit and recruit male CPUE from 2020 to 2021, while post-recruit CPUE remains high, compared to the last ten years, but did decrease some from 2020 (Fig. 3a.). Model fit to the post-recruit survey CPUE was poor in the last few years (Fig. 2), while fit to pre-recruit and recruit CPUEs was substantially better. The mature and legal biomass estimates follow with the recent pre-recruit and recruit CPUE downward trends (due to the close model fit to these CPUE values, Fig. 2), while lack of fit for the post-recruit CPUE downweighs their contribution to the biomass. This suggest more research is needed into Southeast red king crab life history, specifically growth increments and molting probabilities, to parameterize the underlying population dynamics more completely. 
+The biomass estimates for legal and mature RKC from a 3-stage catch-survey analysis (CSA) for the Juneau area are `r change_forecast$legal_curyr[2]` lb and `r change_forecast$mature_curyr[2]` lb respectively for the `r cur_yr` season (Fig. 1). This is a `r change_forecast$leg_change[2]`% increase in legal biomass and `r change_forecast$mat_change[2]`% increase in mature biomass from the `r pr_yr` predicted biomass levels (Fig. A1). Similarly using the `r cur_yr` model, where estimates of the historic biomass are calculated with data that includes up to the current year, there was an `r change_forecast$leg_cur_change[2]`% increase in legal biomass and a `r change_forecast$mat_cur_change[2]`% increase in mature biomass (Fig. 1). Pre-recruit CPUE increased substantially from `r pr_yr`, which suggests increase in juvenile CPUE last year are moving into the mature population. However, both recruit and post-recruit CPUE decreased from `r pr_yr`. While post-recruit CPUE decreased it still remains high, slightly above the long-term average but not significantly so. Recruit CPUE feel significantly below its long-term average, but large increases in pre-recruit CPUE suggest that we can likely expect recruit CPUE to increase in the coming years assuming current population productivity levels (Fig. 3a.). Model fit to the post-recruit survey CPUE was poor in the last few years (Fig. 2), while fit to pre-recruit and recruit CPUEs was substantially better. The mature and legal biomass estimates follow with the recent pre-recruit and recruit CPUE downward trends (due to the close model fit to these CPUE values, Fig. 2), while lack of fit for the post-recruit CPUE downweighs their contribution to the biomass. This suggest more research is needed into Southeast red king crab life history, specifically growth increments and molting probabilities, to parameterize the underlying population dynamics more completely. 
+
 The realized harvest rate in 2020 (3.6% of the mature biomass) allowed for small growth in both legal and mature biomass both of which increased slightly from 2020. Legal biomass estimates remain close to the long-term average and trends in recruitment – in the form of pre-recruit and recruit CPUE – are trending up from low levels in 2019. Mature biomass increased slightly from 2020 but remains below the long-term average. All indicators suggest the population is likely to be stable or showing small increases at the current harvest pressure, additionally the large CPUE of juvenile males indicate the potential for good recruitment in the next few years (Fig. 3a).  
 The stock status for the Juneau area has increased to “above average” from “moderate” in 2020 (Table 1). The CPUE of pre-recruit males was still significantly below its long-term averages; CPUEs of recruit males and mature females were at baseline levels; and CPUEs of post-recruit males, juvenile males, and juvenile females were significantly above their long-term average (using standardized baselines recalculated in 2017, Fig. 3a). There is evidence of a significant short-term (4-year) increase in both juvenile male and female CPUEs, and all other CPUEs are showing no significant trends in the last four years (Fig. 3a, Table 1). The clutch fullness of mature females remains high and few poor clutches were evident (Fig. 3b).  
 Concern remains over the low CPUEs of pre-recruit and recruit males, even with increases in both CPUEs this year they are still below the long-term average levels, with pre-recruits being significantly below (Table A3). However, increases in both juvenile male and female CPUE suggest evidence of potential future recruitment in the population, assuming these individuals survive to “recruit” to the mature population. The point estimate CPUE of mature females is low compared to the 2005 levels (one of the last years with a commercial fishery opening) but has been slowly increasing for the last few years. However, the variability about this CPUE declined from the late 90s early 2000s, suggesting that we are currently more precisely surveying this aspect of the population.  
@@ -97,6 +112,9 @@ The 2019 and 2020 harvest rate (7%) produced a relatively stable biomass estimat
 
 # Figure 4 is also carried over each year in JNU_t_and_f.docx
 ```
+
+
+\newpage
 
 ```{r jnumodel, fig.cap = "Juneau Area biomass estimates for legal (black circles) and mature (gray points) red king crab from the current year’s 3-stage catch-survey analysis model. Black and grey (dashed) reference lines represent mean estimates during baseline years (1995¬¬–2007). Fishery status is reported in symbol type; closed status is when both commercial and personal use fishery are closed and PU only status indicates that only a PU fishery occurred (commercial fishery was closed in that year)."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr,'/juneau_fig1_', cur_yr, '.png'), dpi = 125)
