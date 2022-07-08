@@ -1,5 +1,5 @@
 # K.Palof    katie.palof@alaska.gov
-# recent date updated: 7-14-2020 / 7-18-2021
+# recent date updated: 7-14-2020 / 7-18-2021 / 7-7-22
 
 # Region: Southeast
 # Area : Juneau 
@@ -7,13 +7,14 @@
 
 # load ----
 library(tidyverse)
-cur_yr = 2021
+cur_yr = 2022
 dir.create(file.path(paste0('results/rkc/Juneau/', cur_yr), '/csa')) # creates csa folder in current year results
 
 # data -----
 JNUred <- read.csv(paste0(here::here(), '/data/rkc/Juneau/Juneau', cur_yr, 'RKC.csv'))
 # **FIX** this pulls from old excel file, need to rework this to pull historic data from a file and recent data 
 #     from data summary coming out of the processing of the survey data **FIX**
+# !! need to paste current years line in from excel CSA file - 
 
 # file name needs to be changed to reflect area and species
 str(JNUred)
@@ -48,6 +49,8 @@ write.csv(JNU_RKC_fit1$estimates, paste0('./results/rkc/Juneau/', cur_yr, '/csa/
 write.csv(JNU_RKC_fit1$CI, paste0('./results/rkc/Juneau/', cur_yr, '/csa/JNU_RKC_fit1_par&CI.csv'))
 write(JNU_RKC_fit1$SSQ, file = paste0('./results/rkc/Juneau/', cur_yr, '/csa/JNU_SSQ.txt'))
 ### save graphical output also - DO THIS manually, I have NOT automated this step.
+
+
 
 #########STOP  --------------------------
 ##### BOOTSTRAP ---------------------------------
