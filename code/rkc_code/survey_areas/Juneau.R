@@ -20,6 +20,7 @@ survey.location <- 'Juneau'
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
+dir.create(file.path(paste0('figures/rkc/'), cur_yr))
 
 ## data -------------------
 dat <- read.csv("./data/rkc/Juneau/jnu_21_22_oceanAK_out_RAW.csv") # file name will change annually
