@@ -1,22 +1,24 @@
 # K.Palof 
-# ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19/ 8-23-21
+# ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19/ 8-23-21/ 7-20-22
 # code to process data from Ocean AK to use in crab CSA models.  
-#  
+#  OceanAK report found under Shared Folders/Commercial Fisheries/Region 1/Invertebrates/User Reports/kjpalof/se rkc areas
 
 ## load -------------------------
-source('./code/functions.R')
+source('./code/functions.R')  #functions here for summarising data and figures 
 
 ## setup global ---------------
-cur_yr <- 2021
+cur_yr <- 2022 # this needs to be updated annually with current survey year 
 pr_yr <- cur_yr -1
 survey.location <- 'LynnSisters'
 
-dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
+# lines below create folders if they don't already exist for current year
+dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr)) 
 dir.create(file.path(paste0('text'), cur_yr))
 
 #####Load Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_LS_20_21.csv'))
+# Year reference in first file needs to be updated annually ****!!!! 
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_LS_21_22.csv'))
     # this is input from OceanAK - set up as 'red crab survey data for CSA'
     # Year is cur_yr and pr_yr, project code 007, !! Location = Lynn Sisters and St.James Bay !! (make sure you check both), Species = red king crab 
 area <- read.csv(paste0('./data/rkc/', survey.location, '/LynnCanal_strata_area.csv')) 
