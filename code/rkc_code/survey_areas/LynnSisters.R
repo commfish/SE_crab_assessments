@@ -282,6 +282,8 @@ write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/',
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
+### *** add biomass into biomass.csv file before running figure code ***
+
 #panel_figure('LynnSisters', 2018, 'LynnSisters')
 panel_figure('LynnSisters', cur_yr, 'LynnSisters', 1, 0) # panel with all 3 figures
 panel_figure('LynnSisters', cur_yr, 'LynnSisters', 2, 0) # male panel
