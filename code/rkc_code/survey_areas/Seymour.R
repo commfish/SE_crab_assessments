@@ -1,6 +1,6 @@
 # K.Palof 
 # katie.palof@alaska.gov
-# ADF&G 8-3-16 updated for Seymour Canal  / updated 8-8-17/8-9-18 / 9-4-19/8-23-21
+# ADF&G 8-3-16 updated for Seymour Canal  / updated 8-8-17/8-9-18 / 9-4-19/8-23-21 / 7-26-22
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
 
@@ -11,7 +11,7 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2021
+cur_yr <- 2022
 pr_yr <- cur_yr -1
 survey.location <- 'Seymour'
 
@@ -19,7 +19,7 @@ dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
 
 #####Load Data ---------------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_SC_20_21.csv'))
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_SC_21_22.csv')) # udpated annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Seymour_strata_area.csv')) 
