@@ -272,6 +272,7 @@ write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/',
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
+## need to update biomass from excel CSA model in 'biomass.csv' file 
 panel_figure('Seymour', cur_yr, 'Seymour Canal', 1, 1) # panel with all 3 figures
 panel_figure('Seymour', cur_yr, 'Seymour Canal', 2, 1) # male panel
 panel_figure('Seymour', cur_yr, 'Seymour Canal', 3, 1) # female panel
