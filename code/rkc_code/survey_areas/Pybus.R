@@ -1,5 +1,5 @@
 # K.Palof 
-# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18/ 9-4-19/8-23-21
+# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18/ 9-4-19/8-23-21 / 7-26-22
 # R script contains code to process data from Ocean AK to use in crab CSA models, 
 #      code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -12,7 +12,7 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2021
+cur_yr <- 2022 # update annually 
 pr_yr <- cur_yr -1
 survey.location <- 'Pybus'
 
@@ -20,7 +20,7 @@ dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
 
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PB_20_21.csv'))# file name will change annually
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PB_21_22.csv'))# file name will change annually
               # this is input from OceanAK - set up as red crab survey data for CSA
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Pybus_strata_area.csv')) 
               #this file is the same every year.  Unless the survey methods change
