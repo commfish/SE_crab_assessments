@@ -1,6 +1,6 @@
 # K.Palof
 # katie.palof@alaska.gov
-# 08/03/2018 / 9-4-19 / 8-30-20/ 8-29-21
+# 08/03/2018 / 9-4-19 / 8-30-20/ 8-29-21 / 7-26-22
 
 # notes ----
 # This script is a work in progress to develop figures like those currently used to view the 
@@ -12,7 +12,7 @@ source('./code/functions.R')
 dir.create(file.path(paste0('results/rkc/Region1'), cur_yr))
 
 # data -----
-cur_yr <- 2021
+cur_yr <- 2022
 pry_yr <- cur_yr-1
 mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
 fishery.status <- read.csv('./data/rkc/Juneau/hind_fore_cast_JNU_current.csv') # has fishery status
@@ -62,7 +62,8 @@ regional.b %>%
   gather(type, pounds, legal:adj_mature, factor_key = TRUE) %>% 
   select(-status) %>% 
   spread(key = Year, value = pounds) %>% 
-  mutate(change = 100*(`2021`-`2020`)/`2020`) -> change# report these values in stock health doc
+  # Update annually ###
+  mutate(change = 100*(`2022`-`2021`)/`2021`) -> change# report these values in stock health doc
 write.csv(change, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_regional_biomass_', cur_yr, '.csv'), 
           row.names = FALSE)
 # these values go in regional overview section, other values from last years forecast
@@ -73,7 +74,7 @@ biomass %>%
   select(-harvest, -weighted_ADJ) %>% 
   gather(type, pounds, legal.biomass:adj.mature, factor_key = TRUE) %>% 
   spread(key = Year, value = pounds) %>% 
-  mutate(change = 100*(`2021`-`2020`)/`2020`) -> change2
+  mutate(change = 100*(`2022`-`2021`)/`2021`) -> change2
 write.csv(change2, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_area_biomasses_', cur_yr, '.csv'))
 #
 
@@ -162,7 +163,7 @@ regional.b %>%
         axis.text = element_text(size = 12)) +
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
-            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
+            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) 
   ggsave(paste0('./figures/rkc/', cur_yr, '/MRregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 # Figure 2 **CLOSED** regional biomass M/R adjusted biomass---------
@@ -201,7 +202,7 @@ regional.b %>%
         axis.text = element_text(size = 14)) +
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
-            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
+            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) 
   ggsave(paste0('./figures/rkc/', cur_yr, '/MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 # Figure 2 **CLOSED** EXPANDED regional biomass M/R adjusted biomass---------
@@ -245,7 +246,7 @@ regional.b.expand %>%
         axis.text = element_text(size = 14)) +
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds/expansion, label = label), 
-            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
+            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) 
   ggsave(paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
