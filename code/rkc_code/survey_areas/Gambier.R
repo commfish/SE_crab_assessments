@@ -1,5 +1,5 @@
 #K.Palof 
-# ADF&G 8-12-16 updated for Gambier Bay  / updated 8-8-17/8-10-18 / 9-4-19/8-23-21
+# ADF&G 8-12-16 updated for Gambier Bay  / updated 8-8-17/8-10-18 / 9-4-19/8-23-21 / 7-26-22
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -12,7 +12,7 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2021
+cur_yr <- 2022 # update annually
 pr_yr <- cur_yr -1
 survey.location <- 'Gambier'
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
@@ -20,7 +20,7 @@ dir.create(file.path(paste0('text'), cur_yr))
 
 
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_GB_20_21.csv'))# file name will change annually
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_GB_21_22.csv'))# file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Gambier_strata_area.csv')) 
@@ -294,6 +294,7 @@ write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/',
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
+# updated biomass values from CSA in "biomass.csv"
 panel_figure('Gambier', cur_yr, 'Gambier', 1, 0) # panel with all 3 figures
 panel_figure('Gambier', cur_yr, 'Gambier', 2, 0) # male panel
 panel_figure('Gambier', cur_yr, 'Gambier', 3, 0) # female panel
