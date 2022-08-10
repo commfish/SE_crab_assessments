@@ -1,5 +1,5 @@
 ---
-title: "Southeast red king crab assessment 2021 CONFIDENTIAL RIR draft "
+title: "Southeast red king crab assessment 2022 CONFIDENTIAL RIR draft "
 author: "Katie Palof, katie.palof@alaska.gov"
 date: "`r format(Sys.time(), '%B %Y')`"
 output:
@@ -17,7 +17,7 @@ output:
 ```{r global_options, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
 library(knitr)
 source(paste0(here::here(),'/code/functions.R'))
-cur_yr = 2021
+cur_yr = 2022 # updated annually
 pr_yr = cur_yr-1
 fut_yr = cur_yr+1
 opts_chunk$set(fig.width = 12, fig.height = 7, echo = FALSE, warning = FALSE, message = FALSE,  dpi=300)
@@ -43,12 +43,13 @@ biomass <- read.csv(paste0(here::here(),'/data/rkc/biomass.csv'))
 # mr adjustments can be made in the function using mr_adjust file.
 exploit_rate <- read.csv(paste0(here::here(),"/data/rkc/table3.csv"))
 
-baseline_rel <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/relative_to_baseline_2021.csv'))
+baseline_rel <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/relative_to_baseline_', cur_yr,'.csv'))
+# which R file is this from ?
 
-table2 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_2021.csv'))
+table2 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_', cur_yr,'.csv'))
 # these are created in 'figure2_tables.R'
-table3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table3_regional_2021.csv'))
-tableA3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/TableA3_regional_2021.csv'))
+table3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table3_regional_', cur_yr,'.csv'))
+tableA3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/TableA3_regional_', cur_yr,'.csv'))
 #table4 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table4_regional_2021.csv'))
 ###
 ## clean up figure 2-------
@@ -105,15 +106,15 @@ exploit_rate %>%
          alt.equ.hr = round(alt.equ.hr, 2), 
          hr_cur_yr = ifelse(area == 'Juneau', 0.07, 0)) -> exploit_rate2
 ## look into doing these calcs in figure2_tables instead and brining in csv here
-````
+```
 
 FYI: *italics* information is not completed yet, this is a draft of the RIR for both research(biometrics) and management. Managment sections are also labeled TBD in this draft.
 
 
 # `r cur_yr` QUICK SUMMARY {-}
-  - Regional legal and mature biomass decreased again in `r cur_yr`, and have been declining since 2017
-  - Juneau area is at above average stock health, Lynn Sisters is at moderate stock health, and the other areas are divided between poor and below average. Stock health considers all aspects of the population (mature males, juveniles, and females).
-  - Lynn Sisters and Juneau are the only areas with an increase in both legal and mature biomass from `r pr_yr`. Lynn Sister is a small contributor to the regional biomass compared to most of the survey areas. 
+  - Regional legal biomass decreased again in `r cur_yr` and has been declining since 2017, regional mature biomass increased slightly primarily due to the influence of the Juneau area
+  - Juneau area is at healthy stock health, Lynn Sisters and Gambier Bay are at moderate stock health, Pybus Bay, Seymour Canal, and Peril Strait are below average health, and Excursion Inlet is poor. Stock health considers all aspects of the population (mature males, juveniles, and females).
+  - Juneau, Gambier and Peril are the only areas with an increase in both legal and mature biomass from `r pr_yr`. Gambier and Peril are small contributors to the regional biomass compared to the Juneau area. 
   - None of the harvest rate options (low risk HR or max appropriate HR) reach a harvestable surplus above the 200,000 lb threshold (Table 2, 3).
 
 
@@ -123,25 +124,28 @@ The Alaska Department of Fish and Game (ADF&G) annually evaluates stock status a
 Projected estimates of regional mature male biomass for the `r cur_yr`/`r fut_yr` season are **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb**, using the mark-recapture adjustments and the historical expansion factor applied to the non-surveyed areas. However, this value is substantially below the baseline level (defined as the average biomass from 1993–2007), suggesting the regional stock remains in a low or depressed state.
 *The `r cur_yr`/`r fut_yr` Southeast commercial RKC fishery season GHL is XXXXX lb and is less than the 200,000 lb minimum threshold [5 AAC 34.113]; therefore, the fishery did not open for the `r cur_yr`/`r fut_yr` season.* 
 
-The personal use RKC and BKC fishery opened July 1, 2021 in Excursion Inlet and non-surveyed areas with bag and possession limits of one RKC or BKC per person per day. Results from the annual stock assessment survey in the Juneau Area (Section 11-A) showed overall stock health to be at above average levels, with legal biomass estimated to be above the long-term average and mature biomass estimated to be below the long-term average. *The personal use summer fishery in Section 11-A opened on August XX, 2021 for three and a half days with a seasonal household limit of two crab and daily bag and possession limit of two crab (Table 2) to target XXXXX lb (XXXX crab) in the summer fishery.*
+The personal use RKC and BKC fishery opened July 1, 2022 in Excursion Inlet and non-surveyed areas with bag and possession limits of one RKC or BKC per person per day. Results from the annual stock assessment survey in the Juneau Area (Section 11-A) showed overall stock health to be at healthy stock levels, with both legal and mature biomass estimated to be above the long-term average. *The personal use summer fishery in Section 11-A opened on August XX, 2021 for three and a half days with a seasonal household limit of two crab and daily bag and possession limit of two crab (Table 2) to target XXXXX lb (XXXX crab) in the summer fishery.*
 
 The RKC and BKC commercial fishery and personal use fishery outside of Section 11-A are managed separately and there are no regulatory thresholds or allocations that combine estimated harvest for both user groups. Personal use harvest outside of Section 11-A is not considered when calculating the commercial GHLs for each area to determine whether the total commercial GHL meets the 200,000 lb threshold in regulation for a commercial fishery. A personal use permit requirement was implemented in 2018 for the outside Section 11-A personal use fishery and will improve catch accounting, future stock assessments, and management decisions.
 
 # `r cur_yr` SOUTHEAST RED KING CRAB STOCK ASSESSMENT {-}
 
 ## SUMMARY OF STOCK STATUS {-}
-The Southeast RKC stock assessment regional biomass estimates for the `r cur_yr`/`r fut_yr` season are **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb of legal crab and `r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb of mature crab**, using the historical expansion factor (Tables 2–4). The legal biomass estimate decreased 5.32% from the previous year using the `r cur_yr` model estimates (Figure \@ref(fig:regionalbio)). The mature biomass estimate decreased 3.0% from `r pr_yr` using the `r cur_yr` model estimates. 
+The Southeast RKC stock assessment regional biomass estimates for the `r cur_yr`/`r fut_yr` season are **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb of legal crab and `r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb of mature crab**, using the historical expansion factor (Tables 2–4). The legal biomass estimate decreased 4.6% from the previous year using the `r cur_yr` model estimates (Figure \@ref(fig:regionalbio)). The mature biomass estimate increased 4.7% from `r pr_yr` using the `r cur_yr` model estimates. 
 
-Survey area biomass is estimated using a 3-stage catch survey analysis model (CSA) and adjusted using the mark-recapture expansions  when available (Stratman et al. 2019). Port Frederick and Holkham Bay have not been surveyed since 2015 due to reductions in survey funding and therefore are no longer included in determining survey biomass estimates. The legal crab component is composed of both recruit and postrecruit crab and defined as those greater than 178 mm in carapace width, whereas mature crab are prerecruit, recruit, and postrecruit crab, or those greater than 129 mm in carapace length. Biomass estimates from the survey areas (Table 2, Figure \@ref(fig:distcur)) are then expanded based on assumptions of how representative these areas are to the entire population in Southeast.  
+Survey area biomass is estimated using a 3-stage catch survey analysis model (CSA) and adjusted using the mark-recapture expansions where available (Stratman et al. 2019). Port Frederick and Holkham Bay have not been surveyed since 2015 due to reductions in survey funding and therefore are no longer included in determining survey biomass estimates. The legal crab component is composed of both recruit and postrecruit crab and defined as those greater than 178 mm in carapace width, whereas mature crab are prerecruit, recruit, and postrecruit crab, or those greater than 129 mm in carapace length. Biomass estimates from the survey areas (Table 2, Figure \@ref(fig:distcur)) are then expanded based on assumptions of how representative these areas are to the entire population in Southeast.  
 
-Both mature and legal survey biomass declined an average of 7.0% annually from 2001–2013 (Figure \@ref(fig:regionalbio)). Legal and mature biomass showed region-wide increases for the first time in 2015 since 2008, however, this year only three of the seven survey areas (Lynn Sisters, Juneau, and Peril Strait) had increases in either legal and mature biomass (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). 
-Since 2017, in the absence of a commercial fishery, legal biomass has declined an average of 2% annually and mature biomass has declined an average of 6% annually.
+Both mature and legal survey biomass declined an average of 7.0% annually from 2001–2013 (Figure \@ref(fig:regionalbio)). Legal and mature biomass showed region-wide increases for the first time in 2015 since 2008, and continued to increase until 2017. In 2017 the commercial fishery was opened and the regionwide stock has decreased slowly since then. This year is the first since 2017 that both legal and mature regional biomass did not decreased, although only three of the seven survey areas (Lynn Sisters, Juneau, and Peril Strait) had increases in either legal and mature biomass (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). 
+From 2017 to 2022, in the absence of a commercial fishery, legal biomass has declined an average of 2% annually and mature biomass has declined an average of 3% annually.
 
-Compared to historical levels in most areas (with the exception of Juneau, Lynn Sisters and Gambier), CPUE of juvenile and females size and sex classes are at below average levels, suggesting that either this portion of the population is declining or that the current year’s survey did not adequately capture them. 
+The CPUE of juvenile and females sizes classes has improved in four of the seven survey areas (Pybus, Gambier, Juneau, and Lynn Sisters) to be above the average levels, suggesting some improvement in these components. 
+
+ **suggesting** that either this portion of the population is declining or that the current year’s survey did not adequately capture them. 
+
 The CPUE of some portions of the mature male size and sex classes are still below average for all the survey areas except Lynn Sisters. 
-Pybus, Seymour, and Excursion had significantly low values in all mature male CPUEs, Gambier had two of three mature male recruit classes below their long-term averages, and Peril and Juneau had one of three mature male recruit classes below the long-term average. 
+Pybus, Seymour, and Excursion had significantly low values in all mature male CPUEs, Gambier and Peril Strait had two of three mature male recruit classes below their long-term averages, and Juneau had one of three mature male recruit classes below the long-term average. 
 
-Overall, recruitment, in the form of prerecruit CPUE, is significantly below average levels for five of the seven surveys areas, with only Lynn Sisters and Peril being at the long-term average for prerecruit CPUE, suggesting that regionwide improvements to mature and legal male biomass are still underway and may take a few more years even with the absence of fishing in most of the survey areas. 
+Overall, recruitment, in the form of prerecruit CPUE, is significantly below average levels for five of the seven surveys areas, with only Lynn Sisters and Juneau being at or significantly above the long-term average for prerecruit CPUE, suggesting that regionwide improvements to mature and legal male biomass are still underway and may take a few more years even with the absence of fishing in most of the survey areas. 
 In the majority of survey areas prerecruit biomass is still lacking compared to the 1990s and early 2000s and is visualized as the small difference between mature and legal biomass in the area figures (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). A matrix of stock health indicators provides an objective and repeatable evaluation of the survey data; a five-year summary of matrix results is therefore presented here (Table 4).  Specific stock health by survey area (Table 5) is discussed below.  
 
 ## MARK-RECAPTURE EXPERIMENT ADJUSTMENTS {-}
@@ -178,7 +182,7 @@ The resulting GHL for option 2 is **`r format((table3 %>% filter(Location == 'to
 Recovery in most of the survey areas, except for the Juneau area and Lynn Sisters area, appears to be slow. Most areas, except for Peril Strait, had increasing biomass estimates from 2015–2017, however, in 2018 a decrease in both legal and mature biomass occurred in all survey areas that experienced personal use and commercial harvest in the previous season (2017/2018). 
 The impact of the commercial fishery opening in the 2017/2018 season is confounded by potential increased personal use harvest in the survey areas, but this is hard to quantify since we do not currently have an estimate of personal use harvest in any area except Section 11-A, although estimates of personal use harvest are currently being collected with the implementation of the regional king crab personal use harvest permit in 2018 with a database system to query and analyze harvest still in progress.
 
-Regional biomass levels have decreased from `r pr_yr` and are still below the baseline levels (Figure \@ref(fig:regionalbio)). The Juneau Area and Lynn Sisters area the only survey areas where legal or mature biomass are above their baseline levels. 
+Regional legal biomass levels have decreased from `r pr_yr` while mature biomass levels have increased slightly, although both are still below the baseline levels (Figure \@ref(fig:regionalbio)). The Juneau Area and Lynn Sisters area the only survey areas where legal or mature biomass are above their baseline levels. 
 
 Slow recovery since 2001, which may be due to poor or inconsistent recruitment, and declines in the survey areas after the last commercial fishery opening (2017/2018 fishing season), suggest that harvesting at the equilibrium harvest levels (those used in the 2017/2018 GHL calculations, option 1 here) from these areas would increase the probability of continued population declines or stunt population growth. Thus, removals at the levels presented in options 1 and 2 (Tables 2 and 3) are not recommended for the upcoming season. None of the harvest options presented here resulted in a GHL that is above the 200,000 lb threshold required for a fishery opening [5 AAC 34.113]. 
 
@@ -330,7 +334,7 @@ set_table_properties(ft, layout = "autofit")
 ### Table 6. Sample sizes for the `r cur_yr` survey by area {-}
 
 ```{r table6, results = "asis"}
-df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table7_raw_samp_2021.csv'))
+df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table7_raw_samp_', cur_yr,'.csv'))
 df %>% 
   select(-Year) -> df
 names(df) <- c(" ", "Peril", "Excursion", "Gambier", "Juneau", 
@@ -393,64 +397,64 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture2.jpg'), dpi = 
 ```
 
 ```{r regionalbio, fig.cap = "Total biomass estimates (expanded regional estimates) of mature (gray points and line) and legal (black points and line) red king crab in Southeast Alaska. Estimates based on Catch-Survey Analysis (CSA) methodologies adjusted using mark-recapture study results (Table 1) then further expanded to include non-survey areas. Reference lines represent long-term (1993–2007) average of legal and mature biomass estimates.  Triangles represent years without a commercial harvest."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/MRregional_biomass2021.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr,'.png'), dpi = 125)
 ```
 
 ```{r pybus2, fig.cap = "Pybus Bay CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1993–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. There are no significant short-term trends in mature male CPUEs this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_2021_2.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_', cur_yr,'_2.png'), dpi = 125)
 ```
 
 ```{r pybus3, fig.cap = "Pybus Bay CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1993–2007). There are no significant short-term trends this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_2021_3.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_', cur_yr,'_3.png'), dpi = 125)
 ```
 
 ```{r gambier2, fig.cap = "Gambier Bay CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1993–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. There are no significant short-term trends in mature male CPUEs this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_2021_2.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_', cur_yr,'_2.png'), dpi = 125)
 ```
 
 ```{r gambier3, fig.cap = "Gambier Bay CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1993–2007). There is a significant short-term increasing trend in juvenile male CPUE."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_2021_3.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_', cur_yr,'_3.png'), dpi = 125)
 ```
 
 ```{r seymour2, fig.cap = "Seymour Canal CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1993–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. There are no significant short-term trends in mature male CPUEs this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_2021_2.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_', cur_yr,'_2.png'), dpi = 125)
 ```
 
 ```{r seymour3, fig.cap = "Seymour Canal CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1993–2007). There are no significant short-term trends this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_2021_3.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_', cur_yr,'_3.png'), dpi = 125)
 ```
 
 ```{r peril2, fig.cap = "Peril Strait CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1993–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. There is a significant short-term increasing trend in prerecruit male CPUE."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_2021_2.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', cur_yr,'_2.png'), dpi = 125)
 ```
 
 ```{r peril3, fig.cap = "Peril Strait CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1993–2007). There is a significant short-term increaseing trend in juvenile male CPUE and a significant decreasing trend in the percentage of poor clutches (>25%)."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_2021_3.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', cur_yr,'_3.png'), dpi = 125)
 ```
 
 ```{r juneau2, fig.cap = "Juneau area CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1993–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. There are no significant short-term trends in mature male CPUEs this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_2021_2.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_', cur_yr,'_2.png'), dpi = 125)
 ```
 
 ```{r juneau3, fig.cap = "Juneau area CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1993–2007). There are significant short-term increasing trends for juvenile male and female CPUEs this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_2021_3.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_', cur_yr,'_3.png'), dpi = 125)
 ```
 
 
 ```{r lynn2, fig.cap = "Lynn Sisters CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1993–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. There is a significant short-term increasing trend in post-recruit male CPUE."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_2021_2.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_', cur_yr,'_2.png'), dpi = 125)
 ```
 
 ```{r lynn3, fig.cap = "Lynn Sisters CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1993–2007). There are no significant short-term trends for juveniles or females this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_2021_3.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_', cur_yr,'_3.png'), dpi = 125)
 ```
 
 ```{r excursion2, fig.cap = "Excursion Inlet CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1993–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. There are no significant short-term trends in mature male CPUEs this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_2021_2.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_', cur_yr,'_2.png'), dpi = 125)
 ```
 
 ```{r excursion3, fig.cap = "Excursion Inlet CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1993–2007). There are no significant short-term trends in juvenile or female CPUEs this year."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_2021_3.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_', cur_yr,'_3.png'), dpi = 125)
 ```
 
 
@@ -461,7 +465,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion
 ## Figures and Tables {-}
 ### Table A1: Regional biomass estimates of surveyed areas (used in Figure 2) using `r cur_yr` mark-recapture CSA adjusted biomasses in areas where they are available.{-}
 ```{r tableA1, results = "asis"}
-df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/regional_biomass_2021.csv'))
+df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/regional_biomass_', cur_yr,'.csv'))
 df %>% 
   select(Year, adj_legal, adj_mature) -> df
 df %>% filter(Year <= 2000) -> df1  
@@ -469,7 +473,7 @@ df %>% filter(Year > 2000) %>%
   mutate(Year.cont = Year, 
          adj.Legal2 = adj_legal, adj.Mature2 = adj_mature) %>% 
   select(Year.cont, adj.Legal2, adj.Mature2) -> df2
-df2[nrow(df2)+ 1, ] <- NA
+#df2[nrow(df2)+ 1, ] <- NA
 df1 %>% 
   bind_cols(df2) %>% 
   mutate(Year = as.character(Year), 
@@ -488,7 +492,7 @@ set_table_properties(ft, layout = "autofit")
 \newpage
 ### Table A2: Biomass estimates (lb) for each survey area (used in Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)) using `r cur_yr` mark-recapture CSA adjusted biomasses in areas where they are available {-}
 ```{r tableA2, results = "asis"}
-df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/biomass_2021.csv'))
+df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/biomass_', cur_yr,'.csv'))
 df %>% 
   select(Year, Location, adj.legal, adj.mature) %>% 
   mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) -> df
