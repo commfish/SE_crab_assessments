@@ -21,7 +21,16 @@ Actualized harvest rate for the Juneau area, see tab in Excel file. All tables a
 Each survey area has code to summarize CPUE, weights, trends, etc. under 'code/rkc_code/survey_areas'
 - run each of these
 - code for updating CSA with values and .rmd for each survey area to summarize the results - see 'text/2022'
-- update biomass.csv file after each CSA is run. This need to be updated BEFORE you run the "panlel_figure" function to create figures
+- update biomass.csv file after each CSA is run. This need to be updated BEFORE you run the "panel_figure" function to create figures
 
 After these are complete: 
+run 'figure2_tables.R'
+- this file has code to create tables needed to summarize data in the "RIR draft XX.Rmd"
 
+
+## RIR text ---
+values in line 134 taken from change_in_modeled_regional_biomass_2022.csv
+which is found in 'C:\Users\kjpalof\Documents\SE_crab_assessments\results\rkc\Region1|2022'
+
+excel file for keeping track of estimates from each year - 'Figure 1 table 2022RKC.xlsx"
+- update this file with values from "2022(23)_RKC scoring text_MATRIX_v2.xlsx" for surveyed area legal and mature that are NOT expanded from mark-recapture
