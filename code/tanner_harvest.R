@@ -153,12 +153,14 @@ harvest_all %>%
 #     between North Juneau and Lynn Sisters.
 logb11510 %>% 
   filter(survey.area == "North Juneau") %>% 
-  select(Year = YEAR, percentNJ = percent) -> logb_merge
+  select(Year = YEAR, percentNJ = percent) %>% 
+  mutate(year_caught = Year) %>% # this has 'Year' as "year caught" NOT fishery year - fix this above.
+  select(-Year) -> logb_merge
 
 harvest_all_update %>% 
 #harvest_all %>%  # placeholder for updates made in season after initial calcs are done
   filter(Stat.Area == 11510) %>% 
-  left_join(logb_merge) %>% 
+  left_join(logb_merge) %>% # this has 'Year' as "year caught" NOT fishery year - fix this above.
   mutate(no_NJ = numbers*percentNJ,
          no_LS = numbers*(1-percentNJ), 
          lb_NJ = pounds*percentNJ,
@@ -183,7 +185,7 @@ harvest_all_update %>%
   bind_rows(stat_11510) -> harvest_all_update2
 
 # !! this has update catch distribution between LS and NJ for stat area 11510
-write.csv(harvest_all_update, 
+write.csv(harvest_all_update2, #pretty sure this should be the data frame with the new 11510
           paste0('./results/tanner/harvest/', cur_yr, '/comm_catch_by_statarea_97_', cur_yr,'.csv'), row.names = F)
 
 harvest_all_update2 %>% 
