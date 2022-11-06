@@ -1,5 +1,5 @@
 #K.Palof 
-# ADF&G 11-2-16 / 10-4-18 / 10-16-19 / 11-9-2020/ 11-2-21
+# ADF&G 11-2-16 / 10-4-18 / 10-16-19 / 11-9-2020/ 11-2-21/ 10-19-22
 # data from OceanAK summarize for use in Tanner CSA's 
 # have to modify the output from "detailed fish tickets" need to add "Number of Animals...sum" to this.
 
@@ -8,7 +8,7 @@
 
 # Load ---------------------------
 library(tidyverse)
-cur_yr = 2021
+cur_yr = 2022
 pr_yr = cur_yr-1
 output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
 dir.create(output_path) 
