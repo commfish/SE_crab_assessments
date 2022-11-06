@@ -66,7 +66,7 @@ short_t_tanner <- function(bypot_st, year) {
 #    tidy(fit) -> short_term_slope
   short_term_slope %>%
     filter(mod_recruit %in% recruit_used, term == 'Year') %>%
-    rename(slope = estimate) %>% 
+    dplyr::rename(slope = estimate) %>% 
     select(Location, mod_recruit, slope) %>%
     #spread(term, estimate) %>% 
     right_join(short_term_out2)->short_term_results # estimate here is slope from regression
@@ -178,7 +178,7 @@ poor_clutch_short <- function(females_all, year){
   
   fem_short_slope %>% 
     filter(term == 'Year') %>% 
-    rename(slope = estimate) %>% 
+    dplyr::rename(slope = estimate) %>% 
     select(Location, slope) %>% 
     right_join(fem_short_out) -> fem_short_results
   
