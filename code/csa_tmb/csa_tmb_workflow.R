@@ -31,15 +31,9 @@ input <- f_load_dat("./data/csa_tanner/glacier_bay.dat")
 ## load parameters
 pin <- f_load_pin("./data/csa_tanner/glacier_bay.pin", 3, 24)
 ## fit model
-fit <- f_fit_csa(input, pin, map_set = 1)
+fit <- f_fit_csa(input, pin, map_set = 1, prefix = "glacier_bay")
 fit$objective
 summary(fit$sdreport)
-
-## plots
-f_csa_plots(fit, path = "./figures/csa_tanner", prefix = "glacier_bay")
-
-capture.output(fit$sdreport, file = "./output/csa_tanner/glacier_bay.par")
-f_rep_file(fit, path = "./output/csa_tanner", prefix = "glacier_bay")
 
 
 # icy strait ----
@@ -49,12 +43,8 @@ input <- f_load_dat("./data/csa_tanner/icy_strait.dat")
 ## load parameters
 pin <- f_load_pin("./data/csa_tanner/icy_strait.pin", 3, 26)
 ## fit model
-fit <- f_fit_csa(input, pin, map_set = 1)
+fit <- f_fit_csa(input, pin, map_set = 1, prefix = "icy_strait")
 fit$objective
 summary(fit$sdreport)
 
-## plots
-f_csa_plots(fit, path = "./figures/csa_tanner", prefix = "icy_strait")
 
-capture.output(fit$sdreport, file = "./output/csa_tanner/icy_strait.par")
-f_rep_file(fit, path = "./output/csa_tanner", prefix = "icy_strait")
