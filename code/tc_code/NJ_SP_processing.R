@@ -1,5 +1,5 @@
 #K.Palof 
-# ADF&G 11-15-16 / 10-11-17 / 11-2-18 /10-10-19/ 11-12-20 / 11-7-21
+# ADF&G 11-15-16 / 10-11-17 / 11-2-18 /10-10-19/ 11-12-20 / 11-7-21 / 11-7-22
 # Areas: tanner crab assessment of red crab areas : North Juneau and Stephens Passage
 #   done seperately because they need to be divided into these two areas based on the pot locations, 
 #   division is done in ArcGIS using shape files for survey strata
@@ -16,7 +16,7 @@
 # Load -------------
 # source('./code/tanner_functions.R')
 source('./code/tc_code/sp_nj_figures.R')
-cur_yr <- 2021
+cur_yr <- 2022
 fig_path <- paste0('figures/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
 output_path <- paste0('results/tanner/nj_stp/', cur_yr) # output and results
@@ -40,6 +40,9 @@ dat %>% select(Year, Location.Code, Location, Pot.No, Depth.Fathoms, Latitude.De
   summarise(Depth.Fathoms = mean(Depth.Fathoms), Latitude.Decimal.Degrees = mean(Latitude.Decimal.Degrees), 
             Longitude.Decimal.Degrees = mean(Longitude.Decimal.Degrees)) -> juneau_pot_info
 write.csv(juneau_pot_info, paste0('./data/tanner/nj_stp/juneau_pot_info_', cur_yr,'.csv'))
+## this is the file that needs to be used in GIS to assign pots to either NJ or SP
+## see notes in w
+
 
 ## rest of data -------------
 area <- read.csv("./data/tanner/nj_stp/stp_strata_area.csv")  #density strata for tanner stratification in Stephen's Passage area
@@ -350,8 +353,8 @@ NJ_clutch_historic %>%
 ## add tanner density strata to dat.SP from seperate file
 # in seperate 'classes' is the Tanner.Density.Strata, simplify seperate
 seperate %>%
-  select(Year, Pot_No, Classes) %>%
-  rename(Tanner.Density.Strata.Code = Classes, Pot.No = Pot_No) %>%
+  select(Year, Pot_No, Strata) %>% #Classes) %>% # 2022 this column is now 'Strata'
+  dplyr::rename(Tanner.Density.Strata.Code = Strata, Pot.No = Pot_No) %>%
   mutate(Density.Strata = ifelse(Tanner.Density.Strata.Code ==1, 'Low/Zero', 
                                  ifelse(Tanner.Density.Strata.Code ==2, 'Medium Low', 
                                   ifelse(Tanner.Density.Strata.Code ==3, 'Medium', 
@@ -370,8 +373,8 @@ glimpse(SP_hist) # make sure the column names here match those in dat.NJ
 
 dat.SP %>% 
   select( -Latitude.Decimal.Degrees, -Longitude.Decimal.Degrees) -> dat.SP
-SP_hist %>% 
-  select(-X) -> SP_hist
+#SP_hist %>% 
+#  select(-X) -> SP_hist
 data.SP.all <- rbind(SP_hist, dat.SP)
 write.csv(data.SP.all, paste0('./results/tanner/nj_stp/', cur_yr,'/SP_rawdata_all.csv'), row.names = FALSE)
 
