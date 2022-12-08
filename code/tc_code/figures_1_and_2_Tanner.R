@@ -10,7 +10,7 @@
 
 # K.Palof
 # katie.palof@alaska.gov
-# 11/07/2018 / 11-15-2020 / 3-2-21 / 11-8-21
+# 11/07/2018 / 11-15-2020 / 3-2-21 / 11-8-21/ 11-7-22
 
 # load -----
 source('./code/tanner_functions.R')
@@ -18,7 +18,7 @@ output_path <- paste0('results/tanner/', cur_yr) # output and results
 dir.create(output_path) 
 
 # data -----
-cur_yr <- 2021
+cur_yr <- 2022
 #survey_biomass <- read.csv("./data/TCS/survey_areas_biomass.csv") #add to each year
 # above file had point estimates from each year and was kept historically in SigmaPlot. Now this is tracked in 
 # an appendix table in the stock health document. 
@@ -29,8 +29,8 @@ harvest <- read.csv("./data/harvest/tanner_harvest.csv") # harvest harvest since
 # add current years catch to this file or repull all years
 std_cpue <- read.csv(paste0("C:/Users/kjpalof/Documents/R projects/tanner-crab/results/std_commericial_cpue", cur_yr, ".csv"))
 #calculated in a separate project "tanner-crab" - need to calc this first so go to "tanner-crab"
-hist_biomass <- read.csv("./data/tanner/tanner_annual_pt_estimate_historic.csv")
-# !! where is this updated????
+hist_biomass <- read.csv(paste0("./data/tanner/tanner_annual_pt_estimate_historic_", cur_yr-1, ".csv"))
+# !! where is this updated???? !! updated manually
 
 # data prep for Figure 1 ---------------
 biomass %>% 
@@ -144,9 +144,13 @@ cur_yr_biomass %>%
 tail(hist_biomass) 
   
 # these are projected biomass for each end year - old data/years here are NOT updated.
-  
+# add current year to this.
+cur_yr_biomass %>% 
+  filter(Year == cur_yr) -> temp1
+hist_biomass %>% 
+  rbind(temp1) -> hist_biomass2
 # add code to pull in current year from above here and then re-save from the following year
- hist_biomass %>% 
+ hist_biomass2 %>% 
     gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
     ggplot(aes(Year, y = pounds/1000000, group = type)) +
     geom_line(aes(color = type, linetype = type))+
@@ -292,7 +296,7 @@ cur_yr_biomass %>%
   
   
 #  geom_bar(stat = "identity", 
-           fill = "grey75", colour = "black")
+#           fill = "grey75", colour = "black")
 
 ## this version has survey year but this isn't matched with comm harvest year. 
   ## harvest 2021 is really 2020/2021 season
@@ -352,6 +356,7 @@ biomass_harvest2 %>%
   ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_comm_catch_yr.png'), dpi = 800,
          width = 8.5, height = 6.0)
 # Old with point estimates Figure 1 ------------
+##?????
 survey_biomass %>% 
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
   ggplot(aes(Year, y = pounds/1000000, group = type)) +
