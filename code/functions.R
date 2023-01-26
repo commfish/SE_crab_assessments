@@ -456,6 +456,9 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
           axis.title=element_text(size=14,face="bold"), 
           plot.title = element_text(size = 24))
   
+  if(survey.location == "LynnSisters"){
+    p1 = p1 + ggtitle("Lynn Sisters")
+  }
 
   ### F1b females/juvenile plot ---------------
   p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
@@ -466,7 +469,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
     scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
     #ylim(0,25) + 
-    scale_y_continuous(limits = c(0,25), oob = rescale_none) +
+    scale_y_continuous(limits = c(0,(max(round(femjuv_graph$mean, 0) +1))), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
@@ -484,10 +487,15 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
           axis.title=element_text(size=14,face="bold"))
   
   if(option == 3){
-    p2 = p2 + ggtitle(paste0('Female/juvenile CPUE and egg health for ', survey.location)) +
+    p2 = p2 + ggtitle(paste0('Female/juvenile CPUE & egg health for ', survey.location)) +
       theme(plot.title = element_text(size = 24))
   }
-
+  
+  if(survey.location == "LynnSisters"){
+    p2 = p2 + ggtitle("Female/juvenile CPUE & egg health for Lynn Sisters") +
+      theme(plot.title = element_text(size = 20))
+  }
+  
 
   #### F1c Female eggs graph -----------
   p3 <- ggplot(female_egg_graph, aes(Year, mean)) + 
@@ -897,7 +905,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
                 panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
                 ifelse(option == 3, 
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/rkc/',cur_yr, '/non_conf/', survey.location, '_', cur_yr, '_', 
+  ggsave(paste0('./figures/rkc/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
                 option, 'non_conf.png'), panel,  
          dpi = 800, width = 8, height = 9.5)
 }
