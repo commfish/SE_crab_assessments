@@ -294,7 +294,7 @@ panel_figure('LynnSisters', cur_yr, 'LynnSisters', 3, 0) # female panel
 
 ### NON CONF panel --------------
 panel_figure_NC('LynnSisters', 2020, 'LynnSisters', 1, 0) # panel with all 3 figures
-panel_figure_NC('LynnSisters', 2020, 'LynnSisters', 2, 0)
+panel_figure_NC('LynnSisters', cur_yr, 'LynnSisters', 2, 0)
 
 ### presentation figure -----
 panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 2, 0, 'Lynn Sisters')

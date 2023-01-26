@@ -280,8 +280,8 @@ panel_figure('Seymour', cur_yr, 'Seymour Canal', 3, 1) # female panel
 # base.location is the location name in the baseline file, can be different
 
 ### NON CONF panel --------------
-panel_figure_NC('Seymour', 2019, 'Seymour Canal', 1, 1)
-panel_figure_NC('Seymour', 2019, 'Seymour Canal', 2, 1)
+panel_figure_NC('Seymour', cur_yr, 'Seymour Canal', 1, 1)
+panel_figure_NC('Seymour', cur_yr, 'Seymour Canal', 2, 1)
 
 ### presentation figure -----
 panel_figure_NC_PRES('Seymour', cur_yr, 'Seymour Canal', 2, 1, "Seymour Canal")
