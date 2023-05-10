@@ -18,6 +18,7 @@ cur_yr <- 2022 # change this upon receiving new data
 pr_yr <- cur_yr -1
 survey.location <- 'Juneau'
 
+# these create current year (see above) folders for each of these directories
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
 dir.create(file.path(paste0('figures/rkc/'), cur_yr))
@@ -29,6 +30,7 @@ dat <- read.csv("./data/rkc/Juneau/jnu_21_22_oceanAK_out_RAW.csv") # file name w
 #   Juneau area includes Juneau and Barlow
 area <- read.csv("./data/rkc/Juneau/Juneau_Barlow_strata_area.csv") # same every year
 
+# both of these files are pulled from summaries created in the past years data anlaysis
 histdat <- read.csv(paste0('./results/rkc/', survey.location, 
                            '/', pr_yr, '/JNU_perpot_all_', pr_yr,'.csv'))
 ## !!!!  this file will be 'JNU_perpot_all_pr_yr' and just get updated with current years data.
@@ -38,7 +40,7 @@ females <- read.csv(paste0('./results/rkc/', survey.location,
 baseline <- read.csv("./data/rkc/longterm_means.csv") # same every year
 biomass <- read.csv("./data/rkc/biomass.csv") # ** update ** from CSA model
 #   file for all locations. Has biomass estimates from CSA,
-#   must be updated after CSA model is run for current year USING current year's model
+#   must be updated after CSA model is run (in excel) for current year USING current year's model
 #             NOT historic forecast!
 
 ## survey data QAC -------
@@ -57,7 +59,7 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1, Year == 2022) ->
 
 #**FIX ** issues with recruit class 2021 pot# 191
 #write.csv(temp, paste0('./results/rkc/', survey.location,'/', 
-                          cur_yr, '/data_issues' , cur_yr, '.csv'), row.names = FALSE)
+#                          cur_yr, '/data_issues' , cur_yr, '.csv'), row.names = FALSE)
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
 
