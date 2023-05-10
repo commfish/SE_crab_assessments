@@ -18,7 +18,9 @@ Workflow:
   - CSA model - currently still in Excel file, see "readme" sheet here for instructions
   - Once the CSA is completed and the 'biomass.csv' file is updated go back to "juneau.R" and run the code for the 'panel_figures'
   - Once the above is completed open the "text/cur_yr/Juneau_memo.Rmd" file and update it with current year, etc. file structure should autofind with current year updates. Go through text and update as needed with summarises, etc. 
+  - Figure 1 and A1 - see code in 'juneau_hindcast_figure.R' this has code for these figures for the Juneau area. You need to manually update the input file (see notes in the R script) to include the current years biomass estimates for every year and then the "forecast" which just copies this years estimate. Also here you need to update the last season - 2022 to "PU only" and put in a "TBD" for 2023. 
   - Once this is completed and you "knit" the .doc, then I usually move it to the "2022 RKC" folder into the Juneau folder here. Then I can update the "TABLES and Figs_cur_yr 11-A....doc" and put those figures into one file with ones from markdown .doc. This then becomes the "cur_yr 11-A RKC_CONFIDENTIAL_draft.doc", once you present and give this to regional staff then we can determine the confidential nature of the data. All initial reports are determined to be confidential until this is done, plus current years survey data is confidential.
+  - 
   
 
 ### Juneau personal use
