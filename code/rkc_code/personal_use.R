@@ -9,6 +9,8 @@
 #####Load Packages ---------------------------------
 library(tidyverse)
 library(xlsx)
+source('./code/functions.R')
+
 cur_yr = 2022 # survey year
 
 prv_yr = cur_yr-1 # fishery year NOT survey year
@@ -19,6 +21,18 @@ prv_yr = cur_yr-1 # fishery year NOT survey year
 personal_use <- read.csv(paste0(here::here(), "/data/harvest/11-A rkc pu_catch_updated2022.csv"))
 permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2020 2021 2022 permit status summary.csv"))
 # **FIX** get biologist to help summarize this in future...way to time consuming for me and they have to do it already.
+
+## catch midpoint date -------------------------------
+pu_catch_dates <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2021 catch dates.csv"))
+
+# list of unique dates (day only, excluding time)
+pu.dates <- unique(round_date(ymd_hms(pu_catch_dates$Catch.Date), unit="day"))
+
+# interval of minimum and maximum catch dates
+pu.date.int <- interval(min(pu.dates), max(pu.dates))
+
+# personal use catch midpoint; see functions script for the int_midpoint function
+pu.midpoint <- int_midpoint(pu.date.int)
 
 ## reported number ----
 # ** in order to get permits not returned that do NOT have catch need to click on "xyz" and select "include rows with only null values"
@@ -65,7 +79,7 @@ by_status_current2 %>%
 # 2 = permit returned but NOT fished
 
 ## estimated number ----
-# pervious notes on personal use suggest that an equation was used to estimate harvest from those permits
+# previous notes on personal use suggest that an equation was used to estimate harvest from those permits
 #   that were not returned
 #     
 # percent not returned 
