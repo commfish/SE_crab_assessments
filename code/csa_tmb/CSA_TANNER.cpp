@@ -1,4 +1,18 @@
-// Westward Tanner crab CSA with fixed molt probability and estimated pre-recruit M
+// ==================================================================================== //
+// Crab Catch-Survey-Analysis (CSA) based on Zheng et al. (2007)
+// Version 1
+// 
+// Author: Tyler Jackson
+//
+// Last Update: 6/8/2023
+//
+// Indexs: 
+// i: rows
+// j: columns
+// iyear: years
+// jstage: stages
+// xtage: columns of transition matrix
+// ==================================================================================== //
 
 
 #include <TMB.hpp>
@@ -19,7 +33,7 @@ template<class Type>
 	DATA_VECTOR(tau_cs);			// fraction of year between mid-fishery and mid-surey
 	DATA_VECTOR(tau_s);				// fraction of year between survey(i) and (i-1)
 	DATA_SCALAR(M);						// natural mortality on post-recruit stages
-	DATA_MATRIX(wt_survey);		// stage data weighting 
+	DATA_MATRIX(lambdas);		  // stage data weighting 
 
 	DATA_MATRIX(avg_wt);			// average survey weight (lb) for pre-recruits and recruits nd year;
 
@@ -28,7 +42,7 @@ template<class Type>
 	// parameters
 	PARAMETER_VECTOR(ln_index_init);		  // initial abundance index
 
-	PARAMETER_VECTOR(trans_probs);								// stage transition probs diag
+	PARAMETER_VECTOR(trans_probs);				// stage transition probs diag
 
 	PARAMETER(ln_Rbar);										// mean recruitment
 	PARAMETER_VECTOR(Eps_R);				  		// annual recruitment
@@ -82,7 +96,6 @@ template<class Type>
 	// procedure
 
 	// fill predicted index matrix
-
 	for (int iyear = 0; iyear < nyr; iyear++) {
 		index(iyear, 0) = Rbar * exp(Eps_R(iyear));
 		if(iyear==0) {
@@ -110,7 +123,7 @@ template<class Type>
 
 
 
-	// output stuff
+	// output vectors
 	for (int iyear = 0; iyear < nyr; iyear++) {
 		PMB(iyear) = 0; LMB(iyear) = 0; MMB(iyear) = 0; 
 		for (int jstage = 0; jstage < nstage; jstage++) {
@@ -128,13 +141,13 @@ template<class Type>
 	Type index_lik = 0;
 	Type R_lik = 0;
 
-
+  // index likelihood
 	for (int iyear = 0; iyear < nyr; iyear++) {
 		for (int jstage = 0; jstage < nstage; jstage++) {
-				index_lik += pow(log(obs_index(iyear,jstage)) - log(index(iyear,jstage)), Type(2)) * wt_survey(iyear,jstage);
+				index_lik += pow(log(obs_index(iyear,jstage)) - log(index(iyear,jstage)), Type(2)) * lambdas(iyear,jstage);
 			}
 		}
-
+	// recruitment likelihood
 	if(recruit_likelihood == 1) {
 		for (int iyear = 0; iyear < nyr; iyear++) {
 			R_lik += pow(Eps_R(iyear), Type(2)) / pow(sigmaR, Type(2)) + log(pow(sigmaR, Type(2)));

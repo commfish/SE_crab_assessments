@@ -1,7 +1,7 @@
 # notes ----
 ## wrapper functions SE crab CSA models
 ## tyler jackson
-## 11/10/2022
+## 6/8/2023
 
 # load ---- 
 library(TMB)
@@ -79,10 +79,10 @@ f_load_dat <- function(path) {
   obs_index <- dat[start:end, 2:(nstage+1)]
   # index mid date
   index_md <- dat[start:end, 5]
-  # wt survey
+  # lambdas
   start = end+1
   end = start+length(yrs)-1
-  wt_survey <- dat[start:end, 1:3]
+  lambdas <- dat[start:end, 1:3]
   # avg wt (lbs)
   start = end+1
   end = start+length(yrs)-1
@@ -102,21 +102,21 @@ f_load_dat <- function(path) {
     mutate(tau = (index_md_lead + (365 + leapl - index_md)) / (365)) %>%
     pull(tau) %>% .[1:(length(index_md) - 1)] -> tau_s
   
-  return(list(yrs = yrs, catch_num = catch_num, obs_index = obs_index, tau_cs = tau_cs, tau_s = tau_s, M = M, wt_survey = wt_survey, avg_wt = avg_wt))
+  return(list(yrs = yrs, catch_num = catch_num, obs_index = obs_index, tau_cs = tau_cs, tau_s = tau_s, M = M, lambdas = lambdas, avg_wt = avg_wt))
 }
 
 # load pin file function ----
 
 f_load_pin <- function(path, nstage, nyrs) {
   
-  ln_index_init <- scan(path, skip = 2, n = nstage-1, quiet = T)
-  trans_probs <- scan(path, skip = 4, n = nstage*2 - 2, quiet = T)
-  ln_Rbar <- scan(path, skip = 6, n = 1, quiet = T)
-  Eps_R <- scan(path, skip = 8, n = nyrs, quiet = T)
-  ln_sigmaR <- scan(path, skip = 10, n = 1, quiet = T)
-  preM <- scan(path, skip = 12, n = 1, quiet = T)
-  ln_q <- scan(path, skip = 14, n = 1, quiet = T)
-  ln_mu <- scan(path, skip = 16, n = 1, quiet = T)
+  ln_index_init <- scan(path, skip = 2, nlines = 1, quiet = T)
+  trans_probs <- scan(path, skip = 4, nlines = 1, quiet = T)
+  ln_Rbar <- scan(path, skip = 6, nlines = 1, quiet = T)
+  Eps_R <- scan(path, skip = 8, nlines = 1, quiet = T)
+  ln_sigmaR <- scan(path, skip = 10, nlines = 1, quiet = T)
+  preM <- scan(path, skip = 12, nlines = 1, quiet = T)
+  ln_q <- scan(path, skip = 14, nlines = 1, quiet = T)
+  ln_mu <- scan(path, skip = 16, nlines = 1, quiet = T)
   
   return( list(ln_index_init = ln_index_init, trans_probs = trans_probs, ln_Rbar = ln_Rbar,
               Eps_R = Eps_R, ln_sigmaR = ln_sigmaR, preM = preM, ln_q = ln_q, ln_mu = ln_mu) )
@@ -272,7 +272,7 @@ f_csa_plots <- function(fit, path, prefix, stage_labs = c("Pre-recruit", "Recrui
 }
 
 
-# output rep  and par----
+# output rep and par files ----
 
 f_rep_file <- function(fit, path, prefix) {
   
