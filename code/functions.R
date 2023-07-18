@@ -31,6 +31,8 @@ library(TeachingDemos)
 library(purrr)
 library(TMB)
 library(radiant.data)
+library(lubridate)
+
 #font_import()
 loadfonts(device="win")
 windowsFonts(Times=windowsFont("TT Times New Roman"))
@@ -39,6 +41,11 @@ windowsFonts(Times=windowsFont("TT Times New Roman"))
 theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
             theme(panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank()))
+
+### calculate date midpoint function ----------------
+int_midpoint <- function(interval) {
+  round_date(int_start(interval) + (int_end(interval) - int_start(interval))/2, unit="day")
+}
 
 ### short term function ----------------
 #input is file with last four years of data summarized by pot
