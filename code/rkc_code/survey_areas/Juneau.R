@@ -18,13 +18,20 @@ cur_yr <- 2022 # change this upon receiving new data
 pr_yr <- cur_yr -1
 survey.location <- 'Juneau'
 
+<<<<<<< HEAD
 # these create current year (see above) folders for each of these directories
+=======
+dir.create(file.path('results'))
+dir.create(file.path('results/rkc'))
+dir.create(file.path(paste0('results/rkc/', survey.location)))
+>>>>>>> 2abc0898ea14715522123467acbf355c348b0440
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
+dir.create(file.path('figures/rkc'))
 dir.create(file.path(paste0('figures/rkc/'), cur_yr))
 
 ## data -------------------
-dat <- read.csv("./data/rkc/Juneau/jnu_21_22_oceanAK_out_RAW.csv") # file name will change annually
+dat <- read.csv("./data/rkc/Juneau/jnu_21_22_oceanAK_out_raw.csv") # file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 #   Juneau area includes Juneau and Barlow
@@ -59,7 +66,11 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1, Year == 2022) ->
 
 #**FIX ** issues with recruit class 2021 pot# 191
 #write.csv(temp, paste0('./results/rkc/', survey.location,'/', 
+<<<<<<< HEAD
 #                          cur_yr, '/data_issues' , cur_yr, '.csv'), row.names = FALSE)
+=======
+                          #cur_yr, '/data_issues' , cur_yr, '.csv'), row.names = FALSE)
+>>>>>>> 2abc0898ea14715522123467acbf355c348b0440
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
 
@@ -90,9 +101,10 @@ ggplot(juvies20, aes(Length.Millimeters)) +
 
 ggplot(juvies20, aes(x = Length.Millimeters, fill = cohort)) +
   geom_histogram(binwidth=.5, alpha=.5, position="identity")
+
 ## CPUE calc --------------
 ##### By Pot -------------------------------
-# Now summarize by pot - remember to keep areas seperate.
+# Now summarize by pot - remember to keep areas separate.
 # need Number of Specimens by recruit class
 # keep trip no. to merge with historic data 
 dat1 %>%
@@ -102,7 +114,7 @@ dat1 %>%
 dat3 <- dcast(dat2, Year + Location + Trip.No + Pot.No + Density.Strata.Code ~ Recruit.Status, sum, drop=TRUE)
 head(dat3) # confirm data is summarized by pot with recruit classes each in a column 
 
-# Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has it's own area file or area per
+# Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has its own area file or area per
 #     strata.  This is used to calculating the weighting for weighted CPUE.
 dat3 %>%
   right_join(area) -> tab
@@ -138,7 +150,7 @@ dat5 %>%
 write.csv(CPUE_wt, paste0('./results/rkc/', survey.location,'/', 
                           cur_yr, '/JNU_CPUE_' , cur_yr, '.csv'), row.names = FALSE)
 
-# weighted cpue by strata --- just for comparison
+# weighted cpue by stratum --- just for comparison
 dat5 %>%
   group_by(Year, Density.Strata.Code) %>%
   summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
@@ -148,20 +160,34 @@ dat5 %>%
             MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
             SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/
                                                                           (sqrt(sum(!is.na(Small.Females)))))) 
-# look at results to see the spread between stratas...in high biomass years even low strata 1,2 had higher CPUE. >1 or 2
+# look at results to see the spread between strata...in high biomass years even low strata 1,2 had higher CPUE. >1 or 2
 
 #### survey mid date -----  
 #  ** fix **  make this calculated from data not just visual
 head(dat)
 unique(dat$Time.Hauled)
-# need to seperate time hauled to just have data hauled look for mid-date 
+# need to separate time hauled to just have data hauled look for mid-date 
 #dat[1,7] # 6-20
 #dat[5843,7] # 6-27
 # so mid-date would be 24th.
 ### ***fix *** this needs to be calculated better
 
+# fix: 2023-05-23, Caitlin Stern
+
+# list of unique dates (day only, excluding time)
+dates <- unique(round_date(ymd_hms(dat$Time.Hauled), unit="day"))
+
+# only survey dates from the current year
+dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
+
+# interval of minimum and maximum survey dates
+date.int <- interval(min(dates.cur), max(dates.cur))
+
+# survey midpoint; see functions script for the int_midpoint function
+sur.midpoint <- int_midpoint(date.int)
+
 ##### Historic file ---------------------------------------
-# need to add current years pot summary to the historic pot summary file.  
+# need to add current year's pot summary to the historic pot summary file.  
 # For simplicity reasons this will be inputed for each of the bays.  This will avoid
 # any issues with recalculating the crab per pot due to edits in data.
 # read in historic by pot file and make sure variable names match
@@ -200,7 +226,7 @@ CPUE_ALL_YEARS %>% count(Year)
 CPUE_ALL_YEARS %>%
   filter(Year >= cur_yr - 3) -> bypot_st # short term file has last 4 years in it
 
-# function creates output file in folder /results/redcrab/'area'
+# function creates output file in folder /results/redcrab/'area'/cur_yr
 short_t(bypot_st, cur_yr, "Juneau")
 # output is saved as shortterm.csv
 bypot_st_long <- gather(bypot_st, recruit.status, crab, Missing:Small.Females, 
@@ -217,7 +243,7 @@ long_t(dat5_cur_yr, baseline, cur_yr, 'Juneau', 'Juneau')
 # output is saved as longterm.csv
 
 
-##### Weights from length - weight relatinship.-----------------
+##### Weights from length - weight relationship.-----------------
 # Linear model is changed for each area
 # Juneau linear model: exp(3.03*log(length in mm)-7.23)*2.2/1000
 glimpse(dat1) # raw data for last 2 years
