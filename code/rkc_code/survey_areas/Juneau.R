@@ -18,13 +18,8 @@ cur_yr <- 2022 # change this upon receiving new data
 pr_yr <- cur_yr -1
 survey.location <- 'Juneau'
 
-<<<<<<< HEAD
 # these create current year (see above) folders for each of these directories
-=======
-dir.create(file.path('results'))
-dir.create(file.path('results/rkc'))
-dir.create(file.path(paste0('results/rkc/', survey.location)))
->>>>>>> 2abc0898ea14715522123467acbf355c348b0440
+
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
 dir.create(file.path('figures/rkc'))
@@ -66,11 +61,8 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1, Year == 2022) ->
 
 #**FIX ** issues with recruit class 2021 pot# 191
 #write.csv(temp, paste0('./results/rkc/', survey.location,'/', 
-<<<<<<< HEAD
-#                          cur_yr, '/data_issues' , cur_yr, '.csv'), row.names = FALSE)
-=======
-                          #cur_yr, '/data_issues' , cur_yr, '.csv'), row.names = FALSE)
->>>>>>> 2abc0898ea14715522123467acbf355c348b0440
+#    cur_yr, '/data_issues' , cur_yr, '.csv'), row.names = FALSE)
+
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
 
