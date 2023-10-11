@@ -6,8 +6,10 @@
 *.Rproj
 
 *.png
+*.csv
+*.xlsx
 ./data
-*.docx
+#*.docx
 *.html
 /data
 #/results

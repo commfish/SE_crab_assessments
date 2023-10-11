@@ -12,15 +12,17 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2022 # update annually 
+cur_yr <- 2023 # update annually 
 pr_yr <- cur_yr -1
+cur_yr2 <- 23
+pr_yr2 <- 22
 survey.location <- 'Pybus'
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
 
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PB_21_22.csv'))# file name will change annually
+dat <- read.csv(paste0('./data/rkc/', survey.location, '/RKC_survey_CSA_', survey.location, '_', pr_yr2, '_', cur_yr2, '.csv'))
               # this is input from OceanAK - set up as red crab survey data for CSA
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Pybus_strata_area.csv')) 
               #this file is the same every year.  Unless the survey methods change
@@ -49,14 +51,21 @@ dat %>%
 dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
-dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
+dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> temp
 
-# **FIX **  calculate soak time 
-#come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
+# write out csv of rows with missing recruit status, if they exist
+#write_csv(temp, paste0('./data/rkc/', survey.location, '/PY_missing_recruit_status' , cur_yr, '.csv'))
+
+# Calculate soak time - RKC soak time should be 18-24 hrs. This should produce no rows.
+dat_soak <- dat1 %>%
+  mutate(time_set = as.POSIXct(Time.Set,format="%Y-%m-%d %H:%M:%S",tz=Sys.timezone())) %>%
+  mutate(time_hauled = as.POSIXct(Time.Hauled,format="%Y-%m-%d %H:%M:%S",tz=Sys.timezone())) %>%
+  mutate(soak_time = time_hauled - time_set) %>%
+  filter(soak_time > 24 | soak_time < 18)
 
 ## CPUE calc --------------
 ##### By Pot -------------------------------
-# Now summarize by pot - remember to keep areas seperate.
+# Now summarize by pot - remember to keep areas separate.
 # need Number of Specimens by recruit class
 # keep trip no. to merge with historic data 
 dat1 %>%
@@ -116,11 +125,21 @@ dat5 %>%
 # look at results to see the spread between stratas...in high biomass years even low strata 1,2 had higher CPUE. >1 or 2
 
 #### survey mid date -----  
-#  ** fix **  make this calculated from data not just visual
-head(dat)
-unique(dat$Time.Hauled)
-# need to seperate time hauled to just have data hauled look for mid-date 
-dat %>% filter(Year == cur_yr)  # 7-25
+
+# list of unique dates (day only, excluding time)
+dates <- unique(lubridate::round_date(lubridate::ymd_hms(dat$Time.Hauled), unit="day"))
+
+# only survey dates from the current year
+dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
+
+# interval of minimum and maximum survey dates
+date.int <- interval(min(dates.cur, na.rm=TRUE), max(dates.cur, na.rm=TRUE))
+
+# survey midpoint; see functions script for the int_midpoint function
+sur.midpoint <- int_midpoint(date.int)
+
+# convert to Julian day
+sur.midpoint.jul <- yday(sur.midpoint)
 
 
 ##### Historic file ---------------------------------------
@@ -268,14 +287,14 @@ CPUE_ALL_YEARS %>%
             MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
             SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt_all
 CPUE_wt_all  
-CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
+CPUE_wt_all %>% filter(Year >= 1995) -> CPUE_wt_from95
 
-write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
-                                 cur_yr, '/cpue_wt_since_93.csv'), row.names = FALSE)
+write.csv(CPUE_wt_from95, paste0('results/rkc/', survey.location, '/', 
+                                 cur_yr, '/cpue_wt_since_95.csv'), row.names = FALSE)
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
-### note !!! need to update bimoass.csv file with current yr CSA estiamte before running 
+### note !!! need to update bimoass.csv file with current yr CSA estimate before running 
 #   this function.
 panel_figure('Pybus', cur_yr, 'Pybus', 1, 0) # panel with all 3 figures
 panel_figure('Pybus', cur_yr, 'Pybus', 2, 0) # male panel

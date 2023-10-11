@@ -85,7 +85,7 @@ harvest2 %>%
   #filter (Season == "Sep2017 - Aug18") %>% 
  # filter(Date.of.Landing != '2018-07-13 00:00:00') %>% 
   group_by(Year, survey.area, Date.of.Landing) %>%
-  summarise(numbers = sum(Number.Of.Animals)) ->mid.catch
+  summarise(numbers = sum(Number.Of.Animals)) -> mid.catch
 
 mid.catch %>% 
   group_by(survey.area, Year) %>% 
@@ -157,7 +157,7 @@ logb11510 %>%
   mutate(year_caught = Year) %>% # this has 'Year' as "year caught" NOT fishery year - fix this above.
   select(-Year) -> logb_merge
 
-harvest_all_update %>% 
+stat_11510 <- harvest_all_update %>% 
 #harvest_all %>%  # placeholder for updates made in season after initial calcs are done
   filter(Stat.Area == 11510) %>% 
   left_join(logb_merge) %>% # this has 'Year' as "year caught" NOT fishery year - fix this above.
@@ -174,7 +174,7 @@ harvest_all_update %>%
   select(Year, Stat.Area, survey.area, vessels, people, permits, processor, units, value) %>% 
   spread(units, value) %>% 
   select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds, Year) %>% 
-  mutate(year_caught = Year + 1) -> stat_11510
+  mutate(year_caught = Year + 1) 
 
 
 ### Deal with 11510 -----------

@@ -1,5 +1,7 @@
 # K.Palof   8-4-17
 
+# 7/20/23: changed data set used in panel figures to 1995-present due to biologists' concerns about pre-1995 data (Caitlin Stern)
+
 # Functions for processing of red king crab data
 # need to keep area and year 
 
@@ -11,7 +13,7 @@ library(broom)
 library(kableExtra)
 library(xtable)
 library(flextable)
-
+library(lubridate)
 
 library(stringr)
 library(reshape2)
@@ -31,14 +33,27 @@ library(TeachingDemos)
 library(purrr)
 library(TMB)
 library(radiant.data)
+
+library(ragg)
+
 #font_import()
 loadfonts(device="win")
 windowsFonts(Times=windowsFont("TT Times New Roman"))
+windowsFonts()
+
+loadfonts(quiet = T)
+fonts()
+set_null_device("png")
 
 #theme_set(theme_sleek())
 theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
             theme(panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank()))
+
+### calculate midpoint date function ----------------
+int_midpoint <- function(interval) {
+  round_date(int_start(interval) + (int_end(interval) - int_start(interval))/2, unit="day")
+}
 
 ### short term function ----------------
 #input is file with last four years of data summarized by pot
@@ -302,12 +317,12 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   # Option 1 - all 4 on one file, Option 2 - just p1, p4 (males), 
   # Option 3 - p2,p3 (females), Option 4 - created for Seymour Canal scaling issues
   CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
-                                   '/cpue_wt_since_93.csv')) # changed this to one since 93 - make this change to all processing codes.
+                                   '/cpue_wt_since_95.csv')) # changed this to one since 95 - make this change to all processing codes.
   poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
                                         '/', cur_yr, '/poorclutch_summary_all.csv'))
   egg_mean_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/egg_percent_mean_all.csv'))
-  # file with year and mean percent poor clutch and se poor clutch from 1993 to current
+  # file with year and mean percent poor clutch and se poor clutch from 1995 to current
   mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
   baseline <- read.csv("./data/rkc/longterm_means.csv")
   biomass <- read.csv("./data/rkc/biomass.csv") 
@@ -359,17 +374,17 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     
   ## poor clutch --------
   poorclutch_summary %>% 
-    filter(Year >= 1993) %>% 
+    filter(Year >= 1995) %>% 
     mutate(Pclutch100 = Pclutch *100, 
            Pclutch.se100 = Pclutch.se*100) %>% 
-    select(Year, Pclutch100, Pclutch.se100) ->poorclutch_summary93
+    select(Year, Pclutch100, Pclutch.se100) ->poorclutch_summary95
   ## mean egg percent -------
   egg_mean_all %>% 
-    filter(Year >= 1993) -> egg_mean_all_93
+    filter(Year >= 1995) -> egg_mean_all_95
   ## female egg data -------
   # combine these data sets for graphing.  Create one with means and one with SEs.
-  poorclutch_summary93 %>% 
-    left_join(egg_mean_all_93) -> female_egg
+  poorclutch_summary95 %>% 
+    left_join(egg_mean_all_95) -> female_egg
   female_egg_long <- gather(female_egg, vname, value1, Pclutch100:egg.se, factor_key = TRUE)
   female_egg_long %>% 
     mutate(female.egg = ifelse(vname == "Pclutch100",
@@ -401,7 +416,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     select(-weighted_ADJ, -legal.biomass, -mature.biomass) %>% 
     gather(type, pounds, harvest:adj.mature, factor_key = TRUE) %>% 
     filter(Location == survey.location) %>% 
-    filter(Year >= 1993) -> biomass_graph
+    filter(Year >= 1995) -> biomass_graph
   
   biomass_graph %>% 
       filter(Year <= 2007) %>% 
@@ -415,7 +430,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       select(-weighted_ADJ, -adj.legal, -adj.mature) %>% 
       gather(type, pounds, harvest:mature.biomass, factor_key = TRUE) %>% 
       filter(Location == survey.location) %>% 
-      filter(Year >= 1993) -> biomass_graph
+      filter(Year >= 1995) -> biomass_graph
     biomass_graph %>% 
       filter(Year <= 2007 & Year >=1995) %>% 
       spread(type, pounds) %>% 
@@ -440,7 +455,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     #ylim(0,(max(males_graph$mean) + max(males_graph$se))) + 
     ggtitle(survey.location) + ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -451,7 +466,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
                linetype = "longdash", lwd = 0.75)+
     geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
                lwd = 0.75)+
-    theme(legend.position = c(0.8,0.8), 
+    theme(legend.position = c(0.5,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"), 
           plot.title = element_text(size = 24))
@@ -472,7 +487,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     scale_y_continuous(limits = c(0,(max(round(femjuv_graph$mean, 0) +1))), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -512,7 +527,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     ylab("Percentage") + 
     xlab(NULL) +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     theme(legend.position = c(0.2,0.5), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) 
@@ -536,12 +551,12 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     ylab("Biomass (lbs)") + 
     xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                         na.rm = TRUE) + 25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds, 
                                                    na.rm = TRUE)+25000), by = 50000)) +
-    theme(legend.position = c(0.8,0.8), 
+    theme(legend.position = c(0.5,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) + 
     geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey1")+
@@ -563,12 +578,12 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       ylab("Biomass (lbs)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
       scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                           na.rm = TRUE) + 25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds, 
                                                      na.rm = TRUE)+25000), by = 50000)) +
-      theme(legend.position = c(0.8,0.9), 
+      theme(legend.position = c(0.5,0.85), 
             axis.text = element_text(size = 12), 
             axis.title=element_text(size=14,face="bold")) + 
       geom_hline(data = baseline_means, aes(yintercept = legal_mean), color = "grey1")+
@@ -607,12 +622,12 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   # Option 3 - p2,p3 (females), 
   # scale - created for Seymour Canal scaling issues
   CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
-                                   '/cpue_wt_since_93.csv'))
+                                   '/cpue_wt_since_95.csv'))
   poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
                                         '/', cur_yr, '/poorclutch_summary_all.csv'))
   egg_mean_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/egg_percent_mean_all.csv'))
-  # file with year and mean percent poor clutch and se poor clutch from 1993 to current
+  # file with year and mean percent poor clutch and se poor clutch from 1995 to current
   mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
   baseline <- read.csv("./data/rkc/longterm_means.csv")
   biomass <- read.csv("./data/rkc/biomass.csv") 
@@ -665,17 +680,17 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   
   ## poor clutch --------
   poorclutch_summary %>% 
-    filter(Year >= 1993) %>% 
+    filter(Year >= 1995) %>% 
     mutate(Pclutch100 = Pclutch *100, 
            Pclutch.se100 = Pclutch.se*100) %>% 
-    select(Year, Pclutch100, Pclutch.se100) ->poorclutch_summary93
+    select(Year, Pclutch100, Pclutch.se100) ->poorclutch_summary95
   ## mean egg percent -------
   egg_mean_all %>% 
-    filter(Year >= 1993) -> egg_mean_all_93
+    filter(Year >= 1995) -> egg_mean_all_95
   ## female egg data -------
   # combine these data sets for graphing.  Create one with means and one with SEs.
-  poorclutch_summary93 %>% 
-    left_join(egg_mean_all_93) -> female_egg
+  poorclutch_summary95 %>% 
+    left_join(egg_mean_all_95) -> female_egg
   female_egg_long <- gather(female_egg, vname, value1, Pclutch100:egg.se, factor_key = TRUE)
   female_egg_long %>% 
     mutate(female.egg = ifelse(vname == "Pclutch100",
@@ -718,7 +733,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
  
  if(survey.location != "Juneau") {
   biomass %>% 
-    filter(Year >= 1993) %>% 
+    filter(Year >= 1995) %>% 
     mutate(harvest = ifelse(confidential == "no", harvest, 'na')) %>% 
     mutate(harvest = as.numeric(harvest)) %>% 
     select(-weighted_ADJ, -permits, -confidential, -legal.biomass, -mature.biomass) %>% 
@@ -734,7 +749,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   
   if(survey.location == "Juneau"){
     biomass %>% 
-      filter(Year >= 1993) %>% 
+      filter(Year >= 1995) %>% 
       mutate(harvest = ifelse(confidential == "no", harvest, 'na')) %>% 
       mutate(harvest = as.numeric(harvest)) %>% 
       select(-weighted_ADJ, -permits, -confidential, -adj.legal, -adj.mature) %>% 
@@ -763,7 +778,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     #ylim(0,(max(males_graph$mean) + max(males_graph$se))) + 
     ggtitle(survey.location) + ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -792,7 +807,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -827,7 +842,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     ylab("Percentage") + 
     xlab(NULL) +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     theme(legend.position = c(0.2,0.5), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) 
@@ -850,7 +865,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lbs)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
       scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                           na.rm = TRUE) + 25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -877,7 +892,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lbs)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
       scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                           na.rm = TRUE) + 25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -922,12 +937,12 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
   # scale - created for Seymour Canal scaling issues, 0 means do nothing, 1 is for Seymour, 2 is by 100,000 lbs
   # title for the figure. This could be different than the name given in the data files
   CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
-                                   '/cpue_wt_since_93.csv'))
+                                   '/cpue_wt_since_95.csv'))
   poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
                                         '/', cur_yr, '/poorclutch_summary_all.csv'))
   egg_mean_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/egg_percent_mean_all.csv'))
-  # file with year and mean percent poor clutch and se poor clutch from 1993 to current
+  # file with year and mean percent poor clutch and se poor clutch from 1995 to current
   mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
   baseline <- read.csv("./data/rkc/longterm_means.csv")
   biomass <- read.csv("./data/rkc/biomass.csv") 
@@ -980,17 +995,17 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
   
   ## poor clutch --------
   poorclutch_summary %>% 
-    filter(Year >= 1993) %>% 
+    filter(Year >= 1995) %>% 
     mutate(Pclutch100 = Pclutch *100, 
            Pclutch.se100 = Pclutch.se*100) %>% 
-    select(Year, Pclutch100, Pclutch.se100) ->poorclutch_summary93
+    select(Year, Pclutch100, Pclutch.se100) ->poorclutch_summary95
   ## mean egg percent -------
   egg_mean_all %>% 
-    filter(Year >= 1993) -> egg_mean_all_93
+    filter(Year >= 1995) -> egg_mean_all_95
   ## female egg data -------
   # combine these data sets for graphing.  Create one with means and one with SEs.
-  poorclutch_summary93 %>% 
-    left_join(egg_mean_all_93) -> female_egg
+  poorclutch_summary95 %>% 
+    left_join(egg_mean_all_95) -> female_egg
   female_egg_long <- gather(female_egg, vname, value1, Pclutch100:egg.se, factor_key = TRUE)
   female_egg_long %>% 
     mutate(female.egg = ifelse(vname == "Pclutch100",
@@ -1038,7 +1053,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       select(-weighted_ADJ, -legal.biomass, -mature.biomass, -permits, -confidential) %>% 
       gather(type, pounds, harvest:adj.mature, factor_key = TRUE) %>% 
       filter(Location == survey.location) %>% 
-      filter(Year >= 1993) -> biomass_graph
+      filter(Year >= 1995) -> biomass_graph
     
     biomass_graph %>% 
       filter(Year <= 2007) %>% 
@@ -1054,7 +1069,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       select(-weighted_ADJ, -adj.legal, -adj.mature, -permits, -confidential) %>% 
       gather(type, pounds, harvest:mature.biomass, factor_key = TRUE) %>% 
       filter(Location == survey.location) %>% 
-      filter(Year >= 1993) -> biomass_graph
+      filter(Year >= 1995) -> biomass_graph
     
     biomass_graph %>% 
       filter(Year <= 2007) %>% 
@@ -1076,7 +1091,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
     #ylim(0,(max(males_graph$mean) + max(males_graph$se))) + 
     ggtitle(title) + ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", 
@@ -1105,7 +1120,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
     scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     geom_hline(yintercept = baseline2$Juvenile, color = "#E69F00", 
@@ -1140,7 +1155,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
     ylab("Percentage") + 
     xlab(NULL) +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     theme(legend.position = c(0.2,0.5), 
           legend.text = element_text(size = 20),
           legend.key.size = unit(1.5, 'lines'),
@@ -1165,7 +1180,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       ylab("Biomass (100,000 lbs)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
       scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
                                                           na.rm = TRUE) + .25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
@@ -1201,7 +1216,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       ylab("Biomass (100,000lbs)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
       scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
                                                           na.rm = TRUE) + .25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
@@ -1248,12 +1263,12 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
   # scale - created for Seymour Canal scaling issues, 0 means do nothing, 1 is for Seymour, 2 is by 100,000 lbs
   # title for the figure. This could be different than the name given in the data files
   CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
-                                   '/cpue_wt_since_93.csv'))
+                                   '/cpue_wt_since_95.csv'))
   poorclutch_summary <- read.csv(paste0('./results/rkc/', survey.location, 
                                         '/', cur_yr, '/poorclutch_summary_all.csv'))
   egg_mean_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
                                   '/egg_percent_mean_all.csv'))
-  # file with year and mean percent poor clutch and se poor clutch from 1993 to current
+  # file with year and mean percent poor clutch and se poor clutch from 1995 to current
   mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
   baseline <- read.csv("./data/rkc/longterm_means.csv")
   biomass <- read.csv("./data/rkc/biomass.csv") 
@@ -1306,17 +1321,17 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
   
   ## poor clutch --------
   poorclutch_summary %>% 
-    filter(Year >= 1993) %>% 
+    filter(Year >= 1995) %>% 
     mutate(Pclutch100 = Pclutch *100, 
            Pclutch.se100 = Pclutch.se*100) %>% 
-    select(Year, Pclutch100, Pclutch.se100) ->poorclutch_summary93
+    select(Year, Pclutch100, Pclutch.se100) ->poorclutch_summary95
   ## mean egg percent -------
   egg_mean_all %>% 
-    filter(Year >= 1993) -> egg_mean_all_93
+    filter(Year >= 1995) -> egg_mean_all_95
   ## female egg data -------
   # combine these data sets for graphing.  Create one with means and one with SEs.
-  poorclutch_summary93 %>% 
-    left_join(egg_mean_all_93) -> female_egg
+  poorclutch_summary95 %>% 
+    left_join(egg_mean_all_95) -> female_egg
   female_egg_long <- gather(female_egg, vname, value1, Pclutch100:egg.se, factor_key = TRUE)
   female_egg_long %>% 
     mutate(female.egg = ifelse(vname == "Pclutch100",
@@ -1364,7 +1379,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
       select(-weighted_ADJ, -legal.biomass, -mature.biomass, -permits, -confidential) %>% 
       gather(type, pounds, harvest:adj.mature, factor_key = TRUE) %>% 
       filter(Location == survey.location) %>% 
-      filter(Year >= 1993) -> biomass_graph
+      filter(Year >= 1995) -> biomass_graph
     
     biomass_graph %>% 
       filter(Year <= 2007) %>% 
@@ -1380,7 +1395,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
       select(-weighted_ADJ, -adj.legal, -adj.mature, -permits, -confidential) %>% 
       gather(type, pounds, harvest:mature.biomass, factor_key = TRUE) %>% 
       filter(Location == survey.location) %>% 
-      filter(Year >= 1993) -> biomass_graph
+      filter(Year >= 1995) -> biomass_graph
     
     biomass_graph %>% 
       filter(Year <= 2007) %>% 
@@ -1402,7 +1417,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
     #ylim(0,(max(males_graph$mean) + max(males_graph$se))) + 
     ggtitle(title) + ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", 
@@ -1431,7 +1446,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
     scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     geom_hline(yintercept = baseline2$Juvenile, color = "#E69F00", 
@@ -1466,7 +1481,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
     ylab("Percentage") + 
     xlab(NULL) +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
     theme(legend.position = c(0.2,0.5), 
           legend.text = element_text(size = 20),
           legend.key.size = unit(1.5, 'lines'),
@@ -1491,7 +1506,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
       ylab("Biomass (100,000 lbs)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
       scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
                                           na.rm = TRUE) + .25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
@@ -1527,7 +1542,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
       ylab("Biomass (100,000lbs)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
       scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
                                           na.rm = TRUE) + .25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 

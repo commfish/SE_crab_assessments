@@ -144,15 +144,15 @@ weight_L <- function(Tdat1, cur_yr){
     mutate(weight_lb = (exp((slope*log(Width.Millimeters)) - coeff ))*(2.2/1000))-> datWL
   Mature = c("Pre_Recruit", "Recruit", "Post_Recruit")
   Legal =c("Recruit", "Post_Recruit")
-  datWL %>% 
+  male_weights <- datWL %>% 
     group_by(AREA, Year) %>% 
     filter(Sex.Code == 1) %>% 
     summarise(mature_lbs = weighted.mean(weight_lb[mod_recruit %in% Mature], 
-                                   Number.Of.Specimens[mod_recruit %in% Mature]), 
+                                   Number.Of.Specimens[mod_recruit %in% Mature], na.rm = TRUE), 
               legal_lbs = weighted.mean(weight_lb[mod_recruit %in% Legal], 
-                                  Number.Of.Specimens[mod_recruit %in% Legal]), 
+                                  Number.Of.Specimens[mod_recruit %in% Legal], na.rm = TRUE), 
               prer_lbs = weighted.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
-                                 Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
+                                 Number.Of.Specimens[mod_recruit == "Pre_Recruit"], na.rm = TRUE)) 
   
   write.csv(male_weights, paste0('./results/tanner/tanner_rkc/', cur_yr, '/RKCS_weights.csv'))
   

@@ -1,0 +1,101 @@
+---
+title: "Tanner results from RKC survey"
+author: "Caitlin Stern"
+date: "October 2023"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+library(tidyverse)
+cur_yr <- 2023
+pr_yr <- cur_yr - 1
+
+```
+
+## CPUE from survey / data for CSA
+```{r CPUE, echo = FALSE }
+cpue_cur_yr <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr, '/RKCS_CPUE_all.csv')) %>%
+  filter(Year %in% c(pr_yr, cur_yr)) %>%
+  select(-X)
+kable(cpue_cur_yr, digits = 6)
+
+
+# need to seperate time hauled to just have data hauled look for mid-date 
+#dat[1,7] # 6-22
+#dat[5097,7] # 6-29
+# so mid-date would be 26th.
+```
+
+### Male weights from survey 
+```{r weights, echo = FALSE }
+male_weights <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr, '/RKCS_weights.csv')) %>%
+  filter(Year %in% c(pr_yr, cur_yr)) %>%
+  select(-X)
+kable(male_weights, digits = 3)
+```
+
+## Short term trends in CPUE
+```{r short term, echo = FALSE }
+short_term_results <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr, '/shortterm.csv'))
+kable(short_term_results, digits = 3)
+```
+
+
+## Long term trends in CPUE
+```{r long term,echo = FALSE  }
+long_term_results <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr, '/long_term.csv')) %>%
+  select(-X)
+kable(long_term_results, digits = 3)
+```
+
+## Female health
+#### percentage and SD of poor clutches (<25%)
+```{r female health,echo = FALSE  }
+poorclutch_curyr <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr,'/RKCS_percent_low_clutch.csv')) %>%
+  select(-X)
+poorclutch_curyr %>% 
+  filter(Year >= cur_yr-1) -> poorclutch_curyr
+
+kable(poorclutch_curyr, digits = 3)
+```
+
+
+####long term mean comparison
+```{r long term female, echo = FALSE}
+lt_female <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr,'/female_long_term.csv')) %>%
+  select(-X)
+
+kable(lt_female, digits = 3)
+```
+
+####short term females
+```{r short term female, echo = FALSE}
+short_female <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr,'/female_shortterm.csv'))
+
+kable(short_female, digits = 3)
+```
+
+
+####Mean egg percentage for mature females
+```{r egg per female, echo = FALSE}
+egg_per_mean <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr,'/RKCS_percent_clutch.csv')) %>%
+  select(-X)
+egg_per_mean %>% 
+  filter(Year >= cur_yr-1) -> egg_per_mean
+
+kable(egg_per_mean, digits = 3)
+```
+
+
+
+## Stock health
+```{r stock health, echo = FALSE}
+stock_health <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr,'/stock_health.csv'))
+
+kable(stock_health, digits = 3)
+```
+
+
+
+

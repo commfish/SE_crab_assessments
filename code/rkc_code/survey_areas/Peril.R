@@ -11,7 +11,7 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2022 # udpate annually
+cur_yr <- 2023 # udpate annually
 pr_yr <- cur_yr -1
 survey.location <- 'Peril'   # area is Peril but in data files it's Deadman Reach
 

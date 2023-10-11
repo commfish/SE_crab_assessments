@@ -1,9 +1,7 @@
 # K.Palof  katie.palof@alaska.gov
-# ADF&G 8-1-16 updated for Excursion Inlet  / 
-# updated 8-3-17/7-30-18/7-24-19/ 8-28-20/ 8-18-21/ 7-24-22
+# ADF&G 8-1-16 updated for Excursion Inlet  / updated 8-3-17/7-30-18/7-24-19
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
-
 
 # Read me:
 #     update code with date updated (top), change global year, and pull new survey data (see below)
@@ -12,18 +10,13 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2023
+cur_yr <- 2019
 pr_yr <- cur_yr -1
 survey.location <- 'Excursion'
-cur_yr2 <- 23
-pr_yr2 <- 22
-
-dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
-dir.create(file.path(paste0('text'), cur_yr))
 
 #####Load Data ---------------------------------------------------
 # change input file and input folder for each
-dat <- read.csv(paste0('./data/rkc/', survey.location, '/RKC_survey_CSA_', survey.location, '_', pr_yr2, '_', cur_yr2, '.csv'))
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKC survey CSA_EI_18_19.csv'))
                   # this is input from OceanAK - set up as red crab survey data for CSA
                   # Year = 2018,2019, project code 007, Location - Excursion Inlet, species - red king crab
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Excursion_strata_area.csv')) 
@@ -44,9 +37,14 @@ head(dat)
 glimpse(dat) # confirm that data was read in correctly.
 
 ##### Initial review ---------------------------------
+### measure error -----
+head(dat)
+error <- read.csv('./data/rkc/2018_2019_measurement_error/excursion_m_error.csv')
+dat %>% 
+  right_join(error) -> m_error_dat
 # remove pots with Pot condition code that's not "normal" or 1 
-unique(dat$Pot.Condition)
-dat %>%
+levels(dat$Pot.Condition)
+m_error_dat %>%
   filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> dat1
 
 dat1 %>%
@@ -54,30 +52,77 @@ dat1 %>%
 # before moving forward.
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
 
-# Calculate soak time - RKC soak time should be 18-24 hrs. This should produce no rows.
-dat_soak <- dat1 %>%
-  mutate(time_set = as.POSIXct(Time.Set,format="%Y-%m-%d %H:%M:%S",tz=Sys.timezone())) %>%
-  mutate(time_hauled = as.POSIXct(Time.Hauled,format="%Y-%m-%d %H:%M:%S",tz=Sys.timezone())) %>%
-  mutate(soak_time = time_hauled - time_set) %>%
-  filter(soak_time > 24 | soak_time < 18)
+# **FIX **  calculate soak time 
+#come back later and add a soak time column - RKC soak time should be between 18-24??? double check this
+
+### if Error == error add 6mm to half the crab -----
+dat1 %>% 
+  filter(Error == "error") %>% 
+  mutate(random = c(rep(c(1,2), 35),1)) %>% 
+  mutate(Length = ifelse(random == 2, Length.Millimeters+6, Length.Millimeters)) -> out
+  #select(-Length.Millimeters)  -> out
+
+# compare recruit status ----------
+out %>% 
+  mutate(rclass = ifelse(Sex.Code == 2, "Female", 
+                    ifelse(Sex.Code == 1 & Length <= 128, "Juvenile", 
+                     ifelse(Sex.Code ==1 & Length >= 129 &
+                      Length <=144, "Pre_Recruit", 
+                       ifelse(Sex.Code == 1 & Length >=161, 
+                              "Post_Recruit",
+                          ifelse(Sex.Code ==1 & 144%<% Length %<%161 &
+                         Shell.Condition.Code == 2 | Shell.Condition.Code == 3, "Recruit", 
+                           ifelse(Sex.Code == 1 & 144%<% Length %<%161 &
+                               Shell.Condition.Code == 4| Shell.Condition.Code ==5, "Post_Recruit",
+                               "null"))))))) %>% 
+  mutate(rclass = as.factor(rclass)) %>% 
+  select(Year, Trip.No, Location, Pot.No, Specimen.No, 
+         Number.Of.Specimens, rclass, Recruit.Status, Sex.Code, Length, Length.Millimeters) ->compare 
+write.csv(compare, paste0('./results/rkc/', survey.location, '/', cur_yr, '/M_error_compare_',cur_yr, '.csv'), 
+            row.names = FALSE)
+# issue with crab being classified as post-recruit when less than 144 and shell condition 4
+
+# recalculate recruit status ------
+out %>% 
+  mutate(rclass = ifelse(Sex.Code == 2, "Female", 
+                   ifelse(Sex.Code == 1 & Length <= 128, "Juvenile", 
+                    ifelse(Sex.Code ==1 & Length >= 129 &
+                     Length <=144, "Pre_Recruit", 
+                      ifelse(Sex.Code == 1 & Length >=161, 
+                       "Post_Recruit",
+                        ifelse(Sex.Code ==1 & 144%<% Length %<%161 &
+                         Shell.Condition.Code == 2 | Shell.Condition.Code == 3, "Recruit", 
+                          ifelse(Sex.Code == 1 & 144%<% Length %<%161 &
+                           Shell.Condition.Code == 4| Shell.Condition.Code ==5, "Post_Recruit",
+                            "null"))))))) %>%
+  mutate(rclass = as.factor(rclass)) %>% 
+  select(Year, Trip.No, Location, Pot.No, Density.Strata.Code, Specimen.No, 
+         Number.Of.Specimens, rclass, Sex.Code, Length) %>% 
+  dplyr::rename(Recruit.Status = rclass, Length.Millimeters = Length)-> out2 # these are just error pots 2019
+
+dat1 %>% 
+  filter(Error != "error") %>% 
+  select(Year, Trip.No, Location, Pot.No, Density.Strata.Code, Specimen.No, 
+         Number.Of.Specimens, Recruit.Status, Sex.Code, Length.Millimeters) %>% 
+  rbind(out2) -> m_error_dat1
 
 ## CPUE calc --------------
 ##### By Pot ----------------------------------------------------
-# Now summarize by pot - remember to keep areas separate.
+# Now summarize by pot - remember to keep areas seperate.
 # need Number of Specimens by recruit class
 # keep trip no. to merge with historic data 
-dat1 %>%
+m_error_dat1 %>%
   group_by(Year, Location, Trip.No, Pot.No, Density.Strata.Code, Recruit.Status) %>%
   summarise(crab = sum(Number.Of.Specimens)) -> dat2
 
 dat3 <- dcast(dat2, Year + Location + Trip.No + Pot.No +Density.Strata.Code ~ Recruit.Status, sum, drop=TRUE)
-head(dat3) # check to make sure things worked.
+head(dat3)# check to make sure things worked.
 
-# Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has its own area file or area per
+# Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has it's own area file or area per
 #     strata.  This is used to calculating the weighting for weighted CPUE.
 dat3 %>%
   right_join(area) -> tab
-# Calculates the number of pots per strata.  
+#Calculates the number of pots per strata.  
 tab %>%
   group_by(Year, Location, Density.Strata.Code) %>%
   summarise(npots  = length(Pot.No)) -> pots_per_strata
@@ -90,55 +135,46 @@ tab %>%
   right_join(pots_per_strata) -> dat4
 
 dat4 %>%
-  mutate(inverse_n = 1 / npots, weighting = inverse_n * Area) -> dat5
+  mutate(inverse_n = 1 / npots, weighting = inverse_n * Area) ->dat5
 dat5 %>%
   dplyr::rename(Missing = Var.6, Large.Females = `Large Females`, Small.Females = `Small Females`) -> dat5
-# this is necessary so that current years file (dat5) matches the historic file names
+# this is neccessary so that current years file (dat5) matches the historic file names
 
 # This version is ready to calculate CPUE for each recruit class
 # Calculates a weighted mean CPUE and SE for each recruit class
 dat5 %>%
   group_by(Year) %>%
-  summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
-            Recruit_wt = weighted.mean(Recruit, weighting), Rec_SE = (weighted.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
-            Post_Recruit_wt = weighted.mean(Post_Recruit, weighting), PR_SE = (weighted.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
-            Juvenile_wt = weighted.mean(Juvenile, weighting), Juv_SE = (weighted.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
-            MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
-            SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt
+  summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
+            Recruit_wt = wt.mean(Recruit, weighting), Rec_SE = (wt.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
+            Post_Recruit_wt = wt.mean(Post_Recruit, weighting), PR_SE = (wt.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
+            Juvenile_wt = wt.mean(Juvenile, weighting), Juv_SE = (wt.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
+            MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
+            SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt
 CPUE_wt
-# check to confirm last years CPUEs match - that's why we use two years.
-# change name and folder for each area
-write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/EI_CPUE_',cur_yr, '.csv'), 
-          row.names = FALSE)
+
+write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/ME_error_sim_EI_CPUE_',cur_yr, '.csv'), 
+         row.names = FALSE)
 
 # weighted cpue by strata --- just for comparison
 dat5 %>%
   group_by(Year, Density.Strata.Code) %>%
-  summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
-            Recruit_wt = weighted.mean(Recruit, weighting), Rec_SE = (weighted.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
-            Post_Recruit_wt = weighted.mean(Post_Recruit, weighting), PR_SE = (weighted.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
-            Juvenile_wt = weighted.mean(Juvenile, weighting), Juv_SE = (weighted.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
-            MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
-            SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/
+  summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
+            Recruit_wt = wt.mean(Recruit, weighting), Rec_SE = (wt.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
+            Post_Recruit_wt = wt.mean(Post_Recruit, weighting), PR_SE = (wt.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
+            Juvenile_wt = wt.mean(Juvenile, weighting), Juv_SE = (wt.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
+            MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
+            SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/
                                                                           (sqrt(sum(!is.na(Small.Females)))))) 
 # look at results to see the spread between stratas...in high biomass years even low strata 1,2 had higher CPUE. >1 or 2
 
 #### survey mid date -----  
-
-# list of unique dates (day only, excluding time)
-dates <- unique(round_date(ymd_hms(dat$Time.Hauled), unit="day"))
-
-# only survey dates from the current year
-dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
-
-# interval of minimum and maximum survey dates
-date.int <- interval(min(dates.cur, na.rm=TRUE), max(dates.cur, na.rm=TRUE))
-
-# survey midpoint; see functions script for the int_midpoint function
-sur.midpoint <- int_midpoint(date.int)
-
-# convert to Julian day
-sur.midpoint.jul <- yday(sur.midpoint)
+#  ** fix **  make this calculated from data not just visual
+head(dat)
+unique(dat$Time.Hauled)
+# need to seperate time hauled to just have data hauled look for mid-date 
+dat %>% filter(Year == cur_yr)  # 7-15
+dat[2001,7] # 7-16
+# so mid-date would be 18th.
 
 ##### Historic file ---------------------------------------
 # need to add current years pot summary to the historic pot summary file.  
@@ -187,7 +223,7 @@ head(dat5_cur_yr)
 long_t(dat5_cur_yr, baseline, cur_yr, 'Excursion', 'Excursion')
 # output is saved as longterm.csv
 
-##### Weights from length - weight relationship.-----------------
+##### Weights from length - weight relatinship.-----------------
     # Linear model is changed for each area
     # Excursion linear model: exp(3.12*log(length in mm)-7.67)*2.2/1000
 glimpse(dat1) # raw data for both 2016 and 2017
@@ -258,10 +294,6 @@ total_health('Excursion', cur_yr)
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-### !!! 
-# Run CSA model - either excel or here --
-# Put Biomass estimates for this area in 'data/biomass.csv'. this contains this years estimates.
-
 ### raw sample size -----------
 head(dat5)
 dat5 %>% group_by(Year, Location) %>%  select(Year, Location, Juvenile, Small.Females, 
@@ -280,35 +312,31 @@ write.csv(raw_samp, paste0('./results/rkc/', survey.location, '/', cur_yr, '/raw
 head(CPUE_ALL_YEARS)
 CPUE_ALL_YEARS %>%
   group_by(Year) %>%
-  summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
-            Recruit_wt = weighted.mean(Recruit, weighting), Rec_SE = (weighted.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
-            Post_Recruit_wt = weighted.mean(Post_Recruit, weighting), PR_SE = (weighted.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
-            Juvenile_wt = weighted.mean(Juvenile, weighting), Juv_SE = (weighted.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
-            MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
-            SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt_all
+  summarise(Pre_Recruit_wt = wt.mean(Pre_Recruit, weighting), PreR_SE = (wt.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), 
+            Recruit_wt = wt.mean(Recruit, weighting), Rec_SE = (wt.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), 
+            Post_Recruit_wt = wt.mean(Post_Recruit, weighting), PR_SE = (wt.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))),
+            Juvenile_wt = wt.mean(Juvenile, weighting), Juv_SE = (wt.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
+            MatF_wt = wt.mean(Large.Females, weighting), MatF_SE = (wt.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
+            SmallF_wt = wt.mean(Small.Females, weighting), SmallF_SE = (wt.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt_all
 CPUE_wt_all  
-CPUE_wt_all %>% filter(Year >= 1995) -> CPUE_wt_from95
+CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
 
-write.csv(CPUE_wt_from95, paste0('results/rkc/', survey.location, '/', 
-                                 cur_yr, '/cpue_wt_since_95.csv'), row.names = FALSE)
+write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
+                                 cur_yr, '/cpue_wt_since_93.csv'), row.names = FALSE)
 
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
 
-# stop here make sure CSA has been run and put biomass into "biomass.csv" file
-
-panel_figure('Excursion', cur_yr, 'Excursion', 1, 0) # panel with all 3 figures
-panel_figure('Excursion', cur_yr, 'Excursion', 2, 0) # male panel
-panel_figure('Excursion', cur_yr, 'Excursion', 3, 0) # female panel
+panel_figure('Excursion', 2019, 'Excursion', 1, 0) # panel with all 3 figures
+panel_figure('Excursion', 2019, 'Excursion', 2, 0) # male panel
+panel_figure('Excursion', 2019, 'Excursion', 3, 0) # female panel
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
 
-
-# STOP HERE....come back to this ---
 ### NON CONF panel --------------
-panel_figure_NC('Excursion', cur_yr, 'Excursion', 1, 0) # panel with all 3 figures
-panel_figure_NC('Excursion',  cur_yr, 'Excursion', 2, 0)
+panel_figure_NC('Excursion', 2019, 'Excursion', 1, 0) # panel with all 3 figures
+panel_figure_NC('Excursion', 2019, 'Excursion', 2, 0)
 
 ### presentation figure -----
-panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 2, 0, 'Excursion Inlet')
-panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 3, 0, 'Excursion Inlet')
+panel_figure_NC_PRES('Excursion', 2019, 'Excursion', 2, 0)
+panel_figure_NC_PRES('Excursion', 2019, 'Excursion', 3, 0)

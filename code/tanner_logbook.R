@@ -11,14 +11,11 @@ library(tidyverse)
 library(readxl)
 
 ## global ------
-cur_yr <- 2022 # update annually
+cur_yr <- 2023 # update annually
 
 #####Load Data -------------------------------------
-# change input file and input folder for each
-#logb <- read_excel(path = "./data/harvest/tanner_logbook_cur_yr.xlsx", sheet = "tanner_115")
-# take the current year logbook data and seperate out only district 115 -could also do this in here....
-logb <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr, '.csv')) # all data (2021)
-#logb_all <- read.csv("./data/harvest/logbook_11510_98_18.csv") # bring in previous yrs percentages
+
+logb <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr, '.csv')) # all data 
 logb_all <- read.csv(paste0('./results/tanner/harvest/', cur_yr-1, '/logbook_11510_all.csv')) # bring in previous yrs percentages
 # This is the master file with the percentage of catch in each year that is attributed to NJ or LS - it is added to and saved at the end 
 #    of this file for the following year
@@ -28,7 +25,7 @@ glimpse(logb)
 logb %>% 
   filter(District == 115 & Sub.district == 10) %>% 
   select(Year, ADFG.Number, Entry.Date, District, Sub.district, Area.Description, Number.of.Pots.Lifted, 
-         Target.Species.Retained, Comments) ->log11510
+         Target.Species.Retained, Comments) -> log11510
 
 # sort into LS or NJ -----
 #unique(log11510$Area.Description)
@@ -63,13 +60,14 @@ log11510 %>%
   group_by(Year) %>% 
   summarise(total_no = sum(Target.Species.Retained)) -> total_no
 
-log11510 %>% 
+percent_assigned_cur <- log11510 %>% 
   group_by(survey.area, Year) %>% 
   summarise(crabs = sum(Target.Species.Retained), 
             pots = sum(Number.of.Pots.Lifted)) %>% 
   left_join(total_no) %>% 
   mutate(percent = crabs/total_no, YEAR = Year) %>% ## edits due to pulling data from OceanAK and having column name changes
-  select(survey.area, YEAR, crabs, pots, total_no, percent) -> percent_assigned_cur
+  select(survey.area, YEAR, crabs, pots, total_no, percent) %>%
+  filter(is.na(survey.area) == FALSE) # delete this after dealing with NAs
 
 write.csv(percent_assigned_cur, paste0('./results/tanner/harvest/', cur_yr,'/logbook_11510_', cur_yr,'.csv'))
 

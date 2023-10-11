@@ -21,7 +21,7 @@ theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
 
 # global --------
 # update each year
-cur_yr = 2022
+cur_yr = 2023
 
 #Load data ----------------
 #biomass <- read.csv("./data/redcrab/biomass.csv") no record of historic mature biomass point estimates
@@ -72,8 +72,9 @@ jnu_rkc_fig1 <- hindcast %>%
         legend.text = element_text(size = 8)) +
   geom_text(data = baseline_mean_curyr, aes(x = start_yr, y = baseline, label = label), 
             hjust = -0.45, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
-  guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2))) +
-  ggsave(paste0('./figures/rkc/', cur_yr, '/juneau_fig1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2)))
+
+ggsave(jnu_rkc_fig1, paste0('./figures/rkc/', cur_yr, '/juneau_fig1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 # Figure A1 ---old Figure 1 - move to Appendix --------
@@ -101,11 +102,12 @@ jnu_rkc_annual_fore <- hindcast %>%
         legend.spacing = unit(0.00005, "cm")) +
   geom_text(data = baseline_mean_forecast, aes(x = start_yr, y = baseline, label = label), 
             hjust = -0.55, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
-  guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2))) +
-  ggsave(paste0('./figures/rkc/', cur_yr, '/juneau_figA1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2)))
+
+ggsave(jnu_rkc_annual_fore, paste0(here::here(), '/figures/rkc/', cur_yr, '/juneau_figA1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
-#  select(year, legal_2018)figure of 2018 model with forecast in each year -----
+#  select(year, legal_2023)figure of 2023 model with forecast in each year -----
 ggplot(hindcast_long, aes(year, pounds, group = type))+ 
   geom_point(aes(color = type, shape = type), size =3) +
   geom_line(aes(color = type, group = type, linetype = type))+
@@ -114,9 +116,9 @@ ggplot(hindcast_long, aes(year, pounds, group = type))+
   scale_linetype_manual(name = "", values = c("solid", "dashed", "blank")) +
   scale_y_continuous(labels = comma) +
   #ylim(0,700000) +
-  ggtitle("Juneau 2018 model with annual forecast") + ylab("Estimated Biomass (lbs)")+ xlab("Year")+
+  ggtitle("Juneau 2023 model with annual forecast") + ylab("Estimated Biomass (lbs)")+ xlab("Year")+
   theme(plot.title = element_text(hjust =0.5)) +
-  scale_x_continuous(breaks = seq(min(1975),max(2019), by = 5))
+  scale_x_continuous(breaks = seq(min(1975),max(2023), by = 5))
 #  theme(legend.position = c(0.8,0.7)) + 
 
 
@@ -124,7 +126,7 @@ ggplot(hindcast_long, aes(year, pounds, group = type))+
 # legal only
 # should have current year's model with longterm baselines (1993-2007) and closure status. 
 #   also show current year's forecast as distinct from model output 
-hindcast %>% 
+fig1_pres <- hindcast %>% 
   select(year, legal_curyr, legal_forecast, status) %>% 
   dplyr::rename(legal_lb = legal_curyr) %>% 
   select(-legal_forecast) %>% 
@@ -150,15 +152,16 @@ hindcast %>%
         legend.text = element_text(size = 8)) +
   geom_text(data = baseline_mean_curyr[1, ], aes(x = start_yr, y = baseline, label = label), 
             hjust = -0.45, vjust = -1.0, nudge_y = 0.05, size = 3.5, show.legend = FALSE) +
-  guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2))) +
-  ggsave(paste0('./figures/rkc/', cur_yr,'/juneau_fig1_presentation_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2)))
+
+ggsave(fig1_pres, paste0(here::here(), '/figures/rkc/', cur_yr,'/juneau_fig1_presentation_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 # Figure 1 BOF doc  ---------
 # legal and matureonly
 # should have current year's model with longterm baselines (1993-2007) and closure status. 
 #   also show current year's forecast as distinct from model output 
-hindcast %>% 
+fig1BOF <- hindcast %>% 
   select(year, legal_curyr, mature_curyr, status) %>% 
   dplyr::rename(legal_lb = legal_curyr, mature_lb = mature_curyr) %>% 
   mutate(status = ifelse(status == "TBD", "PU only", as.character(status))) %>% 
@@ -184,8 +187,9 @@ hindcast %>%
         legend.text = element_text(size = 8)) +
   geom_text(data = baseline_mean_curyr, aes(x = start_yr, y = baseline, label = label), 
             hjust = -0.45, vjust = -1.0, nudge_y = 0.05, size = 3.5, show.legend = FALSE) +
-  guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2))) +
-  ggsave(paste0('./figures/rkc/2020/juneau_fig1_presentation2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+  guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2)))
+
+ggsave(fig1BOF, paste0('./figures/rkc/2023/juneau_fig1_presentation2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
   
  

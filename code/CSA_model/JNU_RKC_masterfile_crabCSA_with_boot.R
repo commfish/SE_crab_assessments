@@ -7,7 +7,7 @@
 
 # load ----
 library(tidyverse)
-cur_yr = 2022
+cur_yr = 2023
 dir.create(file.path(paste0('results/rkc/Juneau/', cur_yr), '/csa')) # creates csa folder in current year results
 
 # data -----

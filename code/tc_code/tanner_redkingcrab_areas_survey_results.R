@@ -1,16 +1,17 @@
 #K.Palof 
 # ADF&G 9-21-18 updated and reworked similar to RKC code
 # 10-19-2021/ 10-19-2022
+# updated Oct 2023 by Caitlin Stern
 # Areas: RKCS areas for Tanner crab - EXCLUDES north juneau and stephens passage (see readme.md for reason)
 # includes: Excursion, Seymour Canal, Pybus Bay, Gambier Bay, Peril Strait, and Lynn Sisters
 # code to process data from Ocean AK to use in crab CSA models.  
 
 ## Load ---------------------------------
-source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with mutiple areas at once.
+source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with multiple areas at once.
 
 ## setup global ---------------
-cur_yr <- 2022
-pr_yr <- cur_yr -1
+cur_yr <- 2023
+pr_yr <- cur_yr - 1
 fig_path <- paste0('figures/tanner/tanner_rkc/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
 output_path <- paste0('results/tanner/tanner_rkc/', cur_yr) # output and results
@@ -18,25 +19,51 @@ dir.create(output_path)
 
 ## Data -----------------------------------------------
 # change input file and input folder for each
-dat1 <- read.csv("./data/tanner/tanner_rkc/red crab survey for Tanner crab CSA_96_13.csv")
-dat2 <- read.csv(paste0("./data/tanner/tanner_rkc/red crab survey for Tanner crab CSA_14_", cur_yr,".csv"))
-
-              # this is input from OceanAK - set up as red crab survey data for CSA has all years
-                  # 1997 to present 
-                  # all data in this file do not need area, historic or female files here
+dat.a <- read.csv("./data/tanner/tanner_rkc/red crab survey for Tanner crab CSA_96_13.csv")
+    # this is input from OceanAK - set up as red crab survey data for CSA has all years 1997 to present
+dat.b <- read.csv(paste0("./data/tanner/tanner_rkc/red crab survey for Tanner crab CSA_14_", cur_yr,".csv"))
+    # generate this file by running pull_data_for_csa.R using the section called 
+    # "For pulling Tanner crab data collected on the summer crab survey"
+    # all data in this file do not need area, historic or female files here
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 biomass <- read.csv(paste0("./data/tanner/tanner_", cur_yr, "_biomassmodel.csv")) #!! create a file for the current year
 # by copying last years to start, then have to add each area from CSA models. !!outside R!!
 # this file should be updated with current year model output.
 
 # survey data QAC -------
-head(dat1)
-glimpse(dat1) # confirm that data was read in correctly.
-glimpse(dat2) # confirm that data was read in correctly.
+head(dat.a)
+glimpse(dat.a) # confirm that data were read in correctly.
+glimpse(dat.b) # confirm that data were read in correctly.
+
+# check whether any Time.Set or Time.Hauled fields are missing
+test1a <- dat.a %>% filter(is.na(Time.Hauled)==TRUE | is.na(Time.Set)==TRUE)
+test1b <- dat.b %>% filter(is.na(Time.Hauled)==TRUE | is.na(Time.Set)==TRUE)
+
+# convert Time.Set and Time.Hauled fields to %Y-%m-%d %H:%M:%S date/time format
+dat.a2 <- dat.a %>%
+  mutate(Time.Set = mdy_hm(Time.Set, tz = "America/Anchorage"), Time.Hauled = mdy_hm(Time.Hauled, tz = "America/Anchorage"))
+
+test2a <- dat.a2 %>% filter(is.na(Time.Hauled)==TRUE | is.na(Time.Set)==TRUE)
+
+dat.b2 <- dat.b %>%
+  mutate(Time.Set = case_when(
+    nchar(Time.Set) == 19 ~ Time.Set,
+    nchar(Time.Set) == 10 ~ paste(Time.Set, "12:00:00")
+  )) %>%
+  mutate(Time.Hauled = case_when(
+    nchar(Time.Hauled) == 19 ~ Time.Hauled,
+    nchar(Time.Hauled) == 10 ~ paste(Time.Hauled, "12:00:00")
+  )) %>%
+  mutate(Time_Set = ymd_hms(Time.Set, tz = "America/Anchorage"),
+         Time_Hauled = ymd_hms(Time.Hauled, tz = "America/Anchorage")) %>%
+  mutate(Time.Set = Time_Set, Time.Hauled = Time_Hauled) %>%
+  select(-c(Time_Set, Time_Hauled))
+
+test2b <- dat.b2 %>% filter(is.na(Time.Hauled)==TRUE | is.na(Time.Set)==TRUE)
 
 # merge 2 data files 
-dat1 %>% 
-  bind_rows(dat2) -> dat
+dat.a2 %>% 
+  bind_rows(dat.b2) -> dat
 
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
@@ -51,13 +78,20 @@ dat1 %>%
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> test1
 # 2018 excursion pot 2 and 42
 # 2019 gambier bay pot 39
-write.csv(test1, "./results/tanner/tanner_rkc/data_issues.csv")
+write.csv(test1, paste0("./results/tanner/tanner_rkc/data_issues", cur_yr, ".csv"))
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - tanner soak time should be between 16-20??? double check this
 
+# Calculate soak time - Tanner soak time should be 16-20 hrs (check this). This should produce no rows.
+dat_soak <- dat1 %>%
+  mutate(time_set = as.POSIXlt(Time.Set,format="%Y-%m-%d %H:%M:%S",tz=Sys.timezone())) %>%
+  mutate(time_hauled = as.POSIXlt(Time.Hauled,format="%Y-%m-%d %H:%M:%S",tz=Sys.timezone())) %>%
+  mutate(soak_time = time_hauled - time_set) %>%
+  filter(soak_time > 20 | soak_time < 16)
+
 ##### Tanner specific manipulations -----------------------------
 ####Survey areas ONLY 
-# remove Juneau and Barlow - do these seperately due to needing GIS to seperate the areas.
+# remove Juneau and Barlow - do these separately due to needing GIS to separate the areas.
 # also need to remove other "experimental" areas - simplify to areas used in the assessment
 #levels(dat1$Location)
 unique(dat1$Location)
@@ -82,7 +116,7 @@ dat1a %>%
   mutate(AREA = ifelse(Location.Code == 26 | Location.Code == 42, 'LS',
                        ifelse(Location.Code == 4, 'PS', ifelse(Location.Code == 9, 'EI', 
                             ifelse(Location.Code== 15, 'GB', ifelse(Location.Code == 37, 
-                                'PB', ifelse(Location.Code==39, 'SC', 0))))))) ->dat1ab
+                                'PB', ifelse(Location.Code==39, 'SC', 0))))))) -> dat1ab
 
 dat1ab %>%
   #filter(!is.na(Width.Millimeters)) %>%  # lots of hoops to jump through so that NA come out as missing and not NA
@@ -100,11 +134,11 @@ dat1ab %>%
 
 Tdat1 %>% 
   filter(mod_recruit == "Missing") %>%  # check for data issues
-  write.csv('./results/tanner/tanner_rkc/problemstanner1.csv')
+  write.csv(paste0('./results/tanner/tanner_rkc/problemstanner1_', cur_yr, '.csv'))
 Tdat1 %>% filter(is.na(mod_recruit)) %>% 
-  write.csv('./results/tanner/tanner_rkc/problemstanner2.csv')
+  write.csv(paste0('./results/tanner/tanner_rkc/problemstanner2_', cur_yr, '.csv'))
 ##### By Pot ----------------------------------------------------
-#Now summarize by pot - remember to keep areas seperate.
+#Now summarize by pot - remember to keep areas separate.
 #Need Number of Specimens by recruit class
 Tdat1 %>%
   group_by(Year, AREA, Pot.No, mod_recruit) %>% # use AREA here instead of location due to 
@@ -172,18 +206,20 @@ baseline
 #     function needs to be edited with the current year and confirmed that the 
 #     input files are the same names.
 
-areas <- c('PB', 'EI', 'LS', 'GB', 'SC', 'PS')
+# areas <- c('PB', 'EI', 'LS', 'GB', 'SC', 'PS') # use this for years with a Peril survey
+areas <- c('PB', 'EI', 'LS', 'GB', 'SC') # use this for years without a Peril survey
 
 long_term <- lapply(areas, long_loop_17, curyr = cur_yr)
-long_term[[1]] %>% 
+
+long_term2 <- long_term[[1]] %>% 
   bind_rows(long_term[[2]]) %>% 
   bind_rows(long_term[[3]]) %>% 
   bind_rows(long_term[[4]]) %>% 
-  bind_rows(long_term[[5]]) %>% 
-  bind_rows(long_term[[6]]) -> long_term2
+  bind_rows(long_term[[5]]) #%>% 
+  #bind_rows(long_term[[6]]) # use this for years with a Peril survey
 write.csv(long_term2, paste0('./results/tanner/tanner_rkc/', cur_yr, '/long_term.csv'))
 
-##### Weights from length - weight relatinship--------------------
+##### Weights from length - weight relationship--------------------
 weight_L(Tdat1, cur_yr) # function found in tanner_rkc_functions.R
 
 ##### mid-date survey-------------
@@ -253,12 +289,12 @@ poorclutch1 %>%
 #calculate the t.test
 
 Fem_long_term <- lapply(areas, Fem_long_loop)
-Fem_long_term[[1]] %>% 
+Fem_long_term2 <- Fem_long_term[[1]] %>% 
   bind_rows(Fem_long_term[[2]]) %>% 
   bind_rows(Fem_long_term[[3]]) %>% 
   bind_rows(Fem_long_term[[4]]) %>% 
-  bind_rows(Fem_long_term[[5]]) %>% 
-  bind_rows(Fem_long_term[[6]]) -> Fem_long_term2
+  bind_rows(Fem_long_term[[5]]) #%>% 
+  #bind_rows(Fem_long_term[[6]]) # use this in years with a Peril survey
 write.csv(Fem_long_term2, paste0('./results/tanner/tanner_rkc/', cur_yr, '/Female_long_term.csv'))
 # need to figure out a way to store these results in a better format
 
@@ -279,6 +315,7 @@ total_health("tanner_rkc", cur_yr)
 
 
 ## STOP here and run R markdown with summary of rkc areas ----
+# SE_crab_assessments/text/tanner/tanner_rkc_survey_summary.Rmd
 
 # READ ME: 
 # put cpue from this markdown into CSA excel files or R input files.

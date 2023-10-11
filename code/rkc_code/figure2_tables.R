@@ -1,6 +1,6 @@
 # K.Palof
 # katie.palof@alaska.gov
-# 08/03/2018 / 9-4-19 / 8-30-20/ 8-29-21 / 7-26-22
+# 08/03/2018 / 9-4-19 / 8-30-20/ 8-29-21 / 7-26-22 / 8-23-2023
 
 # notes ----
 # This script is a work in progress to develop figures like those currently used to view the 
@@ -12,7 +12,7 @@ source('./code/functions.R')
 dir.create(file.path(paste0('results/rkc/Region1'), cur_yr))
 
 # data -----
-cur_yr <- 2022
+cur_yr <- 2023
 pry_yr <- cur_yr-1
 mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
 fishery.status <- read.csv('./data/rkc/Juneau/hind_fore_cast_JNU_current.csv') # has fishery status
@@ -56,6 +56,17 @@ write.csv(regional.b, paste0('./results/rkc/Region1/', cur_yr, '/regional_biomas
           row.names = FALSE)
 # use these values for table A1 in stock health document 
 
+# percent change in biomass since 2017 ----
+percent_change <- regional.b %>%
+  mutate(leg_pct_change = (adj_legal/lag(adj_legal) - 1) * 100,
+         mat_pct_change = (adj_mature/lag(adj_mature) - 1) * 100) %>%
+  # calculate average percent change since 2017
+  filter(Year > 2017) %>%
+  summarise(mean_leg_pct_change = mean(leg_pct_change), mean_mat_pct_change = mean(mat_pct_change))
+
+write.csv(percent_change, paste0('./results/rkc/Region1/', cur_yr, '/percent_biomass_change_2017_', cur_yr, '.csv'), 
+          row.names = FALSE)
+
 # change in biomass estimation ----
 regional.b %>% 
   filter(Year > cur_yr-2) %>% 
@@ -63,7 +74,7 @@ regional.b %>%
   select(-status) %>% 
   spread(key = Year, value = pounds) %>% 
   # Update annually ###
-  mutate(change = 100*(`2022`-`2021`)/`2021`) -> change# report these values in stock health doc
+  mutate(change = 100*(`2023`-`2022`)/`2022`) -> change # report these values in stock health doc
 write.csv(change, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_regional_biomass_', cur_yr, '.csv'), 
           row.names = FALSE)
 # these values go in regional overview section, other values from last years forecast
@@ -74,7 +85,7 @@ biomass %>%
   select(-harvest, -weighted_ADJ) %>% 
   gather(type, pounds, legal.biomass:adj.mature, factor_key = TRUE) %>% 
   spread(key = Year, value = pounds) %>% 
-  mutate(change = 100*(`2022`-`2021`)/`2021`) -> change2
+  mutate(change = 100*(`2023`-`2022`)/`2022`) -> change2
 write.csv(change2, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_area_biomasses_', cur_yr, '.csv'))
 #
 
@@ -87,7 +98,7 @@ regional.b %>%
   as.data.frame() %>% 
   gather(type, pounds, factor_key = TRUE) %>% 
   mutate(st_yr = 2007, label = c("CSA Legal (1993-2007)", "CSA Mature (1993-2007)", 
-                                 "Legal (1993-2007)", "Mature (1993-2007)")) ->reg_baseline
+                                 "Legal (1993-2007)", "Mature (1993-2007)")) -> reg_baseline
 
 reg_baseline[1:2, ] ->  reg_baseline_CSA
 reg_baseline[3:4, ] ->  reg_baseline_MR
@@ -127,8 +138,9 @@ regional.b %>%
       axis.text = element_text(size = 12)) +
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_CSA, aes(x = st_yr, y = pounds, label = label), 
-          hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
-  ggsave(paste0('./figures/rkc/', cur_yr, '/CSAregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+          hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) -> fig2_regional_biomass
+
+ggsave(fig2_regional_biomass, filename = paste0('./figures/rkc/', cur_yr, '/CSAregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 # Figure 2 TBD regional biomass M/R adjusted biomass---------
@@ -163,8 +175,9 @@ regional.b %>%
         axis.text = element_text(size = 12)) +
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
-            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) 
-  ggsave(paste0('./figures/rkc/', cur_yr, '/MRregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) -> fig2_regional_mr_biomass
+
+ggsave(fig2_regional_mr_biomass, filename = paste0('./figures/rkc/', cur_yr, '/MRregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 # Figure 2 **CLOSED** regional biomass M/R adjusted biomass---------
 # should have 2018 model with longterm baselines (1993-2007) and closure status. 
@@ -202,8 +215,9 @@ regional.b %>%
         axis.text = element_text(size = 14)) +
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds, label = label), 
-            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) 
-  ggsave(paste0('./figures/rkc/', cur_yr, '/MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) -> fig2_closed_regional_mr_biomass
+
+ggsave(fig2_closed_regional_mr_biomass, filename = paste0('./figures/rkc/', cur_yr, '/MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 # Figure 2 **CLOSED** EXPANDED regional biomass M/R adjusted biomass---------
 # should have 2018 model with longterm baselines (1993-2007) and closure status. 
@@ -246,8 +260,9 @@ regional.b.expand %>%
         axis.text = element_text(size = 14)) +
   theme(axis.text.x = element_text(vjust = 0.50)) +
   geom_text(data = reg_baseline_MR, aes(x = st_yr, y = pounds/expansion, label = label), 
-            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) 
-  ggsave(paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+            hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) -> fig2_expand_mr_regional_biomass
+
+ggsave(fig2_expand_mr_regional_biomass, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 
@@ -259,7 +274,7 @@ exploit_rate %>%  # exploitation rats for other areas as weighted means from sur
             alt.equ.hr = round(weighted.mean(alt.equ.hr, mature.lb.avg), 2)) %>% 
   mutate(Location = "other.areas") -> exploit_other
 
-exploit_rate %>% 
+equ_rate <- exploit_rate %>% 
   dplyr::select(area, equ.er.adj, avg.inc.hr, alt.equ.hr) %>% 
   #mutate(Location = case_when(area == 'pybus' ~ 'Pybus', 
   #                            area == 'gambier' ~ 'Gambier', 
@@ -273,7 +288,11 @@ exploit_rate %>%
          alt.equ.hr = round(alt.equ.hr, 2)) %>% 
   dplyr::select(Location, equ.er.adj, avg.inc.hr, alt.equ.hr) %>% 
   bind_rows(exploit_other) %>% 
-  mutate(hr_cur_yr = ifelse(Location == 'Juneau', 0.07, 0)) -> equ_rate # Juneau area HR set in July, edit in each year
+  mutate(hr_cur_yr = case_when(
+    Location == "Juneau" ~ 0.10, # Juneau area HR set in July, edit in each year
+    Location == "other.areas" ~ 0.10,
+    .default = 0
+  ))
 
 mr_adjust %>% 
   select(-X) %>% 
@@ -336,7 +355,7 @@ biomass_rate %>%
 write.csv(table2_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table2_regional_', cur_yr, '.csv'), row.names = FALSE) 
 
 # Table 3 --
-biomass_rate %>% 
+table3_csv <- biomass_rate %>% 
   mutate(Avg.Inc.HR = ifelse(Location == "Juneau", hr_cur_yr, 
                              ifelse(Location == "Seymour", 0.005, avg.inc.hr))) %>% 
   dplyr::select(-avg.inc.hr, -alt.equ.hr, -equ.er.adj, -hr_cur_yr) %>% 
@@ -344,13 +363,13 @@ biomass_rate %>%
          Legal.HR = round(GHL/adj.legal, 2), 
          PU.catch = round(ifelse(Location == "Juneau", (GHL*.6), ifelse(Location == "other.areas", 
                                                                         1000, 0)), 0), 
-         Comm.GHL = ifelse(Location == "Juneau"|Location == "other.areas", (GHL - PU.catch),
+         Comm.GHL1 = ifelse(Location == "Juneau"|Location == "other.areas", (GHL - PU.catch),
                            ifelse(Legal.HR <= 0.40, GHL, 0)), 
-         bkc_temp = round(sum(Comm.GHL[Location%in%survey.locations], na.rm = TRUE)*0.0106, 0), 
-         Comm.GHL = ifelse(Location == "bkc", bkc_temp, Comm.GHL), 
-         total_temp = sum(Comm.GHL, na.rm = TRUE), 
-         Comm.GHL = ifelse(Location == "total", total_temp, Comm.GHL)) %>% 
-  dplyr::select(-bkc_temp, - total_temp) -> table3_csv
+         bkc_temp = round(sum(Comm.GHL1[Location%in%survey.locations], na.rm = TRUE)*0.0106, 0), 
+         Comm.GHL2 = ifelse(Location == "bkc", bkc_temp, Comm.GHL1), 
+         total_temp = sum(Comm.GHL2, na.rm = TRUE), 
+         Comm.GHL = ifelse(Location == "total", total_temp, Comm.GHL2)) %>% 
+          dplyr::select(-bkc_temp, - total_temp, -Comm.GHL1, -Comm.GHL2)
 write.csv(table3_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table3_regional_', cur_yr, '.csv'), row.names = FALSE) 
 
 # Table X -- table 4 removed from 2021 doc.
@@ -412,6 +431,7 @@ files <- c(paste0(here::here(),"/results/rkc/Pybus/", cur_yr, "/raw_sample.csv")
            paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/raw_sample.csv"), 
            paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/raw_sample.csv"), 
            paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/raw_sample.csv"))
+
 #files <- files[2:7]
 raw_samp <- files %>%
   map(read.csv) %>%    # read in all the files individually, using
