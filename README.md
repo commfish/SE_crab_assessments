@@ -22,7 +22,7 @@ Code: see code/rkc_code/survey_areas for each area that is surveyed.
 code for regional figures, etc. is in 'code/rkc_code'
 
 Area instructions:
-- Juneau areas is usually done on it's own, there's a specific memo for this area to address Juneau (11-A) personal use openings - usually in August. 
+- Juneau areas is usually done on its own, and there's a specific memo for this area to address Juneau (11-A) personal use openings - usually in August. 
 - Each survey area is processed seperately due to the historic differences between them.
 
 
