@@ -114,18 +114,11 @@ basic_pop_model <- function(pars) {
   PredSrvIdx = array(0, dim = c(n_yrs, n_stages, n_srv_fleets)) # Predicted survey index - CPUE is the index. I added n of stages. can probs delete survey fleets, there is 1
   #srv_sel = array(data = 0, dim = c(n_ages, n_srv_fleets)) # Survey selectivity #hmm do we have this? I don't think we have selectivity for CAA
   
-  # Likelihoods #AGR HERE
-  Catch_nLL = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishery Catch Likelihoods #it does not have to be an array. Can be "other ways"
-  FishAgeComps_nLL = array(data = 0, dim = c(n_yrs, n_fish_fleets)) # Fishery Age Comps Likelihoods
-  SrvIdx_nLL = array(0, dim = c(n_yrs, n_srv_fleets)) # Survey Index Likelihoods
-  SrvAgeComps_nLL = array(data = 0, dim = c(n_yrs, n_srv_fleets)) # Survey Age Comps Likelihoods
+  # Likelihoods 
+  SrvIdx_nLL = array(0, dim = c(n_yrs, n_srv_fleets)) # Survey Index Likelihoods - this replaces the sum of squares
+  #Rec_nLL = array(0, dim = c(n_yrs, n_stages)) #recruitment likelihood #n stages in here too? not sure if n_stages needs to be here #would we turn this one off?
+#I think this was an extra tyler thing - the base mod just does min sum squares
   
-  #likelihoods for crab - tyler has these two, idk...idk which ones to use...this is where I deviate from the sum of squares method in the excel doc, I think
-  ##index likelihood #TK
-  
-  ##recruitment likelihood #TK
-  
-  #AGR HERE
   # Penalties #I don't need penalties?? do I?
   #Fmort_Pen = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishing Mortality Deviation penalty
   #Rec_nLL = rep(0, n_yrs) # Recruitment penalty
@@ -135,9 +128,11 @@ basic_pop_model <- function(pars) {
   # Do some parameter transformations here AGR DO I NEED THESE?
   mean_rec = exp(ln_mean_rec) # mean recruitment
   sigma_R = exp(ln_sigma_R) # recruitment variability
-  sigma_F = exp(ln_sigma_F) # fishing mortality variability
-  M = exp(ln_M) # natural mortality
+  #sigma_F = exp(ln_sigma_F) # fishing mortality variability
+  #M = exp(ln_M) # natural mortality #I think I fix natural mortality
   srv_q = exp(ln_srv_q) # survey catchability
+  #tyler exponentiates itinial values too
+
   
   # Set Up Fishery Selectivity -----------------------------------------------------
   #for(f in 1:n_fish_fleets) {
@@ -156,22 +151,24 @@ basic_pop_model <- function(pars) {
   ##matt notes, can also write the selectivty function... outside?
   
   # Set Up Mortality -------------------------------------------------------- #AGR I THINK I FIX MORTALITY
-  for(y in 1:n_yrs) {
-    for(f in 1:n_fish_fleets) {
-      Fmort[y,f] = exp(ln_F_mean[f] + ln_F_devs[y,f]) # get fishing mortality
-      FAA[y,,f] = Fmort[y,f] * fish_sel[,f] # get fishing mortality at age ##easy to index stuff in RTMB, says Matt
-    } # end f loop
-    for(a in 1:n_ages) ZAA[y,a] = sum(FAA[y,a,]) + M # Total Mortality at age
-  } # end y loop
+  #for(y in 1:n_yrs) {
+  #  for(f in 1:n_fish_fleets) {
+  #    Fmort[y,f] = exp(ln_F_mean[f] + ln_F_devs[y,f]) # get fishing mortality
+  #    FAA[y,,f] = Fmort[y,f] * fish_sel[,f] # get fishing mortality at age ##easy to index stuff in RTMB, says Matt
+  #  } # end f loop
+  #  for(a in 1:n_ages) ZAA[y,a] = sum(FAA[y,a,]) + M # Total Mortality at age
+  #} # end y loop
   
   
   # Initialize Population ---------------------------------------------------
-  init_age_idx = 1:(n_ages - 2) # Get initial age indexing
+  ##I need to inditalize this for CRAB- AGR FLAG!!
+  init_age_idx = 1:(n_ages - 2) # Get initial age indexing #WHY -2??
   NAA[1,init_age_idx + 1] = mean_rec * exp(ln_InitDevs - (init_age_idx * M)) # not plus group
   NAA[1,n_ages] = mean_rec * exp(-(n_ages - 1) * M) / (1 - exp(-M)) # geometric series solution for plus group
   
   
   # Population Projection ---------------------------------------------------
+  ###chage to a stage-based projection -AGR FLAG!!
   for(y in 1:n_yrs) {
     NAA[y,1] = mean_rec * exp(ln_RecDevs[y]) # mean recruitment
     # Project Numbers at Age
@@ -191,59 +188,82 @@ basic_pop_model <- function(pars) {
   
   
   # Fishery Observation Model -----------------------------------------------
-  for(y in 1:n_yrs) {
-    for(f in 1:n_fish_fleets) {
-      CAA[y,,f] = FAA[y,,f] / ZAA[y,] * NAA[y,] * (1 - exp(-ZAA[y,])) # Get Catch at Age via Baranov's
-      PredCatch[y,f] = sum(CAA[y,,f] * WAA) # get total catch
-    } # end f loop
-  } # end y loop
-  
+  #for(y in 1:n_yrs) {
+  #  for(f in 1:n_fish_fleets) {
+  #    CAA[y,,f] = FAA[y,,f] / ZAA[y,] * NAA[y,] * (1 - exp(-ZAA[y,])) # Get Catch at Age via Baranov's
+  #    PredCatch[y,f] = sum(CAA[y,,f] * WAA) # get total catch
+  #  } # end f loop
+  #} # end y loop
+  #CAA not a thing for crab CSA
   
   # Survey Observation Model ------------------------------------------------
   for(y in 1:n_yrs) {
-    for(sf in 1:n_srv_fleets) {
-      SrvIAA[y,,sf] = NAA[y,] * srv_sel[,sf] # Get survey indexed ages
-      PredSrvIdx[y,sf] = srv_q * sum(SrvIAA[y,,sf] * WAA) # get predicted survey biomass index
-    } # end sf loop
+    for(sf in 1:n_srv_fleets) { #so there is one survey fleet
+      #SrvIAA[y,,sf] = NAA[y,] * srv_sel[,sf] # Get survey indexed ages
+      #PredSrvIdx[y,sf] = srv_q * sum(SrvIAA[y,,sf] * WAA) # get predicted survey biomass index
+    #SrvIAS[y,,sf] = NAS[y,] #* srv_sel[,sf] # Get survey indexed STAGES
+    PredSrvIdx[y,sf] = srv_q * sum(SrvIAA[y,,sf] * WAA) # get predicted survey biomass index #AGR hmm, did I do this right?
+    }
   } # end y loop
   
   # Likelihoods -------------------------------------------------------------
   ## Catch -------------------------------------------------------------------
-  for(y in 1:n_yrs) {
-    for(f in 1:n_fish_fleets) {
-      Catch_nLL[y,f] = -dnorm(log(ObsCatch[y,f]), log(PredCatch[y,f]), sigma_Catch[f], TRUE)
-    } # end f loop
-  } # end y loop
+  #for(y in 1:n_yrs) {
+   # for(f in 1:n_fish_fleets) {
+  #    Catch_nLL[y,f] = -dnorm(log(ObsCatch[y,f]), log(PredCatch[y,f]), sigma_Catch[f], TRUE)
+   # } # end f loop
+  #} # end y loop
   
   ## Survey Index ------------------------------------------------------------
+  #for(y in 1:n_yrs) { #TURN ON IF WE DO MULTPLE SURVEY FLEETS
+  #  for(sf in 1:n_srv_fleets) {
+  #    SrvIdx_nLL[y,sf] = -dnorm(log(ObsSrvIdx[y,sf]), log(PredSrvIdx[y,sf]), sigma_SrvIdx[sf], TRUE)
+   # } # end sf loop
+  #} # end y loop
+  
+  #re-write without sf
+  for(y in 1:n_yrs) { #TURN ON IF ONLY ONE SURVEY FLEET
+      SrvIdx_nLL[y] = -dnorm(log(ObsSrvIdx[y]), log(PredSrvIdx[y]), sigma_SrvIdx, TRUE) #I probs need to go back through everything and get rid of sf...
+  } # end 
+  
+  #or maybe
   for(y in 1:n_yrs) {
-    for(sf in 1:n_srv_fleets) {
-      SrvIdx_nLL[y,sf] = -dnorm(log(ObsSrvIdx[y,sf]), log(PredSrvIdx[y,sf]), sigma_SrvIdx[sf], TRUE)
-    } # end sf loop
-  } # end y loop
+    SrvIdx_nLL[y] = -dnorm(log(ObsSrvIdx[y]), log(PredSrvIdx[y]), sigma_SrvIdx, TRUE) * lambdas[y] #FLAG match lambdas to the weights nomenclature please
+  }
+  #OR
+  #SrvIdx_nLL <- -dnorm(log(ObsSrvIdx), log(PredSrvIdx), sigma_SrvIdx, log = TRUE) * lambdas #perhaps misses something by year
+  
+  
+  # Index likelihood via sum of squares (no sigma)
+  #index_lik <- sum(
+   # (log(obs_index) - log(pred_index))^2 * lambdas #labdas will be the weights - FLAG
+  #) OR
+ # index_lik <- -sum(
+  #  dnorm(log(obs_index), mean = log(pred_index), sd = sigma, log = TRUE) * lambdas
+  #)
   
   ## Fishery Ages ------------------------------------------------------------
-  for(y in 1:n_yrs) {
-    for(f in 1:n_fish_fleets) {
-      tmp_size = sum(ObsFishAges[y,,f]) # get sample size
-      FishAgeComps_nLL[y,f] = -dmultinom(x = ObsFishAges[y,,f], size = tmp_size, prob = CAA[y,,f], TRUE) #CAA is catch at age
-    } # end f loop
-  } # end y loop
+  #for(y in 1:n_yrs) {
+   # for(f in 1:n_fish_fleets) {
+    #  tmp_size = sum(ObsFishAges[y,,f]) # get sample size
+     # FishAgeComps_nLL[y,f] = -dmultinom(x = ObsFishAges[y,,f], size = tmp_size, prob = CAA[y,,f], TRUE) #CAA is catch at age
+    #} # end f loop
+  #} # end y loop
   
   ## Survey Ages ------------------------------------------------------------
-  for(y in 1:n_yrs) {
-    for(sf in 1:n_srv_fleets) {
-      tmp_size = sum(ObsSrvAges[y,,sf]) # get sample size
-      SrvAgeComps_nLL[y,sf] = -dmultinom(x = ObsSrvAges[y,,sf], size = tmp_size, prob = SrvIAA[y,,sf], TRUE)
-    } # end sf loop   # x is nymbers of fish. #prob doesnt necessarily need to sum to 1 because dmultinom will do it
-  } # end y loop
+  #for(y in 1:n_yrs) {
+  #  for(sf in 1:n_srv_fleets) {
+  #    tmp_size = sum(ObsSrvAges[y,,sf]) # get sample size
+  #    SrvAgeComps_nLL[y,sf] = -dmultinom(x = ObsSrvAges[y,,sf], size = tmp_size, prob = SrvIAA[y,,sf], TRUE)
+  #  } # end sf loop   # x is nymbers of fish. #prob doesnt necessarily need to sum to 1 because dmultinom will do it
+  #} # end y loop
   
   ## Fishing Mortality Penalty -----------------------------------------------
-  for(y in 1:n_yrs) {
-    for(f in 1:n_fish_fleets) {
-      Fmort_Pen[y,f] = -dnorm(ln_F_devs[y,f], 0, sigma_F, TRUE) #"sigma F is pretty big, so I specified it at 5-MATT"
-    } # end f loop
-  } # end y loop
+ # for(y in 1:n_yrs) {
+#    for(f in 1:n_fish_fleets) {
+ #     Fmort_Pen[y,f] = -dnorm(ln_F_devs[y,f], 0, sigma_F, TRUE) #"sigma F is pretty big, so I specified it at 5-MATT"
+#    } # end f loop
+#  } # end y loop
   
   
   ## Recruitment -------------------------------------------------------------
@@ -251,9 +271,10 @@ basic_pop_model <- function(pars) {
   Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE))
   
   # Get joint likelihood
-  jnLL = sum(Catch_nLL) + sum(SrvIdx_nLL) + sum(FishAgeComps_nLL) + 
-    sum(SrvAgeComps_nLL) + sum(Fmort_Pen) + sum(Init_Rec_nLL) +
-    sum(Rec_nLL)
+  jnLL = sum(SrvInd_nLL) #we're keeping it simple for the crab CSA
+  #jnLL = sum(Catch_nLL) + sum(SrvIdx_nLL) + sum(FishAgeComps_nLL) + 
+   # sum(SrvAgeComps_nLL) + sum(Fmort_Pen) + sum(Init_Rec_nLL) +
+    #sum(Rec_nLL)
   
   # Report Section
   RTMB::REPORT(SSB)
