@@ -28,23 +28,43 @@ df$years <- c(1979:2024)
 
 #put data into individual stored places for RTMB
 YEARS <- df$years
-
-#survey CPUE info
-
 WEIGHTS <- df$weights #weighing
+CATCH <- df$Catch_.Number. #FLAG that this notation is ok. #just personal use for now, since the fishery is closed
+##there was some thing in the juneau csa excel readme about how calculating PU is not straightforward. So... check that plz
+CATCH_MIDDATE <- df$Catch_Mid_Date #might have to do some weird date wrangling here FLAG- just put it into julian
+##also check column name, likely not right
+SURVET_MIDDATE <- df$Survey_Mid_Date #same same comments as CATCH_MIDDATE
+
+#survey info
+##survey CPUE (from summary table) #vectors over all the years
+CPUE_prerec <- df$Pre_recruit
+CPUE_rec <- df$Recruit
+CPUE_postrec <- df$Post_recruit
+##survey weights (from summary table) #vectors over all the years
+WEIGHT_mature <- df$Mature_Weight
+WEIGHT_legal <- df$Legal_Weight
+WEIGHT_prerec <- df$Prerecruit_Weight
+
 
 
 ##########
 #PARAMS
 ###########
+Q2 <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
+  ##(do we HAVE a rec -> postrec survival???)
+q <- 104.187334848418/100 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...))
+S <- 0.32 #I think this is fixed.  #neg or positive tho?
+Z <- exp(-S)#total instantaneous mortality
+SURVIVAL_PARAMS <- df$Survival_Parameters
+
+
+##intermediate calcs #FLAG- I needs to do this
+#SURVEY_TAU <-  #ugh. FLAG. make this this year-last year's julian date for all years
+#CATCH_SURVEY_TAU <- #greater than or = to survey_tau. Formula is this in excel: =IF(H41=0,1,+(J42-I41)/365). SO 
+  ##if the catch = 0, the CATCH_SURVEY_TAU = 1 for the previous year. IF catch =! 0 for the previous year, last year SURVEY MID DATE - last year CATCH MID DATE / 365 = the TAU for the current year
 
 
 
-#the new data - will need to pull in the ... everything on line 54 on Juneau 2024 new weighting - that's the new stuff, the new line that I'll have to create
-
-
-
-#any wrangling (combine new, old datasets to make 1 - starting values for the CSA)
 
 
 ####################################################################
