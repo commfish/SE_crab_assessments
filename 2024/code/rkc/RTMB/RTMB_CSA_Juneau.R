@@ -12,8 +12,32 @@ library(RTMB)
 library(here)
 library(TMBhelper)
 
+#to test: use juneau 2023 CSA to calc the 2024 analysis.... and see what happens
+
+#######
+#DATA
+#######
 #load in datas - see the CSA excel for juneau for reference
 #the old data - perhaps imported from last year's CSA
+
+#df <- read.csv() #I might want to put a big df here
+
+#I'll sim one for now:
+df <- data.frame(years = c(1979:2024)) #end year length will be 2025 in 2025
+df$years <- c(1979:2024) 
+
+#put data into individual stored places for RTMB
+YEARS <- df$years
+
+#survey CPUE info
+
+WEIGHTS <- df$weights #weighing
+
+
+##########
+#PARAMS
+###########
+
 
 
 #the new data - will need to pull in the ... everything on line 54 on Juneau 2024 new weighting - that's the new stuff, the new line that I'll have to create
@@ -46,6 +70,7 @@ basic_pop_model <- function(pars) {
   
   # get parameters and data
   RTMB::getAll(pars, data) # i WILL NEED PARS AND DATA
+  ##what are the parameters in the RTMB mdoel?
   
   # Model Set Up (Containers) -----------------------------------------------
   n_ages = length(ages) # number of ages
