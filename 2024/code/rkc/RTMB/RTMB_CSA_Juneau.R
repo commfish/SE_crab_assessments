@@ -33,7 +33,7 @@ CATCH <- df$Catch_.Number. #FLAG that this notation is ok. #just personal use fo
 ##there was some thing in the juneau csa excel readme about how calculating PU is not straightforward. So... check that plz
 CATCH_MIDDATE <- df$Catch_Mid_Date #might have to do some weird date wrangling here FLAG- just put it into julian
 ##also check column name, likely not right
-SURVET_MIDDATE <- df$Survey_Mid_Date #same same comments as CATCH_MIDDATE
+SURVEY_MIDDATE <- df$Survey_Mid_Date #same same comments as CATCH_MIDDATE
 
 #survey info
 ##survey CPUE (from summary table) #vectors over all the years
@@ -55,37 +55,27 @@ Q2 <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value f
 q <- 104.187334848418/100 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...))
 S <- 0.32 #I think this is fixed.  #neg or positive tho?
 Z <- exp(-S)#total instantaneous mortality
-SURVIVAL_PARAMS <- df$Survival_Parameters
+SURVIVAL_PARAMS <- df$Survival_Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it...
 
 
-##intermediate calcs #FLAG- I needs to do this
+##intermediate calcs #FLAG- I needs to do this - perhaps add in after initial model works
 #SURVEY_TAU <-  #ugh. FLAG. make this this year-last year's julian date for all years
 #CATCH_SURVEY_TAU <- #greater than or = to survey_tau. Formula is this in excel: =IF(H41=0,1,+(J42-I41)/365). SO 
   ##if the catch = 0, the CATCH_SURVEY_TAU = 1 for the previous year. IF catch =! 0 for the previous year, last year SURVEY MID DATE - last year CATCH MID DATE / 365 = the TAU for the current year
 
+#NOTE- I might have to log things so nothing goes below 0...
 
 
+####################
+#DERVIVED QUANTITIES
+EST_PREREC <- SURVIVAL_PARAMS #FLAG - it equals survival params post adjustment
+#EST_REC <- EST_PREREC(last year) * Q2 #Q2 is the prerec to rec survival rate #FLAG I need to loop this I think
+#EST_POSTREC <- #(EST_REC(last year) + EST_POSTREC(last year)) * exp(-S * SURVEY_TAU) - (q*CATCH(t-1)*exp(CATCH_SURVEY_TAU*-S))
 
-
-####################################################################
-#The CSA part - in RTMB
-
-#gonna want some initial parameters (WHAT ARE THEY??)
-##WHICH WILL GO HERE
-
-#define the objective function for the CSA model
-
-##something like: #this is a LINEAR MODEL EXAMPLE right now
-nll <- function(par) {
-  pred <- par$alpha + par$beta * dat$x
-  -sum(dnorm(dat$y, pred, exp(par$logSigma), log = TRUE))
-}
-
-#hmmm thinkinh about how my CSA works
 
 
 ############################3
-#NO NOT THAT, SOMETHNG LIKE THIS:
+#SOMETHNG LIKE THIS:
 basic_pop_model <- function(pars) {
   
   # get parameters and data
@@ -93,14 +83,19 @@ basic_pop_model <- function(pars) {
   ##what are the parameters in the RTMB mdoel?
   
   # Model Set Up (Containers) -----------------------------------------------
-  n_ages = length(ages) # number of ages
-  n_yrs = length(years) # number of years
+  n_stages = 3 # number of stages for a 3 stage model
+  n_yrs = length(YEARS) # number of years
   
   # Population Stuff
-  NAA = array(data = 0, dim = c(n_yrs + 1, n_ages)) # Numbers at age
-  ZAA = array(data = 0, dim = c(n_yrs, n_ages)) # Total mortality at age
-  Total_Biom = rep(0, n_yrs) # Total biomass
-  SSB = rep(0, n_yrs) # Spawning stock biomass
+  NAA = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage
+  ZAA = array(data = 0, dim = c(n_yrs, n_ages)) # Total mortality at stage #DO WE FIX THIS- FLAG
+  #Total_Biom = rep(0, n_yrs) # Total biomass
+  #SSB = rep(0, n_yrs) # Spawning stock biomass
+  Biom_prerec = rep(0, n_yrs) #Prerecuit biomass
+  Biom_rec = rep(0, n_yrs) #Recuit biomass #this is derived. Do I need to stage this here.
+  Biom_postrec = rep(0, n_yrs) #Postrecuit biomass  #this is derived. Do I need to stage this here.
+  
+  #AGR HERE
   
   # Fishing Stuff
   Fmort = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishing mortality scalar
@@ -306,3 +301,21 @@ obj$report()$Sigma
 ##3. Any other tables that I want
 
 #Q: so WHY does this have to be in RTMB? Why was optim unstable?
+
+
+##TRASH CAN
+####################################################################
+#The CSA part - in RTMB
+
+#gonna want some initial parameters (WHAT ARE THEY??)
+##WHICH WILL GO HERE
+
+#define the objective function for the CSA model
+
+##something like: #this is a LINEAR MODEL EXAMPLE right now
+nll <- function(par) {
+  pred <- par$alpha + par$beta * dat$x
+  -sum(dnorm(dat$y, pred, exp(par$logSigma), log = TRUE))
+}
+
+#hmmm thinkinh about how my CSA works
