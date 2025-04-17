@@ -207,6 +207,9 @@ basic_pop_model <- function(pars) {
   } # end y loop
   
   # Likelihoods -------------------------------------------------------------
+  ##AGR- I currently have the survey ssq-like likelihood in there. In excel. q (catchability) and PreRtoR survival (recruitment??) are also in the minimizer for solver, along with the sum of squares for the survey. Do I include these in the likelihood?
+  ###nope- but include them in related calcs
+  ###
   ## Catch -------------------------------------------------------------------
   #for(y in 1:n_yrs) {
    # for(f in 1:n_fish_fleets) {
