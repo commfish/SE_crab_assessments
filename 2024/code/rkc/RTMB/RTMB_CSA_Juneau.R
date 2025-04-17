@@ -267,8 +267,8 @@ basic_pop_model <- function(pars) {
   
   
   ## Recruitment -------------------------------------------------------------
-  Init_Rec_nLL = -sum(dnorm(ln_InitDevs, -sigma_R^2/2, sigma_R, TRUE))
-  Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE))
+  #Init_Rec_nLL = -sum(dnorm(ln_InitDevs, -sigma_R^2/2, sigma_R, TRUE)) #I am unsure if these stay for the crab CSA.. this will be the next addition if not now, at least
+  #Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE))
   
   # Get joint likelihood
   jnLL = sum(SrvInd_nLL) #we're keeping it simple for the crab CSA
@@ -277,24 +277,24 @@ basic_pop_model <- function(pars) {
     #sum(Rec_nLL)
   
   # Report Section
-  RTMB::REPORT(SSB)
-  RTMB::REPORT(NAA)
-  RTMB::REPORT(ZAA)
-  RTMB::REPORT(CAA)
-  RTMB::REPORT(SrvIAA)
-  RTMB::REPORT(Total_Biom)
+  RTMB::REPORT(SSB)# by stage ideally
+  RTMB::REPORT(NAS) #Numbers at Stage! (can we also report biomass at stage??)
+  #RTMB::REPORT(ZAA) #I think we have constant inst. total mort..
+  #RTMB::REPORT(CAA) #not for us!
+  RTMB::REPORT(SrvIAS) #sruvey Index at stage!
+  RTMB::REPORT(Total_Biom) #total biomass
   RTMB::REPORT(jnLL)
-  RTMB::REPORT(Catch_nLL)
-  RTMB::REPORT(SrvIdx_nLL)
-  RTMB::REPORT(FishAgeComps_nLL)
-  RTMB::REPORT(SrvAgeComps_nLL)
-  RTMB::REPORT(Fmort_Pen)
-  RTMB::REPORT(Init_Rec_nLL)
-  RTMB::REPORT(Rec_nLL)
-  RTMB::REPORT(PredCatch)
+  #RTMB::REPORT(Catch_nLL)
+  #RTMB::REPORT(SrvIdx_nLL)
+  #RTMB::REPORT(FishAgeComps_nLL)
+  #RTMB::REPORT(SrvAgeComps_nLL) #survey stage comps NLL? I think not for me
+  #RTMB::REPORT(Fmort_Pen) #I think no?
+  #RTMB::REPORT(Init_Rec_nLL) #maybe add these in later? or now...
+  #RTMB::REPORT(Rec_nLL)
+  #RTMB::REPORT(PredCatch)#this one?maybe... I dont think we predict this though
   RTMB::REPORT(PredSrvIdx)
-  RTMB::REPORT(fish_sel)
-  RTMB::REPORT(srv_sel)
+  #RTMB::REPORT(fish_sel)
+  #RTMB::REPORT(srv_sel)
   
   return(jnLL)
 }
