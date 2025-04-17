@@ -95,33 +95,44 @@ basic_pop_model <- function(pars) {
   Biom_rec = rep(0, n_yrs) #Recuit biomass #this is derived. Do I need to stage this here.
   Biom_postrec = rep(0, n_yrs) #Postrecuit biomass  #this is derived. Do I need to stage this here.
   
-  #AGR HERE
   
   # Fishing Stuff
-  Fmort = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishing mortality scalar
-  FAA = array(data = 0, dim = c(n_yrs, n_ages, n_fish_fleets)) # Fishing mortality at age
-  CAA = array(data = 0, dim = c(n_yrs, n_ages, n_fish_fleets)) # Catch at age
-  PredCatch = array(0, dim = c(n_yrs, n_fish_fleets)) # Predicted catch in weight
-  fish_sel = array(data = 0, dim = c(n_ages, n_fish_fleets)) # Fishery selectivity
+  #Fmort = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishing mortality scalar
+  n_fish_fleets = 1 #just one fleet here
+  ##also is fishing mort part of this at all?? PErhaps not
+  #FAA = array(data = 0, dim = c(n_yrs, n_ages, n_fish_fleets)) # Fishing mortality at age #do we have this in CAA?
+  #CAA = array(data = 0, dim = c(n_yrs, n_ages, n_fish_fleets)) # Catch at age
+  C = array(data = 0, dim = c(n_yrs, n_fish_fleets)) # So we just have catch, not at age
+  #PredCatch = array(0, dim = c(n_yrs, n_fish_fleets)) # Predicted catch in weight #I dont think we use this either
+  #fish_sel = array(data = 0, dim = c(n_ages, n_fish_fleets)) # Fishery selectivity #also not a thing in CAA
   
   # Survey Stuff
-  SrvIAA = array(data = 0, dim = c(n_yrs, n_ages, n_srv_fleets)) # Survey index at age
-  PredSrvIdx = array(0, dim = c(n_yrs, n_srv_fleets)) # Predicted survey index 
-  srv_sel = array(data = 0, dim = c(n_ages, n_srv_fleets)) # Survey selectivity
+  n_srv_fleets = 1 #just one survey
+  #SrvIAA = array(data = 0, dim = c(n_yrs, n_ages, n_srv_fleets)) # Survey index at age
+  SrvCAS = array(data = 0, dim = c(n_yrs, n_stages, n_srv_fleets)) #survey CPUE at stage
+  #PredSrvIdx = array(0, dim = c(n_yrs, n_srv_fleets)) # Predicted survey index - CPUE is the index 
+  PredSrvIdx = array(0, dim = c(n_yrs, n_stages, n_srv_fleets)) # Predicted survey index - CPUE is the index. I added n of stages. can probs delete survey fleets, there is 1
+  #srv_sel = array(data = 0, dim = c(n_ages, n_srv_fleets)) # Survey selectivity #hmm do we have this? I don't think we have selectivity for CAA
   
-  # Likelihoods
+  # Likelihoods #AGR HERE
   Catch_nLL = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishery Catch Likelihoods #it does not have to be an array. Can be "other ways"
   FishAgeComps_nLL = array(data = 0, dim = c(n_yrs, n_fish_fleets)) # Fishery Age Comps Likelihoods
   SrvIdx_nLL = array(0, dim = c(n_yrs, n_srv_fleets)) # Survey Index Likelihoods
   SrvAgeComps_nLL = array(data = 0, dim = c(n_yrs, n_srv_fleets)) # Survey Age Comps Likelihoods
   
-  # Penalties
-  Fmort_Pen = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishing Mortality Deviation penalty
-  Rec_nLL = rep(0, n_yrs) # Recruitment penalty
-  Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty
-  jnLL = 0 # Joint negative log likelihood
+  #likelihoods for crab - tyler has these two, idk...idk which ones to use...this is where I deviate from the sum of squares method in the excel doc, I think
+  ##index likelihood #TK
   
-  # Do some parameter transformations here
+  ##recruitment likelihood #TK
+  
+  #AGR HERE
+  # Penalties #I don't need penalties?? do I?
+  #Fmort_Pen = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishing Mortality Deviation penalty
+  #Rec_nLL = rep(0, n_yrs) # Recruitment penalty
+  #Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty
+  jnLL = 0 # Joint negative log likelihood #keep this AGR?
+  
+  # Do some parameter transformations here AGR DO I NEED THESE?
   mean_rec = exp(ln_mean_rec) # mean recruitment
   sigma_R = exp(ln_sigma_R) # recruitment variability
   sigma_F = exp(ln_sigma_F) # fishing mortality variability
@@ -129,22 +140,22 @@ basic_pop_model <- function(pars) {
   srv_q = exp(ln_srv_q) # survey catchability
   
   # Set Up Fishery Selectivity -----------------------------------------------------
-  for(f in 1:n_fish_fleets) {
-    a50_tmp = exp(ln_fish_sel_pars[1, f]) # transform and extract a50
-    k_tmp = exp(ln_fish_sel_pars[2, f]) # transform and extract slope
-    fish_sel[,f] = 1 / (1 + exp(-k_tmp * (1:n_ages - a50_tmp))) # logistic selectivity
-  } # end f loop
+  #for(f in 1:n_fish_fleets) {
+   # a50_tmp = exp(ln_fish_sel_pars[1, f]) # transform and extract a50
+  #  k_tmp = exp(ln_fish_sel_pars[2, f]) # transform and extract slope
+  #  fish_sel[,f] = 1 / (1 + exp(-k_tmp * (1:n_ages - a50_tmp))) # logistic selectivity
+#  } # end f loop
   
   
   # Set Up Survey Selectivity -----------------------------------------------
-  for(sf in 1:n_srv_fleets) {
-    a50_tmp = exp(ln_srv_sel_pars[1, sf]) # transform and extract a50
-    k_tmp = exp(ln_srv_sel_pars[2, sf]) # transform and extract slope
-    srv_sel[,sf] = 1 / (1 + exp(-k_tmp * (1:n_ages - a50_tmp))) # logistic selectivity
-  } # end sf loop
+ # for(sf in 1:n_srv_fleets) {
+  #  a50_tmp = exp(ln_srv_sel_pars[1, sf]) # transform and extract a50
+  #  k_tmp = exp(ln_srv_sel_pars[2, sf]) # transform and extract slope
+  #  srv_sel[,sf] = 1 / (1 + exp(-k_tmp * (1:n_ages - a50_tmp))) # logistic selectivity
+  #} # end sf loop
   ##matt notes, can also write the selectivty function... outside?
   
-  # Set Up Mortality --------------------------------------------------------
+  # Set Up Mortality -------------------------------------------------------- #AGR I THINK I FIX MORTALITY
   for(y in 1:n_yrs) {
     for(f in 1:n_fish_fleets) {
       Fmort[y,f] = exp(ln_F_mean[f] + ln_F_devs[y,f]) # get fishing mortality
