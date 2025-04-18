@@ -41,16 +41,13 @@ CPUE_prerec <- df$Pre_recruit
 CPUE_rec <- df$Recruit
 CPUE_postrec <- df$Post_recruit
 ##survey weights (from summary table) #vectors over all the years
-WEIGHT_mature <- df$Mature_Weight
-WEIGHT_legal <- df$Legal_Weight
-WEIGHT_prerec <- df$Prerecruit_Weight
-
+WEIGHT <- Weight
 
 
 ##########
 #PARAMS
 ###########
-Q2 <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
+REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
   ##(do we HAVE a rec -> postrec survival???)
 q <- 104.187334848418/100 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...))
 S <- 0.32 #I think this is fixed.  #neg or positive tho?
@@ -79,48 +76,41 @@ EST_PREREC <- SURVIVAL_PARAMS #FLAG - it equals survival params post adjustment
 basic_pop_model <- function(pars) {
   
   # get parameters and data
-  RTMB::getAll(pars, data) # i WILL NEED PARS AND DATA
-  ##what are the parameters in the RTMB mdoel?
+  RTMB::getAll(pars, data) # i WILL NEED PARS AND DATA as inputs
   
   # Model Set Up (Containers) -----------------------------------------------
   n_stages = 3 # number of stages for a 3 stage model
   n_yrs = length(YEARS) # number of years
+  lambdas = length(YEARS) #the weights
   
   # Population Stuff
-  CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage
-  #Total_Biom = rep(0, n_yrs) # Total biomass
-  SSB = rep(0, n_yrs, n_stages) # Spawning stock biomass
-  #Biom_prerec = rep(0, n_yrs) #Prerecuit biomass #FLAG- could simplify, do indidually
-  #Biom_rec = rep(0, n_yrs) #Recuit biomass #this is derived. Do I need to stage this here.
-  #Biom_postrec = rep(0, n_yrs) #Postrecuit biomass  #this is derived. Do I need to stage this here.
-  
+  CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage, adds one for this year
+  SSB = array(0, dim = c(n_yrs, n_stages)) # Pre-rec, legal, and mature biomasses
   
   # Fishing Stuff
   C = array(data = 0, dim = c(n_yrs)) # Catch (just PU right now, hasnt been a commercial fishery in a while)
 
   # Survey Stuff
   SrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey index at stage
-  pred_SrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) #survey CPUE at stage
-  PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # Predicted survey index - CPUE is the index. I added n of stages. can probs delete survey fleets, there is 1
+  predSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) #survey CPUE at stage
+  PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calcualted from the predicted survey CPUE and waa
 
   # Likelihoods - box
-  SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares
-  #Rec_nLL = array(0, dim = c(n_yrs, n_stages)) #recruitment likelihood #n stages in here too? not sure if n_stages needs to be here #would we turn this one off?
-#I think this was an extra tyler thing - the base mod just does min sum squares
-  
+  SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
+
   # Penalties #I don't need penalties?? do I?
-  #Fmort_Pen = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishing Mortality Deviation penalty
   #Rec_nLL = rep(0, n_yrs) # Recruitment penalty
   #Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty
-  jnLL = 0 # Joint negative log likelihood #keep this AGR?
+  jnLL = 0 # Joint negative log likelihood
   
   # Do some parameter transformations here AGR DO I NEED THESE?
-  mean_rec = exp(ln_mean_rec) # mean recruitment
-  sigma_R = exp(ln_sigma_R) # recruitment variability
+  #mean_rec = exp(ln_mean_rec) # mean recruitment
+  #sigma_R = exp(ln_sigma_R) # recruitment variability
   #sigma_F = exp(ln_sigma_F) # fishing mortality variability
   #M = exp(ln_M) # natural mortality #I think I fix natural mortality
   srv_q = exp(ln_srv_q) # survey catchability
-  #tyler exponentiates itinial values too
+  mean_rec = exp(ln_mean_rec) # mean recruitment
+  
 
   
   # Initialize Population ---------------------------------------------------
@@ -188,13 +178,14 @@ basic_pop_model <- function(pars) {
   #} # end y loop
 
   for(y in 1:n_yrs) {
-    SrvIdx_nLL[y] = -dnorm(log(ObsSrvIdx[y]), log(PredSrvIdx[y]), sigma_SrvIdx, TRUE) * lambdas[y] #FLAG match lambdas to the weights nomenclature please
+     for(st in 1:n_stages) {
+    SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvIdx[y,st]), log(PredSrvIdx[y,st]), sigma_SrvIdx[st], TRUE) * lambdas[y] #FLAG match lambdas to the weights nomenclature please
+     } #end of st(stage) loop
   } #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
   #OR
 
   
-
-  ## Recruitment -------------------------------------------------------------
+  ## Recruitment ------------------------------------------------------------- PERHAPS ADD THIS LATER
   #Init_Rec_nLL = -sum(dnorm(ln_InitDevs, -sigma_R^2/2, sigma_R, TRUE)) #I am unsure if these stay for the crab CSA.. this will be the next addition if not now, at least
   #Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE))
   
@@ -202,13 +193,13 @@ basic_pop_model <- function(pars) {
   jnLL = sum(SrvInd_nLL) #we're keeping it simple for the crab CSA
   #jnLL = sum(Catch_nLL) + sum(SrvIdx_nLL) + sum(FishAgeComps_nLL) + 
    # sum(SrvAgeComps_nLL) + sum(Fmort_Pen) + sum(Init_Rec_nLL) +
-    #sum(Rec_nLL)
+    #sum(Rec_nLL)solver in excel including preR to R survival (and also catchability q) - is this part of the likelihood?? #FLAG- perhaps add this next!!
   
+ 
   # Report Section
-  RTMB::REPORT(SSB)# this IS the total mature biomass (perhaps change name later)
-  RTMB::REPORT(Total_Biom_Leg) #total legal biomass
+  RTMB::REPORT(SSB)# Mature and Legal biomasses
   #RTMB::REPORT(SrvIAS) #sruvey Index at stage! The predicted CPUE??
-  RTMB::REPORT(PredSrvIdx) #survey index? Pred cpue?
+  RTMB::REPORT(PredSrvIdx) #survey biomass by stage
   RTMB::REPORT(jnLL)
   
   return(jnLL)
@@ -235,6 +226,13 @@ obj$report()$Sigma
 
 ######################################################################
 #update the misc Juneau tables that I need (parallel the CSV) (only for the RKC juneau survey area)
+
+
+##############3
+#CALC GHL HERE
+################
+#it is mature biomass * 0.1 or whatever
+
 
 
 
