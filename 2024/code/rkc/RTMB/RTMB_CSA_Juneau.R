@@ -87,35 +87,24 @@ basic_pop_model <- function(pars) {
   n_yrs = length(YEARS) # number of years
   
   # Population Stuff
-  NAA = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage
-  ZAA = array(data = 0, dim = c(n_yrs, n_ages)) # Total mortality at stage #DO WE FIX THIS- FLAG
+  CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage
   #Total_Biom = rep(0, n_yrs) # Total biomass
-  #SSB = rep(0, n_yrs) # Spawning stock biomass
-  Biom_prerec = rep(0, n_yrs) #Prerecuit biomass
-  Biom_rec = rep(0, n_yrs) #Recuit biomass #this is derived. Do I need to stage this here.
-  Biom_postrec = rep(0, n_yrs) #Postrecuit biomass  #this is derived. Do I need to stage this here.
+  SSB = rep(0, n_yrs, n_stages) # Spawning stock biomass
+  #Biom_prerec = rep(0, n_yrs) #Prerecuit biomass #FLAG- could simplify, do indidually
+  #Biom_rec = rep(0, n_yrs) #Recuit biomass #this is derived. Do I need to stage this here.
+  #Biom_postrec = rep(0, n_yrs) #Postrecuit biomass  #this is derived. Do I need to stage this here.
   
   
   # Fishing Stuff
-  #Fmort = array(0, dim = c(n_yrs, n_fish_fleets)) # Fishing mortality scalar
-  n_fish_fleets = 1 #just one fleet here
-  ##also is fishing mort part of this at all?? PErhaps not
-  #FAA = array(data = 0, dim = c(n_yrs, n_ages, n_fish_fleets)) # Fishing mortality at age #do we have this in CAA?
-  #CAA = array(data = 0, dim = c(n_yrs, n_ages, n_fish_fleets)) # Catch at age
-  C = array(data = 0, dim = c(n_yrs, n_fish_fleets)) # So we just have catch, not at age
-  #PredCatch = array(0, dim = c(n_yrs, n_fish_fleets)) # Predicted catch in weight #I dont think we use this either
-  #fish_sel = array(data = 0, dim = c(n_ages, n_fish_fleets)) # Fishery selectivity #also not a thing in CAA
-  
+  C = array(data = 0, dim = c(n_yrs)) # Catch (just PU right now, hasnt been a commercial fishery in a while)
+
   # Survey Stuff
-  n_srv_fleets = 1 #just one survey
-  #SrvIAA = array(data = 0, dim = c(n_yrs, n_ages, n_srv_fleets)) # Survey index at age
-  SrvCAS = array(data = 0, dim = c(n_yrs, n_stages, n_srv_fleets)) #survey CPUE at stage
-  #PredSrvIdx = array(0, dim = c(n_yrs, n_srv_fleets)) # Predicted survey index - CPUE is the index 
-  PredSrvIdx = array(0, dim = c(n_yrs, n_stages, n_srv_fleets)) # Predicted survey index - CPUE is the index. I added n of stages. can probs delete survey fleets, there is 1
-  #srv_sel = array(data = 0, dim = c(n_ages, n_srv_fleets)) # Survey selectivity #hmm do we have this? I don't think we have selectivity for CAA
-  
-  # Likelihoods 
-  SrvIdx_nLL = array(0, dim = c(n_yrs, n_srv_fleets)) # Survey Index Likelihoods - this replaces the sum of squares
+  SrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey index at stage
+  pred_SrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) #survey CPUE at stage
+  PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # Predicted survey index - CPUE is the index. I added n of stages. can probs delete survey fleets, there is 1
+
+  # Likelihoods - box
+  SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares
   #Rec_nLL = array(0, dim = c(n_yrs, n_stages)) #recruitment likelihood #n stages in here too? not sure if n_stages needs to be here #would we turn this one off?
 #I think this was an extra tyler thing - the base mod just does min sum squares
   
@@ -133,32 +122,6 @@ basic_pop_model <- function(pars) {
   srv_q = exp(ln_srv_q) # survey catchability
   #tyler exponentiates itinial values too
 
-  
-  # Set Up Fishery Selectivity -----------------------------------------------------
-  #for(f in 1:n_fish_fleets) {
-   # a50_tmp = exp(ln_fish_sel_pars[1, f]) # transform and extract a50
-  #  k_tmp = exp(ln_fish_sel_pars[2, f]) # transform and extract slope
-  #  fish_sel[,f] = 1 / (1 + exp(-k_tmp * (1:n_ages - a50_tmp))) # logistic selectivity
-#  } # end f loop
-  
-  
-  # Set Up Survey Selectivity -----------------------------------------------
- # for(sf in 1:n_srv_fleets) {
-  #  a50_tmp = exp(ln_srv_sel_pars[1, sf]) # transform and extract a50
-  #  k_tmp = exp(ln_srv_sel_pars[2, sf]) # transform and extract slope
-  #  srv_sel[,sf] = 1 / (1 + exp(-k_tmp * (1:n_ages - a50_tmp))) # logistic selectivity
-  #} # end sf loop
-  ##matt notes, can also write the selectivty function... outside?
-  
-  # Set Up Mortality -------------------------------------------------------- #AGR I THINK I FIX MORTALITY
-  #for(y in 1:n_yrs) {
-  #  for(f in 1:n_fish_fleets) {
-  #    Fmort[y,f] = exp(ln_F_mean[f] + ln_F_devs[y,f]) # get fishing mortality
-  #    FAA[y,,f] = Fmort[y,f] * fish_sel[,f] # get fishing mortality at age ##easy to index stuff in RTMB, says Matt
-  #  } # end f loop
-  #  for(a in 1:n_ages) ZAA[y,a] = sum(FAA[y,a,]) + M # Total Mortality at age
-  #} # end y loop
-  
   
   # Initialize Population ---------------------------------------------------
   ##I need to inditalize this for CRAB- AGR FLAG!!
@@ -197,78 +160,40 @@ basic_pop_model <- function(pars) {
   #CAA not a thing for crab CSA
   
   # Survey Observation Model ------------------------------------------------
+
   for(y in 1:n_yrs) {
-    for(sf in 1:n_srv_fleets) { #so there is one survey fleet
-      #SrvIAA[y,,sf] = NAA[y,] * srv_sel[,sf] # Get survey indexed ages
-      #PredSrvIdx[y,sf] = srv_q * sum(SrvIAA[y,,sf] * WAA) # get predicted survey biomass index
-    #SrvIAS[y,,sf] = NAS[y,] #* srv_sel[,sf] # Get survey indexed STAGES
-    PredSrvIdx[y,sf] = srv_q * sum(SrvIAA[y,,sf] * WAA) # get predicted survey biomass index #AGR hmm, did I do this right?
-    }
+      SrvIAS[y,] = NAA[y,] # Get survey indexed STAGES??
+      PredSrvIdx[y,sf] = srv_q * sum(SrvIAS[y,,sf] * WAA) # get predicted survey biomass index
   } # end y loop
   
-  # Likelihoods -------------------------------------------------------------
-  ##AGR- I currently have the survey ssq-like likelihood in there. In excel. q (catchability) and PreRtoR survival (recruitment??) are also in the minimizer for solver, along with the sum of squares for the survey. Do I include these in the likelihood?
-  ###nope- but include them in related calcs
-  ###
-  ## Catch -------------------------------------------------------------------
-  #for(y in 1:n_yrs) {
-   # for(f in 1:n_fish_fleets) {
-  #    Catch_nLL[y,f] = -dnorm(log(ObsCatch[y,f]), log(PredCatch[y,f]), sigma_Catch[f], TRUE)
-   # } # end f loop
-  #} # end y loop
+  #################################
+  ##OK agr HERE. THE CALCS PART
+  ############################
+  #initialize population
   
+  #add mortality?
+  
+  #population projection- stage-based
+  
+  #calc the biomass per year for prerecruit, recruit, and postrecruit legal and mature
+  
+  
+  # Likelihoods -------------------------------------------------------------
+
   ## Survey Index ------------------------------------------------------------
   #for(y in 1:n_yrs) { #TURN ON IF WE DO MULTPLE SURVEY FLEETS
   #  for(sf in 1:n_srv_fleets) {
   #    SrvIdx_nLL[y,sf] = -dnorm(log(ObsSrvIdx[y,sf]), log(PredSrvIdx[y,sf]), sigma_SrvIdx[sf], TRUE)
    # } # end sf loop
   #} # end y loop
-  
-  #re-write without sf
-  for(y in 1:n_yrs) { #TURN ON IF ONLY ONE SURVEY FLEET
-      SrvIdx_nLL[y] = -dnorm(log(ObsSrvIdx[y]), log(PredSrvIdx[y]), sigma_SrvIdx, TRUE) #I probs need to go back through everything and get rid of sf...
-  } # end 
-  
-  #or maybe
+
   for(y in 1:n_yrs) {
     SrvIdx_nLL[y] = -dnorm(log(ObsSrvIdx[y]), log(PredSrvIdx[y]), sigma_SrvIdx, TRUE) * lambdas[y] #FLAG match lambdas to the weights nomenclature please
-  }
+  } #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
   #OR
-  #SrvIdx_nLL <- -dnorm(log(ObsSrvIdx), log(PredSrvIdx), sigma_SrvIdx, log = TRUE) * lambdas #perhaps misses something by year
+
   
-  
-  # Index likelihood via sum of squares (no sigma)
-  #index_lik <- sum(
-   # (log(obs_index) - log(pred_index))^2 * lambdas #labdas will be the weights - FLAG
-  #) OR
- # index_lik <- -sum(
-  #  dnorm(log(obs_index), mean = log(pred_index), sd = sigma, log = TRUE) * lambdas
-  #)
-  
-  ## Fishery Ages ------------------------------------------------------------
-  #for(y in 1:n_yrs) {
-   # for(f in 1:n_fish_fleets) {
-    #  tmp_size = sum(ObsFishAges[y,,f]) # get sample size
-     # FishAgeComps_nLL[y,f] = -dmultinom(x = ObsFishAges[y,,f], size = tmp_size, prob = CAA[y,,f], TRUE) #CAA is catch at age
-    #} # end f loop
-  #} # end y loop
-  
-  ## Survey Ages ------------------------------------------------------------
-  #for(y in 1:n_yrs) {
-  #  for(sf in 1:n_srv_fleets) {
-  #    tmp_size = sum(ObsSrvAges[y,,sf]) # get sample size
-  #    SrvAgeComps_nLL[y,sf] = -dmultinom(x = ObsSrvAges[y,,sf], size = tmp_size, prob = SrvIAA[y,,sf], TRUE)
-  #  } # end sf loop   # x is nymbers of fish. #prob doesnt necessarily need to sum to 1 because dmultinom will do it
-  #} # end y loop
-  
-  ## Fishing Mortality Penalty -----------------------------------------------
- # for(y in 1:n_yrs) {
-#    for(f in 1:n_fish_fleets) {
- #     Fmort_Pen[y,f] = -dnorm(ln_F_devs[y,f], 0, sigma_F, TRUE) #"sigma F is pretty big, so I specified it at 5-MATT"
-#    } # end f loop
-#  } # end y loop
-  
-  
+
   ## Recruitment -------------------------------------------------------------
   #Init_Rec_nLL = -sum(dnorm(ln_InitDevs, -sigma_R^2/2, sigma_R, TRUE)) #I am unsure if these stay for the crab CSA.. this will be the next addition if not now, at least
   #Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE))
@@ -280,24 +205,11 @@ basic_pop_model <- function(pars) {
     #sum(Rec_nLL)
   
   # Report Section
-  RTMB::REPORT(SSB)# by stage ideally
-  RTMB::REPORT(NAS) #Numbers at Stage! (can we also report biomass at stage??)
-  #RTMB::REPORT(ZAA) #I think we have constant inst. total mort..
-  #RTMB::REPORT(CAA) #not for us!
-  RTMB::REPORT(SrvIAS) #sruvey Index at stage!
-  RTMB::REPORT(Total_Biom) #total biomass
+  RTMB::REPORT(SSB)# this IS the total mature biomass (perhaps change name later)
+  RTMB::REPORT(Total_Biom_Leg) #total legal biomass
+  #RTMB::REPORT(SrvIAS) #sruvey Index at stage! The predicted CPUE??
+  RTMB::REPORT(PredSrvIdx) #survey index? Pred cpue?
   RTMB::REPORT(jnLL)
-  #RTMB::REPORT(Catch_nLL)
-  #RTMB::REPORT(SrvIdx_nLL)
-  #RTMB::REPORT(FishAgeComps_nLL)
-  #RTMB::REPORT(SrvAgeComps_nLL) #survey stage comps NLL? I think not for me
-  #RTMB::REPORT(Fmort_Pen) #I think no?
-  #RTMB::REPORT(Init_Rec_nLL) #maybe add these in later? or now...
-  #RTMB::REPORT(Rec_nLL)
-  #RTMB::REPORT(PredCatch)#this one?maybe... I dont think we predict this though
-  RTMB::REPORT(PredSrvIdx)
-  #RTMB::REPORT(fish_sel)
-  #RTMB::REPORT(srv_sel)
   
   return(jnLL)
 }
