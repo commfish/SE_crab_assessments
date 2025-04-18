@@ -41,7 +41,11 @@ CPUE_prerec <- df$Pre_recruit
 CPUE_rec <- df$Recruit
 CPUE_postrec <- df$Post_recruit
 ##survey weights (from summary table) #vectors over all the years
-WEIGHT <- Weight
+WEIGHT <- df$Weight
+#pred survey CPUE
+pred_CPUE_prerec <- df$Estimated_Pre_recruit
+pred_CPUE_rec <- df$Estimated_Recruit
+pred_CPUE_postrec <- df$Estimated_Post_recruit
 
 
 ##########
@@ -86,6 +90,8 @@ basic_pop_model <- function(pars) {
   # Population Stuff
   CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage, adds one for this year
   SSB = array(0, dim = c(n_yrs, n_stages)) # Pre-rec, legal, and mature biomasses
+  #survival_params = rep(0, n_yrs)
+  survival_params = SURVIVAL_PARAMS
   
   # Fishing Stuff
   C = array(data = 0, dim = c(n_yrs)) # Catch (just PU right now, hasnt been a commercial fishery in a while)
@@ -94,7 +100,8 @@ basic_pop_model <- function(pars) {
   SrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey index at stage
   predSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) #survey CPUE at stage
   PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calcualted from the predicted survey CPUE and waa
-
+  
+  
   # Likelihoods - box
   SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
 
@@ -115,9 +122,18 @@ basic_pop_model <- function(pars) {
   
   # Initialize Population ---------------------------------------------------
   ##I need to inditalize this for CRAB- AGR FLAG!!
-  init_age_idx = 1:(n_ages - 2) # Get initial age indexing #WHY -2??
-  NAA[1,init_age_idx + 1] = mean_rec * exp(ln_InitDevs - (init_age_idx * M)) # not plus group
-  NAA[1,n_ages] = mean_rec * exp(-(n_ages - 1) * M) / (1 - exp(-M)) # geometric series solution for plus group
+  #init_age_idx = 1:(n_ages - 2) # Get initial age indexing #WHY -2??
+  #NAA[1,init_age_idx + 1] = mean_rec * exp(ln_InitDevs - (init_age_idx * M)) # not plus group
+  #NAA[1,n_ages] = mean_rec * exp(-(n_ages - 1) * M) / (1 - exp(-M)) # geometric series solution for plus group
+  #I kind of already have the initial pops - based on prior work
+  
+  #IS this a likelihood instead??
+  predSrvCPUE <- data.frame(
+    years = YEARS,
+    CPUE_prerec = 
+    
+  )
+  
   
   
   # Population Projection ---------------------------------------------------
