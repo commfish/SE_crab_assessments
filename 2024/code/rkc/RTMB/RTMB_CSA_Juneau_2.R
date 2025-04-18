@@ -37,27 +37,29 @@ SURVEY_MIDDATE <- as.numeric(format(SURVEY_MIDDATE, "%j"))
 
 #survey info
 ##survey CPUE (from summary table) #vectors over all the years
-CPUE_prerec <- df$Pre_recruit
+CPUE_prerec <- df$Pre.recruit
 CPUE_rec <- df$Recruit
-CPUE_postrec <- df$Post_recruit
+CPUE_postrec <- df$Post.recruit
 ##survey weights (from summary table) #vectors over all the years
 WEIGHT <- df$Weight
 #pred survey CPUE
-pred_CPUE_prerec <- df$Estimated_Pre_recruit
-pred_CPUE_rec <- df$Estimated_Recruit
-pred_CPUE_postrec <- df$Estimated_Post_recruit
+pred_CPUE_prerec <- df$Estimated.Prerecruit
+pred_CPUE_rec <- df$Estimated.Recruits
+pred_CPUE_postrec <- df$Estimated.Postrecruits
 
 
 ##########
 #PARAMS
 ###########
 REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
-  ##(do we HAVE a rec -> postrec survival???)
-q <- 104.187334848418/100 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...))
-S <- 0.32 #I think this is fixed.  #neg or positive tho?
-Z <- exp(-S)#total instantaneous mortality
-SURVIVAL_PARAMS <- df$Survival_Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it...
+  ##(do we HAVE a rec -> postrec survival???) #THIS IS ALLOWED TO CHANGE
+q <- 104.187334848418/100 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
+S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED
+Z <- exp(-S)#total instantaneous mortality #FIXED
+SURVIVAL_PARAMS <- df$Survival_Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
 
+#AGR HERE - next I'll do intermediate calcs and figure out which parts need to be within the RTMB...
+###I think intermediate calcs can be in RTMB?? Since they can change.
 
 ##intermediate calcs #FLAG- I needs to do this - perhaps add in after initial model works
 #SURVEY_TAU <-  #ugh. FLAG. make this this year-last year's julian date for all years
