@@ -66,10 +66,10 @@ for (i in 2:length(CATCH_MIDDATE)){
   }
 }
 
-SURVEY_TAO <- rep(0, length(SURVEY_MIDDATE)) #create a vector of zeros
-SURVEY_TAO[1] <- 0 #first year as 0
+SURVEY_TAU <- rep(0, length(SURVEY_MIDDATE)) #create a vector of zeros
+SURVEY_TAU[1] <- 0 #first year as 0
   for (i in 2:length(SURVEY_MIDDATE)){
-  SURVEY_TAO[i] <- (abs(SURVEY_MIDDATE[i]-SURVEY_MIDDATE[i-1]))/365 #same formula as excel to get the tao adjustor
+  SURVEY_TAU[i] <- (abs(SURVEY_MIDDATE[i]-SURVEY_MIDDATE[i-1]))/365 #same formula as excel to get the tao adjustor
 }
 #survey info
 ##survey CPUE (from summary table) #vectors over all the years
@@ -92,7 +92,7 @@ REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value 
 q <- 104.187334848418/100 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
 S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED
 Z <- exp(-S)#total instantaneous mortality #FIXED
-SURVIVAL_PARAMS <- df$Survival_Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
+SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
 
 #AGR HERE - next I'll do intermediate calcs and figure out which parts need to be within the RTMB...
 ###I think intermediate calcs can be in RTMB?? Since they can change.
@@ -123,9 +123,9 @@ data <- list(
   CPUE_prerec = CPUE_prerec,
   CPUE_rec = CPUE_rec,
   CPUE_postrec = CPUE_postrec,
-  #pred_CPUE_prerec = pred_CPUE_prerec,
-  #pred_CPUE_rec = pred_CPUE_rec,
-  #pred_CPUE_postrec = pred_CPUE_postrec #uh, these are calced and thus dont need to be in data?
+  pred_CPUE_prerec = pred_CPUE_prerec,
+  pred_CPUE_rec = pred_CPUE_rec,
+  pred_CPUE_postrec = pred_CPUE_postrec #uh, these are calced and thus dont need to be in data?
   #survival params here or in parameters?
 )
 
@@ -149,10 +149,10 @@ pars <- list(
 basic_pop_model <- function(pars) {
   
   # get parameters and data
-  RTMB::getAll(pars, data) 
+  RTMB::getAll(pars, data) #or can write out as in the RTMB vonbert example
   
   # Model Set Up (Containers) -----------------------------------------------
-  ##DO I EVEN NEED CONTAINERS? I don't think I need containers
+  ##DO I EVEN NEED CONTAINERS? I don't think I need ...
   n_stages = 3 # number of stages for a 3 stage model
   n_yrs = length(YEARS) # number of years
   lambdas = length(YEARS) #the weights container
@@ -178,7 +178,7 @@ basic_pop_model <- function(pars) {
   # Penalties #I don't need penalties?? do I?
   #Rec_nLL = rep(0, n_yrs) # Recruitment penalty
   #Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty
-  jnLL = 0 # Joint negative log likelihood
+  jnLL = 0 # Joint negative log likelihood #this I need
   
   # Do some parameter transformations here AGR DO I NEED THESE?
   #mean_rec = exp(ln_mean_rec) # mean recruitment
@@ -199,23 +199,25 @@ basic_pop_model <- function(pars) {
   
   
   #pop initialization
-  predSrvCPUE <- data.frame(
-    years = YEARS,
-    CPUE_prerec = SURVIVAL_PARAMS,
-    CPUE_rec = rec*CPUE_prerec[t-1],
-    CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S) - (q*CATCH[t-1]*exp(-S)) #i removed tau. see if she runs first
+  #juneau specific, I'm giving it the starting predicted cpue values from excel
+  predSrvCPUE[1,] <- c( #should I call these something else?? since I read this in from excel at some point....
+   # years = YEARS[1],
+    pred_CPUE_prerec_calc = survival_params[1],
+    pred_CPUE_rec_calc = pred_CPUE_rec[1],
+    pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
+    #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S) - (q*CATCH[t-1]*exp(-S)) #i removed tau. see if she runs first
     #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU*-S)) 
   )
   
   #Pop projection
-  predSrvCPUE <- data.frame(
-    years = YEARS,
-    CPUE_prerec[t] = SURVIVAL_PARAMS[t],
-    CPUE_rec[t] = rec*CPUE_prerec[t-1],
-    CPUE_postrec[t] = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU*-S)) 
-    
-  )
-  
+  for (t in 2:n_yrs){
+  #predSrvCPUE[t,] <- c(
+    #years = YEARS,
+    predSrvCPUE[t,1] = survival_params[t] #this is the prerecruit
+    predSrvCPUE[t,2] = rec*pred_CPUE_prerec[t-1] #this is the recruit
+    predSrvCPUE[t,3] = (pred_CPUE_rec[t-1] + pred_CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
+  #)
+}
   
   
   # Population Projection ---------------------------------------------------
