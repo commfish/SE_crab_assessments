@@ -24,17 +24,53 @@ df <- read.csv("CSA_excel/JNU_test.csv") #I might want to put a big df here
 #put data into individual stored places for RTMB
 YEARS <- df$Survey.Year
 WEIGHTS <- df$Weight #weighing. MAy need to add one for the new year
-CATCH <- df$Catch..Number. #FLAG that this notation is ok. #just personal use for now, since the fishery is closed
+CATCH <- as.numeric(gsub(",", "", df$Catch..Number.)) #get rid of commas, ideally before...
+#replace NA in catch with 0
+CATCH[is.na(CATCH)] <- 0 #replace NA with 0
+
 ##there was some thing in the juneau csa excel readme about how calculating PU is not straightforward. So... check that plz
 
-###FIX!!: change to Julian date please
+
 CATCH_MIDDATE <-as.Date(df$Catch.Mid.Date,format = "%d-%b-%y") #might have to do some weird date wrangling here FLAG- just put it into julian
-CATCH_MIDDATE <- as.numeric(format(CATCH_MIDDATE, "%j"))
-##also check column name, likely not right
+REF_DATE <- CATCH_MIDDATE[1]
+#CATCH_MIDDATE <- as.numeric(format(CATCH_MIDDATE, "%j"))
+CATCH_MIDDATE <- as.numeric(CATCH_MIDDATE - REF_DATE) #eqential added days
+
+#fill NA's with the value before
+#for (i in 2:length(CATCH_MIDDATE)){
+#  if (is.na(CATCH_MIDDATE[i])) {
+#    CATCH_MIDDATE[i] <- CATCH_MIDDATE[i-1]
+#  }
+#}
+
+
 SURVEY_MIDDATE <-as.Date(df$Survey.Mid.Date,format = "%d-%b-%y") #might have to do some weird date wrangling here FLAG- just put it into julian
-SURVEY_MIDDATE <- as.numeric(format(SURVEY_MIDDATE, "%j"))
+#SURVEY_MIDDATE <- as.numeric(format(SURVEY_MIDDATE, "%j")) #nope, I want not julian
+SURVEY_MIDDATE <- as.numeric(SURVEY_MIDDATE - REF_DATE) #seqential added days
+#fill NA's with the value before
+for (i in 2:length(SURVEY_MIDDATE)){
+  if (is.na(SURVEY_MIDDATE[i])) {
+    SURVEY_MIDDATE[i] <- SURVEY_MIDDATE[i-1]
+  }
+}
 
+#TAU's
+CATCH_SURVEY_TAU <- rep(0, length(CATCH_MIDDATE)) #create a vector of zeros
+CATCH_SURVEY_TAU[1] <- 0 #first year as 0
+for (i in 2:length(CATCH_MIDDATE)){
+  if(CATCH [i-1] ==0){
+    CATCH_SURVEY_TAU[i] <- 1 #if the catch is 0, the CATCH_SURVEY_TAU = 1 for the next year
+  }
+  else{
+  CATCH_SURVEY_TAU[i] <- (abs(SURVEY_MIDDATE[i]-CATCH_MIDDATE[i-1]))/365 #same formula as excel to get the tao adjustor
+  }
+}
 
+SURVEY_TAO <- rep(0, length(SURVEY_MIDDATE)) #create a vector of zeros
+SURVEY_TAO[1] <- 0 #first year as 0
+  for (i in 2:length(SURVEY_MIDDATE)){
+  SURVEY_TAO[i] <- (abs(SURVEY_MIDDATE[i]-SURVEY_MIDDATE[i-1]))/365 #same formula as excel to get the tao adjustor
+}
 #survey info
 ##survey CPUE (from summary table) #vectors over all the years
 CPUE_prerec <- df$Pre.recruit
@@ -75,6 +111,37 @@ EST_PREREC <- SURVIVAL_PARAMS #FLAG - it equals survival params post adjustment
 #EST_REC <- EST_PREREC(last year) * Q2 #Q2 is the prerec to rec survival rate #FLAG I need to loop this I think
 #EST_POSTREC <- #(EST_REC(last year) + EST_POSTREC(last year)) * exp(-S * SURVEY_TAU) - (q*CATCH(t-1)*exp(CATCH_SURVEY_TAU*-S))
 
+####################
+#SETUP
+#######################
+data <- list(
+  YEARS = YEARS,
+  lambdas = WEIGHT,
+  CATCH = CATCH,
+  #CATCH_MIDDATE = CATCH_MIDDATE,#add this in to postrec after we get rolling
+  #SURVEY_MIDDATE = SURVEY_MIDDATE,
+  CPUE_prerec = CPUE_prerec,
+  CPUE_rec = CPUE_rec,
+  CPUE_postrec = CPUE_postrec,
+  #pred_CPUE_prerec = pred_CPUE_prerec,
+  #pred_CPUE_rec = pred_CPUE_rec,
+  #pred_CPUE_postrec = pred_CPUE_postrec #uh, these are calced and thus dont need to be in data?
+  #survival params here or in parameters?
+)
+
+pars <- list(
+  #ln_mean_rec = log(1), # mean recruitment
+  #ln_sigma_R = log(0.1), # recruitment variability #MIGHT WANT TO ADD THIS IN!!
+  #ln_sigma_F = log(0.1), # fishing mortality variability
+  #ln_M = log(0.2), # natural mortality
+  ln_srv_q = log(q), # survey catchability
+  ln_rec = log(REC), # preR to R survival rate
+  SURVIVAL_PARAMS = SURVIVAL_PARAMS,
+  S = S, #fixed!!survival
+  Z= Z #fixed!! instantaneous (i think) total mortality
+  #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
+  #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
+)
 
 
 ############################3
@@ -135,7 +202,8 @@ basic_pop_model <- function(pars) {
     years = YEARS,
     CPUE_prerec = SURVIVAL_PARAMS,
     CPUE_rec = rec*CPUE_prerec[t-1],
-    CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU*-S)) 
+    CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S) - (q*CATCH[t-1]*exp(-S)) #i removed tau. see if she runs first
+    #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU*-S)) 
   )
   
   #Pop projection
