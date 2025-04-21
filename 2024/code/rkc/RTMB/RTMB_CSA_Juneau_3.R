@@ -125,8 +125,11 @@ data <- list(
   CPUE_postrec = CPUE_postrec,
   pred_CPUE_prerec = pred_CPUE_prerec,
   pred_CPUE_rec = pred_CPUE_rec,
-  pred_CPUE_postrec = pred_CPUE_postrec #uh, these are calced and thus dont need to be in data?
-  #survival params here or in parameters?
+  pred_CPUE_postrec = pred_CPUE_postrec, #uh, these are calced and thus dont need to be in data?
+  #survival params here or in parameters?!! something, at least
+  wt_mature= df$Mature.Weight,
+  wt_legal = df$Legal.Weight,
+  wt_prerec = df$Prerecruit.Weight #wrong
 )
 
 pars <- list(
@@ -136,13 +139,15 @@ pars <- list(
   #ln_M = log(0.2), # natural mortality
   ln_srv_q = log(q), # survey catchability
   ln_rec = log(REC), # preR to R survival rate
-  SURVIVAL_PARAMS = SURVIVAL_PARAMS,
+  survival_params = SURVIVAL_PARAMS,
   S = S, #fixed!!survival
-  Z= Z #fixed!! instantaneous (i think) total mortality
+  Z = Z #fixed!! instantaneous (i think) total mortality
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
 )
 
+#map- to fix things!! need to fix some of my params (FLAG!!)
+#do I need to specify starting values for my params??
 
 ############################3
 #SOMETHNG LIKE THIS:
@@ -158,16 +163,17 @@ basic_pop_model <- function(pars) {
   lambdas = length(YEARS) #the weights container
   
   # Population Stuff
-  CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage, adds one for this year
+  #CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage, adds one for this year
   SSB = array(0, dim = c(n_yrs, n_stages)) # Pre-rec, legal, and mature biomasses
   #survival_params = rep(0, n_yrs)
-  survival_params = SURVIVAL_PARAMS
+  #survival_params = SURVIVAL_PARAMS #read in as parameters
   
   # Fishing Stuff
-  C = array(data = 0, dim = c(n_yrs)) # Catch (just PU right now, hasnt been a commercial fishery in a while)
-
+  ##C = array(data = 0, dim = c(n_yrs)) # Catch (just PU right now, hasnt been a commercial fishery in a while)
+  ###I dont calculate this! It's read in
+  
   # Survey Stuff
-  SrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey index at stage
+  #SrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey index at stage #I read this in
   predSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) #survey CPUE at stage
   PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calcualted from the predicted survey CPUE and waa
   
@@ -191,15 +197,9 @@ basic_pop_model <- function(pars) {
 
   
   # Initialize Population ---------------------------------------------------
-  ##I need to inditalize this for CRAB- AGR FLAG!!
-  #init_age_idx = 1:(n_ages - 2) # Get initial age indexing #WHY -2??
-  #NAA[1,init_age_idx + 1] = mean_rec * exp(ln_InitDevs - (init_age_idx * M)) # not plus group
-  #NAA[1,n_ages] = mean_rec * exp(-(n_ages - 1) * M) / (1 - exp(-M)) # geometric series solution for plus group
-  #I kind of already have the initial pops - based on prior work
-  
-  
+
   #pop initialization
-  #juneau specific, I'm giving it the starting predicted cpue values from excel
+  #juneau specific, I'm giving it the starting predicted cpue values from excel- will have to change this for every area
   predSrvCPUE[1,] <- c( #should I call these something else?? since I read this in from excel at some point....
    # years = YEARS[1],
     pred_CPUE_prerec_calc = survival_params[1],
@@ -217,56 +217,15 @@ basic_pop_model <- function(pars) {
     predSrvCPUE[t,2] = rec*pred_CPUE_prerec[t-1] #this is the recruit
     predSrvCPUE[t,3] = (pred_CPUE_rec[t-1] + pred_CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
   #)
-}
+} #ok cool, got the pop (CPUE) projection in there.
   
-  
-  # Population Projection ---------------------------------------------------
-  ###chage to a stage-based projection -AGR FLAG!!
-  for(y in 1:n_yrs) {
-    NAA[y,1] = mean_rec * exp(ln_RecDevs[y]) # mean recruitment
-    # Project Numbers at Age
-    for(a in 1:n_ages) {
-      if(a < n_ages) {
-        # Exponential mortality for individuals not in plus group
-        NAA[y+1,a+1] = NAA[y,a] * exp(-ZAA[y,a])
-      } else {
-        # Accumulate individuals into plus group and individuals from previous year
-        NAA[y+1,n_ages] = NAA[y+1,n_ages] + NAA[y,n_ages] * exp(-ZAA[y,a])
-      } # end else
-    } # end a loop
-    # Calculations for Biomass
-    Total_Biom[y] = sum(NAA[y,] * WAA) # Total Biomass
-    SSB[y] = sum(NAA[y,] * WAA * MatAA)  * 0.5 # Spawning Stock Biomass 
-  } # end y loop
-  
-  
-  # Fishery Observation Model -----------------------------------------------
-  #for(y in 1:n_yrs) {
-  #  for(f in 1:n_fish_fleets) {
-  #    CAA[y,,f] = FAA[y,,f] / ZAA[y,] * NAA[y,] * (1 - exp(-ZAA[y,])) # Get Catch at Age via Baranov's
-  #    PredCatch[y,f] = sum(CAA[y,,f] * WAA) # get total catch
-  #  } # end f loop
-  #} # end y loop
-  #CAA not a thing for crab CSA
-  
-  # Survey Observation Model ------------------------------------------------
 
-  for(y in 1:n_yrs) {
-      SrvIAS[y,] = NAA[y,] # Get survey indexed STAGES??
-      PredSrvIdx[y,sf] = srv_q * sum(SrvIAS[y,,sf] * WAA) # get predicted survey biomass index
-  } # end y loop
-  
-  #################################
-  ##OK agr HERE. THE CALCS PART
-  ############################
-  #initialize population
-  
-  #add mortality?
-  
-  #population projection- stage-based
   
   #calc the biomass per year for prerecruit, recruit, and postrecruit legal and mature
-  
+  PredSrvIdx[,1] <- (predSrvCPUE[,1]/q) * wt_prerec #prerecruit biomass = prerecruit cpue/catchability * the weight 
+  PredSrvIdx[,2] <- ((predSrvCPUE[,2]+predSrvCPUE[,3])/q) * wt_legal #legal biomasss = recruit cpue + postrecruit cpue, divided by catchability, times the legal weight
+  PredSrvIdx[,3] <- PredSrvIdx[,1]+PredSrvIdx[,2] #mature biomass =  legal biomass + prerecruit biomasss
+  #looks good
   
   # Likelihoods -------------------------------------------------------------
 
@@ -300,9 +259,10 @@ basic_pop_model <- function(pars) {
   RTMB::REPORT(SSB)# Mature and Legal biomasses
   #RTMB::REPORT(SrvIAS) #sruvey Index at stage! The predicted CPUE??
   RTMB::REPORT(PredSrvIdx) #survey biomass by stage
+  RTMB::REPORT(PredSrvCPUE) #predicted survey CPUE by stage #ADREPORT instead perhaps? give me the sigmas??
   RTMB::REPORT(jnLL)
   
-  return(jnLL)
+  return(jnLL) #do I needs this too?
 }
 #END POP MODEL EXAMPLE
 
