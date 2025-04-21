@@ -89,7 +89,7 @@ pred_CPUE_postrec <- df$Estimated.Postrecruits
 ###########
 REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
   ##(do we HAVE a rec -> postrec survival???) #THIS IS ALLOWED TO CHANGE
-q <- 104.187334848418/100 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
+q <- 104.187334848418/1000000 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
 S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED
 Z <- exp(-S)#total instantaneous mortality #FIXED
 SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
