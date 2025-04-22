@@ -3,7 +3,8 @@
 ##start of development: 4/14/25
 ##recent work: 4/14/25
 ##IN DEVELOPMENT###
-
+##potential problems
+##some NA years in the survey observations - does RTMB deal with these appropriately??
 
 
 #load libraries
@@ -35,13 +36,6 @@ CATCH_MIDDATE <-as.Date(df$Catch.Mid.Date,format = "%d-%b-%y") #might have to do
 REF_DATE <- CATCH_MIDDATE[1]
 #CATCH_MIDDATE <- as.numeric(format(CATCH_MIDDATE, "%j"))
 CATCH_MIDDATE <- as.numeric(CATCH_MIDDATE - REF_DATE) #eqential added days
-
-#fill NA's with the value before
-#for (i in 2:length(CATCH_MIDDATE)){
-#  if (is.na(CATCH_MIDDATE[i])) {
-#    CATCH_MIDDATE[i] <- CATCH_MIDDATE[i-1]
-#  }
-#}
 
 
 SURVEY_MIDDATE <-as.Date(df$Survey.Mid.Date,format = "%d-%b-%y") #might have to do some weird date wrangling here FLAG- just put it into julian
@@ -113,20 +107,21 @@ data <- list(
   #survival params here or in parameters?!! something, at least
   wt_mature= df$Mature.Weight,
   wt_legal = df$Legal.Weight,
-  wt_prerec = df$Prerecruit.Weight, 
+  wt_prerec = df$Prerecruit.Weight 
   
 )
 
 pars <- list(
   #ln_mean_rec = log(1), # mean recruitment
   #ln_sigma_R = log(0.1), # recruitment variability #MIGHT WANT TO ADD THIS IN!!
-  #ln_q = log(q), # catchability #AGR- will have to put this in there- insead of q FLAG
-  q=q,  #let's let q gp negative and see if it blows up #FLAG
-  #ln_rec = log(rec), # preR to R survival rate #where was this calc?
-  rec=REC, #should not be allowed to go neg, but let's see what happens when I let it...
-  survival_params = SURVIVAL_PARAMS, #not fixed!! What is this??
+  ln_q = log(q), # catchability #AGR- will have to put this in there- insead of q FLAG
+  #q=q,  #let's let q gp negative and see if it blows up #FLAG
+  ln_rec = log(REC), # preR to R survival rate #where was this calc?
+  #rec=REC, #should not be allowed to go neg, but let's see what happens when I let it...
+  survival_params = SURVIVAL_PARAMS, #not fixed!! What is this?? They can't go neg, so maybe make sure of that too...
   S = S, #fixed!!survival. Fix using map. How to again??
-  sigma_survey = 0.1 # survey index error #uh... do I need other error too? #also, dont let this go negative. For each one one one # total?
+  ln_sigma_survey = log(0.1)
+ # sigma_survey = 0.1 # survey index error #uh... do I need other error too? #also, dont let this go negative. For each one one one # total?
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
 )
@@ -159,7 +154,6 @@ basic_pop_model <- function(pars) {
   PredSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) #survey CPUE at stage
   PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calcualted from the predicted survey CPUE and waa
   
-  
   # Likelihoods - box
   SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
 
@@ -173,9 +167,10 @@ basic_pop_model <- function(pars) {
   #sigma_R = exp(ln_sigma_R) # recruitment variability
   #sigma_F = exp(ln_sigma_F) # fishing mortality variability
   #M = exp(ln_M) # natural mortality #I think I fix natural mortality
-  srv_q = exp(ln_srv_q) # survey catchability
+  q = exp(ln_q) # survey catchability
   #mean_rec = exp(ln_mean_rec) # mean recruitment
-  rec = REC
+  rec = exp(ln_rec)
+  sigma_survey = exp(ln_sigma_survey) # survey index error)
 
   
   # Initialize Population ---------------------------------------------------
@@ -216,7 +211,7 @@ basic_pop_model <- function(pars) {
 
   for(y in 1:n_yrs) {
      for(st in 1:n_stages) {
-    SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvIdx[y,st]), log(PredSrvIdx[y,st]), sigma_survey, TRUE) * lambdas[y] 
+    SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvCPUE[y,st]), log(PredSrvCPUE[y,st]), sigma_survey, TRUE) * lambdas[y] 
      } #end of st(stage) loop
   } #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
   #other error needed too?
@@ -228,7 +223,7 @@ basic_pop_model <- function(pars) {
   #Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE))
   
   # Get joint likelihood
-  jnLL = sum(SrvInd_nLL) #we're keeping it simple for the crab CSA
+  jnLL = sum(SrvIdx_nLL) #we're keeping it simple for the crab CSA
   #jnLL = sum(Catch_nLL) + sum(SrvIdx_nLL) + sum(FishAgeComps_nLL) + 
    # sum(SrvAgeComps_nLL) + sum(Fmort_Pen) + sum(Init_Rec_nLL) +
     #sum(Rec_nLL)solver in excel including preR to R survival (and also catchability q) - is this part of the likelihood?? #FLAG- perhaps add this next!!
@@ -245,9 +240,25 @@ basic_pop_model <- function(pars) {
 }
 #END POP MODEL EXAMPLE
 
+#map step??
 
+# Run Model ---------------------------------------------------------------
+pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars) #I should probs map survival...
+#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, 
+ #                          map = map)
+
+#fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not insteall- 
+ ##                                fn = pop_mod$fn,
+   #                              gr = pop_mod$gr, 
+    #                             newtonsteps = 2, # additional steps helps get the gradient lower
+     #(no work...)                            getsd = FALSE)
+
+#AGR hERE
+opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) #it does not like the NA's- there are some in the survey obs. Fugure out how to deal with this
+
+###below is a box, unedited yet
 # Constructs objective function with derivatives #PULLED FROM EXAMPLEAND I THINK THSI WORKS
-obj <- MakeADFun(nll, par)
+#obj <- MakeADFun(nll, par)
 
 # Minimize the objective function # PULLED FROM EXAMPLE AND THIS WORKS HERE I BELEIVE
 opt <- nlminb(obj$par, obj$fn, obj$gr)
