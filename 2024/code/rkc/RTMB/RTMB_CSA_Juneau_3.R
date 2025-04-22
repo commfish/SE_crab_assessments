@@ -107,7 +107,7 @@ SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prer
 
 ####################
 #DERVIVED QUANTITIES
-EST_PREREC <- SURVIVAL_PARAMS #FLAG - it equals survival params post adjustment
+#EST_PREREC <- SURVIVAL_PARAMS #FLAG - it equals survival params post adjustment
 #EST_REC <- EST_PREREC(last year) * Q2 #Q2 is the prerec to rec survival rate #FLAG I need to loop this I think
 #EST_POSTREC <- #(EST_REC(last year) + EST_POSTREC(last year)) * exp(-S * SURVEY_TAU) - (q*CATCH(t-1)*exp(CATCH_SURVEY_TAU*-S))
 
@@ -120,7 +120,7 @@ data <- list(
   CATCH = CATCH,
   #CATCH_MIDDATE = CATCH_MIDDATE,#add this in to postrec after we get rolling
   #SURVEY_MIDDATE = SURVEY_MIDDATE,
-  CPUE_prerec = CPUE_prerec,
+  CPUE_prerec = CPUE_prerec, #are NA's a problem? Cause we have 'em. For all survey obs
   CPUE_rec = CPUE_rec,
   CPUE_postrec = CPUE_postrec,
   pred_CPUE_prerec = pred_CPUE_prerec,
@@ -129,19 +129,20 @@ data <- list(
   #survival params here or in parameters?!! something, at least
   wt_mature= df$Mature.Weight,
   wt_legal = df$Legal.Weight,
-  wt_prerec = df$Prerecruit.Weight #wrong
+  wt_prerec = df$Prerecruit.Weight, 
+  
 )
 
 pars <- list(
   #ln_mean_rec = log(1), # mean recruitment
   #ln_sigma_R = log(0.1), # recruitment variability #MIGHT WANT TO ADD THIS IN!!
-  #ln_sigma_F = log(0.1), # fishing mortality variability
-  #ln_M = log(0.2), # natural mortality
-  ln_srv_q = log(q), # survey catchability
-  ln_rec = log(REC), # preR to R survival rate
-  survival_params = SURVIVAL_PARAMS,
-  S = S, #fixed!!survival
-  Z = Z #fixed!! instantaneous (i think) total mortality
+  #ln_q = log(q), # catchability #AGR- will have to put this in there- insead of q FLAG
+  q=q,  #let's let q gp negative and see if it blows up #FLAG
+  #ln_rec = log(rec), # preR to R survival rate #where was this calc?
+  rec=rec, #should not be allowed to go neg, but let's see what happens when I let it...
+  survival_params = SURVIVAL_PARAMS, #not fixed!! What is this??
+  S = S, #fixed!!survival. Fix using map. How to again??
+  sigma_survey = 0.1 # survey index error #uh... do I need other error too? #also, dont let this go negative. For each one one one # total?
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
 )
@@ -165,16 +166,13 @@ basic_pop_model <- function(pars) {
   # Population Stuff
   #CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage, adds one for this year
   SSB = array(0, dim = c(n_yrs, n_stages)) # Pre-rec, legal, and mature biomasses
-  #survival_params = rep(0, n_yrs)
-  #survival_params = SURVIVAL_PARAMS #read in as parameters
-  
-  # Fishing Stuff
-  ##C = array(data = 0, dim = c(n_yrs)) # Catch (just PU right now, hasnt been a commercial fishery in a while)
-  ###I dont calculate this! It's read in
   
   # Survey Stuff
-  #SrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey index at stage #I read this in
-  predSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) #survey CPUE at stage
+  ObsSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey index at stage #I read this in
+  ObsSrvCPUE[,1] <- CPUE_prerec # prerecruit
+  ObsSrvCPUE[,2] <- CPUE_rec # recruit
+  ObsSrvCPUE[,3] <- CPUE_postrec # postrecruit
+  PredSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) #survey CPUE at stage
   PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calcualted from the predicted survey CPUE and waa
   
   
@@ -200,11 +198,11 @@ basic_pop_model <- function(pars) {
 
   #pop initialization
   #juneau specific, I'm giving it the starting predicted cpue values from excel- will have to change this for every area
-  predSrvCPUE[1,] <- c( #should I call these something else?? since I read this in from excel at some point....
+  PredSrvCPUE[1,] <- c( #should I call these something else?? since I read this in from excel at some point....
    # years = YEARS[1],
-    pred_CPUE_prerec_calc = survival_params[1],
-    pred_CPUE_rec_calc = pred_CPUE_rec[1],
-    pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
+    Pred_CPUE_prerec_calc = survival_params[1],
+    Pred_CPUE_rec_calc = pred_CPUE_rec[1],
+    Pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
     #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S) - (q*CATCH[t-1]*exp(-S)) #i removed tau. see if she runs first
     #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU*-S)) 
   )
@@ -213,35 +211,32 @@ basic_pop_model <- function(pars) {
   for (t in 2:n_yrs){
   #predSrvCPUE[t,] <- c(
     #years = YEARS,
-    predSrvCPUE[t,1] = survival_params[t] #this is the prerecruit
-    predSrvCPUE[t,2] = rec*pred_CPUE_prerec[t-1] #this is the recruit
-    predSrvCPUE[t,3] = (pred_CPUE_rec[t-1] + pred_CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
+    PredSrvCPUE[t,1] = survival_params[t] #this is the prerecruit
+    PredSrvCPUE[t,2] = rec*pred_CPUE_prerec[t-1] #this is the recruit
+    PredSrvCPUE[t,3] = (pred_CPUE_rec[t-1] + pred_CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
   #)
 } #ok cool, got the pop (CPUE) projection in there.
   
 
   
   #calc the biomass per year for prerecruit, recruit, and postrecruit legal and mature
-  PredSrvIdx[,1] <- (predSrvCPUE[,1]/q) * wt_prerec #prerecruit biomass = prerecruit cpue/catchability * the weight 
-  PredSrvIdx[,2] <- ((predSrvCPUE[,2]+predSrvCPUE[,3])/q) * wt_legal #legal biomasss = recruit cpue + postrecruit cpue, divided by catchability, times the legal weight
+  PredSrvIdx[,1] <- (PredSrvCPUE[,1]/q) * wt_prerec #prerecruit biomass = prerecruit cpue/catchability * the weight 
+  PredSrvIdx[,2] <- ((PredSrvCPUE[,2]+PredSrvCPUE[,3])/q) * wt_legal #legal biomasss = recruit cpue + postrecruit cpue, divided by catchability, times the legal weight
   PredSrvIdx[,3] <- PredSrvIdx[,1]+PredSrvIdx[,2] #mature biomass =  legal biomass + prerecruit biomasss
   #looks good
   
   # Likelihoods -------------------------------------------------------------
 
   ## Survey Index ------------------------------------------------------------
-  #for(y in 1:n_yrs) { #TURN ON IF WE DO MULTPLE SURVEY FLEETS
-  #  for(sf in 1:n_srv_fleets) {
-  #    SrvIdx_nLL[y,sf] = -dnorm(log(ObsSrvIdx[y,sf]), log(PredSrvIdx[y,sf]), sigma_SrvIdx[sf], TRUE)
-   # } # end sf loop
-  #} # end y loop
+
 
   for(y in 1:n_yrs) {
      for(st in 1:n_stages) {
-    SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvIdx[y,st]), log(PredSrvIdx[y,st]), sigma_SrvIdx[st], TRUE) * lambdas[y] #FLAG match lambdas to the weights nomenclature please
+    SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvIdx[y,st]), log(PredSrvIdx[y,st]), sigma_survey, TRUE) * lambdas[y] 
      } #end of st(stage) loop
   } #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
-  #OR
+  #other error needed too?
+  #perhaps try logged and unlogged and see what happens...
 
   
   ## Recruitment ------------------------------------------------------------- PERHAPS ADD THIS LATER
@@ -256,10 +251,10 @@ basic_pop_model <- function(pars) {
   
  
   # Report Section
-  RTMB::REPORT(SSB)# Mature and Legal biomasses
-  #RTMB::REPORT(SrvIAS) #sruvey Index at stage! The predicted CPUE??
-  RTMB::REPORT(PredSrvIdx) #survey biomass by stage
-  RTMB::REPORT(PredSrvCPUE) #predicted survey CPUE by stage #ADREPORT instead perhaps? give me the sigmas??
+  RTMB::ADREPORT(SSB)# Mature and Legal biomasses, and error
+  RTMB::REPORT(sigma_survey) #I want my error. Will have to add in other error sources later??
+  RTMB::ADREPORT(PredSrvIdx) #survey biomass by stage
+  RTMB::ADREPORT(PredSrvCPUE) #predicted survey CPUE by stage #ADREPORT instead perhaps? give me the sigmas??
   RTMB::REPORT(jnLL)
   
   return(jnLL) #do I needs this too?
