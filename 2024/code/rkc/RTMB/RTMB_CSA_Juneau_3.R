@@ -1,7 +1,7 @@
 ###Juneau RTMB CSA###
 ##Alex Reich
 ##start of development: 4/14/25
-##recent work: 4/14/25
+##recent work: 4/22/25
 ##IN DEVELOPMENT###
 ##potential problems
 ##some NA years in the survey observations - does RTMB deal with these appropriately??
@@ -25,6 +25,9 @@ df <- read.csv("CSA_excel/JNU_test.csv") #I might want to put a big df here
 #put data into individual stored places for RTMB
 YEARS <- df$Survey.Year
 WEIGHTS <- df$Weight #weighing. MAy need to add one for the new year
+#replace NA's with 0
+WEIGHTS[is.na(WEIGHTS)] <- 0 #replace NA with 0
+
 CATCH <- as.numeric(gsub(",", "", df$Catch..Number.)) #get rid of commas, ideally before...
 #replace NA in catch with 0
 CATCH[is.na(CATCH)] <- 0 #replace NA with 0
@@ -70,6 +73,11 @@ SURVEY_TAU[1] <- 0 #first year as 0
 CPUE_prerec <- df$Pre.recruit
 CPUE_rec <- df$Recruit
 CPUE_postrec <- df$Post.recruit
+#replace NA's in survey CPUEs with 0
+CPUE_prerec[is.na(CPUE_prerec)] <- 0 #replace NA with 0
+CPUE_rec[is.na(CPUE_rec)] <- 0 #replace NA with 0
+CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
+
 ##survey weights (from summary table) #vectors over all the years
 WEIGHT <- df$Weight
 #pred survey CPUE
@@ -98,7 +106,7 @@ data <- list(
   CATCH = CATCH,
   #CATCH_MIDDATE = CATCH_MIDDATE,#add this in to postrec after we get rolling
   #SURVEY_MIDDATE = SURVEY_MIDDATE,
-  CPUE_prerec = CPUE_prerec, #are NA's a problem? Cause we have 'em. For all survey obs
+  CPUE_prerec = CPUE_prerec, #I replaced the NA's with 0's. Weights (lambda's are also 0 during the missing survey years)
   CPUE_rec = CPUE_rec,
   CPUE_postrec = CPUE_postrec,
   pred_CPUE_prerec = pred_CPUE_prerec,
@@ -119,15 +127,28 @@ pars <- list(
   ln_rec = log(REC), # preR to R survival rate #where was this calc?
   #rec=REC, #should not be allowed to go neg, but let's see what happens when I let it...
   survival_params = SURVIVAL_PARAMS, #not fixed!! What is this?? They can't go neg, so maybe make sure of that too...
-  S = S, #fixed!!survival. Fix using map. How to again??
-  ln_sigma_survey = log(0.1)
+  S = S, #fixed!!survival. do I need to log??
+  ln_sigma_survey = log(0.1),
+  SURVEY_TAU = SURVEY_TAU, #is this data or param? #regardless, fix this please
+  CATCH_SURVEY_TAU = CATCH_SURVEY_TAU #fix this in the mapping
  # sigma_survey = 0.1 # survey index error #uh... do I need other error too? #also, dont let this go negative. For each one one one # total?
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
 )
+#remove other saved things in the environment:
+#rm(list = ls(pattern = "^[^pars|data|df]$")) #remove everything except pars, data, and df
+#rm(list = ls(pattern = "^[^pars|data]$")) #remove everything except pars, data, and df
+#remove all values from the environment except pars and data:
+rm(list = ls()[!(ls() %in% c("pars", "data"))]) #remove everything except pars and data
 
 #map- to fix things!! need to fix some of my params (FLAG!!)
-#do I need to specify starting values for my params??
+map <- list()
+map$S <- factor(NA) #fix survival
+map$SURVEY_TAU <- factor(NA) #fix survey tau
+map$CATCH_SURVEY_TAU <- factor(NA) #fix catch tau
+
+
+#do I need to specify starting values for my params?? In some other way?
 
 ############################3
 #SOMETHNG LIKE THIS:
@@ -240,10 +261,17 @@ basic_pop_model <- function(pars) {
 }
 #END POP MODEL EXAMPLE
 
-#map step??
+#try this too:
+##OUT OF ORDER RIGHT NOW
+#fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not insteall- 
+ #                                fn = pop_mod$fn,
+ #                                gr = pop_mod$gr, 
+  #                               newtonsteps = 2, # additional steps helps get the gradient lower
+   #                              getsd = FALSE)
 
 # Run Model ---------------------------------------------------------------
-pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars) #I should probs map survival...
+pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars)
+#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #I should probs map survival...
 #pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, 
  #                          map = map)
 
@@ -252,6 +280,34 @@ pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars) #I should probs m
    #                              gr = pop_mod$gr, 
     #                             newtonsteps = 2, # additional steps helps get the gradient lower
      #(no work...)                            getsd = FALSE)
+
+##################
+#TORUBLESHOOT
+# Check initial parameter values
+print(pop_mod$par)
+
+# Evaluate the objective function and gradient at initial parameter values
+initial_fn <- pop_mod$fn(pop_mod$par)
+initial_gr <- pop_mod$gr(pop_mod$par)
+
+print(initial_fn)
+print(initial_gr)
+
+# Ensure no NA/NaN values in the function and gradient evaluations
+if (any(is.na(initial_fn)) || any(is.nan(initial_fn))) {
+  stop("Objective function evaluation returned NA/NaN values.")
+}
+
+if (any(is.na(initial_gr)) || any(is.nan(initial_gr))) {
+  stop("Gradient evaluation returned NA/NaN values.")
+}
+
+# Run the optimization
+opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr)
+
+
+##END TROUBLESHOOT
+################
 
 #AGR hERE
 opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) #it does not like the NA's- there are some in the survey obs. Fugure out how to deal with this
