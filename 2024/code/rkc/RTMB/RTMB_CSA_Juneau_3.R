@@ -85,7 +85,7 @@ pred_CPUE_postrec <- df$Estimated.Postrecruits
 
 
 ##########
-#PARAMS
+#PARAMS- merge with SETUP below??
 ###########
 REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
   ##(do we HAVE a rec -> postrec survival???) #THIS IS ALLOWED TO CHANGE
@@ -94,22 +94,6 @@ S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED
 Z <- exp(-S)#total instantaneous mortality #FIXED
 SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
 
-#AGR HERE - next I'll do intermediate calcs and figure out which parts need to be within the RTMB...
-###I think intermediate calcs can be in RTMB?? Since they can change.
-
-##intermediate calcs #FLAG- I needs to do this - perhaps add in after initial model works
-#SURVEY_TAU <-  #ugh. FLAG. make this this year-last year's julian date for all years
-#CATCH_SURVEY_TAU <- #greater than or = to survey_tau. Formula is this in excel: =IF(H41=0,1,+(J42-I41)/365). SO 
-  ##if the catch = 0, the CATCH_SURVEY_TAU = 1 for the previous year. IF catch =! 0 for the previous year, last year SURVEY MID DATE - last year CATCH MID DATE / 365 = the TAU for the current year
-
-#NOTE- I might have to log things so nothing goes below 0...
-
-
-####################
-#DERVIVED QUANTITIES
-#EST_PREREC <- SURVIVAL_PARAMS #FLAG - it equals survival params post adjustment
-#EST_REC <- EST_PREREC(last year) * Q2 #Q2 is the prerec to rec survival rate #FLAG I need to loop this I think
-#EST_POSTREC <- #(EST_REC(last year) + EST_POSTREC(last year)) * exp(-S * SURVEY_TAU) - (q*CATCH(t-1)*exp(CATCH_SURVEY_TAU*-S))
 
 ####################
 #SETUP
@@ -139,7 +123,7 @@ pars <- list(
   #ln_q = log(q), # catchability #AGR- will have to put this in there- insead of q FLAG
   q=q,  #let's let q gp negative and see if it blows up #FLAG
   #ln_rec = log(rec), # preR to R survival rate #where was this calc?
-  rec=rec, #should not be allowed to go neg, but let's see what happens when I let it...
+  rec=REC, #should not be allowed to go neg, but let's see what happens when I let it...
   survival_params = SURVIVAL_PARAMS, #not fixed!! What is this??
   S = S, #fixed!!survival. Fix using map. How to again??
   sigma_survey = 0.1 # survey index error #uh... do I need other error too? #also, dont let this go negative. For each one one one # total?
@@ -280,7 +264,7 @@ se <- as.list(rep, "Std", report=TRUE)$pred
 obj$report()$Sigma
 
 ######################################################################
-#update the misc Juneau tables that I need (parallel the CSV) (only for the RKC juneau survey area)
+#update the misc Juneau tables that I need (parallel the Excel doc) (only for the RKC juneau survey area)
 
 
 ##############3
@@ -302,20 +286,3 @@ obj$report()$Sigma
 
 #Q: so WHY does this have to be in RTMB? Why was optim unstable?
 
-
-##TRASH CAN
-####################################################################
-#The CSA part - in RTMB
-
-#gonna want some initial parameters (WHAT ARE THEY??)
-##WHICH WILL GO HERE
-
-#define the objective function for the CSA model
-
-##something like: #this is a LINEAR MODEL EXAMPLE right now
-nll <- function(par) {
-  pred <- par$alpha + par$beta * dat$x
-  -sum(dnorm(dat$y, pred, exp(par$logSigma), log = TRUE))
-}
-
-#hmmm thinkinh about how my CSA works
