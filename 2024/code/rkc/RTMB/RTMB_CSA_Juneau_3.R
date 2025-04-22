@@ -3,8 +3,14 @@
 ##start of development: 4/14/25
 ##recent work: 4/22/25
 ##IN DEVELOPMENT###
-##potential problems
-##some NA years in the survey observations - does RTMB deal with these appropriately??
+
+
+#TO DO:
+##load in 2023 data to a df and see if I can replicate 2024 analysis predictions
+##log or no log for dnorm? 
+#Im in the looking at results section. She runs, but not well(?)
+
+
 
 
 #load libraries
@@ -79,7 +85,7 @@ CPUE_rec[is.na(CPUE_rec)] <- 0 #replace NA with 0
 CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
 
 ##survey weights (from summary table) #vectors over all the years
-WEIGHT <- df$Weight
+#WEIGHT <- df$Weight
 #pred survey CPUE
 pred_CPUE_prerec <- df$Estimated.Prerecruit
 pred_CPUE_rec <- df$Estimated.Recruits
@@ -102,7 +108,7 @@ SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prer
 #######################
 data <- list(
   YEARS = YEARS,
-  lambdas = WEIGHT,
+  lambdas = WEIGHTS,
   CATCH = CATCH,
   #CATCH_MIDDATE = CATCH_MIDDATE,#add this in to postrec after we get rolling
   #SURVEY_MIDDATE = SURVEY_MIDDATE,
@@ -144,8 +150,8 @@ rm(list = ls()[!(ls() %in% c("pars", "data"))]) #remove everything except pars a
 #map- to fix things!! need to fix some of my params (FLAG!!)
 map <- list()
 map$S <- factor(NA) #fix survival
-map$SURVEY_TAU <- factor(NA) #fix survey tau
-map$CATCH_SURVEY_TAU <- factor(NA) #fix catch tau
+map$SURVEY_TAU <- factor(rep(NA, length(pars$SURVEY_TAU))) #fix survey tau
+map$CATCH_SURVEY_TAU <- factor(rep(NA, length(pars$CATCH_SURVEY_TAU))) #fix catch tau
 
 
 #do I need to specify starting values for my params?? In some other way?
@@ -161,7 +167,7 @@ basic_pop_model <- function(pars) {
   ##DO I EVEN NEED CONTAINERS? I don't think I need ...
   n_stages = 3 # number of stages for a 3 stage model
   n_yrs = length(YEARS) # number of years
-  lambdas = length(YEARS) #the weights container
+  #lambdas = length(YEARS) #the weights container
   
   # Population Stuff
   #CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage, adds one for this year
@@ -251,10 +257,10 @@ basic_pop_model <- function(pars) {
   
  
   # Report Section
-  RTMB::ADREPORT(SSB)# Mature and Legal biomasses, and error
+  #RTMB::ADREPORT(SSB)# Mature and Legal biomasses, and error
   RTMB::REPORT(sigma_survey) #I want my error. Will have to add in other error sources later??
   RTMB::ADREPORT(PredSrvIdx) #survey biomass by stage
-  RTMB::ADREPORT(PredSrvCPUE) #predicted survey CPUE by stage #ADREPORT instead perhaps? give me the sigmas??
+  RTMB::ADREPORT(PredSrvCPUE) #predicted survey CPUE by stage
   RTMB::REPORT(jnLL)
   
   return(jnLL) #do I needs this too?
@@ -270,7 +276,9 @@ basic_pop_model <- function(pars) {
    #                              getsd = FALSE)
 
 # Run Model ---------------------------------------------------------------
-pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars)
+
+
+pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map)
 #pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #I should probs map survival...
 #pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, 
  #                          map = map)
@@ -279,7 +287,7 @@ pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars)
  ##                                fn = pop_mod$fn,
    #                              gr = pop_mod$gr, 
     #                             newtonsteps = 2, # additional steps helps get the gradient lower
-     #(no work...)                            getsd = FALSE)
+    # (no work...)                            getsd = FALSE)
 
 ##################
 #TORUBLESHOOT
@@ -303,32 +311,51 @@ if (any(is.na(initial_gr)) || any(is.nan(initial_gr))) {
 }
 
 # Run the optimization
-opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr)
+##opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr)
 
 
 ##END TROUBLESHOOT
 ################
 
-#AGR hERE
+
 opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) #it does not like the NA's- there are some in the survey obs. Fugure out how to deal with this
 
-###below is a box, unedited yet
-# Constructs objective function with derivatives #PULLED FROM EXAMPLEAND I THINK THSI WORKS
-#obj <- MakeADFun(nll, par)
-
-# Minimize the objective function # PULLED FROM EXAMPLE AND THIS WORKS HERE I BELEIVE
-opt <- nlminb(obj$par, obj$fn, obj$gr)
 
 # Model summaries
-sdrep <- sdreport(obj)
+sdrep <- sdreport(pop_mod)
 summary(sdrep)
+#ok well, my results appear to be in here
+#what's up with the sd tho, they dont have sd... survey sd is it's own thing?? Do I need to input sd differently perhaps?
+names(pop_mod)
+pop_mod$report
 
+pop_mod$report()$sigma_survey #yay, a number!  did I do this part right?
+pop_mod$report() #why does my jnLL not exist??
+
+#Idk what that is- AGR
 # Predictions and standard errors from ADREPORT() #WILL i WANT TO CHANGE THIS TO GET DIFFERENT OUTPUTS??
-pred <- as.list(rep, "Est", report=TRUE)$pred
-se <- as.list(rep, "Std", report=TRUE)$pred
+#pred <- as.list(rep, "Est", report=TRUE)$pred
+#se <- as.list(rep, "Std", report=TRUE)$pred
 
-# Output REPORT() variable (no SEs)
-obj$report()$Sigma
+
+
+
+#ok that was messy - try the other way
+########################################
+#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, 
+#                           map = map) # make adfun object #random is the epsiolons that are getting integrated out - the random effects
+
+#uoptimized_rep <- pop_mod$report() #the report file prior to optimizing our objective function. Can get anything in report section using unoptomized values
+#plot(uoptimized_rep$SSB)
+#lines(sim$SSB)
+
+# fit_tmb uses nlminb in the background to optimize model
+#fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not insteall- 
+ #                                fn = pop_mod$fn,
+    #                             gr = pop_mod$gr, 
+     #                            newtonsteps = 5, # additional steps helps get the gradient lower
+      #                           getsd = TRUE)
+#that does not work
 
 ######################################################################
 #update the misc Juneau tables that I need (parallel the Excel doc) (only for the RKC juneau survey area)
