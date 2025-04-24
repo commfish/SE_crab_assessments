@@ -247,8 +247,10 @@ basic_pop_model <- function(pars) {
 
   for(y in 1:n_yrs) {
      for(st in 1:n_stages) {
-    #SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvCPUE[y,st]), log(PredSrvCPUE[y,st]), sigma_survey, TRUE) * lambdas[y] #to log or not to log (*FLAG*)?? #TO LOG!!
-    SrvIdx_nLL[y, st] = -dnorm(ObsSrvCPUE[y,st], PredSrvCPUE[y,st], sigma_survey, TRUE) * lambdas[y] #NOT TO LOG!!
+    #SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvCPUE[y,st]+0.0001), log(PredSrvCPUE[y,st]+0.0001), sigma_survey, TRUE) * lambdas[y] #to log or not to log (*FLAG*)?? #TO LOG!! 
+       ##the above is a better (logged) model according to jnll. but the below (not logged) is more similar to RSS
+       ##perhaps graph the data and see distribution
+    SrvIdx_nLL[y, st] = -dnorm(ObsSrvCPUE[y,st], PredSrvCPUE[y,st], sigma_survey, TRUE) * lambdas[y] #NOT TO LOG!! - 
      } #end of st(stage) loop
   } #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
   #other error needed too?
@@ -330,10 +332,13 @@ pop_mod$report
 pop_mod$report()$sigma_survey #yay, a number!  did I do this part right? #ooh. very different if log() vs. not log() in dnorm. **FLAG**
 ##so this is the standard error on my predicted values in CPUE? so to get the standard error around biomass of prerec, postrec, , I can do calcs
 pop_mod$report() #why does my jnLL not exist?? #that's sketch. *FLAG*- it exists when dnorm has no logs. When dnorm has yes logs, jnll fails (perhaps because 0 or negative predicted #'s)
+##Ok I addded a constant w/in the log so no 0's exist. and this jnLL is way lower- which is better. -65.38131
 
 #Similar values when dnorm is unlogged. but slightly different. jnll 631.3896
 #I NEED TO GRAPH THIS
 
+#when dnorm is logged
+##crap the biomass here is a good bit higher- WHY??
 
 #Idk what that is- AGR
 # Predictions and standard errors from ADREPORT() #WILL i WANT TO CHANGE THIS TO GET DIFFERENT OUTPUTS??
