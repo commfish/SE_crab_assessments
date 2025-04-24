@@ -348,16 +348,30 @@ pop_mod$report()
 pop_mod$report()$sigma_survey #yay, a number!  did I do this part right? #ooh. very different if log() vs. not log() in dnorm. **FLAG**
 ##so this is the standard error on my predicted values in CPUE? so to get the standard error around biomass of prerec, postrec, , I can do calcs
 
+#how do I check convergence again?? *FLAG*- it's in the sablefish SCAA code too..
+pop_mod$gr()
+pop_mod$report(pop_mod$env$last.par.best)
+
+#covariance graphs??
+#cor <- cov2cor(solve(as.matrix(pop_mod$sd_rep$jointPrecision)))
+#library(corrplot)
+#corrplot(cor, type='lower')
+
+#cor = cov2cor(pop_mod$sd_rep$cov.fixed)
+#corrplot(cor, type='lower')
+
 
 #Similar values when dnorm is unlogged. but slightly different. jnll 631.3896 UNLOGGED
 ################################################################k=jnll is -65.38131 w/LOGGEd model
+
 #I NEED TO GRAPH THIS
 ##GRAPH TO GO HERE:
 #predicted biomass values of last year (RSS excel analysis) vs predicted biomass this year (RTMB analysis)
 ##WITH UNCERTAINTY
 
-#when dnorm is logged
-##crap the biomass here is a good bit higher- WHY??
+
+
+
 
 #Idk what that is- AGR
 # Predictions and standard errors from ADREPORT() #WILL i WANT TO CHANGE THIS TO GET DIFFERENT OUTPUTS??
