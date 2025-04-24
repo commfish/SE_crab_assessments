@@ -1,16 +1,22 @@
 ###Juneau RTMB CSA###
 ##Alex Reich
 ##start of development: 4/14/25
-##recent work: 4/22/25
+##recent work: 4/24/25
 ##IN DEVELOPMENT###
 
 
 #TO DO:
-##load in 2023 data to a df and see if I can replicate 2024 analysis predictions
+##load in 2023 data to a df and see if I can replicate 2024 analysis predictions- ON IT
 ##log or no log for dnorm? 
-#Im in the looking at results section. She runs, but not well(?)
+#SHE RUNS! Does she run well? - as of 4/22/25
 
+###input files - FLAG - can be improved in  the future
+#I'm trying to figure out the best way... to adjust the CSA excel to a regular CSV input
+##adding in new values manually for now (best way?? probs not but I can adjust later)
+##est prerec is copied over from last year, est rec and est postrec set to 0. I think I calc these below so...
+###sooo that should be ok??
 
+##output files- FLAG- gonna want to create an output that looks like the input, for ease and reproducibility in future years
 
 
 #load libraries
@@ -25,7 +31,8 @@ library(TMBhelper)
 #DATA
 #######
 
-df <- read.csv("CSA_excel/JNU_test.csv") #I might want to put a big df here
+#df <- read.csv("CSA_excel/JNU_test.csv") #df goes here!!
+df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv")
 
 
 #put data into individual stored places for RTMB
@@ -95,9 +102,11 @@ pred_CPUE_postrec <- df$Estimated.Postrecruits
 ##########
 #PARAMS- merge with SETUP below??
 ###########
-REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
+#REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
+REC <- 84.6347230128254/100  #starting value from 2023 to 2024 analysis (last year)
   ##(do we HAVE a rec -> postrec survival???) #THIS IS ALLOWED TO CHANGE
-q <- 104.187334848418/1000000 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
+#q <- 104.187334848418/1000000 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
+q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
 S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED
 Z <- exp(-S)#total instantaneous mortality #FIXED
 SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
@@ -147,7 +156,7 @@ pars <- list(
 #remove all values from the environment except pars and data:
 rm(list = ls()[!(ls() %in% c("pars", "data"))]) #remove everything except pars and data
 
-#map- to fix things!! need to fix some of my params (FLAG!!)
+#map- to fix things!!
 map <- list()
 map$S <- factor(NA) #fix survival
 map$SURVEY_TAU <- factor(rep(NA, length(pars$SURVEY_TAU))) #fix survey tau
@@ -238,7 +247,8 @@ basic_pop_model <- function(pars) {
 
   for(y in 1:n_yrs) {
      for(st in 1:n_stages) {
-    SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvCPUE[y,st]), log(PredSrvCPUE[y,st]), sigma_survey, TRUE) * lambdas[y] 
+    #SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvCPUE[y,st]), log(PredSrvCPUE[y,st]), sigma_survey, TRUE) * lambdas[y] #to log or not to log (*FLAG*)?? #TO LOG!!
+    SrvIdx_nLL[y, st] = -dnorm(ObsSrvCPUE[y,st], PredSrvCPUE[y,st], sigma_survey, TRUE) * lambdas[y] #NOT TO LOG!!
      } #end of st(stage) loop
   } #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
   #other error needed too?
@@ -259,31 +269,23 @@ basic_pop_model <- function(pars) {
   # Report Section
   #RTMB::ADREPORT(SSB)# Mature and Legal biomasses, and error
   RTMB::REPORT(sigma_survey) #I want my error. Will have to add in other error sources later??
-  RTMB::ADREPORT(PredSrvIdx) #survey biomass by stage
-  RTMB::ADREPORT(PredSrvCPUE) #predicted survey CPUE by stage
+  #RTMB::ADREPORT(PredSrvIdx) #survey biomass by stage
+  RTMB::REPORT(PredSrvIdx) #REPORT or ADREPORT?? *FLAG*
+  #RTMB::ADREPORT(PredSrvCPUE) #predicted survey CPUE by stage
+  RTMB::REPORT(PredSrvCPUE) #REPORT or ADREPORT?? *FLAG*
   RTMB::REPORT(jnLL)
   
   return(jnLL) #do I needs this too?
 }
 #END POP MODEL EXAMPLE
 
-#try this too:
-##OUT OF ORDER RIGHT NOW
-#fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not insteall- 
- #                                fn = pop_mod$fn,
- #                                gr = pop_mod$gr, 
-  #                               newtonsteps = 2, # additional steps helps get the gradient lower
-   #                              getsd = FALSE)
 
 # Run Model ---------------------------------------------------------------
 
 
 pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map)
-#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #I should probs map survival...
-#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, 
- #                          map = map)
 
-#fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not insteall- 
+#fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not insteall- #NO WORK!!
  ##                                fn = pop_mod$fn,
    #                              gr = pop_mod$gr, 
     #                             newtonsteps = 2, # additional steps helps get the gradient lower
@@ -298,8 +300,8 @@ print(pop_mod$par)
 initial_fn <- pop_mod$fn(pop_mod$par)
 initial_gr <- pop_mod$gr(pop_mod$par)
 
-print(initial_fn)
-print(initial_gr)
+print(initial_fn) #if NA's there is problem
+print(initial_gr) #if NA's, problem
 
 # Ensure no NA/NaN values in the function and gradient evaluations
 if (any(is.na(initial_fn)) || any(is.nan(initial_fn))) {
@@ -310,27 +312,28 @@ if (any(is.na(initial_gr)) || any(is.nan(initial_gr))) {
   stop("Gradient evaluation returned NA/NaN values.")
 }
 
-# Run the optimization
-##opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr)
-
-
 ##END TROUBLESHOOT
 ################
 
 
-opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) #it does not like the NA's- there are some in the survey obs. Fugure out how to deal with this
+opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) 
 
 
 # Model summaries
 sdrep <- sdreport(pop_mod)
-summary(sdrep)
+summary(sdrep) #why are all sd' na??
 #ok well, my results appear to be in here
 #what's up with the sd tho, they dont have sd... survey sd is it's own thing?? Do I need to input sd differently perhaps?
 names(pop_mod)
 pop_mod$report
 
-pop_mod$report()$sigma_survey #yay, a number!  did I do this part right?
-pop_mod$report() #why does my jnLL not exist??
+pop_mod$report()$sigma_survey #yay, a number!  did I do this part right? #ooh. very different if log() vs. not log() in dnorm. **FLAG**
+##so this is the standard error on my predicted values in CPUE? so to get the standard error around biomass of prerec, postrec, , I can do calcs
+pop_mod$report() #why does my jnLL not exist?? #that's sketch. *FLAG*- it exists when dnorm has no logs. When dnorm has yes logs, jnll fails (perhaps because 0 or negative predicted #'s)
+
+#Similar values when dnorm is unlogged. but slightly different. jnll 631.3896
+#I NEED TO GRAPH THIS
+
 
 #Idk what that is- AGR
 # Predictions and standard errors from ADREPORT() #WILL i WANT TO CHANGE THIS TO GET DIFFERENT OUTPUTS??
