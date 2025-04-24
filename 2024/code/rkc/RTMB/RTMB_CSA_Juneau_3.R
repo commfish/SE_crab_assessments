@@ -7,7 +7,7 @@
 
 #TO DO:
 ##load in 2023 data to a df and see if I can replicate 2024 analysis predictions- ON IT
-##log or no log for dnorm? 
+##log or no log for dnorm? - logged is a better model according to jnll BUT unlogged is more similar to the excel RSS analysis
 #SHE RUNS! Does she run well? - as of 4/22/25
 
 ###input files - FLAG - can be improved in  the future
@@ -156,6 +156,20 @@ pars <- list(
 #remove all values from the environment except pars and data:
 rm(list = ls()[!(ls() %in% c("pars", "data"))]) #remove everything except pars and data
 
+
+#quick graph to check CPUE distributions
+df <- data.frame(data)
+#graph the distribution of the observed survey CPUE
+ggplot(df)+ aes(x=CPUE_prerec) + geom_density()
+ggplot(df)+ aes(x=log(CPUE_prerec)) + geom_density() 
+ggplot(df)+ aes(x=CPUE_rec) + geom_density()
+ggplot(df)+ aes(x=log(CPUE_rec)) + geom_density() 
+ggplot(df)+ aes(x=CPUE_postrec) + geom_density()
+ggplot(df)+ aes(x=log(CPUE_postrec)) + geom_density() 
+##ok ok I don't need to log...
+#arguably CPUE_prerec and CPUE_rec could be logged
+
+
 #map- to fix things!!
 map <- list()
 map$S <- factor(NA) #fix survival
@@ -276,6 +290,8 @@ basic_pop_model <- function(pars) {
   #RTMB::ADREPORT(PredSrvCPUE) #predicted survey CPUE by stage
   RTMB::REPORT(PredSrvCPUE) #REPORT or ADREPORT?? *FLAG*
   RTMB::REPORT(jnLL)
+  RTMB::REPORT(q)
+  RTMB::REPORT(rec)
   
   return(jnLL) #do I needs this too?
 }
@@ -327,15 +343,18 @@ summary(sdrep) #why are all sd' na??
 #ok well, my results appear to be in here
 #what's up with the sd tho, they dont have sd... survey sd is it's own thing?? Do I need to input sd differently perhaps?
 names(pop_mod)
-pop_mod$report
+pop_mod$report()
 
 pop_mod$report()$sigma_survey #yay, a number!  did I do this part right? #ooh. very different if log() vs. not log() in dnorm. **FLAG**
 ##so this is the standard error on my predicted values in CPUE? so to get the standard error around biomass of prerec, postrec, , I can do calcs
-pop_mod$report() #why does my jnLL not exist?? #that's sketch. *FLAG*- it exists when dnorm has no logs. When dnorm has yes logs, jnll fails (perhaps because 0 or negative predicted #'s)
-##Ok I addded a constant w/in the log so no 0's exist. and this jnLL is way lower- which is better. -65.38131
 
-#Similar values when dnorm is unlogged. but slightly different. jnll 631.3896
+
+#Similar values when dnorm is unlogged. but slightly different. jnll 631.3896 UNLOGGED
+################################################################k=jnll is -65.38131 w/LOGGEd model
 #I NEED TO GRAPH THIS
+##GRAPH TO GO HERE:
+#predicted biomass values of last year (RSS excel analysis) vs predicted biomass this year (RTMB analysis)
+##WITH UNCERTAINTY
 
 #when dnorm is logged
 ##crap the biomass here is a good bit higher- WHY??
