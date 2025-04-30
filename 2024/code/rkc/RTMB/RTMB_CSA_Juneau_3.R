@@ -1,14 +1,13 @@
 ###Juneau RTMB CSA###
 ##Alex Reich
 ##start of development: 4/14/25
-##recent work: 4/24/25
+##recent work: 4/30/25
 ##IN DEVELOPMENT###
 
 
 #TO DO:
-##load in 2023 data to a df and see if I can replicate 2024 analysis predictions- ON IT
-##log or no log for dnorm? - logged is a better model according to jnll BUT unlogged is more similar to the excel RSS analysis
-#SHE RUNS! Does she run well? - as of 4/22/25
+##Graph!!! Graph!!
+
 
 ###input files - FLAG - can be improved in  the future
 #I'm trying to figure out the best way... to adjust the CSA excel to a regular CSV input
@@ -26,13 +25,13 @@ library(here)
 library(TMBhelper)
 
 #to test: use juneau 2023 CSA to calc the 2024 analysis.... and see what happens
-
+set.seed(100) #Hessian issues at all set seed's that I've tried, but inconsistent
 #######
 #DATA
 #######
 
-#df <- read.csv("CSA_excel/JNU_test.csv") #df goes here!!
-df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv")
+df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv") #df goes here!! this is the analysis at the end of 2024
+df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv") #this is the analysis at the end of 2023
 
 
 #put data into individual stored places for RTMB
@@ -136,8 +135,8 @@ data <- list(
 
 pars <- list(
   #ln_mean_rec = log(1), # mean recruitment
-  #ln_sigma_R = log(0.1), # recruitment variability #MIGHT WANT TO ADD THIS IN!!
-  ln_q = log(q), # catchability #AGR- will have to put this in there- insead of q FLAG
+  #ln_sigma_R = log(0.1), # recruitment variability #Add in in later iterations??
+  ln_q = log(q), # catchability 
   #q=q,  #let's let q gp negative and see if it blows up #FLAG
   ln_rec = log(REC), # preR to R survival rate #where was this calc?
   #rec=REC, #should not be allowed to go neg, but let's see what happens when I let it...
@@ -170,7 +169,7 @@ ggplot(df)+ aes(x=log(CPUE_postrec)) + geom_density()
 #arguably CPUE_prerec and CPUE_rec could be logged
 
 
-#map- to fix things!!
+#map- to fix parameters!!
 map <- list()
 map$S <- factor(NA) #fix survival
 map$SURVEY_TAU <- factor(rep(NA, length(pars$SURVEY_TAU))) #fix survey tau
@@ -187,10 +186,8 @@ basic_pop_model <- function(pars) {
   RTMB::getAll(pars, data) #or can write out as in the RTMB vonbert example
   
   # Model Set Up (Containers) -----------------------------------------------
-  ##DO I EVEN NEED CONTAINERS? I don't think I need ...
   n_stages = 3 # number of stages for a 3 stage model
   n_yrs = length(YEARS) # number of years
-  #lambdas = length(YEARS) #the weights container
   
   # Population Stuff
   #CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage, adds one for this year
@@ -293,7 +290,7 @@ basic_pop_model <- function(pars) {
   RTMB::REPORT(q)
   RTMB::REPORT(rec)
   
-  return(jnLL) #do I needs this too?
+  return(jnLL) #do I need this too?
 }
 #END POP MODEL EXAMPLE
 
@@ -304,10 +301,10 @@ basic_pop_model <- function(pars) {
 pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map)
 
 #fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not insteall- #NO WORK!!
- ##                                fn = pop_mod$fn,
-   #                              gr = pop_mod$gr, 
-    #                             newtonsteps = 2, # additional steps helps get the gradient lower
-    # (no work...)                            getsd = FALSE)
+ #                                fn = pop_mod$fn,
+  #                               gr = pop_mod$gr, 
+   #                              newtonsteps = 2, # additional steps helps get the gradient lower
+    #                            getsd = TRUE)
 
 ##################
 #TORUBLESHOOT
@@ -333,12 +330,19 @@ if (any(is.na(initial_gr)) || any(is.nan(initial_gr))) {
 ##END TROUBLESHOOT
 ################
 
+pop_mod$par #object and starting params
+pop_mod$fn()
+pop_mod$gr()
 
-opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) 
+opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) #can I do more newtonsteps here? IDK
+opt
+#relative convergence - I've definitely seen worse! but **FLAG**
 
 
 # Model summaries
 sdrep <- sdreport(pop_mod)
+sdrep #maximum gradient component is here - # 0.001 or smaller considered converged, can use newtonsteps (can I tho??) to make it smaller
+##Crap- does not consistently have a positive definite hessian- maybe I do need more newtonsteps
 summary(sdrep) #why are all sd' na??
 #ok well, my results appear to be in here
 #what's up with the sd tho, they dont have sd... survey sd is it's own thing?? Do I need to input sd differently perhaps?
@@ -350,7 +354,8 @@ pop_mod$report()$sigma_survey #yay, a number!  did I do this part right? #ooh. v
 
 #how do I check convergence again?? *FLAG*- it's in the sablefish SCAA code too..
 pop_mod$gr()
-pop_mod$report(pop_mod$env$last.par.best)
+pop_mod$report(pop_mod$env$last.par.best) #parameters
+pop_mod$env$last.par.best 
 
 #covariance graphs??
 #cor <- cov2cor(solve(as.matrix(pop_mod$sd_rep$jointPrecision)))
@@ -363,6 +368,14 @@ pop_mod$report(pop_mod$env$last.par.best)
 
 #Similar values when dnorm is unlogged. but slightly different. jnll 631.3896 UNLOGGED
 ################################################################k=jnll is -65.38131 w/LOGGEd model
+
+
+#EXTRACT FINAL VALUES - (to do *FLAG*)
+result_df <- data.frame(pop_mod$report(pop_mod$env$last.par.best))
+#change result df names to prerecruit, recruit, postrectuit
+
+#graph to compare observed survey values, excel CSA model, and RTMB CSA model
+
 
 #I NEED TO GRAPH THIS
 ##GRAPH TO GO HERE:
