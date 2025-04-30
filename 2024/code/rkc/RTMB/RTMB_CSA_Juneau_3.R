@@ -283,9 +283,9 @@ basic_pop_model <- function(pars) {
   #RTMB::ADREPORT(SSB)# Mature and Legal biomasses, and error
   RTMB::REPORT(sigma_survey) #I want my error. Will have to add in other error sources later??
   #RTMB::ADREPORT(PredSrvIdx) #survey biomass by stage
-  RTMB::REPORT(PredSrvIdx) #REPORT or ADREPORT?? *FLAG*
+  RTMB::REPORT(PredSrvIdx) #REPORT or ADREPORT?? *FLAG* #the pred biomass
   #RTMB::ADREPORT(PredSrvCPUE) #predicted survey CPUE by stage
-  RTMB::REPORT(PredSrvCPUE) #REPORT or ADREPORT?? *FLAG*
+  RTMB::REPORT(PredSrvCPUE) #REPORT or ADREPORT?? *FLAG* #the pred cpue
   RTMB::REPORT(jnLL)
   RTMB::REPORT(q)
   RTMB::REPORT(rec)
@@ -373,8 +373,36 @@ pop_mod$env$last.par.best
 #EXTRACT FINAL VALUES - (to do *FLAG*)
 result_df <- data.frame(pop_mod$report(pop_mod$env$last.par.best))
 #change result df names to prerecruit, recruit, postrectuit
+names(result_df) <- c("sd","prerecruit_biomass", "legal_biomass", "mature_biomass", 
+                      "prerecuit_cpue", "recruit_cpue", "postrecuit_cpue",
+                      "jnll","q", "rec")
+results_df_relevant <- result_df %>%
+  #select(-q, -rec, -jnll) %>% #remove things I don't want to graph
+  #get confidence intervals on the cpue
+  mutate(prerecuit_cpue_upper = prerecuit_cpue + (1.96 * sd),
+         prerecuit_cpue_lower = prerecuit_cpue - (1.96 * sd),
+         recruit_cpue_upper = recruit_cpue + (1.96 * sd),
+         recruit_cpue_lower = recruit_cpue - (1.96 * sd),
+         postrecuit_cpue_upper = postrecuit_cpue + (1.96 * sd),
+         postrecuit_cpue_lower = postrecuit_cpue - (1.96 * sd),
+         #import the weights in
+         prerecuit_weight = df$wt_prerec,
+         legal_weight = df$wt_legal,
+         mature_weight = df$wt_mature,
+        #get CI's on the biomass by converting the cpue upper and lower to biomass for prerecuit, legal, and mature
+        ##double check these equations please
+        prerecruit_biomass_upper = (prerecuit_cpue_upper * prerecuit_weight) / q,
+        prerecruit_biomass_lower = (prerecuit_cpue_lower * prerecuit_weight) / q,
+        legal_biomass_upper = (recruit_cpue_upper + postrecuit_cpue_upper) * legal_weight / q,
+        legal_biomass_lower = (recruit_cpue_lower + postrecuit_cpue_lower) * legal_weight / q,
+        mature_biomass_upper = (prerecruit_biomass_upper + legal_biomass_upper),
+        mature_biomass_lower = (prerecruit_biomass_lower + legal_biomass_lower))
 
+
+  
 #graph to compare observed survey values, excel CSA model, and RTMB CSA model
+
+#graph CSA excel biomass vs. RTMB biomass estimates
 
 
 #I NEED TO GRAPH THIS
