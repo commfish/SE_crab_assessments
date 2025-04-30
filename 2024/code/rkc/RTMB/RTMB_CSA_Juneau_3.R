@@ -175,7 +175,7 @@ ggplot(df)+ aes(x=log(CPUE_postrec)) + geom_density()
 
 #map- to fix parameters!!
 map <- list()
-map$S <- factor(NA) #fix survival
+map$S <- factor(NA) #fix survival #when I let the model estimate survival, it estimates 0.229 and does not converge great
 map$SURVEY_TAU <- factor(rep(NA, length(pars$SURVEY_TAU))) #fix survey tau
 map$CATCH_SURVEY_TAU <- factor(rep(NA, length(pars$CATCH_SURVEY_TAU))) #fix catch tau
 
@@ -468,24 +468,44 @@ ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
   theme_minimal()
 
 
-#I NEED TO GRAPH THIS
-##GRAPH TO GO HERE:
-#predicted biomass values of last year (RSS excel analysis) vs predicted biomass this year (RTMB analysis)
-##WITH UNCERTAINTY
-
-#PROBLEM-
-##prerecuit CPUE not estimated....? WHY
 
 
 
-#Idk what that is- AGR
-# Predictions and standard errors from ADREPORT() #WILL i WANT TO CHANGE THIS TO GET DIFFERENT OUTPUTS??
-#pred <- as.list(rep, "Est", report=TRUE)$pred
-#se <- as.list(rep, "Std", report=TRUE)$pred
+######################################################################
+#update the misc Juneau tables that I need (parallel the Excel doc) (only for the RKC juneau survey area)
+##############3
+#CALC GHL HERE
+################
+#it is mature biomass * 0.1 or whatever - a range for the tables. See excel tables and base off of those **TO DO NEXT**
 
 
 
 
+##################################################################
+#the update the biomass csv part
+#####################################################################
+
+
+
+
+
+
+
+
+#########################################################################################
+###DEVELOPMENT WORKFLOW
+##1. create input dataset (the CSA starting values)
+##2. create the RTMB code - to run the CSA starting values and get CSA ending calues
+##3. Any other tables that I want
+
+#Q: so WHY does this have to be in RTMB? Why was optim unstable?
+
+######################################################
+######################################################
+######################################################
+
+
+#TRASH CAN
 #ok that was messy - try the other way
 ########################################
 #pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, 
@@ -497,32 +517,16 @@ ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
 
 # fit_tmb uses nlminb in the background to optimize model
 #fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not insteall- 
- #                                fn = pop_mod$fn,
-    #                             gr = pop_mod$gr, 
-     #                            newtonsteps = 5, # additional steps helps get the gradient lower
-      #                           getsd = TRUE)
+#                                fn = pop_mod$fn,
+#                             gr = pop_mod$gr, 
+#                            newtonsteps = 5, # additional steps helps get the gradient lower
+#                           getsd = TRUE)
 #that does not work
 
-######################################################################
-#update the misc Juneau tables that I need (parallel the Excel doc) (only for the RKC juneau survey area)
 
+#Idk what that is- AGR
+# Predictions and standard errors from ADREPORT() #WILL i WANT TO CHANGE THIS TO GET DIFFERENT OUTPUTS??
+#pred <- as.list(rep, "Est", report=TRUE)$pred
+#se <- as.list(rep, "Std", report=TRUE)$pred
 
-##############3
-#CALC GHL HERE
-################
-#it is mature biomass * 0.1 or whatever
-
-
-
-
-##################################################################
-#the update the biomass csv part
-
-
-###DEVELOPMENT WORKFLOW
-##1. create input dataset (the CSA starting values)
-##2. create the RTMB code - to run the CSA starting values and get CSA ending calues
-##3. Any other tables that I want
-
-#Q: so WHY does this have to be in RTMB? Why was optim unstable?
 
