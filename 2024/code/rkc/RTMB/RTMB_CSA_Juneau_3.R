@@ -376,6 +376,11 @@ pop_mod$env$last.par.best
 ################################################################k=jnll is -65.38131 w/LOGGEd model
 
 df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv")
+#get rid of commas in the numbers for prerecuit biomass, legal biomass, and mature biomass
+df_juneau_24_compare$Mature.Biomass <- as.numeric(gsub(",", "", df_juneau_24_compare$Mature.Biomass))
+df_juneau_24_compare$Legal.Biomass <- as.numeric(gsub(",", "", df_juneau_24_compare$Legal.Biomass))
+df_juneau_24_compare$Prerecruit.Biomass <- as.numeric(gsub(",", "", df_juneau_24_compare$Prerecruit.Biomass))
+
 
 #EXTRACT FINAL VALUES - (to do *FLAG*)
 result_df <- data.frame(pop_mod$report(pop_mod$env$last.par.best))
@@ -444,8 +449,23 @@ ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) +
   labs(title="Juneau Postrecruit CPUE", x="Year", y="CPUE") +
   theme_minimal()
 
-
+##################################################
 #graph CSA excel biomass vs. RTMB biomass estimates
+#mature biomass
+ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
+  geom_ribbon(aes(ymin=mature_biomass_lower, ymax=mature_biomass_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
+  geom_line(color ="lightblue", size=1) + #the model-predicted RTMB biomasss
+  geom_line(data=df_juneau_24_compare ,aes(y=Mature.Biomass, x=Survey.Year), color="blue") + #this is excel model mature biomass
+  #add legal biomass
+  geom_ribbon(aes(ymin=legal_biomass_lower, ymax=legal_biomass_upper), alpha = 0.2, fill = "lightgreen") + #uncertainty
+  geom_line(aes(y=legal_biomass),color ="lightgreen", size=1) + #the RTMB model-predicted biomasss
+  geom_line(data=df_juneau_24_compare ,aes(y=Legal.Biomass, x=Survey.Year), color="darkgreen") + #this is the excel moodel
+  #add prerecruit biomass
+  geom_ribbon(aes(ymin=prerecruit_biomass_lower, ymax=prerecruit_biomass_upper), alpha = 0.2, fill = "lightpink") + #uncertainty
+  geom_line(aes(y=prerecruit_biomass),color ="lightpink", size=1) + #the RTMB model-predicted biomass
+  geom_line(data=df_juneau_24_compare ,aes(y=Prerecruit.Biomass, x=Survey.Year), color="pink") + #this is the excel-predicted biomass
+  labs(title="Juneau Biomass Estimates", x="Year", y="Biomass") +
+  theme_minimal()
 
 
 #I NEED TO GRAPH THIS
