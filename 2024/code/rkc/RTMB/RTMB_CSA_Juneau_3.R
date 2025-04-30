@@ -96,6 +96,9 @@ CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
 pred_CPUE_prerec <- df$Estimated.Prerecruit
 pred_CPUE_rec <- df$Estimated.Recruits
 pred_CPUE_postrec <- df$Estimated.Postrecruits
+#chagned survivial params to data due to overfitting. let's see what happens
+SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
+
 
 
 ##########
@@ -108,7 +111,7 @@ REC <- 84.6347230128254/100  #starting value from 2023 to 2024 analysis (last ye
 q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
 S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED
 Z <- exp(-S)#total instantaneous mortality #FIXED
-SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
+#SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
 
 
 ####################
@@ -129,7 +132,8 @@ data <- list(
   #survival params here or in parameters?!! something, at least
   wt_mature= df$Mature.Weight,
   wt_legal = df$Legal.Weight,
-  wt_prerec = df$Prerecruit.Weight 
+  wt_prerec = df$Prerecruit.Weight,
+  survival_params = SURVIVAL_PARAMS #moved this to data instead of parameters. Is it right?? IDK!
   
 )
 
@@ -140,7 +144,7 @@ pars <- list(
   #q=q,  #let's let q gp negative and see if it blows up #FLAG
   ln_rec = log(REC), # preR to R survival rate #where was this calc?
   #rec=REC, #should not be allowed to go neg, but let's see what happens when I let it...
-  survival_params = SURVIVAL_PARAMS, #not fixed!! What is this?? They can't go neg, so maybe make sure of that too...
+  #survival_params = SURVIVAL_PARAMS, #not fixed!! What is this?? They can't go neg, so maybe make sure of that too...
   S = S, #fixed!!survival. do I need to log??
   ln_sigma_survey = log(0.1),
   SURVEY_TAU = SURVEY_TAU, #is this data or param? #regardless, fix this please
@@ -289,6 +293,7 @@ basic_pop_model <- function(pars) {
   RTMB::REPORT(jnLL)
   RTMB::REPORT(q)
   RTMB::REPORT(rec)
+  RTMB::REPORT(survival_params) #report the survival params
   
   return(jnLL) #do I need this too?
 }
@@ -343,6 +348,7 @@ opt
 sdrep <- sdreport(pop_mod)
 sdrep #maximum gradient component is here - # 0.001 or smaller considered converged, can use newtonsteps (can I tho??) to make it smaller
 ##Crap- does not consistently have a positive definite hessian- maybe I do need more newtonsteps
+#update- I think I fixed the hessian issue - moved surival params to data instead of parameters
 summary(sdrep) #why are all sd' na??
 #ok well, my results appear to be in here
 #what's up with the sd tho, they dont have sd... survey sd is it's own thing?? Do I need to input sd differently perhaps?
@@ -369,13 +375,14 @@ pop_mod$env$last.par.best
 #Similar values when dnorm is unlogged. but slightly different. jnll 631.3896 UNLOGGED
 ################################################################k=jnll is -65.38131 w/LOGGEd model
 
+df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv")
 
 #EXTRACT FINAL VALUES - (to do *FLAG*)
 result_df <- data.frame(pop_mod$report(pop_mod$env$last.par.best))
 #change result df names to prerecruit, recruit, postrectuit
 names(result_df) <- c("sd","prerecruit_biomass", "legal_biomass", "mature_biomass", 
                       "prerecuit_cpue", "recruit_cpue", "postrecuit_cpue",
-                      "jnll","q", "rec")
+                      "jnll","q", "rec", "survival_params")
 results_df_relevant <- result_df %>%
   #select(-q, -rec, -jnll) %>% #remove things I don't want to graph
   #get confidence intervals on the cpue
@@ -396,11 +403,47 @@ results_df_relevant <- result_df %>%
         legal_biomass_upper = (recruit_cpue_upper + postrecuit_cpue_upper) * legal_weight / q,
         legal_biomass_lower = (recruit_cpue_lower + postrecuit_cpue_lower) * legal_weight / q,
         mature_biomass_upper = (prerecruit_biomass_upper + legal_biomass_upper),
-        mature_biomass_lower = (prerecruit_biomass_lower + legal_biomass_lower))
+        mature_biomass_lower = (prerecruit_biomass_lower + legal_biomass_lower),
+        year = df_juneau_24_compare$Survey.Year) #that could have been cleaner but I added year
 
 
   
 #graph to compare observed survey values, excel CSA model, and RTMB CSA model
+##results_df_relevant has my predicted values
+##df_juneau_24_compare has the observed values
+ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) + 
+  geom_ribbon(aes(ymin=prerecuit_cpue_lower, ymax=prerecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
+  geom_line(color ="lightblue", size=1) + #the model-predicted cpue
+  geom_point(data=df_juneau_24_compare ,aes(y=Pre.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
+  ##probs should add the SE for that at some point- I'm sure it exists
+  #add the CSA excel model CPUE
+  geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Prerecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
+  labs(title="Juneau Prerecruit CPUE", x="Year", y="CPUE") +
+  theme_minimal()
+#there we go.pre-rec is being estimated now.
+
+#anyway, recruits CPUE
+ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) + 
+  geom_ribbon(aes(ymin=recruit_cpue_lower, ymax=recruit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
+  geom_line(color ="lightblue", size=1) + #the model-predicted cpue
+  geom_point(data=df_juneau_24_compare ,aes(y=Recruit, x=Survey.Year)) + #this is the observed survey CPUE values
+  ##probs should add the SE for that at some point- I'm sure it exists
+  #add the CSA excel model CPUE
+  geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Recruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
+  labs(title="Juneau Recruit CPUE", x="Year", y="CPUE") +
+  theme_minimal()
+
+#and postrecruit CPUE
+ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) + 
+  geom_ribbon(aes(ymin=postrecuit_cpue_lower, ymax=postrecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
+  geom_line(color ="lightblue", size=1) + #the model-predicted cpue
+  geom_point(data=df_juneau_24_compare ,aes(y=Post.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
+  ##probs should add the SE for that at some point- I'm sure it exists
+  #add the CSA excel model CPUE
+  geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Postrecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
+  labs(title="Juneau Postrecruit CPUE", x="Year", y="CPUE") +
+  theme_minimal()
+
 
 #graph CSA excel biomass vs. RTMB biomass estimates
 
@@ -410,7 +453,8 @@ results_df_relevant <- result_df %>%
 #predicted biomass values of last year (RSS excel analysis) vs predicted biomass this year (RTMB analysis)
 ##WITH UNCERTAINTY
 
-
+#PROBLEM-
+##prerecuit CPUE not estimated....? WHY
 
 
 
