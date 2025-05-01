@@ -4,16 +4,35 @@
 ##recent work: 4/30/25
 ##IN DEVELOPMENT###
 
+##############################################################################
+#BASIC STRUCTURE
+##setup with data
+##wrangle data
+##figuring out which parameters/data I need
+##put those data and parameters in RTMB-ok form
+##map - fix parameters
+##RTMB function model
+##run RTMB
+##look at RTMB outputs and convergence
+##graph things (Excel CSA 2024 output compared to RTMB CSA 2024 output (I re-did the 2024 analysis in RTMB, essentially))
 
-#TO DO:
-##Graph!!! Graph!!
+#TAKE-AWAYS
+##the RTMB model is pretty dang similar to the excel CSA model
+##differnt results during the missing survey years- liekly because of how I told RTMB to handle missing values vs excel- but these were many years ago and have minimal impact on overall time series
+##it's easy to add things to the RTMB model - my gut says the next step to make this model better will be something to do with RECRUITMENT involving another LIKELIHOOD
+###But let's think about priorities here before I go on an improving this model tangent - much other work to do and I am one person.
+##Notable that when S (survival) is estimated, it is a good deal lower than what we've been using as a fixed value - marginal convergence but I haven't tried multiple newton steps
+###and I suspect something about recruitment, not survival, is the next step to messing with this model.
+
+#I used the 2023 and 2024 Juneau Excel CSA's, Basic_Pop_Model_RTMB.Day3.R (from the RTMB workshop), and Tyler's TMB code for SE Tanner crab (on S drive) to draft this model.
+##################################################################################
 
 
 ###input files - FLAG - can be improved in  the future
 #I'm trying to figure out the best way... to adjust the CSA excel to a regular CSV input
 ##adding in new values manually for now (best way?? probs not but I can adjust later)
 ##est prerec is copied over from last year, est rec and est postrec set to 0. I think I calc these below so...
-###sooo that should be ok??
+
 
 ##output files- FLAG- gonna want to create an output that looks like the input, for ease and reproducibility in future years
 
@@ -25,12 +44,13 @@ library(here)
 library(TMBhelper)
 
 #to test: use juneau 2023 CSA to calc the 2024 analysis.... and see what happens
-set.seed(100) #Hessian issues at all set seed's that I've tried, but inconsistent
+set.seed(100)
+
 #######
 #DATA
 #######
 
-df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv") #df goes here!! this is the analysis at the end of 2024
+df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv") #this is the analysis at the end of 2024
 df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv") #this is the analysis at the end of 2023
 
 
@@ -47,15 +67,15 @@ CATCH[is.na(CATCH)] <- 0 #replace NA with 0
 ##there was some thing in the juneau csa excel readme about how calculating PU is not straightforward. So... check that plz
 
 
-CATCH_MIDDATE <-as.Date(df$Catch.Mid.Date,format = "%d-%b-%y") #might have to do some weird date wrangling here FLAG- just put it into julian
+CATCH_MIDDATE <-as.Date(df$Catch.Mid.Date,format = "%d-%b-%y") #data wrangle catch middate into usable format
 REF_DATE <- CATCH_MIDDATE[1]
 #CATCH_MIDDATE <- as.numeric(format(CATCH_MIDDATE, "%j"))
-CATCH_MIDDATE <- as.numeric(CATCH_MIDDATE - REF_DATE) #eqential added days
+CATCH_MIDDATE <- as.numeric(CATCH_MIDDATE - REF_DATE) #sequential added days
 
 
-SURVEY_MIDDATE <-as.Date(df$Survey.Mid.Date,format = "%d-%b-%y") #might have to do some weird date wrangling here FLAG- just put it into julian
+SURVEY_MIDDATE <-as.Date(df$Survey.Mid.Date,format = "%d-%b-%y") #data wrangle survey middate into usable format
 #SURVEY_MIDDATE <- as.numeric(format(SURVEY_MIDDATE, "%j")) #nope, I want not julian
-SURVEY_MIDDATE <- as.numeric(SURVEY_MIDDATE - REF_DATE) #seqential added days
+SURVEY_MIDDATE <- as.numeric(SURVEY_MIDDATE - REF_DATE) #sequential added days
 #fill NA's with the value before
 for (i in 2:length(SURVEY_MIDDATE)){
   if (is.na(SURVEY_MIDDATE[i])) {
@@ -96,8 +116,9 @@ CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
 pred_CPUE_prerec <- df$Estimated.Prerecruit
 pred_CPUE_rec <- df$Estimated.Recruits
 pred_CPUE_postrec <- df$Estimated.Postrecruits
-#chagned survivial params to data due to overfitting. let's see what happens
-SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
+#survival parameters are apparently data, not parameters.
+##model does bad thinbgs if they are parameters (prerecruit CPUE expected = observed exactly)
+SURVIVAL_PARAMS <- df$Survival.Parameters # this ALSO the estimated prerecriuits for that year? WHY? Idk theory but replicating the excel. **FLAG**
 
 
 
@@ -121,7 +142,7 @@ data <- list(
   YEARS = YEARS,
   lambdas = WEIGHTS,
   CATCH = CATCH,
-  #CATCH_MIDDATE = CATCH_MIDDATE,#add this in to postrec after we get rolling
+  #CATCH_MIDDATE = CATCH_MIDDATE, #params I think
   #SURVEY_MIDDATE = SURVEY_MIDDATE,
   CPUE_prerec = CPUE_prerec, #I replaced the NA's with 0's. Weights (lambda's are also 0 during the missing survey years)
   CPUE_rec = CPUE_rec,
@@ -129,7 +150,6 @@ data <- list(
   pred_CPUE_prerec = pred_CPUE_prerec,
   pred_CPUE_rec = pred_CPUE_rec,
   pred_CPUE_postrec = pred_CPUE_postrec, #uh, these are calced and thus dont need to be in data?
-  #survival params here or in parameters?!! something, at least
   wt_mature= df$Mature.Weight,
   wt_legal = df$Legal.Weight,
   wt_prerec = df$Prerecruit.Weight,
@@ -153,9 +173,7 @@ pars <- list(
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
 )
-#remove other saved things in the environment:
-#rm(list = ls(pattern = "^[^pars|data|df]$")) #remove everything except pars, data, and df
-#rm(list = ls(pattern = "^[^pars|data]$")) #remove everything except pars, data, and df
+
 #remove all values from the environment except pars and data:
 rm(list = ls()[!(ls() %in% c("pars", "data"))]) #remove everything except pars and data
 
@@ -175,15 +193,14 @@ ggplot(df)+ aes(x=log(CPUE_postrec)) + geom_density()
 
 #map- to fix parameters!!
 map <- list()
-map$S <- factor(NA) #fix survival #when I let the model estimate survival, it estimates 0.229 and does not converge great
+map$S <- factor(NA) #fix survival #when I let the model estimate survival, it estimates 0.229 (a good bit lower than what we typically fix) and model does not converge great (but what if I were to add more newtonsteps...)
 map$SURVEY_TAU <- factor(rep(NA, length(pars$SURVEY_TAU))) #fix survey tau
 map$CATCH_SURVEY_TAU <- factor(rep(NA, length(pars$CATCH_SURVEY_TAU))) #fix catch tau
 
 
-#do I need to specify starting values for my params?? In some other way?
-
 ############################3
 #SOMETHNG LIKE THIS:
+#the function
 basic_pop_model <- function(pars) {
   
   # get parameters and data
@@ -198,12 +215,12 @@ basic_pop_model <- function(pars) {
   SSB = array(0, dim = c(n_yrs, n_stages)) # Pre-rec, legal, and mature biomasses
   
   # Survey Stuff
-  ObsSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey index at stage #I read this in
+  ObsSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey CPUE at stage #I read this in
   ObsSrvCPUE[,1] <- CPUE_prerec # prerecruit
   ObsSrvCPUE[,2] <- CPUE_rec # recruit
   ObsSrvCPUE[,3] <- CPUE_postrec # postrecruit
-  PredSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) #survey CPUE at stage
-  PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calcualted from the predicted survey CPUE and waa
+  PredSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Predicted CPUE at stage
+  PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calculated from the predicted survey CPUE and waa
   
   # Likelihoods - box
   SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
@@ -221,7 +238,7 @@ basic_pop_model <- function(pars) {
   q = exp(ln_q) # survey catchability
   #mean_rec = exp(ln_mean_rec) # mean recruitment
   rec = exp(ln_rec)
-  sigma_survey = exp(ln_sigma_survey) # survey index error)
+  sigma_survey = exp(ln_sigma_survey) # survey index error
 
   
   # Initialize Population ---------------------------------------------------
@@ -303,9 +320,9 @@ basic_pop_model <- function(pars) {
 # Run Model ---------------------------------------------------------------
 
 
-pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map)
+pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #maybe I can try some ranefs
 
-#fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not insteall- #NO WORK!!
+#fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not install- #NO WORK!!
  #                                fn = pop_mod$fn,
   #                               gr = pop_mod$gr, 
    #                              newtonsteps = 2, # additional steps helps get the gradient lower
@@ -347,7 +364,7 @@ opt
 # Model summaries
 sdrep <- sdreport(pop_mod)
 sdrep #maximum gradient component is here - # 0.001 or smaller considered converged, can use newtonsteps (can I tho??) to make it smaller
-##Crap- does not consistently have a positive definite hessian- maybe I do need more newtonsteps
+## **FIXED** Crap- does not consistently have a positive definite hessian- maybe I do need more newtonsteps **FIXED**
 #update- I think I fixed the hessian issue - moved surival params to data instead of parameters
 summary(sdrep) #why are all sd' na??
 #ok well, my results appear to be in here
@@ -358,7 +375,7 @@ pop_mod$report()
 pop_mod$report()$sigma_survey #yay, a number!  did I do this part right? #ooh. very different if log() vs. not log() in dnorm. **FLAG**
 ##so this is the standard error on my predicted values in CPUE? so to get the standard error around biomass of prerec, postrec, , I can do calcs
 
-#how do I check convergence again?? *FLAG*- it's in the sablefish SCAA code too..
+
 pop_mod$gr()
 pop_mod$report(pop_mod$env$last.par.best) #parameters
 pop_mod$env$last.par.best 
@@ -372,9 +389,7 @@ pop_mod$env$last.par.best
 #corrplot(cor, type='lower')
 
 
-#Similar values when dnorm is unlogged. but slightly different. jnll 631.3896 UNLOGGED
-################################################################k=jnll is -65.38131 w/LOGGEd model
-
+#load in the CSA 2024 analysis (again...) for comparison of methods: RTMB to Ecvel
 df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv")
 #get rid of commas in the numbers for prerecuit biomass, legal biomass, and mature biomass
 df_juneau_24_compare$Mature.Biomass <- as.numeric(gsub(",", "", df_juneau_24_compare$Mature.Biomass))
@@ -382,14 +397,13 @@ df_juneau_24_compare$Legal.Biomass <- as.numeric(gsub(",", "", df_juneau_24_comp
 df_juneau_24_compare$Prerecruit.Biomass <- as.numeric(gsub(",", "", df_juneau_24_compare$Prerecruit.Biomass))
 
 
-#EXTRACT FINAL VALUES - (to do *FLAG*)
+#EXTRACT FINAL VALUES
 result_df <- data.frame(pop_mod$report(pop_mod$env$last.par.best))
 #change result df names to prerecruit, recruit, postrectuit
 names(result_df) <- c("sd","prerecruit_biomass", "legal_biomass", "mature_biomass", 
                       "prerecuit_cpue", "recruit_cpue", "postrecuit_cpue",
                       "jnll","q", "rec", "survival_params")
 results_df_relevant <- result_df %>%
-  #select(-q, -rec, -jnll) %>% #remove things I don't want to graph
   #get confidence intervals on the cpue
   mutate(prerecuit_cpue_upper = prerecuit_cpue + (1.96 * sd),
          prerecuit_cpue_lower = prerecuit_cpue - (1.96 * sd),
@@ -418,35 +432,35 @@ results_df_relevant <- result_df %>%
 ##df_juneau_24_compare has the observed values
 ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) + 
   geom_ribbon(aes(ymin=prerecuit_cpue_lower, ymax=prerecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
-  geom_line(color ="lightblue", size=1) + #the model-predicted cpue
+  geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(data=df_juneau_24_compare ,aes(y=Pre.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
   ##probs should add the SE for that at some point- I'm sure it exists
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Prerecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="Juneau Prerecruit CPUE", x="Year", y="CPUE") +
+  labs(title="JNU Prerec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE") +
   theme_minimal()
 #there we go.pre-rec is being estimated now.
 
 #anyway, recruits CPUE
 ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) + 
   geom_ribbon(aes(ymin=recruit_cpue_lower, ymax=recruit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
-  geom_line(color ="lightblue", size=1) + #the model-predicted cpue
+  geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(data=df_juneau_24_compare ,aes(y=Recruit, x=Survey.Year)) + #this is the observed survey CPUE values
   ##probs should add the SE for that at some point- I'm sure it exists
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Recruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="Juneau Recruit CPUE", x="Year", y="CPUE") +
+  labs(title="JNU Rec CPUE - Excel in dark, RTMB light with CIE", x="Year", y="CPUE") +
   theme_minimal()
 
 #and postrecruit CPUE
 ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) + 
   geom_ribbon(aes(ymin=postrecuit_cpue_lower, ymax=postrecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
-  geom_line(color ="lightblue", size=1) + #the model-predicted cpue
+  geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(data=df_juneau_24_compare ,aes(y=Post.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
   ##probs should add the SE for that at some point- I'm sure it exists
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Postrecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="Juneau Postrecruit CPUE", x="Year", y="CPUE") +
+  labs(title="JNU Postrec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE") +
   theme_minimal()
 
 ##################################################
@@ -464,7 +478,7 @@ ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
   geom_ribbon(aes(ymin=prerecruit_biomass_lower, ymax=prerecruit_biomass_upper), alpha = 0.2, fill = "lightpink") + #uncertainty
   geom_line(aes(y=prerecruit_biomass),color ="lightpink", size=1) + #the RTMB model-predicted biomass
   geom_line(data=df_juneau_24_compare ,aes(y=Prerecruit.Biomass, x=Survey.Year), color="pink") + #this is the excel-predicted biomass
-  labs(title="Juneau Biomass Estimates", x="Year", y="Biomass") +
+  labs(title="JNU Biomass - Excel dark lines, RTMB light lines with CI", x="Year", y="Biomass") +
   theme_minimal()
 
 
@@ -500,11 +514,12 @@ ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
 
 #Q: so WHY does this have to be in RTMB? Why was optim unstable?
 
-######################################################
-######################################################
-######################################################
 
 
+
+######################################################
+######################################################
+######################################################
 #TRASH CAN
 #ok that was messy - try the other way
 ########################################
