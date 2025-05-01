@@ -142,7 +142,7 @@ data <- list(
   YEARS = YEARS,
   lambdas = WEIGHTS,
   CATCH = CATCH,
-  #CATCH_MIDDATE = CATCH_MIDDATE, #params I think
+  #CATCH_MIDDATE = CATCH_MIDDATE, #params I think #shit, this might be data, according to tyler code **FLAG**
   #SURVEY_MIDDATE = SURVEY_MIDDATE,
   CPUE_prerec = CPUE_prerec, #I replaced the NA's with 0's. Weights (lambda's are also 0 during the missing survey years)
   CPUE_rec = CPUE_rec,
@@ -167,8 +167,8 @@ pars <- list(
   #survival_params = SURVIVAL_PARAMS, #not fixed!! What is this?? They can't go neg, so maybe make sure of that too...
   S = S, #fixed!!survival. do I need to log??
   ln_sigma_survey = log(0.1),
-  SURVEY_TAU = SURVEY_TAU, #is this data or param? #regardless, fix this please
-  CATCH_SURVEY_TAU = CATCH_SURVEY_TAU #fix this in the mapping
+  SURVEY_TAU = SURVEY_TAU, #is this data or param? #regardless, fix this please #shit, this might be data, according to tyler code **FLAG**
+  CATCH_SURVEY_TAU = CATCH_SURVEY_TAU #fix this in the mapping #shit, this might be data, according to tyler code **FLAG**
  # sigma_survey = 0.1 # survey index error #uh... do I need other error too? #also, dont let this go negative. For each one one one # total?
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
@@ -322,11 +322,6 @@ basic_pop_model <- function(pars) {
 
 pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #maybe I can try some ranefs
 
-#fitted_mod <- TMBhelper::fit_tmb(obj = pop_mod, #TMB optimizer- I could not install- #NO WORK!!
- #                                fn = pop_mod$fn,
-  #                               gr = pop_mod$gr, 
-   #                              newtonsteps = 2, # additional steps helps get the gradient lower
-    #                            getsd = TRUE)
 
 ##################
 #TORUBLESHOOT
@@ -356,9 +351,20 @@ pop_mod$par #object and starting params
 pop_mod$fn()
 pop_mod$gr()
 
-opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) #can I do more newtonsteps here? IDK
-opt
+
+#OPTION 1 for model run - nlminb
+#opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) #can I do more newtonsteps here? IDK
+#opt
 #relative convergence - I've definitely seen worse! but **FLAG**
+
+#OPTION 2 for model run - fit_tmb - let's me use newton steps
+opt <- TMBhelper::fit_tmb(obj = pop_mod, #works now; in progress, turn off please!
+                                fn = pop_mod$fn,
+                               gr = pop_mod$gr, 
+                               newtonsteps = 2, # additional steps helps get the gradient lower
+                         getsd = TRUE) #can check out this model results, how different from nlmimb
+opt
+
 
 
 # Model summaries
@@ -486,19 +492,39 @@ ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
 
 
 ######################################################################
-#update the misc Juneau tables that I need (parallel the Excel doc) (only for the RKC juneau survey area)
+
+#tranform results_df_relevant to the same strucutre as df_juneau_24_compare with the same column names
+output_df <-  df_juneau_24_compare %>%
+  select (-X, -GHL..pounds.) %>%
+  mutate(Estimated.Prerecruits = results_df_relevant$prerecuit_cpue,
+         Estimated.Recruits = results_df_relevant$recruit_cpue,
+         Estimated.Postrecruits = results_df_relevant$postrecuit_cpue,
+         Prerecruit.Biomass = results_df_relevant$prerecruit_biomass,
+         Legal.Biomass = results_df_relevant$legal_biomass,
+         Mature.Biomass = results_df_relevant$mature_biomass)
+    #that should give me inputs for next year
+
+#SAVE SAVE that output csv
+
+
 ##############3
 #CALC GHL HERE
 ################
 #it is mature biomass * 0.1 or whatever - a range for the tables. See excel tables and base off of those **TO DO NEXT**
 
-
-
-
 ##################################################################
 #the update the biomass csv part
 #####################################################################
+output_df$Mature.Biomass
+output_df$Legal.Biomass #here, can copy uncertainty in if I choose to do so
 
+
+#Table 2 replication ("just update current year, this is a comparison from previous puclished forecasts")
+
+#Table 3 - add in mature and legal biomasses from this year.... and current year's legal weight
+##this table will be a pain, might need to make 2 different ones
+
+#Table 2_currentYR replication ("This is the current yeras model output - all biomass values get replaced (from the entire CSV))
 
 
 
