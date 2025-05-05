@@ -519,10 +519,75 @@ output_df$Mature.Biomass
 output_df$Legal.Biomass #here, can copy uncertainty in if I choose to do so
 
 
-#Table 2 replication ("just update current year, this is a comparison from previous puclished forecasts")
+
 
 #Table 3 - add in mature and legal biomasses from this year.... and current year's legal weight
 ##this table will be a pain, might need to make 2 different ones
+###table 3.1 - note that there will be some grammar of table wrangling in the output RMD file 
+Legal_biomass_curyr <- output_df %>% 
+  filter(Survey.Year == max(Survey.Year)) %>%
+  select(Legal.Biomass)%>%
+  unlist() #turns it into a numeric vector
+Mature_biomass_curyr <- output_df %>% 
+  filter(Survey.Year == max(Survey.Year)) %>%
+  select(Mature.Biomass)%>%
+  unlist()
+legal_weight_curyr <- output_df %>% 
+  filter(Survey.Year == max(Survey.Year)) %>%
+  select(Legal.Weight) %>%
+  unlist()
+
+GHL_Allocation <- c("PU Summmer", "PU Winter", "Commercial", "Total legal", "Total mature", "Percent legal if targeting total mature")
+HR_20 <- c(Legal_biomass_curyr*0.20*0.5, Legal_biomass_curyr*0.20*0.1, Legal_biomass_curyr*0.20*0.4) #allocations if the harvest rate is 20 percent of legal biomass
+HR_17 <- c(Legal_biomass_curyr*0.17*0.5, Legal_biomass_curyr*0.17*0.1, Legal_biomass_curyr*0.17*0.4) #allocations if the harvest rate is 17 percent
+HR_15 <- c(Legal_biomass_curyr*0.15*0.5, Legal_biomass_curyr*0.15*0.1, Legal_biomass_curyr*0.15*0.4) #allocations if the harvest rate is 15 percent
+HR_12 <- c(Legal_biomass_curyr*0.12*0.5, Legal_biomass_curyr*0.12*0.1, Legal_biomass_curyr*0.12*0.4) #allocations if the harvest rate is 12 percent
+HR_10 <- c(Legal_biomass_curyr*0.10*0.5, Legal_biomass_curyr*0.10*0.1, Legal_biomass_curyr*0.10*0.4) #allocations if the harvest rate is 10 percent
+HR_8 <- c(Legal_biomass_curyr*0.08*0.5, Legal_biomass_curyr*0.08*0.1, Legal_biomass_curyr*0.08*0.4) #allocations if the harvest rate is 8 percent
+HR_7 <- c(Legal_biomass_curyr*0.07*0.5, Legal_biomass_curyr*0.07*0.1, Legal_biomass_curyr*0.07*0.4) #allocations if the harvest rate is 7 percent
+HR_6 <- c(Legal_biomass_curyr*0.06*0.5, Legal_biomass_curyr*0.06*0.1, Legal_biomass_curyr*0.06*0.4) #and so on
+HR_5 <- c(Legal_biomass_curyr*0.05*0.5, Legal_biomass_curyr*0.05*0.1, Legal_biomass_curyr*0.05*0.4) #and so on
+#combine in a df table
+Table3.1_temp <- data.frame(HR_20, HR_17, HR_15, HR_12, HR_10, HR_8, HR_7, HR_6, HR_5)
+#calculate total legal biomass as a sum of each column
+Total_legal <- Table3.1_temp %>%
+  summarize(across(everything(), sum)) # Sum each column
+Total_mature <- c(Mature_biomass_curyr*0.2, Mature_biomass_curyr*0.17, Mature_biomass_curyr*0.15, Mature_biomass_curyr*0.12, Mature_biomass_curyr*0.10, Mature_biomass_curyr*0.08, Mature_biomass_curyr*0.07, Mature_biomass_curyr*0.06, Mature_biomass_curyr*0.05)
+Percent_legal_if_targeting_mature <- c(Total_mature/Legal_biomass_curyr) *100
+
+Table_3.1_temp2 <- data.frame(HR_20, HR_17, HR_15, HR_12, HR_10, HR_8, HR_7, HR_6, HR_5) %>%
+  rbind(Total_legal) %>% rbind(Total_mature) %>% rbind(Percent_legal_if_targeting_mature)
+
+round(Table_3.1_temp2)
+Table_3.1 <- cbind(GHL_Allocation, Table_3.1_temp2) #add the GHL allocation column
+
+###table 3.2: harvest rate in numbers
+#calc the #'s using mature weight
+mature_weight_curyr <- output_df %>% 
+  filter(Survey.Year == max(Survey.Year)) %>%
+  select(Mature.Weight) %>%
+  unlist()
+
+legal_numbers_approx
+mature_numbers_approx
+
+Table3.2 <- Table_3.1_temp2[-c(5:6),] %>% #removed mature biomass and crab %
+  mutate(HR20 = HR_20/legal_weight_curyr, #convert to # of crab
+         HR17 = HR_17/legal_weight_curyr,
+         HR15 = HR_15/legal_weight_curyr,
+         HR12 = HR_12/legal_weight_curyr,
+         HR10 = HR_10/legal_weight_curyr,
+         HR8 = HR_8/legal_weight_curyr,
+         HR7 = HR_7/legal_weight_curyr,
+         HR6 = HR_6/legal_weight_curyr,
+         HR5 = HR_5/legal_weight_curyr) %>%
+  round() #round to the nearest crab
+
+Tab3.2_temp <- Table_3.1_temp2[5,] %>%
+  mutate(HR20)
+
+
+#Table 2 replication ("just update current year, this is a comparison from previous published forecasts")
 
 #Table 2_currentYR replication ("This is the current yeras model output - all biomass values get replaced (from the entire CSV))
 
