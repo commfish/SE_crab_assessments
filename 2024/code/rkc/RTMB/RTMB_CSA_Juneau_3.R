@@ -568,10 +568,10 @@ mature_weight_curyr <- output_df %>%
   select(Mature.Weight) %>%
   unlist()
 
-legal_numbers_approx
-mature_numbers_approx
+legal_numbers_approx <- round(Legal_biomass_curyr/legal_weight_curyr)  #ugh, I see a potential for error here. C used the average of a few random-looking years as the mean legal weight. I'm gonna use this year's. **FLAG!!**
+mature_numbers_approx <- round(Mature_biomass_curyr/mature_weight_curyr) 
 
-Table3.2 <- Table_3.1_temp2[-c(5:6),] %>% #removed mature biomass and crab %
+Table3.2 <- Table_3.1_temp2[-c(4:6),] %>% #removed total legalbiomass, mature biomass and crab %
   mutate(HR20 = HR_20/legal_weight_curyr, #convert to # of crab
          HR17 = HR_17/legal_weight_curyr,
          HR15 = HR_15/legal_weight_curyr,
@@ -582,10 +582,26 @@ Table3.2 <- Table_3.1_temp2[-c(5:6),] %>% #removed mature biomass and crab %
          HR6 = HR_6/legal_weight_curyr,
          HR5 = HR_5/legal_weight_curyr) %>%
   round() #round to the nearest crab
+  #add in a row, not column, that is the sum
+Total_legal_nums <- Table3.2 %>%
+  summarize(across(everything(), sum))
+   
 
-Tab3.2_temp <- Table_3.1_temp2[5,] %>%
-  mutate(HR20)
+Total_mature_nums<- c(HR20 = mature_numbers_approx*0.20,# get mature harvest numbers for each harvest rate
+                       HR17 = mature_numbers_approx*0.17, 
+                       HR15 = mature_numbers_approx*0.15, 
+                       HR12 = mature_numbers_approx*0.12, 
+                       HR10 = mature_numbers_approx*0.10, 
+                       HR8 = mature_numbers_approx*0.08, 
+                       HR7 = mature_numbers_approx*0.07, 
+                       HR6 = mature_numbers_approx*0.06, 
+                       HR5 = mature_numbers_approx*0.05) #and so on
 
+#combine 
+Table3.2_final <- Table3.2 %>% rbind(Total_legal_nums) %>% rbind(Total_mature_nums) #add the total legal and mature crab numbers
+Table3.2_final <- cbind(GHL_Allocation[-6], Table3.2_final)
+
+#Ok I THINK that is everything I need from table 3 in the Juneau CSA excel file. Reference RMD if anything else is needed.
 
 #Table 2 replication ("just update current year, this is a comparison from previous published forecasts")
 
