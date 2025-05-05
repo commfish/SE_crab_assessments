@@ -1,7 +1,8 @@
 ###Juneau RTMB CSA###
 ##Alex Reich
-##start of development: 4/14/25
-##recent work: 4/30/25
+##start of development (on vertsion 4):5/8/25
+##recent work: 5/8/25
+##Versopm on 4 significance: got feedback on version 3, editing accordingly.
 ##IN DEVELOPMENT###
 
 ##############################################################################
@@ -33,9 +34,9 @@
 ##adding in new values manually for now (best way?? probs not but I can adjust later)
 ##est prerec is copied over from last year, est rec and est postrec set to 0. I think I calc these below so...
 
-
-##output files- FLAG- gonna want to create an output that looks like the input, for ease and reproducibility in future years
-
+##Version 4 improvements
+#get rid of the "survival parameters" crap- that is jsut prerecuits
+#r_bar, r_bar deviance, and r_bar likelihood (no r_bar se yet)
 
 #load libraries
 library(tidyverse)
@@ -110,15 +111,27 @@ CPUE_prerec[is.na(CPUE_prerec)] <- 0 #replace NA with 0
 CPUE_rec[is.na(CPUE_rec)] <- 0 #replace NA with 0
 CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
 
-##survey weights (from summary table) #vectors over all the years
-#WEIGHT <- df$Weight
+
 #pred survey CPUE
 pred_CPUE_prerec <- df$Estimated.Prerecruit
 pred_CPUE_rec <- df$Estimated.Recruits
 pred_CPUE_postrec <- df$Estimated.Postrecruits
-#survival parameters are apparently data, not parameters.
+
+
+#mean of predicted prerecuits (the "recruitment") except the last year
+R_bar_1 <- mean(pred_CPUE_prerec[1:(length(pred_CPUE_prerec)-1)]) #mean of prerecruit CPUE
+#mean of predicted prerecruits("recruitment") for the last 10 years
+#R_bar_2 <- mean(pred_CPUE_prerec[(length(pred_CPUE_prerec)-9):length(pred_CPUE_prerec)]) #mean of prerecruit CPUE
+
+#vector of deviates from the mean precruit CPUE/ devaites from the average recruitment
+Eps_R <- rep(0, length(pred_CPUE_prerec)) #create a vector of zeros
+for (i in 1:length(pred_CPUE_prerec)){
+  Eps_Rbar[i] <- (pred_CPUE_prerec[i] - R_bar_1)/R_bar_1 #deviate from the mean
+}
+
+
 ##model does bad thinbgs if they are parameters (prerecruit CPUE expected = observed exactly)
-SURVIVAL_PARAMS <- df$Survival.Parameters # this ALSO the estimated prerecriuits for that year? WHY? Idk theory but replicating the excel. **FLAG**
+#SURVIVAL_PARAMS <- df$Survival.Parameters # this ALSO the estimated prerecriuits for that year? WHY? Idk theory but replicating the excel. **FLAG**
 
 
 
@@ -126,7 +139,7 @@ SURVIVAL_PARAMS <- df$Survival.Parameters # this ALSO the estimated prerecriuits
 #PARAMS- merge with SETUP below??
 ###########
 #REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
-REC <- 84.6347230128254/100  #starting value from 2023 to 2024 analysis (last year)
+T12 <- 84.6347230128254/100  #starting value from 2023 to 2024 analysis (last year)
   ##(do we HAVE a rec -> postrec survival???) #THIS IS ALLOWED TO CHANGE
 #q <- 104.187334848418/1000000 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
 q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
@@ -152,24 +165,22 @@ data <- list(
   pred_CPUE_postrec = pred_CPUE_postrec, #uh, these are calced and thus dont need to be in data?
   wt_mature= df$Mature.Weight,
   wt_legal = df$Legal.Weight,
-  wt_prerec = df$Prerecruit.Weight,
-  survival_params = SURVIVAL_PARAMS #moved this to data instead of parameters. Is it right?? IDK!
+  wt_prerec = df$Prerecruit.Weight
+  #survival_params = get rid of these **FLAG**
   
 )
 
 pars <- list(
-  #ln_mean_rec = log(1), # mean recruitment
+  ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
+  Eps_R <- Eps_R, #annual recruitment **FLAG - I add in a value for the final year, same as the year before... this not ok?? ** 
+  ##what if I make Eps_R 0's as starting values??
   #ln_sigma_R = log(0.1), # recruitment variability #Add in in later iterations??
   ln_q = log(q), # catchability 
-  #q=q,  #let's let q gp negative and see if it blows up #FLAG
-  ln_rec = log(REC), # preR to R survival rate #where was this calc?
-  #rec=REC, #should not be allowed to go neg, but let's see what happens when I let it...
-  #survival_params = SURVIVAL_PARAMS, #not fixed!! What is this?? They can't go neg, so maybe make sure of that too...
+  ln_rec = log(T12), # preR to R survival rate and molt rate, both
   S = S, #fixed!!survival. do I need to log??
   ln_sigma_survey = log(0.1),
   SURVEY_TAU = SURVEY_TAU, #is this data or param? #regardless, fix this please #shit, this might be data, according to tyler code **FLAG**
   CATCH_SURVEY_TAU = CATCH_SURVEY_TAU #fix this in the mapping #shit, this might be data, according to tyler code **FLAG**
- # sigma_survey = 0.1 # survey index error #uh... do I need other error too? #also, dont let this go negative. For each one one one # total?
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
 )
