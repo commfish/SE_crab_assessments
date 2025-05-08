@@ -38,6 +38,12 @@
 #get rid of the "survival parameters" crap- that is jsut prerecuits
 #r_bar, r_bar deviance, and r_bar likelihood (no r_bar se yet)
 
+##TO DO:
+#1. add in the recruitment (prerecruits), deviations, and likelihood
+##what the hell are recruitment penalties?
+#2. remove years with missing survey data - and fix graph accordingly...
+
+
 #load libraries
 library(tidyverse)
 library(RTMB)
@@ -176,7 +182,7 @@ data <- list(
 
 pars <- list(
   ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
-  Eps_R <- Eps_R, #annual recruitment **FLAG - I add in a value for the final year, same as the year before... this not ok?? ** 
+  Eps_R = Eps_R, #annual recruitment **FLAG - I add in a value for the final year, same as the year before... this not ok?? ** 
   ##what if I make Eps_R 0's as starting values??
   ln_sigma_R = log(0.1), # recruitment variability #Add in in later iterations?? #Ok I put this here
   ln_q = log(q), # catchability 
@@ -211,6 +217,7 @@ map <- list()
 map$S <- factor(NA) #fix survival #when I let the model estimate survival, it estimates 0.229 (a good bit lower than what we typically fix) and model does not converge great (but what if I were to add more newtonsteps...)
 map$SURVEY_TAU <- factor(rep(NA, length(pars$SURVEY_TAU))) #fix survey tau
 map$CATCH_SURVEY_TAU <- factor(rep(NA, length(pars$CATCH_SURVEY_TAU))) #fix catch tau
+map$ln_sigma_R <- factor(NA) #fix recruitment variability - not dealing with this right now
 
 
 ############################3
@@ -247,7 +254,7 @@ basic_pop_model <- function(pars) {
   
   # Do some parameter transformations here AGR DO I NEED THESE?
   mean_rec = exp(ln_mean_rec) # mean recruitment
-  #sigma_R = exp(ln_sigma_R) # recruitment variability
+  sigma_R = exp(ln_sigma_R) # recruitment variability
   #sigma_F = exp(ln_sigma_F) # fishing mortality variability
   #M = exp(ln_M) # natural mortality #I think I fix natural mortality
   q = exp(ln_q) # survey catchability
@@ -262,7 +269,7 @@ basic_pop_model <- function(pars) {
   PredSrvCPUE[1,] <- c( #should I call these something else?? since I read this in from excel at some point....
    # years = YEARS[1],
    # Pred_CPUE_prerec_calc = survival_params[1],
-    Pre_CPUE_prerec_calc <- Esp_R[1] * mean_rec + mean_rec, #this is R_bar *FLAG* check formula please
+    Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #this is R_bar *FLAG* check formula please
     Pred_CPUE_rec_calc = pred_CPUE_rec[1],
     Pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
     #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S) - (q*CATCH[t-1]*exp(-S)) #i removed tau. see if she runs first
@@ -273,7 +280,7 @@ basic_pop_model <- function(pars) {
   for (t in 2:n_yrs){
   #predSrvCPUE[t,] <- c(
     #years = YEARS,
-    PredSrvCPUE[t,1] = Esp_R[t] * mean_rec + mean_rec #this is the prerecruit
+    PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec #this is the prerecruit
     PredSrvCPUE[t,2] = T12*pred_CPUE_prerec[t-1] #this is the recruit
     PredSrvCPUE[t,3] = (pred_CPUE_rec[t-1] + pred_CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
   #)
@@ -306,10 +313,11 @@ basic_pop_model <- function(pars) {
   
   ## Recruitment ------------------------------------------------------------- PERHAPS ADD THIS LATER
   #Init_Rec_nLL = -sum(dnorm(ln_InitDevs, -sigma_R^2/2, sigma_R, TRUE)) #I am unsure if these stay for the crab CSA.. this will be the next addition if not now, at least
-  Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE)) #why? **FLAG**
+  #Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE)) #why? **FLAG**
+  Rec_nLL = -sum(dnorm(Eps_R, -sigma_R^2/2, sigma_R, TRUE)) #why are their recdevs logged? mine can go negative... Oh maybe they dont want it to go TOO negative
   
   # Get joint likelihood
-  jnLL = sum(SrvIdx_nLL) + sum(ln_RecDevs) #we're keeping it simple for the crab CSA
+  jnLL = sum(SrvIdx_nLL) + sum(Rec_nLL) #we're keeping it simple for the crab CSA
   #jnLL = sum(Catch_nLL) + sum(SrvIdx_nLL) + sum(FishAgeComps_nLL) + 
    # sum(SrvAgeComps_nLL) + sum(Fmort_Pen) + sum(Init_Rec_nLL) +
     #sum(Rec_nLL)solver in excel including preR to R survival (and also catchability q) - is this part of the likelihood?? #FLAG- perhaps add this next!!
@@ -325,8 +333,8 @@ basic_pop_model <- function(pars) {
   RTMB::REPORT(jnLL)
   RTMB::REPORT(q)
   RTMB::REPORT(T12)
-  RTMB::REPORT(mean_rec)
-  RTKB::REPORT(Eps_R) #annual recruitment
+  RTMB::ADREPORT(mean_rec)
+  RTMB::ADREPORT(Eps_R) #annual recruitment
   #RTMB::REPORT(survival_params) #report the survival params
   
   return(jnLL) #do I need this too?
@@ -393,7 +401,7 @@ summary(sdrep) #why are all sd' na??
 #ok well, my results appear to be in here
 #what's up with the sd tho, they dont have sd... survey sd is it's own thing?? Do I need to input sd differently perhaps?
 names(pop_mod)
-pop_mod$report()
+pop_mod$report() #weird warning**FLAG**
 
 pop_mod$report()$sigma_survey #yay, a number!  did I do this part right? #ooh. very different if log() vs. not log() in dnorm. **FLAG**
 ##so this is the standard error on my predicted values in CPUE? so to get the standard error around biomass of prerec, postrec, , I can do calcs
@@ -419,13 +427,17 @@ df_juneau_24_compare$Mature.Biomass <- as.numeric(gsub(",", "", df_juneau_24_com
 df_juneau_24_compare$Legal.Biomass <- as.numeric(gsub(",", "", df_juneau_24_compare$Legal.Biomass))
 df_juneau_24_compare$Prerecruit.Biomass <- as.numeric(gsub(",", "", df_juneau_24_compare$Prerecruit.Biomass))
 
+Temp<- df_juneau_24_compare%>%
+  filter(!is.na(Recruit)) #get rid of any years with missing survey data
+Year <- Temp$Survey.Year
 
 #EXTRACT FINAL VALUES
+#*FLAG* - I need to edit to put blanks in the blank years
 result_df <- data.frame(pop_mod$report(pop_mod$env$last.par.best))
 #change result df names to prerecruit, recruit, postrectuit
 names(result_df) <- c("sd","prerecruit_biomass", "legal_biomass", "mature_biomass", 
                       "prerecuit_cpue", "recruit_cpue", "postrecuit_cpue",
-                      "jnll","q", "rec", "survival_params")
+                      "jnll","q", "T12")
 results_df_relevant <- result_df %>%
   #get confidence intervals on the cpue
   mutate(prerecuit_cpue_upper = prerecuit_cpue + (1.96 * sd),
@@ -446,7 +458,17 @@ results_df_relevant <- result_df %>%
         legal_biomass_lower = (recruit_cpue_lower + postrecuit_cpue_lower) * legal_weight / q,
         mature_biomass_upper = (prerecruit_biomass_upper + legal_biomass_upper),
         mature_biomass_lower = (prerecruit_biomass_lower + legal_biomass_lower),
-        year = df_juneau_24_compare$Survey.Year) #that could have been cleaner but I added year
+        year = Year) #that could have been cleaner but I added year
+
+#add in blank rows for the missing years:
+results_df_relevant <- results_df_relevant %>%
+  mutate(year = as.numeric(year)) %>% #make sure year is numeric
+  complete(year = full_seq(year, 1), fill = list(prerecuit_cpue = NA, recruit_cpue = NA, postrecuit_cpue = NA,
+                                                 prerecruit_biomass = NA, legal_biomass = NA, mature_biomass = NA,
+                                                 prerecuit_cpue_upper = NA, recruit_cpue_upper = NA, postrecuit_cpue_upper = NA,
+                                                 prerecuit_cpue_lower = NA, recruit_cpue_lower = NA, postrecuit_cpue_lower = NA,
+                                                 legal_biomass_upper = NA, legal_biomass_lower = NA,
+                                                 mature_biomass_upper = NA, mature_biomass_lower = NA)) #fill in the missing years with NAs
 
 
   
