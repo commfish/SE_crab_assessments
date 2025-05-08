@@ -54,6 +54,10 @@ set.seed(100)
 df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv") #this is the analysis at the end of 2024
 df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv") #this is the analysis at the end of 2023
 
+#get rid of any years with missing survey data
+df <- df %>%
+  filter(!is.na(Recruit)) #get rid of any years with missing survey data
+ 
 
 #put data into individual stored places for RTMB
 YEARS <- df$Survey.Year
@@ -126,7 +130,7 @@ R_bar_1 <- mean(pred_CPUE_prerec[1:(length(pred_CPUE_prerec)-1)]) #mean of prere
 #vector of deviates from the mean precruit CPUE/ devaites from the average recruitment
 Eps_R <- rep(0, length(pred_CPUE_prerec)) #create a vector of zeros
 for (i in 1:length(pred_CPUE_prerec)){
-  Eps_Rbar[i] <- (pred_CPUE_prerec[i] - R_bar_1)/R_bar_1 #deviate from the mean
+  Eps_R[i] <- (pred_CPUE_prerec[i] - R_bar_1)/R_bar_1 #deviate from the mean
 }
 
 
@@ -174,9 +178,9 @@ pars <- list(
   ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
   Eps_R <- Eps_R, #annual recruitment **FLAG - I add in a value for the final year, same as the year before... this not ok?? ** 
   ##what if I make Eps_R 0's as starting values??
-  #ln_sigma_R = log(0.1), # recruitment variability #Add in in later iterations??
+  ln_sigma_R = log(0.1), # recruitment variability #Add in in later iterations?? #Ok I put this here
   ln_q = log(q), # catchability 
-  ln_rec = log(T12), # preR to R survival rate and molt rate, both
+  ln_T12 = log(T12), # preR to R survival rate and molt rate, both
   S = S, #fixed!!survival. do I need to log??
   ln_sigma_survey = log(0.1),
   SURVEY_TAU = SURVEY_TAU, #is this data or param? #regardless, fix this please #shit, this might be data, according to tyler code **FLAG**
@@ -237,18 +241,17 @@ basic_pop_model <- function(pars) {
   SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
 
   # Penalties #I don't need penalties?? do I?
-  #Rec_nLL = rep(0, n_yrs) # Recruitment penalty
-  #Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty
+  Rec_nLL = rep(0, n_yrs) # Recruitment penalty - AR- why is this a penalty?? **FLAG**
+  #Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty #and why is there an initial?? ***FLAG**
   jnLL = 0 # Joint negative log likelihood #this I need
   
   # Do some parameter transformations here AGR DO I NEED THESE?
-  #mean_rec = exp(ln_mean_rec) # mean recruitment
+  mean_rec = exp(ln_mean_rec) # mean recruitment
   #sigma_R = exp(ln_sigma_R) # recruitment variability
   #sigma_F = exp(ln_sigma_F) # fishing mortality variability
   #M = exp(ln_M) # natural mortality #I think I fix natural mortality
   q = exp(ln_q) # survey catchability
-  #mean_rec = exp(ln_mean_rec) # mean recruitment
-  rec = exp(ln_rec)
+  T12 = exp(ln_T12)
   sigma_survey = exp(ln_sigma_survey) # survey index error
 
   
@@ -258,7 +261,8 @@ basic_pop_model <- function(pars) {
   #juneau specific, I'm giving it the starting predicted cpue values from excel- will have to change this for every area
   PredSrvCPUE[1,] <- c( #should I call these something else?? since I read this in from excel at some point....
    # years = YEARS[1],
-    Pred_CPUE_prerec_calc = survival_params[1],
+   # Pred_CPUE_prerec_calc = survival_params[1],
+    Pre_CPUE_prerec_calc <- Esp_R[1] * mean_rec + mean_rec, #this is R_bar *FLAG* check formula please
     Pred_CPUE_rec_calc = pred_CPUE_rec[1],
     Pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
     #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S) - (q*CATCH[t-1]*exp(-S)) #i removed tau. see if she runs first
@@ -269,8 +273,8 @@ basic_pop_model <- function(pars) {
   for (t in 2:n_yrs){
   #predSrvCPUE[t,] <- c(
     #years = YEARS,
-    PredSrvCPUE[t,1] = survival_params[t] #this is the prerecruit
-    PredSrvCPUE[t,2] = rec*pred_CPUE_prerec[t-1] #this is the recruit
+    PredSrvCPUE[t,1] = Esp_R[t] * mean_rec + mean_rec #this is the prerecruit
+    PredSrvCPUE[t,2] = T12*pred_CPUE_prerec[t-1] #this is the recruit
     PredSrvCPUE[t,3] = (pred_CPUE_rec[t-1] + pred_CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
   #)
 } #ok cool, got the pop (CPUE) projection in there.
@@ -302,10 +306,10 @@ basic_pop_model <- function(pars) {
   
   ## Recruitment ------------------------------------------------------------- PERHAPS ADD THIS LATER
   #Init_Rec_nLL = -sum(dnorm(ln_InitDevs, -sigma_R^2/2, sigma_R, TRUE)) #I am unsure if these stay for the crab CSA.. this will be the next addition if not now, at least
-  #Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE))
+  Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE)) #why? **FLAG**
   
   # Get joint likelihood
-  jnLL = sum(SrvIdx_nLL) #we're keeping it simple for the crab CSA
+  jnLL = sum(SrvIdx_nLL) + sum(ln_RecDevs) #we're keeping it simple for the crab CSA
   #jnLL = sum(Catch_nLL) + sum(SrvIdx_nLL) + sum(FishAgeComps_nLL) + 
    # sum(SrvAgeComps_nLL) + sum(Fmort_Pen) + sum(Init_Rec_nLL) +
     #sum(Rec_nLL)solver in excel including preR to R survival (and also catchability q) - is this part of the likelihood?? #FLAG- perhaps add this next!!
@@ -320,8 +324,10 @@ basic_pop_model <- function(pars) {
   RTMB::REPORT(PredSrvCPUE) #REPORT or ADREPORT?? *FLAG* #the pred cpue
   RTMB::REPORT(jnLL)
   RTMB::REPORT(q)
-  RTMB::REPORT(rec)
-  RTMB::REPORT(survival_params) #report the survival params
+  RTMB::REPORT(T12)
+  RTMB::REPORT(mean_rec)
+  RTKB::REPORT(Eps_R) #annual recruitment
+  #RTMB::REPORT(survival_params) #report the survival params
   
   return(jnLL) #do I need this too?
 }
