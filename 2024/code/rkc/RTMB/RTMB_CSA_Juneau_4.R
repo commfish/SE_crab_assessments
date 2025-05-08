@@ -39,9 +39,8 @@
 #r_bar, r_bar deviance, and r_bar likelihood (no r_bar se yet)
 
 ##TO DO:
-#1. add in the recruitment (prerecruits), deviations, and likelihood
-##what the hell are recruitment penalties?
-#2. remove years with missing survey data - and fix graph accordingly...
+#adjusting SE of recruitment has big impact (0.1 vs 0.5 vs 0.25- big changes to prerecruit. Investigate
+
 
 ##TO DO
 #Draft plain-enlgish bridging analysis
@@ -190,11 +189,11 @@ pars <- list(
   #Eps_R = Eps_R, #annual recruitment **FLAG - I add in a value for the final year, same as the year before... this not ok?? ** 
   Eps_R = rep(0, 44),
   ##what if I make Eps_R 0's as starting values??
-  ln_sigma_R = log(0.1), # recruitment variability #Add in in later iterations?? #Ok I put this here
+  ln_sigma_R = log(0.25), # goes wild at larger values
   ln_q = log(q), # catchability 
   ln_T12 = log(T12), # preR to R survival rate and molt rate, both
   S = S, #fixed!!survival. do I need to log??
-  ln_sigma_survey = log(0.1),
+  ln_sigma_survey = log(0.1), #0.1,
   SURVEY_TAU = SURVEY_TAU, #is this data or param? #regardless, fix this please #shit, this might be data, according to tyler code **FLAG**
   CATCH_SURVEY_TAU = CATCH_SURVEY_TAU #fix this in the mapping #shit, this might be data, according to tyler code **FLAG**
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
