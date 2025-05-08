@@ -43,6 +43,10 @@
 ##what the hell are recruitment penalties?
 #2. remove years with missing survey data - and fix graph accordingly...
 
+##TO DO
+#Draft plain-enlgish bridging analysis
+#Draft stats-dense bridging analysis.
+
 
 #load libraries
 library(tidyverse)
@@ -181,8 +185,10 @@ data <- list(
 )
 
 pars <- list(
-  ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
-  Eps_R = Eps_R, #annual recruitment **FLAG - I add in a value for the final year, same as the year before... this not ok?? ** 
+  #ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
+  ln_mean_rec = log(1),
+  #Eps_R = Eps_R, #annual recruitment **FLAG - I add in a value for the final year, same as the year before... this not ok?? ** 
+  Eps_R = rep(0, 44),
   ##what if I make Eps_R 0's as starting values??
   ln_sigma_R = log(0.1), # recruitment variability #Add in in later iterations?? #Ok I put this here
   ln_q = log(q), # catchability 
