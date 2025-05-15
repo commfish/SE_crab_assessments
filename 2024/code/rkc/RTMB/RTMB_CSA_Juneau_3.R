@@ -432,11 +432,12 @@ results_df_relevant <- result_df %>%
         year = df_juneau_24_compare$Survey.Year) #that could have been cleaner but I added year
 
 
-  
+cur_yr <- 2024  #last year of data UPDATE EACH YEAR  
+
 #graph to compare observed survey values, excel CSA model, and RTMB CSA model
 ##results_df_relevant has my predicted values
 ##df_juneau_24_compare has the observed values
-ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) + 
+p1<-ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) + 
   geom_ribbon(aes(ymin=prerecuit_cpue_lower, ymax=prerecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(data=df_juneau_24_compare ,aes(y=Pre.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
@@ -448,18 +449,18 @@ ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) +
 #there we go.pre-rec is being estimated now.
 
 #anyway, recruits CPUE
-ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) + 
+p2<-ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) + 
   geom_ribbon(aes(ymin=recruit_cpue_lower, ymax=recruit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(data=df_juneau_24_compare ,aes(y=Recruit, x=Survey.Year)) + #this is the observed survey CPUE values
   ##probs should add the SE for that at some point- I'm sure it exists
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Recruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="JNU Rec CPUE - Excel in dark, RTMB light with CIE", x="Year", y="CPUE") +
+  labs(title="JNU Rec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE") +
   theme_minimal()
 
 #and postrecruit CPUE
-ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) + 
+p3<-ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) + 
   geom_ribbon(aes(ymin=postrecuit_cpue_lower, ymax=postrecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(data=df_juneau_24_compare ,aes(y=Post.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
@@ -469,10 +470,16 @@ ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) +
   labs(title="JNU Postrec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE") +
   theme_minimal()
 
+library(patchwork)
+p123 <- p1/p2/p3
+
+#save graph
+ggsave(paste0(cur_yr,"/figures/Compare_JNU3_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
+
 ##################################################
 #graph CSA excel biomass vs. RTMB biomass estimates
 #mature biomass
-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
+p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
   geom_ribbon(aes(ymin=mature_biomass_lower, ymax=mature_biomass_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", size=1) + #the model-predicted RTMB biomasss
   geom_line(data=df_juneau_24_compare ,aes(y=Mature.Biomass, x=Survey.Year), color="blue") + #this is excel model mature biomass
@@ -487,6 +494,8 @@ ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
   labs(title="JNU Biomass - Excel dark lines, RTMB light lines with CI", x="Year", y="Biomass") +
   theme_minimal()
 
+#save graph
+ggsave(paste0(cur_yr,"/figures/Compare_JNU3_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
 
 
 
