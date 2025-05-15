@@ -2,7 +2,8 @@
 ##Alex Reich
 ##start of development (on vertsion 4):5/8/25
 ##recent work: 5/8/25
-##Versopm on 4 significance: got feedback on version 3, editing accordingly.
+##Version  5: recruitment being weird, digging further, potetially matching basic pop mod example R file
+###adding intial values to recruitment deviates and it's own NLL
 ##IN DEVELOPMENT###
 
 ##############################################################################
@@ -186,8 +187,8 @@ data <- list(
 pars <- list(
   ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
   #ln_mean_rec = log(1),
-  #Eps_R = Eps_R, #annual recruitment **FLAG - I add in a value for the final year, same as the year before... this not ok?? ** 
-  Eps_R = rep(0, 44),
+  Eps_R = Eps_R, #intial values
+  #Eps_R_2 = rep(0, 44), #do I need this? 
   ##what if I make Eps_R 0's as starting values??
   ln_sigma_R = log(0.25), # goes wild at larger values
   ln_q = log(q), # catchability 
@@ -321,7 +322,7 @@ basic_pop_model <- function(pars) {
   #Init_Rec_nLL = -sum(dnorm(ln_InitDevs, -sigma_R^2/2, sigma_R, TRUE)) #I am unsure if these stay for the crab CSA.. this will be the next addition if not now, at least
   #Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE)) #why? **FLAG**
   #Rec_nLL = -sum(dnorm(Eps_R, -sigma_R^2/2, sigma_R, TRUE)) #why are their recdevs logged? mine can go negative... Oh maybe they dont want it to go TOO negative
-  Rec_nLL = -sum(dnorm(Eps_R, 0, sigma_R, TRUE)) #add weights later? #is this right? I'm calling the predicted mean the true mean.... could also take the survey mean as the true mean...
+  Rec_nLL = -sum(dnorm(Eps_R, mean_rec, sigma_R, TRUE)) #add weights later? #is this right? I'm calling the predicted mean the true mean.... could also take the survey mean as the true mean...
   #hmm did I do this right, does it need to loop over year?? *FLAG* Also mayve add in lambdas
   #for(y in 1:n_yrs) {
    #   Rec_nLL[y] = -dnorm(Eps_R, -sigma_R^2/2, sigma_R, TRUE) * lambdas[y] #try adding weights here  #that ran poorly
