@@ -187,14 +187,14 @@ data <- list(
 pars <- list(
   ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
   #ln_mean_rec = log(1),
-  Eps_R = Eps_R, #intial values
-  #Eps_R_2 = rep(0, 44), #do I need this? 
+  #Eps_R = Eps_R, #intial values
+  Eps_R = rep(0, 44), #do I need this? 
   ##what if I make Eps_R 0's as starting values??
-  ln_sigma_R = log(0.25), # goes wild at larger values
+  ln_sigma_R = log(0.25), #really sensitive to changing sigma R. 0.1 does not fit well, 0.5 overfits, 0.25 seems to be a compromise
   ln_q = log(q), # catchability 
   ln_T12 = log(T12), # preR to R survival rate and molt rate, both
   S = S, #fixed!!survival. do I need to log??
-  ln_sigma_survey = log(0.1), #0.1,
+  ln_sigma_survey = log(0.25), #0.1,
   SURVEY_TAU = SURVEY_TAU, #is this data or param? #regardless, fix this please #shit, this might be data, according to tyler code **FLAG**
   CATCH_SURVEY_TAU = CATCH_SURVEY_TAU #fix this in the mapping #shit, this might be data, according to tyler code **FLAG**
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
@@ -208,12 +208,12 @@ rm(list = ls()[!(ls() %in% c("pars", "data"))]) #remove everything except pars a
 #quick graph to check CPUE distributions
 df <- data.frame(data)
 #graph the distribution of the observed survey CPUE
-ggplot(df)+ aes(x=CPUE_prerec) + geom_density()
-ggplot(df)+ aes(x=log(CPUE_prerec)) + geom_density() 
-ggplot(df)+ aes(x=CPUE_rec) + geom_density()
-ggplot(df)+ aes(x=log(CPUE_rec)) + geom_density() 
-ggplot(df)+ aes(x=CPUE_postrec) + geom_density()
-ggplot(df)+ aes(x=log(CPUE_postrec)) + geom_density() 
+#ggplot(df)+ aes(x=CPUE_prerec) + geom_density()
+#ggplot(df)+ aes(x=log(CPUE_prerec)) + geom_density() 
+#ggplot(df)+ aes(x=CPUE_rec) + geom_density()
+#ggplot(df)+ aes(x=log(CPUE_rec)) + geom_density() 
+#ggplot(df)+ aes(x=CPUE_postrec) + geom_density()
+#ggplot(df)+ aes(x=log(CPUE_postrec)) + geom_density() 
 ##ok ok I don't need to log...
 #arguably CPUE_prerec and CPUE_rec could be logged
 
@@ -223,8 +223,9 @@ map <- list()
 map$S <- factor(NA) #fix survival #when I let the model estimate survival, it estimates 0.229 (a good bit lower than what we typically fix) and model does not converge great (but what if I were to add more newtonsteps...)
 map$SURVEY_TAU <- factor(rep(NA, length(pars$SURVEY_TAU))) #fix survey tau
 map$CATCH_SURVEY_TAU <- factor(rep(NA, length(pars$CATCH_SURVEY_TAU))) #fix catch tau
-map$ln_sigma_R <- factor(NA) #fix recruitment variability - not dealing with this right now
-map$ln_mean_rec <- factor(NA) #fix mean recruitment - not dealing with this right now
+map$ln_sigma_R <- factor(NA) #prerecurits is overfit when I let this estimate
+#map$ln_mean_rec <- factor(NA) #fix mean recruitment - not dealing with this right now
+#map$Eps_R <- factor(rep(NA, length(pars$Eps_R))) #fix recruitment deviates - a test
 
 ############################3
 #SOMETHNG LIKE THIS:
@@ -358,7 +359,7 @@ basic_pop_model <- function(pars) {
 
 
 pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #maybe I can try some ranefs
-
+#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map, random=c("Eps_R"))
 
 ##################
 #TORUBLESHOOT
@@ -487,9 +488,10 @@ results_df_relevant <- results_df_relevant %>%
 #graph to compare observed survey values, excel CSA model, and RTMB CSA model
 ##results_df_relevant has my predicted values
 ##df_juneau_24_compare has the observed values
-ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) + 
+p1 <- ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) + 
   geom_ribbon(aes(ymin=prerecuit_cpue_lower, ymax=prerecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
+  geom_point(color="lightblue")+
   geom_point(data=df_juneau_24_compare ,aes(y=Pre.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
   ##probs should add the SE for that at some point- I'm sure it exists
   #add the CSA excel model CPUE
@@ -499,9 +501,10 @@ ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) +
 #there we go.pre-rec is being estimated now.
 
 #anyway, recruits CPUE
-ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) + 
+p2 <- ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) + 
   geom_ribbon(aes(ymin=recruit_cpue_lower, ymax=recruit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
+  geom_point(color="lightblue")+
   geom_point(data=df_juneau_24_compare ,aes(y=Recruit, x=Survey.Year)) + #this is the observed survey CPUE values
   ##probs should add the SE for that at some point- I'm sure it exists
   #add the CSA excel model CPUE
@@ -510,9 +513,10 @@ ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) +
   theme_minimal()
 
 #and postrecruit CPUE
-ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) + 
+p3 <- ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) + 
   geom_ribbon(aes(ymin=postrecuit_cpue_lower, ymax=postrecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
+  geom_point(color="lightblue")+
   geom_point(data=df_juneau_24_compare ,aes(y=Post.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
   ##probs should add the SE for that at some point- I'm sure it exists
   #add the CSA excel model CPUE
@@ -520,10 +524,17 @@ ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) +
   labs(title="JNU Postrec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE") +
   theme_minimal()
 
+library(patchwork)
+(p123 <- p1/p2/p3)
+
+cur_yr <- 2024 #the current year
+#save plot to figures file
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_5_estR_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
+
 ##################################################
 #graph CSA excel biomass vs. RTMB biomass estimates
 #mature biomass
-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
+p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
   geom_ribbon(aes(ymin=mature_biomass_lower, ymax=mature_biomass_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", size=1) + #the model-predicted RTMB biomasss
   geom_line(data=df_juneau_24_compare ,aes(y=Mature.Biomass, x=Survey.Year), color="blue") + #this is excel model mature biomass
@@ -537,8 +548,9 @@ ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
   geom_line(data=df_juneau_24_compare ,aes(y=Prerecruit.Biomass, x=Survey.Year), color="pink") + #this is the excel-predicted biomass
   labs(title="JNU Biomass - Excel dark lines, RTMB light lines with CI", x="Year", y="Biomass") +
   theme_minimal()
-
-
+p4
+#ggsave to current year figures folder
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_5_estR_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
 
 
 
