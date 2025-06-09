@@ -1,9 +1,8 @@
 ###Juneau RTMB CSA###
 ##Alex Reich
-##start of development (on vertsion 4):5/8/25
-##recent work: 5/8/25
-##Version  5: recruitment being weird, digging further, potetially matching basic pop mod example R file
-###adding intial values to recruitment deviates and it's own NLL
+##start of development (on vertsion 5):6/9/25
+##recent work: 6/9/25
+##Version  6: Tyler fixed all of my problems
 ##IN DEVELOPMENT###
 
 ##############################################################################
@@ -19,12 +18,7 @@
 ##graph things (Excel CSA 2024 output compared to RTMB CSA 2024 output (I re-did the 2024 analysis in RTMB, essentially))
 
 #TAKE-AWAYS
-##the RTMB model is pretty dang similar to the excel CSA model
-##differnt results during the missing survey years- liekly because of how I told RTMB to handle missing values vs excel- but these were many years ago and have minimal impact on overall time series
-##it's easy to add things to the RTMB model - my gut says the next step to make this model better will be something to do with RECRUITMENT involving another LIKELIHOOD
-###But let's think about priorities here before I go on an improving this model tangent - much other work to do and I am one person.
-##Notable that when S (survival) is estimated, it is a good deal lower than what we've been using as a fixed value - marginal convergence but I haven't tried multiple newton steps
-###and I suspect something about recruitment, not survival, is the next step to messing with this model.
+##(add here)
 
 #I used the 2023 and 2024 Juneau Excel CSA's, Basic_Pop_Model_RTMB.Day3.R (from the RTMB workshop), and Tyler's TMB code for SE Tanner crab (on S drive) to draft this model.
 ##################################################################################
@@ -35,18 +29,9 @@
 ##adding in new values manually for now (best way?? probs not but I can adjust later)
 ##est prerec is copied over from last year, est rec and est postrec set to 0. I think I calc these below so...
 
-##Version 4 improvements
-#get rid of the "survival parameters" crap- that is jsut prerecuits
-#r_bar, r_bar deviance, and r_bar likelihood (no r_bar se yet)
-
-##TO DO:
-#adjusting SE of recruitment has big impact (0.1 vs 0.5 vs 0.25- big changes to prerecruit. Investigate
-
-
 ##TO DO
 #Draft plain-enlgish bridging analysis
 #Draft stats-dense bridging analysis.
-
 
 #load libraries
 library(tidyverse)
@@ -174,8 +159,6 @@ data <- list(
   YEARS = YEARS,
   lambdas = WEIGHTS,
   CATCH = CATCH,
-  #CATCH_MIDDATE = CATCH_MIDDATE, #params I think #shit, this might be data, according to tyler code **FLAG**
-  #SURVEY_MIDDATE = SURVEY_MIDDATE,
   CPUE_prerec = CPUE_prerec, #I replaced the NA's with 0's. Weights (lambda's are also 0 during the missing survey years)
   CPUE_rec = CPUE_rec,
   CPUE_postrec = CPUE_postrec,
@@ -184,8 +167,9 @@ data <- list(
   pred_CPUE_postrec = pred_CPUE_postrec, #uh, these are calced and thus dont need to be in data?
   wt_mature= df$Mature.Weight,
   wt_legal = df$Legal.Weight,
-  wt_prerec = df$Prerecruit.Weight
-  #survival_params = get rid of these **FLAG**
+  wt_prerec = df$Prerecruit.Weight,
+  SURVEY_TAU = SURVEY_TAU,
+  CATCH_SURVEY_TAU = CATCH_SURVEY_TAU 
   
 )
 
@@ -199,9 +183,7 @@ pars <- list(
   ln_q = log(q), # catchability 
   ln_T12 = log(T12), # preR to R survival rate and molt rate, both
   S = S, #fixed!!survival. do I need to log??
-  ln_sigma_survey = log(0.25), #0.1,
-  SURVEY_TAU = SURVEY_TAU, #is this data or param? #regardless, fix this please #shit, this might be data, according to tyler code **FLAG**
-  CATCH_SURVEY_TAU = CATCH_SURVEY_TAU #fix this in the mapping #shit, this might be data, according to tyler code **FLAG**
+  ln_sigma_survey = log(0.25) #0.1,
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
 )
@@ -226,8 +208,6 @@ df <- data.frame(data)
 #map- to fix parameters!!
 map <- list()
 map$S <- factor(NA) #fix survival #when I let the model estimate survival, it estimates 0.229 (a good bit lower than what we typically fix) and model does not converge great (but what if I were to add more newtonsteps...)
-map$SURVEY_TAU <- factor(rep(NA, length(pars$SURVEY_TAU))) #fix survey tau
-map$CATCH_SURVEY_TAU <- factor(rep(NA, length(pars$CATCH_SURVEY_TAU))) #fix catch tau
 map$ln_sigma_R <- factor(NA) #prerecurits is overfit when I let this estimate
 #map$ln_mean_rec <- factor(NA) #fix mean recruitment - not dealing with this right now
 #map$Eps_R <- factor(rep(NA, length(pars$Eps_R))) #fix recruitment deviates - a test
