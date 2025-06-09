@@ -183,9 +183,11 @@ pars <- list(
   ln_q = log(q), # catchability 
   ln_T12 = log(T12), # preR to R survival rate and molt rate, both
   S = S, #fixed!!survival. do I need to log??
-  ln_sigma_survey = log(0.25) #0.1,
+  ln_sigma_survey = log(0.25), #0.1,
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
+  ln_init_rec_cpue = log(pred_CPUE_rec[1]), #initial recruit CPUE, to be estimated #log-tranform perhaps? can't go neg.
+  ln_init_postrec_cpue= log(pred_CPUE_postrec[1]) #initial postrecruit CPUE, to be estimated #log-tranform perhaps? can't go neg.
 )
 
 #remove all values from the environment except pars and data:
@@ -252,6 +254,8 @@ basic_pop_model <- function(pars) {
   q = exp(ln_q) # survey catchability
   T12 = exp(ln_T12)
   sigma_survey = exp(ln_sigma_survey) # survey index error
+  init_rec_cpue = exp(ln_init_rec_cpue) # initial recruit CPUE
+  init_postrec_cpue = exp(ln_init_postrec_cpue) # initial postrecruit CPUE
 
   
   # Initialize Population ---------------------------------------------------
@@ -265,8 +269,10 @@ basic_pop_model <- function(pars) {
     #Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #this is R_bar *FLAG* check formula please
     #Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #Tyler said pick additive or multiplicative, having both is weird
     Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec,
-    Pred_CPUE_rec_calc = pred_CPUE_rec[1],
-    Pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
+    #Pred_CPUE_rec_calc = pred_CPUE_rec[1],
+    Pred_CPUE_rec_calc = init_rec_cpue,
+    #Pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
+    Pred_CPUE_postrec_calc = init_postrec_cpue 
     #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S) - (q*CATCH[t-1]*exp(-S)) #i removed tau. see if she runs first
     #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU*-S)) 
   )
