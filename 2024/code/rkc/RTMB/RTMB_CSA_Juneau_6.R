@@ -174,8 +174,8 @@ data <- list(
 )
 
 pars <- list(
-  ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
-  #ln_mean_rec = log(1),
+  #ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
+  ln_mean_rec = log(1),
   #Eps_R = Eps_R, #intial values
   Eps_R = rep(0, 44), #do I need this? 
   ##what if I make Eps_R 0's as starting values??
@@ -209,7 +209,7 @@ df <- data.frame(data)
 map <- list()
 map$S <- factor(NA) #fix survival #when I let the model estimate survival, it estimates 0.229 (a good bit lower than what we typically fix) and model does not converge great (but what if I were to add more newtonsteps...)
 map$ln_sigma_R <- factor(NA) #prerecurits is overfit when I let this estimate
-#map$ln_mean_rec <- factor(NA) #fix mean recruitment - not dealing with this right now
+map$ln_mean_rec <- factor(NA) #fix mean recruitment - not dealing with this right now
 #map$Eps_R <- factor(rep(NA, length(pars$Eps_R))) #fix recruitment deviates - a test
 
 ############################3
@@ -257,6 +257,7 @@ basic_pop_model <- function(pars) {
   # Initialize Population ---------------------------------------------------
 
   #pop initialization
+  ##initial value could be better, perhaps? 6/9/25
   #juneau specific, I'm giving it the starting predicted cpue values from excel- will have to change this for every area
   PredSrvCPUE[1,] <- c( #should I call these something else?? since I read this in from excel at some point....
    # years = YEARS[1],
@@ -274,8 +275,10 @@ basic_pop_model <- function(pars) {
   #predSrvCPUE[t,] <- c(
     #years = YEARS,
     PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec #this is the prerecruit
-    PredSrvCPUE[t,2] = T12*pred_CPUE_prerec[t-1, 1] #this is the recruit
-    PredSrvCPUE[t,3] = (pred_CPUE_rec[t-1, 2] + pred_CPUE_postrec[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
+    #PredSrvCPUE[t,2] = T12*pred_CPUE_prerec[t-1, 1] #this is the recruit #hmm perhaps my error is here. Transition times the est prerec (read in data.)
+    PredSrvCPUE[t,2] = T12*PredSrvCPUE[t-1, 1] #using my rtmb calcs instead of the read-in data
+    #PredSrvCPUE[t,3] = (pred_CPUE_rec[t-1, 2] + pred_CPUE_postrec[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
+    PredSrvCPUE[t,3] = (PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #using my rtmb calcs instead of the read-in data
   #)
 } #ok cool, got the pop (CPUE) projection in there.
   
@@ -514,7 +517,7 @@ library(patchwork)
 
 cur_yr <- 2024 #the current year
 #save plot to figures file
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_5_estR_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_6_estR_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
 
 ##################################################
 #graph CSA excel biomass vs. RTMB biomass estimates
@@ -535,7 +538,7 @@ p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
   theme_minimal()
 p4
 #ggsave to current year figures folder
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_5_estR_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_6_estR_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
 
 
 
