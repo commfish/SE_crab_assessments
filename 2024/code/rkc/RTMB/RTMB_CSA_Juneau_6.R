@@ -179,7 +179,7 @@ pars <- list(
   #Eps_R = Eps_R, #intial values
   Eps_R = rep(0, 44), #do I need this? 
   ##what if I make Eps_R 0's as starting values??
-  ln_sigma_R = log(0.25), #really sensitive to changing sigma R. 0.1 does not fit well, 0.5 overfits, 0.25 seems to be a compromise
+  ln_sigma_R = log(0.5), #really sensitive to changing sigma R. 0.1 does not fit well, 0.5 overfits, 0.25 seems to be a compromise
   ln_q = log(q), # catchability 
   ln_T12 = log(T12), # preR to R survival rate and molt rate, both
   S = S, #fixed!!survival. do I need to log??
@@ -208,7 +208,7 @@ df <- data.frame(data)
 #map- to fix parameters!!
 map <- list()
 map$S <- factor(NA) #fix survival #when I let the model estimate survival, it estimates 0.229 (a good bit lower than what we typically fix) and model does not converge great (but what if I were to add more newtonsteps...)
-map$ln_sigma_R <- factor(NA) #prerecurits is overfit when I let this estimate
+#map$ln_sigma_R <- factor(NA) #prerecurits is overfit when I let this estimate
 map$ln_mean_rec <- factor(NA) #fix mean recruitment - not dealing with this right now
 #map$Eps_R <- factor(rep(NA, length(pars$Eps_R))) #fix recruitment deviates - a test
 
@@ -263,7 +263,8 @@ basic_pop_model <- function(pars) {
    # years = YEARS[1],
    # Pred_CPUE_prerec_calc = survival_params[1],
     #Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #this is R_bar *FLAG* check formula please
-    Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec,
+    #Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #Tyler said pick additive or multiplicative, having both is weird
+    Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec,
     Pred_CPUE_rec_calc = pred_CPUE_rec[1],
     Pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
     #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S) - (q*CATCH[t-1]*exp(-S)) #i removed tau. see if she runs first
@@ -274,10 +275,9 @@ basic_pop_model <- function(pars) {
   for (t in 2:n_yrs){
   #predSrvCPUE[t,] <- c(
     #years = YEARS,
-    PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec #this is the prerecruit
-    #PredSrvCPUE[t,2] = T12*pred_CPUE_prerec[t-1, 1] #this is the recruit #hmm perhaps my error is here. Transition times the est prerec (read in data.)
+    #PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec #this is the prerecruit #tyler said pic multiplicative or additive error, not both
+    PredSrvCPUE[t,1] = Eps_R[t] * mean_rec #prerecruit
     PredSrvCPUE[t,2] = T12*PredSrvCPUE[t-1, 1] #using my rtmb calcs instead of the read-in data
-    #PredSrvCPUE[t,3] = (pred_CPUE_rec[t-1, 2] + pred_CPUE_postrec[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
     PredSrvCPUE[t,3] = (PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #using my rtmb calcs instead of the read-in data
   #)
 } #ok cool, got the pop (CPUE) projection in there.
