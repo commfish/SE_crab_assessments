@@ -274,8 +274,8 @@ basic_pop_model <- function(pars) {
   #predSrvCPUE[t,] <- c(
     #years = YEARS,
     PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec #this is the prerecruit
-    PredSrvCPUE[t,2] = T12*pred_CPUE_prerec[t-1] #this is the recruit
-    PredSrvCPUE[t,3] = (pred_CPUE_rec[t-1] + pred_CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
+    PredSrvCPUE[t,2] = T12*pred_CPUE_prerec[t-1, 1] #this is the recruit
+    PredSrvCPUE[t,3] = (pred_CPUE_rec[t-1, 2] + pred_CPUE_postrec[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #postrecruit
   #)
 } #ok cool, got the pop (CPUE) projection in there.
   
