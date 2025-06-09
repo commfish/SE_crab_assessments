@@ -398,18 +398,15 @@ sdrep <- sdreport(pop_mod)
 sdrep #maximum gradient component is here - # 0.001 or smaller considered converged, can use newtonsteps (can I tho??) to make it smaller
 ## **FIXED** Crap- does not consistently have a positive definite hessian- maybe I do need more newtonsteps **FIXED**
 #update- I think I fixed the hessian issue - moved surival params to data instead of parameters
-summary(sdrep) #why are all sd' na??
-#ok well, my results appear to be in here
-#what's up with the sd tho, they dont have sd... survey sd is it's own thing?? Do I need to input sd differently perhaps?
+summary(sdrep)
+
 names(pop_mod)
-pop_mod$report() #weird warning**FLAG**
+pop_mod$report()
 
-pop_mod$report()$sigma_survey #yay, a number!  did I do this part right? #ooh. very different if log() vs. not log() in dnorm. **FLAG**
-##so this is the standard error on my predicted values in CPUE? so to get the standard error around biomass of prerec, postrec, , I can do calcs
-
+pop_mod$report()$sigma_survey 
 
 pop_mod$gr()
-pop_mod$report(pop_mod$env$last.par.best) #parameters
+pop_mod$report(pop_mod$env$last.par.best) #output
 pop_mod$env$last.par.best 
 
 #covariance graphs??
@@ -433,7 +430,6 @@ Temp<- df_juneau_24_compare%>%
 Year <- Temp$Survey.Year
 
 #EXTRACT FINAL VALUES
-#*FLAG* - I need to edit to put blanks in the blank years
 result_df <- data.frame(pop_mod$report(pop_mod$env$last.par.best))
 #change result df names to prerecruit, recruit, postrectuit
 names(result_df) <- c("sd","prerecruit_biomass", "legal_biomass", "mature_biomass", 
@@ -517,7 +513,7 @@ library(patchwork)
 
 cur_yr <- 2024 #the current year
 #save plot to figures file
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_6_estR_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_6_estS_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
 
 ##################################################
 #graph CSA excel biomass vs. RTMB biomass estimates
@@ -538,7 +534,7 @@ p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
   theme_minimal()
 p4
 #ggsave to current year figures folder
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_6_estR_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_6_estS_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
 
 
 
