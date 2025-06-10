@@ -331,6 +331,10 @@ basic_pop_model <- function(pars) {
   } #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
   #other error needed too?
   #perhaps try logged and unlogged and see what happens...
+  
+  
+  ###alternate: two objects: "after piped into likelihood function, pipe into function that doesn't use years"
+  ####so two dnorms then??
 
   
   ## Recruitment ------------------------------------------------------------- PERHAPS ADD THIS LATER
