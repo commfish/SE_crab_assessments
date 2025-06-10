@@ -49,9 +49,16 @@ set.seed(100)
 df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv") #this is the analysis at the end of 2024
 df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv") #this is the analysis at the end of 2023
 
-#get rid of any years with missing survey data
-df <- df %>%
-  filter(!is.na(Recruit)) #get rid of any years with missing survey data
+#get rid of any years with missing survey data #jk we want these 6/9/25
+#df <- df %>%
+
+#but identify years with missing data and remove them, make a vector of just the years with data
+no_NAs <- df %>%
+  rownames_to_column() %>%
+  filter(!is.na(Recruit)) %>%
+  select(rowname)
+
+
  
 
 #put data into individual stored places for RTMB
@@ -169,7 +176,8 @@ data <- list(
   wt_legal = df$Legal.Weight,
   wt_prerec = df$Prerecruit.Weight,
   SURVEY_TAU = SURVEY_TAU,
-  CATCH_SURVEY_TAU = CATCH_SURVEY_TAU 
+  CATCH_SURVEY_TAU = CATCH_SURVEY_TAU, 
+  vector_avoid_NA = as.numeric(no_NAs$rowname) #this is a vector of the years with data, to avoid NAs in the model
   
 )
 
@@ -177,7 +185,7 @@ pars <- list(
   #ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
   ln_mean_rec = log(1),
   #Eps_R = Eps_R, #intial values
-  ln_Eps_R = log(rep(0.00001, 44)), #very small value so log doesn't explode
+  ln_Eps_R = log(rep(0.00001, length(df$Survey.Year))), #very small value so log doesn't explode
   ##what if I make Eps_R 0's as starting values??
   #ln_sigma_R = log(0.5), #really sensitive to changing sigma R. 0.1 does not fit well, 0.5 overfits, 0.25 seems to be a compromise
   ln_q = log(q), # catchability 
@@ -195,7 +203,7 @@ rm(list = ls()[!(ls() %in% c("pars", "data"))]) #remove everything except pars a
 
 
 #quick graph to check CPUE distributions
-df <- data.frame(data)
+#df <- data.frame(data) #broken with my current data entry...
 #graph the distribution of the observed survey CPUE
 #ggplot(df)+ aes(x=CPUE_prerec) + geom_density()
 #ggplot(df)+ aes(x=log(CPUE_prerec)) + geom_density() 
@@ -302,12 +310,13 @@ basic_pop_model <- function(pars) {
   ## Survey Index ------------------------------------------------------------
 
 
-  for(y in 1:n_yrs) { #make a vector that skips the missing years TODO
+  #for(y in 1:n_yrs) { #make a vector that skips the missing years TODO
+  for(y in vector_avoid_NA) { #this one skips missing years
      for(st in 1:n_stages) {
     #SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvCPUE[y,st]+0.0001), log(PredSrvCPUE[y,st]+0.0001), sigma_survey, TRUE) * lambdas[y] #to log or not to log (*FLAG*)?? #TO LOG!! 
        ##the above is a better (logged) model according to jnll. but the below (not logged) is more similar to RSS
        ##perhaps graph the data and see distribution
-    SrvIdx_nLL[y, st] = -dnorm(ObsSrvCPUE[y,st], PredSrvCPUE[y,st], sigma_survey, TRUE) * lambdas[y] #NOT TO LOG!! - 
+    SrvIdx_nLL[y, st] = -dnorm(ObsSrvCPUE[y,st], PredSrvCPUE[y,st], sigma_survey, TRUE) * lambdas[y] 
      } #end of st(stage) loop
   } #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
   #other error needed too?
