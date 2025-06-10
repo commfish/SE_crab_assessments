@@ -53,10 +53,10 @@ df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv") #this is the ana
 #df <- df %>%
 
 #but identify years with missing data and remove them, make a vector of just the years with data
-no_NAs <- df %>%
-  rownames_to_column() %>%
-  filter(!is.na(Recruit)) %>%
-  select(rowname)
+#no_NAs <- df %>%
+ # rownames_to_column() %>%
+#  filter(!is.na(Recruit)) %>%
+ # select(rowname)
 
 
  
@@ -65,11 +65,11 @@ no_NAs <- df %>%
 YEARS <- df$Survey.Year
 WEIGHTS <- df$Weight #weighing. MAy need to add one for the new year
 #replace NA's with 0
-WEIGHTS[is.na(WEIGHTS)] <- 0 #replace NA with 0
+WEIGHTS[is.na(WEIGHTS)] <- 0 #replace NA with 0 #def want to weight these as 0.
 
 CATCH <- as.numeric(gsub(",", "", df$Catch..Number.)) #get rid of commas, ideally before...
 #replace NA in catch with 0
-CATCH[is.na(CATCH)] <- 0 #replace NA with 0
+CATCH[is.na(CATCH)] <- 0 #replace NA with 0 gonna keep NA for now. 6/10/25
 
 ##there was some thing in the juneau csa excel readme about how calculating PU is not straightforward. So... check that plz
 
@@ -112,10 +112,10 @@ SURVEY_TAU[1] <- 0 #first year as 0
 CPUE_prerec <- df$Pre.recruit
 CPUE_rec <- df$Recruit
 CPUE_postrec <- df$Post.recruit
-#replace NA's in survey CPUEs with 0
-CPUE_prerec[is.na(CPUE_prerec)] <- 0 #replace NA with 0
-CPUE_rec[is.na(CPUE_rec)] <- 0 #replace NA with 0
-CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
+#replace NA's in survey CPUEs with 0 #AGR 6/10/25 removed- I think I can make it esimate where NA's, and not loop over them in the likelihood
+#CPUE_prerec[is.na(CPUE_prerec)] <- 0 #replace NA with 0
+#CPUE_rec[is.na(CPUE_rec)] <- 0 #replace NA with 0
+#CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
 
 
 #pred survey CPUE
@@ -176,8 +176,8 @@ data <- list(
   wt_legal = df$Legal.Weight,
   wt_prerec = df$Prerecruit.Weight,
   SURVEY_TAU = SURVEY_TAU,
-  CATCH_SURVEY_TAU = CATCH_SURVEY_TAU, 
-  vector_avoid_NA = as.numeric(no_NAs$rowname) #this is a vector of the years with data, to avoid NAs in the model
+  CATCH_SURVEY_TAU = CATCH_SURVEY_TAU 
+  #vector_avoid_NA = as.numeric(no_NAs$rowname) #this is a vector of the years with data, to avoid NAs in the model
   
 )
 
@@ -249,6 +249,16 @@ basic_pop_model <- function(pars) {
   # Likelihoods - box
   SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
 
+  
+  #identify a vector where there are no NA's in the data- for the likelihood loop
+  no_NAs <- data.frame(CPUE_rec) %>% #not a df. Need to do this for just a numeric item in a list
+    rownames_to_column() %>%
+    filter(!is.na(CPUE_rec)) %>% #will tell us where NA's are in the data
+    select(rowname)
+  
+ no_NAs <- as.integer(no_NAs$rowname)
+  
+  
   # Penalties #I don't need penalties?? do I?
   #Rec_nLL = rep(0, n_yrs) # Recruitment penalty - AR- why is this a penalty?? **FLAG**
   #Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty #and why is there an initial?? ***FLAG**
@@ -311,7 +321,7 @@ basic_pop_model <- function(pars) {
 
 
   #for(y in 1:n_yrs) { #make a vector that skips the missing years TODO
-  for(y in vector_avoid_NA) { #this one skips missing years
+  for(y in no_NAs) { #this one skips missing years #oops, needs to be the years??- FLAG**
      for(st in 1:n_stages) {
     #SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvCPUE[y,st]+0.0001), log(PredSrvCPUE[y,st]+0.0001), sigma_survey, TRUE) * lambdas[y] #to log or not to log (*FLAG*)?? #TO LOG!! 
        ##the above is a better (logged) model according to jnll. but the below (not logged) is more similar to RSS
@@ -353,8 +363,7 @@ basic_pop_model <- function(pars) {
   RTMB::REPORT(T12)
   #RTMB::ADREPORT(mean_rec)
   RTMB::ADREPORT(Eps_R) #annual recruitment
-  #RTMB::REPORT(survival_params) #report the survival params
-  
+
   return(jnLL) #do I need this too?
 }
 #END POP MODEL EXAMPLE
@@ -363,7 +372,7 @@ basic_pop_model <- function(pars) {
 # Run Model ---------------------------------------------------------------
 
 
-pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #maybe I can try some ranefs
+pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map)
 #pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map, random=c("Eps_R"))
 
 ##################
@@ -400,8 +409,8 @@ pop_mod$gr()
 #opt
 #relative convergence - I've definitely seen worse! but **FLAG**
 
-#OPTION 2 for model run - fit_tmb - let's me use newton steps
-opt <- TMBhelper::fit_tmb(obj = pop_mod, #works now; in progress, turn off please!
+#OPTION 2 for model run - fit_tmb - lets me use newton steps
+opt <- TMBhelper::fit_tmb(obj = pop_mod, #**FLAG Broken as of 6/10/25 - can't run the likelihood while skipping over the NA's
                                 fn = pop_mod$fn,
                                gr = pop_mod$gr, 
                                newtonsteps = 2, # additional steps helps get the gradient lower
