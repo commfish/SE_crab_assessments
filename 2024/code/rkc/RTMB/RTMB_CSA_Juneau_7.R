@@ -177,7 +177,7 @@ pars <- list(
   #ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
   ln_mean_rec = log(1),
   #Eps_R = Eps_R, #intial values
-  Eps_R = rep(0, 44), #do I need this? 
+  ln_Eps_R = log(rep(0.00001, 44)), #very small value so log doesn't explode
   ##what if I make Eps_R 0's as starting values??
   #ln_sigma_R = log(0.5), #really sensitive to changing sigma R. 0.1 does not fit well, 0.5 overfits, 0.25 seems to be a compromise
   ln_q = log(q), # catchability 
@@ -242,13 +242,13 @@ basic_pop_model <- function(pars) {
   SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
 
   # Penalties #I don't need penalties?? do I?
-  Rec_nLL = rep(0, n_yrs) # Recruitment penalty - AR- why is this a penalty?? **FLAG**
+  #Rec_nLL = rep(0, n_yrs) # Recruitment penalty - AR- why is this a penalty?? **FLAG**
   #Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty #and why is there an initial?? ***FLAG**
   jnLL = 0 # Joint negative log likelihood #this I need
   
   # Do some parameter transformations here AGR DO I NEED THESE?
   mean_rec = exp(ln_mean_rec) # mean recruitment
-  sigma_R = exp(ln_sigma_R) # recruitment variability
+  #sigma_R = exp(ln_sigma_R) # recruitment variability
   #sigma_F = exp(ln_sigma_F) # fishing mortality variability
   #M = exp(ln_M) # natural mortality #I think I fix natural mortality
   q = exp(ln_q) # survey catchability
@@ -256,6 +256,7 @@ basic_pop_model <- function(pars) {
   sigma_survey = exp(ln_sigma_survey) # survey index error
   init_rec_cpue = exp(ln_init_rec_cpue) # initial recruit CPUE
   init_postrec_cpue = exp(ln_init_postrec_cpue) # initial postrecruit CPUE
+  Eps_R = exp(ln_Eps_R) # recruitment deviates
 
   
   # Initialize Population ---------------------------------------------------
@@ -324,7 +325,8 @@ basic_pop_model <- function(pars) {
   #}
   
   # Get joint likelihood
-  jnLL = sum(SrvIdx_nLL) + sum(Rec_nLL) #we're keeping it simple for the crab CSA
+  jnLL = sum(SrvIdx_nLL)
+  #jnLL = sum(SrvIdx_nLL) + sum(Rec_nLL) #we're keeping it simple for the crab CSA
   #jnLL = sum(Catch_nLL) + sum(SrvIdx_nLL) + sum(FishAgeComps_nLL) + 
    # sum(SrvAgeComps_nLL) + sum(Fmort_Pen) + sum(Init_Rec_nLL) +
     #sum(Rec_nLL)solver in excel including preR to R survival (and also catchability q) - is this part of the likelihood?? #FLAG- perhaps add this next!!
@@ -340,7 +342,7 @@ basic_pop_model <- function(pars) {
   RTMB::REPORT(jnLL)
   RTMB::REPORT(q)
   RTMB::REPORT(T12)
-  RTMB::ADREPORT(mean_rec)
+  #RTMB::ADREPORT(mean_rec)
   RTMB::ADREPORT(Eps_R) #annual recruitment
   #RTMB::REPORT(survival_params) #report the survival params
   
@@ -519,7 +521,7 @@ library(patchwork)
 
 cur_yr <- 2024 #the current year
 #save plot to figures file
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_6_estS_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_7_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
 
 ##################################################
 #graph CSA excel biomass vs. RTMB biomass estimates
@@ -540,7 +542,7 @@ p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
   theme_minimal()
 p4
 #ggsave to current year figures folder
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_6_estS_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_7_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
 
 
 
