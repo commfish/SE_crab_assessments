@@ -151,11 +151,18 @@ array_prerec_cpue <- array(c(YEARS, CPUE_prerec, WEIGHTS), #weights will be repl
 
 array_rec_cpue <- array(c(YEARS, CPUE_rec, WEIGHTS), #weights will be replaced with CV once I... do that calc
                            dim = c(nrow(df), 3), 
-                           dimnames = list(NULL, c("YEARS", "CPUE_prerec", "WEIGHTS")))
+                           dimnames = list(NULL, c("YEARS", "CPUE_rec", "WEIGHTS")))
 
 array_postrec_cpue <- array(c(YEARS, CPUE_postrec, WEIGHTS), #weights will be replaced with CV once I... do that calc
                            dim = c(nrow(df), 3), 
-                           dimnames = list(NULL, c("YEARS", "CPUE_prerec", "WEIGHTS")))
+                           dimnames = list(NULL, c("YEARS", "CPUE_postrec", "WEIGHTS")))
+
+array_all_stages <- abind::abind(array_prerec_cpue, array_rec_cpue, array_postrec_cpue, along = 3)
+
+# Set dimnames for the third dimension (stage)
+dimnames(array_all_stages)[[3]] <- c("Stage_1", "Stage_2", "Stage_3")
+#remove the rows with NA's in the second column
+array_all_stages <- array_all_stages[!is.na(array_all_stages[,2,1]), , ] #remove rows with NA's in the second column (missing years of data)
 
 
 
@@ -185,15 +192,7 @@ data <- list(
   YEARS = YEARS, #all years inclduing missing cpue data years
   #lambdas = WEIGHTS, AGR off 6/12/25- now this is in the cpue data (and I still need to convert to CV...)
   CATCH = CATCH,
-  #CPUE_prerec = CPUE_prerec, #I replaced the NA's with 0's. Weights (lambda's are also 0 during the missing survey years)
-  CPUE_prerec = array_prerec_cpue,
-  #CPUE_rec = CPUE_rec,
-  CPUE_rec = array_rec_cpue,
-  #CPUE_postrec = CPUE_postrec,
-  CPUE_postrec = array_postrec_cpue,
-  pred_CPUE_prerec = pred_CPUE_prerec,#FLAG**#do I need this? ugh I'm about to break so many things at once. MAKE A PARAMETER STARTING VALUE NEXT TIME THINGS ARE STABLE
-  #pred_CPUE_rec = pred_CPUE_rec,
-  #pred_CPUE_postrec = pred_CPUE_postrec, #uh, these are calced and thus dont need to be in data?
+  survey_data = array_all_stages,
   wt_mature= df$Mature.Weight,
   wt_legal = df$Legal.Weight,
   wt_prerec = df$Prerecruit.Weight,
@@ -265,20 +264,23 @@ basic_pop_model <- function(pars) {
   #ObsSrvCPUE[,1] <- CPUE_prerec # prerecruit
   #ObsSrvCPUE[,2] <- CPUE_rec # recruit
   #ObsSrvCPUE[,3] <- CPUE_postrec # postrecruit
-  PredSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Predicted CPUE at stage
+  #THE SURVEY DATA IS HERE:CPUE_prerec, CPUE_rec, CPUE_postrec
+  PredSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Predicted CPUE at stage PREREC, REC, POSTREC #THE MATRIX MODEL
   PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calculated from the predicted survey CPUE and waa
+  
+  #LINK SURVEY DATA TO MATRIX PREDICTIONS TO LIKELIHOOD. 
   
   # Likelihoods - box
   #SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
   SrvIdx_nLL = rep(0,3) #AGR changed to this 6/12/25
   
   #identify a vector where there are no NA's in the data- for the likelihood loop
-  no_NAs <- data.frame(CPUE_rec) %>% #not a df. Need to do this for just a numeric item in a list
-    rownames_to_column() %>%
-    filter(!is.na(CPUE_rec)) %>% #will tell us where NA's are in the data
-    select(rowname)
+  #no_NAs <- data.frame(CPUE_rec) %>% #not a df. Need to do this for just a numeric item in a list
+  #  rownames_to_column() %>%
+  #  filter(!is.na(CPUE_rec)) %>% #will tell us where NA's are in the data
+  #  select(rowname)
   
- no_NAs <- as.integer(no_NAs$rowname)
+# no_NAs <- as.integer(no_NAs$rowname) #not srue if I still need this
   
   
   # Penalties #I don't need penalties?? do I?
@@ -329,28 +331,31 @@ basic_pop_model <- function(pars) {
   #)
 } #ok cool, got the pop (CPUE) projection in there.
   
-
   
   #calc the biomass per year for prerecruit, recruit, and postrecruit legal and mature
   PredSrvIdx[,1] <- (PredSrvCPUE[,1]/q) * wt_prerec #prerecruit biomass = prerecruit cpue/catchability * the weight 
   PredSrvIdx[,2] <- ((PredSrvCPUE[,2]+PredSrvCPUE[,3])/q) * wt_legal #legal biomasss = recruit cpue + postrecruit cpue, divided by catchability, times the legal weight
   PredSrvIdx[,3] <- PredSrvIdx[,1]+PredSrvIdx[,2] #mature biomass =  legal biomass + prerecruit biomasss
-  #looks good
+  
   
   # Likelihoods -------------------------------------------------------------
 
   ## Survey Index ------------------------------------------------------------
 
-
+pred <- NULL
   #for(y in 1:n_yrs) { #make a vector that skips the missing years TODO
-  for(y in no_NAs) { #this one skips missing years #oops, needs to be the years??- FLAG**
-     for(st in 1:n_stages) {
-    #SrvIdx_nLL[y, st] = -dnorm(log(ObsSrvCPUE[y,st]+0.0001), log(PredSrvCPUE[y,st]+0.0001), sigma_survey, TRUE) * lambdas[y] #to log or not to log (*FLAG*)?? #TO LOG!! 
-       ##the above is a better (logged) model according to jnll. but the below (not logged) is more similar to RSS
-       ##perhaps graph the data and see distribution
-    SrvIdx_nLL[y, st] = -dnorm(ObsSrvCPUE[y,st], PredSrvCPUE[y,st], sigma_survey, TRUE) * lambdas[y] 
+  #for(y in no_NAs) { #this one skips missing years #oops, needs to be the years??- FLAG**
+     for(h in 1:n_stages) {
+       for(y in 1:nrow(survey_data[[h]])){
+         y_row <- which(yrs == survey_data[[h]][y, 1]) #index the nrow of the model matrix that year y of survey data corresponds to
+         pred[y] <- mod_matrix[y_row, h] # vector of predictions for stage h in only years that we have data
+       }
+    SrvIdx_nLL[h] = -sum(dnorm(survey_data[[h]][,2], pred, sigma_survey, TRUE) * lambdas[[h]] ) #the likelihood
+    # add predictions to the data for the report however you want to
+    survey_data[[h]] <- cbind(survey_data[[h]], pred)
      } #end of st(stage) loop
-  } #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
+    
+  #} #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
   #other error needed too?
   #perhaps try logged and unlogged and see what happens...
   
