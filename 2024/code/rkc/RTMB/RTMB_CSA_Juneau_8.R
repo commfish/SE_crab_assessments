@@ -2,7 +2,7 @@
 ##Alex Reich
 ##start of development (on version 8):6/12/25
 ##recent work: 6/12/25
-##Version  7: I deal with the NA's instead of ignoring them
+##Version  8: I deal with the NA's instead of ignoring them
 ##IN DEVELOPMENT###
 
 ##############################################################################
@@ -140,16 +140,34 @@ for (i in 1:length(pred_CPUE_prerec)){
 #SURVIVAL_PARAMS <- df$Survival.Parameters # this ALSO the estimated prerecriuits for that year? WHY? Idk theory but replicating the excel. **FLAG**
 
 
+#Tyler says change cpue inputs
+##data as a list with a matrix for each stage and with columns for year, CPUE, and CV
+##I don't really understand lists, so I'm going to make these their own matrices
+##Also I prefer arrays.
+#temp1 <- data.frame(YEARS, CPUE_prerec, WEIGHTS) #year, cpue, CV
+array_prerec_cpue <- array(c(YEARS, CPUE_prerec, WEIGHTS), #weights will be replaced with CV once I... do that calc
+                  dim = c(nrow(df), 3), 
+                  dimnames = list(NULL, c("YEARS", "CPUE_prerec", "WEIGHTS")))
+
+array_rec_cpue <- array(c(YEARS, CPUE_rec, WEIGHTS), #weights will be replaced with CV once I... do that calc
+                           dim = c(nrow(df), 3), 
+                           dimnames = list(NULL, c("YEARS", "CPUE_prerec", "WEIGHTS")))
+
+array_postrec_cpue <- array(c(YEARS, CPUE_postrec, WEIGHTS), #weights will be replaced with CV once I... do that calc
+                           dim = c(nrow(df), 3), 
+                           dimnames = list(NULL, c("YEARS", "CPUE_prerec", "WEIGHTS")))
+
+
 
 ##########
-#PARAMS- merge with SETUP below??
+#PARAMS
 ###########
 #REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
 T12 <- 84.6347230128254/100  #starting value from 2023 to 2024 analysis (last year)
   ##(do we HAVE a rec -> postrec survival???) #THIS IS ALLOWED TO CHANGE
 #q <- 104.187334848418/1000000 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
 q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
-S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED
+S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED #enentially the mortality but in survival form. This dataset is not good for estimating mortality but I can do a likelihood profile later (low priority)
 Z <- exp(-S)#total instantaneous mortality #FIXED
 #SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
 
@@ -159,19 +177,23 @@ obs_sigmaR <- sd(df$Pre.recruit, na.rm = TRUE) #observed standard deviation of t
 existing_sigmaR <- sd(df$Estimated.Prerecruit, na.rm = TRUE) #existing standard deviation of the prerecruits
 ##dang that is too large to use...
 
+
 ####################
 #SETUP
 #######################
 data <- list(
-  YEARS = YEARS,
-  lambdas = WEIGHTS,
+  YEARS = YEARS, #all years inclduing missing cpue data years
+  #lambdas = WEIGHTS, AGR off 6/12/25- now this is in the cpue data (and I still need to convert to CV...)
   CATCH = CATCH,
-  CPUE_prerec = CPUE_prerec, #I replaced the NA's with 0's. Weights (lambda's are also 0 during the missing survey years)
-  CPUE_rec = CPUE_rec,
-  CPUE_postrec = CPUE_postrec,
-  pred_CPUE_prerec = pred_CPUE_prerec,
-  pred_CPUE_rec = pred_CPUE_rec,
-  pred_CPUE_postrec = pred_CPUE_postrec, #uh, these are calced and thus dont need to be in data?
+  #CPUE_prerec = CPUE_prerec, #I replaced the NA's with 0's. Weights (lambda's are also 0 during the missing survey years)
+  CPUE_prerec = array_prerec_cpue,
+  #CPUE_rec = CPUE_rec,
+  CPUE_rec = array_rec_cpue,
+  #CPUE_postrec = CPUE_postrec,
+  CPUE_postrec = array_postrec_cpue,
+  pred_CPUE_prerec = pred_CPUE_prerec,#FLAG**#do I need this? ugh I'm about to break so many things at once. MAKE A PARAMETER STARTING VALUE NEXT TIME THINGS ARE STABLE
+  #pred_CPUE_rec = pred_CPUE_rec,
+  #pred_CPUE_postrec = pred_CPUE_postrec, #uh, these are calced and thus dont need to be in data?
   wt_mature= df$Mature.Weight,
   wt_legal = df$Legal.Weight,
   wt_prerec = df$Prerecruit.Weight,
@@ -239,16 +261,16 @@ basic_pop_model <- function(pars) {
   SSB = array(0, dim = c(n_yrs, n_stages)) # Pre-rec, legal, and mature biomasses
   
   # Survey Stuff
-  ObsSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey CPUE at stage #I read this in
-  ObsSrvCPUE[,1] <- CPUE_prerec # prerecruit
-  ObsSrvCPUE[,2] <- CPUE_rec # recruit
-  ObsSrvCPUE[,3] <- CPUE_postrec # postrecruit
+  #ObsSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey CPUE at stage #I read this in #off 6/12/25, this line and next 3
+  #ObsSrvCPUE[,1] <- CPUE_prerec # prerecruit
+  #ObsSrvCPUE[,2] <- CPUE_rec # recruit
+  #ObsSrvCPUE[,3] <- CPUE_postrec # postrecruit
   PredSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Predicted CPUE at stage
   PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calculated from the predicted survey CPUE and waa
   
   # Likelihoods - box
-  SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
-
+  #SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
+  SrvIdx_nLL = rep(0,3) #AGR changed to this 6/12/25
   
   #identify a vector where there are no NA's in the data- for the likelihood loop
   no_NAs <- data.frame(CPUE_rec) %>% #not a df. Need to do this for just a numeric item in a list
