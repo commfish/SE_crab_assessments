@@ -319,7 +319,8 @@ basic_pop_model <- function(pars) {
   
   #Pop projection
   
-  softplus <- function(x) log1p(exp(x))
+  softplus <- function(x) log1p(exp(x)) #hmm. This subjectively raises my postrecruit starting value and I'm not sure how I feel about that
+  #softplus <- function(x) log(0.5 + exp(x)) #ugh. seems subjective.
   
   for (t in 2:n_yrs){
   #predSrvCPUE[t,] <- c(
@@ -327,6 +328,7 @@ basic_pop_model <- function(pars) {
     PredSrvCPUE[t,1] = Eps_R[t] * mean_rec
     PredSrvCPUE[t,2] = T12*PredSrvCPUE[t-1, 1] #using my rtmb calcs instead of the read-in data
     PredSrvCPUE[t,3] = softplus((PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S))) #cant be neg
+    #PredSrvCPUE[t,3] = (PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S))
 } #ok cool, got the pop (CPUE) projection in there.
   
   #########
@@ -342,8 +344,8 @@ basic_pop_model <- function(pars) {
   #  PredSrvCPUE[t,2] = ln_T12 + PredSrvCPUE[t-1, 1] #logspace equation of: T12*PredSrvCPUE[t-1, 1]
   #  x= log(exp(PredSrvCPUE[t-1, 2]) + exp(PredSrvCPUE[t-1, 3])) + (-S * SURVEY_TAU[t])
   #  y= ln_q + log(CATCH[t-1]) - S * CATCH_SURVEY_TAU[t]
-  #  PredSrvCPUE[t, 3] <- x + log(1 - exp(y - x))
-    #PredSrvCPUE[t,3] = log(exp(PredSrvCPUE[t-1, 2]) + exp(PredSrvCPUE[t-1, 3])) + (-S * SURVEY_TAU[t]) + log(1-exp(ln_q) + log(CATCH[t-1]) - S * CATCH_SURVEY_TAU[t]) #using my rtmb calcs instead of the read-in data
+  #  PredSrvCPUE[t, 3] <- x + log(1 - exp(y - x)) #check is correct
+    #NOPredSrvCPUE[t,3] = log(exp(PredSrvCPUE[t-1, 2]) + exp(PredSrvCPUE[t-1, 3])) + (-S * SURVEY_TAU[t]) + log(1-exp(ln_q) + log(CATCH[t-1]) - S * CATCH_SURVEY_TAU[t]) #using my rtmb calcs instead of the read-in data
 
   #} 
   
