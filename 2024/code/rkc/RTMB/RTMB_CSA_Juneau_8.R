@@ -258,11 +258,6 @@ basic_pop_model <- function(pars) {
   SSB = array(0, dim = c(n_yrs, n_stages)) # Pre-rec, legal, and mature biomasses
   
   # Survey Stuff
-  #ObsSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Survey CPUE at stage #I read this in #off 6/12/25, this line and next 3
-  #ObsSrvCPUE[,1] <- CPUE_prerec # prerecruit
-  #ObsSrvCPUE[,2] <- CPUE_rec # recruit
-  #ObsSrvCPUE[,3] <- CPUE_postrec # postrecruit
-  #THE SURVEY DATA IS HERE:CPUE_prerec, CPUE_rec, CPUE_postrec
   PredSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Predicted CPUE at stage PREREC, REC, POSTREC #THE MATRIX MODEL
   PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calculated from the predicted survey CPUE and waa
   
@@ -277,7 +272,6 @@ basic_pop_model <- function(pars) {
   #  rownames_to_column() %>%
   #  filter(!is.na(CPUE_rec)) %>% #will tell us where NA's are in the data
   #  select(rowname)
-  
 # no_NAs <- as.integer(no_NAs$rowname) #not srue if I still need this
   
   
@@ -286,7 +280,7 @@ basic_pop_model <- function(pars) {
   #Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty #and why is there an initial?? ***FLAG**
   jnLL = 0 # Joint negative log likelihood #this I need
   
-  # Do some parameter transformations here AGR DO I NEED THESE?
+  # Do some parameter transformations here 
   mean_rec = exp(ln_mean_rec) # mean recruitment
   q = exp(ln_q) # survey catchability
   T12 = exp(ln_T12)
@@ -300,26 +294,17 @@ basic_pop_model <- function(pars) {
   # Initialize Population ---------------------------------------------------
 
   #pop initialization
-  ##initial value could be better, perhaps? 6/9/25
-  #juneau specific, I'm giving it the starting predicted cpue values from excel- will have to change this for every area
-  PredSrvCPUE[1,] <- c( #should I call these something else?? since I read this in from excel at some point....
-   # years = YEARS[1],
-   # Pred_CPUE_prerec_calc = survival_params[1],
-    #Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #this is R_bar *FLAG* check formula please
+  PredSrvCPUE[1,] <- c( 
     #Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #Tyler said pick additive or multiplicative, having both is weird
     Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec,
     #Pre_CPUE_prerec_calc <- Eps_R[1] + mean_rec,
-    #Pred_CPUE_rec_calc = pred_CPUE_rec[1],
     Pred_CPUE_rec_calc = init_rec_cpue,
-    #Pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
     Pred_CPUE_postrec_calc = init_postrec_cpue 
-    #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S) - (q*CATCH[t-1]*exp(-S)) #i removed tau. see if she runs first
-    #CPUE_postrec = (CPUE_rec[t-1] + CPUE_postrec[t-1]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU*-S)) 
   )
   
   #Pop projection
   
-  softplus <- function(x) log1p(exp(x)) #hmm. This subjectively raises my postrecruit starting value and I'm not sure how I feel about that
+  softplus <- function(x) log1p(exp(x)) #hmm. This subjectively raises my postrecruit starting values and I'm not sure how I feel about that
   #softplus <- function(x) log(0.5 + exp(x)) #ugh. seems subjective.
   
   for (t in 2:n_yrs){
@@ -376,32 +361,19 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
     holder[,,h] <- cbind(survey_data[,,h], pred) #um, should I put the predicted data somewhere else? like not in syrvey data? maybe in pred_srv_cpue? I don't get this part. FLAG
      } #end of st(stage) loop
     
-  #} #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
-  #other error needed too?
-  #perhaps try logged and unlogged and see what happens...
-  
-  
-  ###alternate: two objects: "after piped into likelihood function, pipe into function that doesn't use years"
-  ####so two dnorms then??
 
   
   ## Recruitment ------------------------------------------------------------- PERHAPS ADD THIS LATER
   #Init_Rec_nLL = -sum(dnorm(ln_InitDevs, -sigma_R^2/2, sigma_R, TRUE)) #I am unsure if these stay for the crab CSA.. this will be the next addition if not now, at least
-  #Rec_nLL = -sum(dnorm(ln_RecDevs, -sigma_R^2/2, sigma_R, TRUE)) #why? **FLAG**
   #Rec_nLL = -sum(dnorm(Eps_R, -sigma_R^2/2, sigma_R, TRUE)) #use if ranefs
-  #Rec_nLL = -sum(dnorm(Eps_R, mean_rec, sigma_R, TRUE)) #add weights later? #is this right? I'm calling the predicted mean the true mean.... could also take the survey mean as the true mean...
-  #hmm did I do this right, does it need to loop over year?? *FLAG* Also mayve add in lambdas
   #for(y in 1:n_yrs) {
-   #   Rec_nLL[y] = -dnorm(Eps_R, -sigma_R^2/2, sigma_R, TRUE) * lambdas[y] #try adding weights here  #that ran poorly
+   #   Rec_nLL[y] = -dnorm(Eps_R, -sigma_R^2/2, sigma_R, TRUE) #* lambdas[y] #try adding weights here  #that ran poorly
   #}
   
   # Get joint likelihood
   jnLL = sum(SrvIdx_nLL)
   #jnLL = sum(SrvIdx_nLL) + sum(Rec_nLL) #we're keeping it simple for the crab CSA
-  #jnLL = sum(Catch_nLL) + sum(SrvIdx_nLL) + sum(FishAgeComps_nLL) + 
-   # sum(SrvAgeComps_nLL) + sum(Fmort_Pen) + sum(Init_Rec_nLL) +
-    #sum(Rec_nLL)solver in excel including preR to R survival (and also catchability q) - is this part of the likelihood?? #FLAG- perhaps add this next!!
-  
+
  
   # Report Section
   #RTMB::ADREPORT(SSB)# Mature and Legal biomasses, and error
@@ -419,7 +391,7 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
 
   return(jnLL) #do I need this too?
 }
-#END POP MODEL EXAMPLE
+#END POP MODEL
 
 
 # Run Model ---------------------------------------------------------------
