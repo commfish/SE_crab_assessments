@@ -192,6 +192,7 @@ data <- list(
   YEARS = YEARS, #all years inclduing missing cpue data years
   #lambdas = WEIGHTS, AGR off 6/12/25- now this is in the cpue data (and I still need to convert to CV...)
   CATCH = CATCH,
+  #log_survey_data = log(array_all_stages), #log makes it not go negative? try it
   survey_data = array_all_stages,
   wt_mature= df$Mature.Weight,
   wt_legal = df$Legal.Weight,
@@ -203,12 +204,8 @@ data <- list(
 )
 
 pars <- list(
-  #ln_mean_rec = log(R_bar_1), # mean recruitment with a starting value
-  ln_mean_rec = log(1),
-  #Eps_R = Eps_R, #intial values
-  ln_Eps_R = log(rep(0.00001, length(df$Survey.Year))), #very small value so log doesn't explode
-  ##what if I make Eps_R 0's as starting values??
-  #ln_sigma_R = log(0.5), #really sensitive to changing sigma R. 0.1 does not fit well, 0.5 overfits, 0.25 seems to be a compromise
+  ln_mean_rec = log(1.7), #could also try 1. 1.7 was close to juneau mean
+  ln_Eps_R = log(rep(1, length(df$Survey.Year))), #very small value if additive. close to 1 if multiplicative
   ln_q = log(q), # catchability 
   ln_T12 = log(T12), # preR to R survival rate and molt rate, both
   S = S, #fixed!!survival. do I need to log??
@@ -290,15 +287,13 @@ basic_pop_model <- function(pars) {
   
   # Do some parameter transformations here AGR DO I NEED THESE?
   mean_rec = exp(ln_mean_rec) # mean recruitment
-  #sigma_R = exp(ln_sigma_R) # recruitment variability
-  #sigma_F = exp(ln_sigma_F) # fishing mortality variability
-  #M = exp(ln_M) # natural mortality #I think I fix natural mortality
   q = exp(ln_q) # survey catchability
   T12 = exp(ln_T12)
   sigma_survey = exp(ln_sigma_survey) # survey index error
   init_rec_cpue = exp(ln_init_rec_cpue) # initial recruit CPUE
   init_postrec_cpue = exp(ln_init_postrec_cpue) # initial postrecruit CPUE
   Eps_R = exp(ln_Eps_R) # recruitment deviates
+  #survey_data = exp(log_survey_data) #delete later perhaps
 
   
   # Initialize Population ---------------------------------------------------
@@ -312,6 +307,7 @@ basic_pop_model <- function(pars) {
     #Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #this is R_bar *FLAG* check formula please
     #Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #Tyler said pick additive or multiplicative, having both is weird
     Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec,
+    #Pre_CPUE_prerec_calc <- Eps_R[1] + mean_rec,
     #Pred_CPUE_rec_calc = pred_CPUE_rec[1],
     Pred_CPUE_rec_calc = init_rec_cpue,
     #Pred_CPUE_postrec_calc = pred_CPUE_postrec[1]
@@ -324,12 +320,30 @@ basic_pop_model <- function(pars) {
   for (t in 2:n_yrs){
   #predSrvCPUE[t,] <- c(
     #years = YEARS,
-    #PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec #this is the prerecruit #tyler said pic multiplicative or additive error, not both
-    PredSrvCPUE[t,1] = Eps_R[t] * mean_rec #prerecruit
-    PredSrvCPUE[t,2] = T12*PredSrvCPUE[t-1, 1] #using my rtmb calcs instead of the read-in data
-    PredSrvCPUE[t,3] = (PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #using my rtmb calcs instead of the read-in data
+    PredSrvCPUE[t,1] = Eps_R[t] * mean_rec 
+    PredSrvCPUE[t,2] = pmax(T12*PredSrvCPUE[t-1, 1], 1e-4) #using my rtmb calcs instead of the read-in data
+    PredSrvCPUE[t,3] = pmax((PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)),1e-4) #using my rtmb calcs instead of the read-in data
+    #PredSrvCPUE[t,3] = (PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #using my rtmb calcs instead of the read-in data
+    
   #)
 } #ok cool, got the pop (CPUE) projection in there.
+  
+  #########
+  ##POPULATION CALC IN LOGSPACE
+ # PredSrvCPUE[1,] <- c( 
+  #  Pre_CPUE_prerec_calc <- ln_Eps_R[1] * ln_mean_rec,
+  #  Pred_CPUE_rec_calc = ln_init_rec_cpue,
+  #  Pred_CPUE_postrec_calc = ln_init_postrec_cpue 
+  #)
+  
+  #for (t in 2:n_yrs){
+  #  PredSrvCPUE[t,1] = ln_Eps_R[t] * ln_mean_rec #prerecruit
+  #  PredSrvCPUE[t,2] = ln_T12*PredSrvCPUE[t-1, 1] #using my rtmb calcs instead of the read-in data
+  #  PredSrvCPUE[t,3] = (PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * (-S * SURVEY_TAU[t]) - log(q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #using my rtmb calcs instead of the read-in data
+
+#  } 
+  
+  #####
   
   
   #calc the biomass per year for prerecruit, recruit, and postrecruit legal and mature
@@ -349,7 +363,7 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
      for(h in 1:n_stages) {
        for(y in 1:nrow(survey_data[,,h])){
          y_row <- which(YEARS == survey_data[y,1,h])#[y, 1]) #index the nrow of the model matrix that year y of survey data corresponds to
-         pred[y] <- PredSrvCPUE[y_row, h] # vector of predictions for stage h in only years that we have data
+         pred[y] <- PredSrvCPUE[y_row, h] # vector of predictions for stage h in only years that we have data. FLAG Negatives. NEgatives not ok? No negative CPUE... Log?
        }
     SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * survey_data[,3,h] ) #the likelihood. Pred is going negative. this bad? FLAG** #survey data is labda
     # add predictions to the data for the report however you want to
@@ -393,9 +407,9 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
   RTMB::REPORT(jnLL)
   RTMB::REPORT(q)
   RTMB::REPORT(T12)
-  RTMB::ADREPORT(holder) # a better name for this one perhaps
+  RTMB::REPORT(holder) # a better name for this one perhaps
   #RTMB::ADREPORT(mean_rec)
-  RTMB::ADREPORT(Eps_R) #annual recruitment
+  RTMB::REPORT(Eps_R) #annual recruitment
 
   return(jnLL) #do I need this too?
 }
@@ -409,6 +423,13 @@ pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #sigh, s
 #pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map, random=c("Eps_R"))
 
 ##################
+#troubleshoot 2 6/13/25
+out <- basic_pop_model(pars)
+out #that is a number
+map
+str(pars)
+str(map)
+
 #TORUBLESHOOT
 # Check initial parameter values
 print(pop_mod$par)
@@ -439,8 +460,8 @@ pop_mod$gr()
 
 #OPTION 1 for model run - nlminb
 #opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) #can I do more newtonsteps here? IDK
-#opt
-#relative convergence - I've definitely seen worse! but **FLAG**
+#opt #no convergence 6/13/25
+
 
 #OPTION 2 for model run - fit_tmb - lets me use newton steps
 opt <- TMBhelper::fit_tmb(obj = pop_mod, #**FLAG Broken as of 6/10/25 - can't run the likelihood while skipping over the NA's
