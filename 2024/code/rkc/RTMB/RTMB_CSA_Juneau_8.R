@@ -221,7 +221,8 @@ rm(list = ls()[!(ls() %in% c("pars", "data"))]) #remove everything except pars a
 
 
 #quick graph to check CPUE distributions
-#df <- data.frame(data) #broken with my current data entry...
+df <- data.frame(data$wt_prerec, data$wt_legal, data$wt_mature) 
+names(df) <- c("wt_prerec", "wt_legal", "wt_mature") #prep for graphing
 #graph the distribution of the observed survey CPUE
 #ggplot(df)+ aes(x=CPUE_prerec) + geom_density()
 #ggplot(df)+ aes(x=log(CPUE_prerec)) + geom_density() 
@@ -317,31 +318,34 @@ basic_pop_model <- function(pars) {
   )
   
   #Pop projection
+  
+  softplus <- function(x) log1p(exp(x))
+  
   for (t in 2:n_yrs){
   #predSrvCPUE[t,] <- c(
     #years = YEARS,
-    PredSrvCPUE[t,1] = Eps_R[t] * mean_rec 
-    PredSrvCPUE[t,2] = pmax(T12*PredSrvCPUE[t-1, 1], 1e-4) #using my rtmb calcs instead of the read-in data
-    PredSrvCPUE[t,3] = pmax((PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)),1e-4) #using my rtmb calcs instead of the read-in data
-    #PredSrvCPUE[t,3] = (PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #using my rtmb calcs instead of the read-in data
-    
-  #)
+    PredSrvCPUE[t,1] = Eps_R[t] * mean_rec
+    PredSrvCPUE[t,2] = T12*PredSrvCPUE[t-1, 1] #using my rtmb calcs instead of the read-in data
+    PredSrvCPUE[t,3] = softplus((PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S))) #cant be neg
 } #ok cool, got the pop (CPUE) projection in there.
   
   #########
   ##POPULATION CALC IN LOGSPACE
- # PredSrvCPUE[1,] <- c( 
-  #  Pre_CPUE_prerec_calc <- ln_Eps_R[1] * ln_mean_rec,
+  #PredSrvCPUE[1,] <- c( 
+  #  Pre_CPUE_prerec_calc <- ln_Eps_R[1] + ln_mean_rec, #logspace; Eps_R[t] * mean_rec in regular space
   #  Pred_CPUE_rec_calc = ln_init_rec_cpue,
   #  Pred_CPUE_postrec_calc = ln_init_postrec_cpue 
   #)
   
   #for (t in 2:n_yrs){
-  #  PredSrvCPUE[t,1] = ln_Eps_R[t] * ln_mean_rec #prerecruit
-  #  PredSrvCPUE[t,2] = ln_T12*PredSrvCPUE[t-1, 1] #using my rtmb calcs instead of the read-in data
-  #  PredSrvCPUE[t,3] = (PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * (-S * SURVEY_TAU[t]) - log(q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)) #using my rtmb calcs instead of the read-in data
+  #  PredSrvCPUE[t,1] = ln_Eps_R[t] + ln_mean_rec #logspace equation of:  Eps_R[t] * mean_rec
+  #  PredSrvCPUE[t,2] = ln_T12 + PredSrvCPUE[t-1, 1] #logspace equation of: T12*PredSrvCPUE[t-1, 1]
+  #  x= log(exp(PredSrvCPUE[t-1, 2]) + exp(PredSrvCPUE[t-1, 3])) + (-S * SURVEY_TAU[t])
+  #  y= ln_q + log(CATCH[t-1]) - S * CATCH_SURVEY_TAU[t]
+  #  PredSrvCPUE[t, 3] <- x + log(1 - exp(y - x))
+    #PredSrvCPUE[t,3] = log(exp(PredSrvCPUE[t-1, 2]) + exp(PredSrvCPUE[t-1, 3])) + (-S * SURVEY_TAU[t]) + log(1-exp(ln_q) + log(CATCH[t-1]) - S * CATCH_SURVEY_TAU[t]) #using my rtmb calcs instead of the read-in data
 
-#  } 
+  #} 
   
   #####
   
@@ -407,7 +411,7 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
   RTMB::REPORT(jnLL)
   RTMB::REPORT(q)
   RTMB::REPORT(T12)
-  RTMB::REPORT(holder) # a better name for this one perhaps
+  #RTMB::REPORT(holder) # a better name for this one perhaps. #does not convert to df because only 44 entries.
   #RTMB::ADREPORT(mean_rec)
   RTMB::REPORT(Eps_R) #annual recruitment
 
@@ -464,7 +468,7 @@ pop_mod$gr()
 
 
 #OPTION 2 for model run - fit_tmb - lets me use newton steps
-opt <- TMBhelper::fit_tmb(obj = pop_mod, #**FLAG Broken as of 6/10/25 - can't run the likelihood while skipping over the NA's
+opt <- TMBhelper::fit_tmb(obj = pop_mod, #**some warning about reordering parameters 6/13/25
                                 fn = pop_mod$fn,
                                gr = pop_mod$gr, 
                                newtonsteps = 2, # additional steps helps get the gradient lower
@@ -507,14 +511,14 @@ df_juneau_24_compare$Prerecruit.Biomass <- as.numeric(gsub(",", "", df_juneau_24
 
 Temp<- df_juneau_24_compare%>%
   filter(!is.na(Recruit)) #get rid of any years with missing survey data
-Year <- Temp$Survey.Year
+Year <- c(min(Temp$Survey.Year):max(Temp$Survey.Year)) #get the years from the data
 
 #EXTRACT FINAL VALUES
 result_df <- data.frame(pop_mod$report(pop_mod$env$last.par.best))
 #change result df names to prerecruit, recruit, postrectuit
 names(result_df) <- c("sd","prerecruit_biomass", "legal_biomass", "mature_biomass", 
                       "prerecuit_cpue", "recruit_cpue", "postrecuit_cpue",
-                      "jnll","q", "T12")
+                      "jnll","q", "T12", "EpsR")
 results_df_relevant <- result_df %>%
   #get confidence intervals on the cpue
   mutate(prerecuit_cpue_upper = prerecuit_cpue + (1.96 * sd),
@@ -538,14 +542,14 @@ results_df_relevant <- result_df %>%
         year = Year) #that could have been cleaner but I added year
 
 #add in blank rows for the missing years:
-results_df_relevant <- results_df_relevant %>%
-  mutate(year = as.numeric(year)) %>% #make sure year is numeric
-  complete(year = full_seq(year, 1), fill = list(prerecuit_cpue = NA, recruit_cpue = NA, postrecuit_cpue = NA,
-                                                 prerecruit_biomass = NA, legal_biomass = NA, mature_biomass = NA,
-                                                 prerecuit_cpue_upper = NA, recruit_cpue_upper = NA, postrecuit_cpue_upper = NA,
-                                                 prerecuit_cpue_lower = NA, recruit_cpue_lower = NA, postrecuit_cpue_lower = NA,
-                                                 legal_biomass_upper = NA, legal_biomass_lower = NA,
-                                                 mature_biomass_upper = NA, mature_biomass_lower = NA)) #fill in the missing years with NAs
+#results_df_relevant <- results_df_relevant %>%
+#  mutate(year = as.numeric(year)) %>% #make sure year is numeric
+#  complete(year = full_seq(year, 1), fill = list(prerecuit_cpue = NA, recruit_cpue = NA, postrecuit_cpue = NA,
+ #                                                prerecruit_biomass = NA, legal_biomass = NA, mature_biomass = NA,
+  #                                               prerecuit_cpue_upper = NA, recruit_cpue_upper = NA, postrecuit_cpue_upper = NA,
+   #                                              prerecuit_cpue_lower = NA, recruit_cpue_lower = NA, postrecuit_cpue_lower = NA,
+    #                                             legal_biomass_upper = NA, legal_biomass_lower = NA,
+     #                                            mature_biomass_upper = NA, mature_biomass_lower = NA)) #fill in the missing years with NAs
 
 
   
@@ -593,7 +597,7 @@ library(patchwork)
 
 cur_yr <- 2024 #the current year
 #save plot to figures file
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_7_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_8_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
 
 ##################################################
 #graph CSA excel biomass vs. RTMB biomass estimates
@@ -614,7 +618,7 @@ p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
   theme_minimal()
 p4
 #ggsave to current year figures folder
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_7_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_8_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
 
 
 
