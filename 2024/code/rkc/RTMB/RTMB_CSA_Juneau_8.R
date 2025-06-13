@@ -351,7 +351,7 @@ pred <- NULL
          y_row <- which(YEARS == survey_data[y,1,h])#[y, 1]) #index the nrow of the model matrix that year y of survey data corresponds to
          pred[y] <- PredSrvCPUE[y_row, h] # vector of predictions for stage h in only years that we have data
        }
-    SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * lambdas[[h]] ) #the likelihood
+    SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * survey_data[,3,h] ) #the likelihood. Pred is going negative. this bad? FLAG** #survey data is labda
     # add predictions to the data for the report however you want to
     holder[,,h] <- cbind(survey_data[,,h], pred) #um, should I put the predicted data somewhere else? like not in syrvey data? maybe in pred_srv_cpue? I don't get this part. FLAG
      } #end of st(stage) loop
@@ -405,7 +405,7 @@ pred <- NULL
 # Run Model ---------------------------------------------------------------
 
 
-pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map)
+pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #sigh, she fails. 6/12/24
 #pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map, random=c("Eps_R"))
 
 ##################
