@@ -341,18 +341,19 @@ basic_pop_model <- function(pars) {
   # Likelihoods -------------------------------------------------------------
 
   ## Survey Index ------------------------------------------------------------
-
+lambdas <- survey_data[,3,1] #the to, from CV conversion should be here (see tyler solution code and emails)
+holder <- array(0, dim = c(44, 4, 3))
 pred <- NULL
   #for(y in 1:n_yrs) { #make a vector that skips the missing years TODO
   #for(y in no_NAs) { #this one skips missing years #oops, needs to be the years??- FLAG**
      for(h in 1:n_stages) {
-       for(y in 1:nrow(survey_data[[h]])){
-         y_row <- which(yrs == survey_data[[h]][y, 1]) #index the nrow of the model matrix that year y of survey data corresponds to
-         pred[y] <- mod_matrix[y_row, h] # vector of predictions for stage h in only years that we have data
+       for(y in 1:nrow(survey_data[,,h])){
+         y_row <- which(YEARS == survey_data[y,1,h])#[y, 1]) #index the nrow of the model matrix that year y of survey data corresponds to
+         pred[y] <- PredSrvCPUE[y_row, h] # vector of predictions for stage h in only years that we have data
        }
-    SrvIdx_nLL[h] = -sum(dnorm(survey_data[[h]][,2], pred, sigma_survey, TRUE) * lambdas[[h]] ) #the likelihood
+    SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * lambdas[[h]] ) #the likelihood
     # add predictions to the data for the report however you want to
-    survey_data[[h]] <- cbind(survey_data[[h]], pred)
+    holder[,,h] <- cbind(survey_data[,,h], pred) #um, should I put the predicted data somewhere else? like not in syrvey data? maybe in pred_srv_cpue? I don't get this part. FLAG
      } #end of st(stage) loop
     
   #} #logged so they don't go negative. This ok?? Do they need a constant so they don't go 0?
@@ -392,6 +393,7 @@ pred <- NULL
   RTMB::REPORT(jnLL)
   RTMB::REPORT(q)
   RTMB::REPORT(T12)
+  RTMB::ADREPORT(holder) # a better name for this one perhaps
   #RTMB::ADREPORT(mean_rec)
   RTMB::ADREPORT(Eps_R) #annual recruitment
 
