@@ -343,7 +343,7 @@ basic_pop_model <- function(pars) {
   ## Survey Index ------------------------------------------------------------
 lambdas <- survey_data[,3,1] #the to, from CV conversion should be here (see tyler solution code and emails)
 holder <- array(0, dim = c(44, 4, 3))
-pred <- NULL
+pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
   #for(y in 1:n_yrs) { #make a vector that skips the missing years TODO
   #for(y in no_NAs) { #this one skips missing years #oops, needs to be the years??- FLAG**
      for(h in 1:n_stages) {
