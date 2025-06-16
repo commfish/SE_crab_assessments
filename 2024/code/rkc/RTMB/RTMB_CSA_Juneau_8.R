@@ -1,11 +1,15 @@
 ###Juneau RTMB CSA###
 ##Alex Reich
 ##start of development (on version 8):6/12/25
-##recent work: 6/12/25
+##recent work: 6/16/25
 ##Version  8: I deal with the NA's instead of ignoring them
 ##IN DEVELOPMENT###
 
 ##############################################################################
+#POTENTIAL PROBLEMS
+##Line :____ -  limitation to keep predicted CPUE positive - is this legit??
+
+
 #BASIC STRUCTURE
 ##setup with data
 ##wrangle data
@@ -38,6 +42,7 @@ library(tidyverse)
 library(RTMB)
 library(here)
 library(TMBhelper)
+library(abind)
 
 #to test: use juneau 2023 CSA to calc the 2024 analysis.... and see what happens
 set.seed(100)
@@ -64,8 +69,13 @@ df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv") #this is the ana
 #put data into individual stored places for RTMB
 YEARS <- df$Survey.Year
 WEIGHTS <- df$Weight #weighing. MAy need to add one for the new year
-#replace NA's with 0
-WEIGHTS[is.na(WEIGHTS)] <- 0 #replace NA with 0 #def want to weight these as 0.
+
+
+#make the weights CV 6/16/25
+CV <- sqrt(exp(1/(2*WEIGHTS))-1)
+CV[is.na(CV)] <- 0 #replace NA with 0 #def want to weight these as 0. $leaving NA there might be ok too.
+
+
 
 CATCH <- as.numeric(gsub(",", "", df$Catch..Number.)) #get rid of commas, ideally before...
 #replace NA in catch with 0
@@ -145,17 +155,18 @@ for (i in 1:length(pred_CPUE_prerec)){
 ##I don't really understand lists, so I'm going to make these their own matrices
 ##Also I prefer arrays.
 #temp1 <- data.frame(YEARS, CPUE_prerec, WEIGHTS) #year, cpue, CV
-array_prerec_cpue <- array(c(YEARS, CPUE_prerec, WEIGHTS), #weights will be replaced with CV once I... do that calc
+##I just replaced WEIGHTS with CV in all 3 of these. Need to 6/16/25. Need to go into function and turn CV back into weights?
+array_prerec_cpue <- array(c(YEARS, CPUE_prerec, CV), #weights will be replaced with CV once I... do that calc
                   dim = c(nrow(df), 3), 
-                  dimnames = list(NULL, c("YEARS", "CPUE_prerec", "WEIGHTS")))
+                  dimnames = list(NULL, c("YEARS", "CPUE_prerec", "CV")))
 
-array_rec_cpue <- array(c(YEARS, CPUE_rec, WEIGHTS), #weights will be replaced with CV once I... do that calc
+array_rec_cpue <- array(c(YEARS, CPUE_rec, CV), #weights will be replaced with CV once I... do that calc
                            dim = c(nrow(df), 3), 
-                           dimnames = list(NULL, c("YEARS", "CPUE_rec", "WEIGHTS")))
+                           dimnames = list(NULL, c("YEARS", "CPUE_rec", "CV")))
 
-array_postrec_cpue <- array(c(YEARS, CPUE_postrec, WEIGHTS), #weights will be replaced with CV once I... do that calc
+array_postrec_cpue <- array(c(YEARS, CPUE_postrec, CV), #weights will be replaced with CV once I... do that calc
                            dim = c(nrow(df), 3), 
-                           dimnames = list(NULL, c("YEARS", "CPUE_postrec", "WEIGHTS")))
+                           dimnames = list(NULL, c("YEARS", "CPUE_postrec", "CV")))
 
 array_all_stages <- abind::abind(array_prerec_cpue, array_rec_cpue, array_postrec_cpue, along = 3)
 
@@ -289,6 +300,8 @@ basic_pop_model <- function(pars) {
   init_postrec_cpue = exp(ln_init_postrec_cpue) # initial postrecruit CPUE
   Eps_R = exp(ln_Eps_R) # recruitment deviates
   #survey_data = exp(log_survey_data) #delete later perhaps
+  WEIGHTS = 1.0/(2* sqrt(log(1.0+survey_data[,3,]^2))^2)   #turn CV into weights
+  survey_data <- abind(survey_data, WEIGHTS, along=2) ## add weights to the 3d array
 
   
   # Initialize Population ---------------------------------------------------
@@ -342,12 +355,11 @@ basic_pop_model <- function(pars) {
   PredSrvIdx[,2] <- ((PredSrvCPUE[,2]+PredSrvCPUE[,3])/q) * wt_legal #legal biomasss = recruit cpue + postrecruit cpue, divided by catchability, times the legal weight
   PredSrvIdx[,3] <- PredSrvIdx[,1]+PredSrvIdx[,2] #mature biomass =  legal biomass + prerecruit biomasss
   
-  
   # Likelihoods -------------------------------------------------------------
 
   ## Survey Index ------------------------------------------------------------
-lambdas <- survey_data[,3,1] #the to, from CV conversion should be here (see tyler solution code and emails)
-holder <- array(0, dim = c(44, 4, 3))
+#lambdas <- survey_data[,3,1] #the to, from CV conversion should be here (see tyler solution code and emails)
+#holder <- array(0, dim = c(44, 4, 3))
 pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
   #for(y in 1:n_yrs) { #make a vector that skips the missing years TODO
   #for(y in no_NAs) { #this one skips missing years #oops, needs to be the years??- FLAG**
@@ -356,11 +368,11 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
          y_row <- which(YEARS == survey_data[y,1,h])#[y, 1]) #index the nrow of the model matrix that year y of survey data corresponds to
          pred[y] <- PredSrvCPUE[y_row, h] # vector of predictions for stage h in only years that we have data. FLAG Negatives. NEgatives not ok? No negative CPUE... Log?
        }
-    SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * survey_data[,3,h] ) #the likelihood. Pred is going negative. this bad? FLAG** #survey data is labda
+    SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * survey_data[,4,h] ) #the likelihood. Pred is going negative. this bad? FLAG** #survey data is labda
     # add predictions to the data for the report however you want to
-    holder[,,h] <- cbind(survey_data[,,h], pred) #um, should I put the predicted data somewhere else? like not in syrvey data? maybe in pred_srv_cpue? I don't get this part. FLAG
+    #holder[,,h] <- cbind(survey_data[,,h], pred) #I dont get why I have this. FLAG. MY data is spit out elsewhere.
      } #end of st(stage) loop
-    
+  
 
   
   ## Recruitment ------------------------------------------------------------- PERHAPS ADD THIS LATER
@@ -374,6 +386,8 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
   jnLL = sum(SrvIdx_nLL)
   #jnLL = sum(SrvIdx_nLL) + sum(Rec_nLL) #we're keeping it simple for the crab CSA
 
+  
+  
  
   # Report Section
   #RTMB::ADREPORT(SSB)# Mature and Legal biomasses, and error
