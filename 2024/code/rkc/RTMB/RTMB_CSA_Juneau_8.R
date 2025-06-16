@@ -423,7 +423,7 @@ opt
 
 # Model summaries
 sdrep <- sdreport(pop_mod)
-sdrep 
+sdrep #max gradient component should be <0.001 I beleive, to indicate convergence
 summary(sdrep)
 
 names(pop_mod)
@@ -494,13 +494,18 @@ results_df_relevant <- result_df %>%
 
 
 #I should add CV to the raw data (juenau 2024 compare)
-df_juneau_2024_compare <- df_juneau_24_compare %>% 
+df_juneau_24_compare <- df_juneau_24_compare %>% 
   mutate(year = Survey.Year) %>% #added a matching year column
   left_join(cv_df) %>% #joined cv
-  #now calculate upper and lower CI when possible, on a normal distribution
   mutate(
-    #ok unsure if I should show as CV or CI on the graph. Pending a phone a friend.
+    cv_upper_prerec = Pre.recruit + CV, #adding upper and lower CV
+    cv_lower_prerec = Pre.recruit - CV,
+    cv_upper_rec = Recruit + CV,
+    cv_lower_rec = Recruit - CV,
+    cv_upper_postrec = Post.recruit + CV,
+    cv_lower_postrec = Post.recruit - CV
   )
+
  
 
 #add in blank rows for the missing years:
@@ -522,11 +527,11 @@ p1 <- ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) +
   geom_ribbon(aes(ymin=prerecuit_cpue_lower, ymax=prerecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(color="lightblue")+
-  geom_point(data=df_juneau_24_compare ,aes(y=Pre.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
-  #geom_errorbar()
+  geom_point(data=df_juneau_24_compare, aes(y=Pre.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
+  geom_errorbar(data=df_juneau_24_compare, aes(ymin=cv_lower_prerec, ymax=cv_upper_prerec, x=Survey.Year, y=NULL))+
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Prerecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="JNU Prerec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE") +
+  labs(title="JNU Prerec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE", subtitle = "obs CPUE as black points with CV error bars") +
   theme_minimal()
 #there we go.pre-rec is being estimated now.
 
@@ -536,10 +541,10 @@ p2 <- ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) +
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(color="lightblue")+
   geom_point(data=df_juneau_24_compare ,aes(y=Recruit, x=Survey.Year)) + #this is the observed survey CPUE values
-  ##probs should add the SE for that at some point- I'm sure it exists
+  geom_errorbar(data=df_juneau_24_compare, aes(ymin=cv_lower_rec, ymax=cv_upper_rec, x=Survey.Year, y=NULL))+
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Recruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="JNU Rec CPUE - Excel in dark, RTMB light with CIE", x="Year", y="CPUE") +
+  labs(title="JNU Rec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE", subtitle = "obs CPUE as black points with CV error bars") +
   theme_minimal()
 
 #and postrecruit CPUE
@@ -548,10 +553,10 @@ p3 <- ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) +
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(color="lightblue")+
   geom_point(data=df_juneau_24_compare ,aes(y=Post.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
-  ##probs should add the SE for that at some point- I'm sure it exists
+  geom_errorbar(data=df_juneau_24_compare, aes(ymin=cv_lower_postrec, ymax=cv_upper_postrec, x=Survey.Year, y=NULL))+
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Postrecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="JNU Postrec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE") +
+  labs(title="JNU Postrec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE", subtitle = "obs CPUE as black points with CV error bars") +
   theme_minimal()
 
 library(patchwork)
