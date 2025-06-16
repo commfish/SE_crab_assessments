@@ -2,7 +2,7 @@
 ##Alex Reich
 ##start of development (on version 8):6/12/25
 ##recent work: 6/16/25
-##Version  8: I deal with the NA's instead of ignoring them
+##Version  8: I deal with the NA's instead of ignoring them, and add CV into the model and graphs, and add a quasi-retro graph
 ##IN DEVELOPMENT###
 
 ##############################################################################
@@ -21,21 +21,17 @@
 ##look at RTMB outputs and convergence
 ##graph things (Excel CSA 2024 output compared to RTMB CSA 2024 output (I re-did the 2024 analysis in RTMB, essentially))
 
-#TAKE-AWAYS
-##(add here)
-
 #I used the 2023 and 2024 Juneau Excel CSA's, Basic_Pop_Model_RTMB.Day3.R (from the RTMB workshop), and Tyler's TMB code for SE Tanner crab (on S drive) to draft this model.
 ##################################################################################
 
 
-###input files - FLAG - can be improved in  the future
+###input files - can be improved in  the future
 #I'm trying to figure out the best way... to adjust the CSA excel to a regular CSV input
 ##adding in new values manually for now (best way?? probs not but I can adjust later)
-##est prerec is copied over from last year, est rec and est postrec set to 0. I think I calc these below so...
 
 ##TO DO
-#Draft plain-enlgish bridging analysis
-#Draft stats-dense bridging analysis.
+#Draft plain-enlgish bridging analysis write up
+#Draft stats-dense bridging analysis write up
 
 #load libraries
 library(tidyverse)
@@ -54,41 +50,24 @@ set.seed(100)
 df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv") #this is the analysis at the end of 2024
 df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv") #this is the analysis at the end of 2023
 
-#get rid of any years with missing survey data #jk we want these 6/9/25
-#df <- df %>%
-
-#but identify years with missing data and remove them, make a vector of just the years with data
-#no_NAs <- df %>%
- # rownames_to_column() %>%
-#  filter(!is.na(Recruit)) %>%
- # select(rowname)
-
-
- 
-
 #put data into individual stored places for RTMB
 YEARS <- df$Survey.Year
 WEIGHTS <- df$Weight #weighing. MAy need to add one for the new year
-
 
 #make the weights CV 6/16/25
 CV <- sqrt(exp(1/(2*WEIGHTS))-1)
 CV[is.na(CV)] <- 0 #replace NA with 0 #def want to weight these as 0. $leaving NA there might be ok too.
 
-
-
 CATCH <- as.numeric(gsub(",", "", df$Catch..Number.)) #get rid of commas, ideally before...
 #replace NA in catch with 0
-CATCH[is.na(CATCH)] <- 0 #replace NA with 0 gonna keep NA for now. 6/10/25
+CATCH[is.na(CATCH)] <- 0 #replace NA with 0
 
 ##there was some thing in the juneau csa excel readme about how calculating PU is not straightforward. So... check that plz
-
 
 CATCH_MIDDATE <-as.Date(df$Catch.Mid.Date,format = "%d-%b-%y") #data wrangle catch middate into usable format
 REF_DATE <- CATCH_MIDDATE[1]
 #CATCH_MIDDATE <- as.numeric(format(CATCH_MIDDATE, "%j"))
 CATCH_MIDDATE <- as.numeric(CATCH_MIDDATE - REF_DATE) #sequential added days
-
 
 SURVEY_MIDDATE <-as.Date(df$Survey.Mid.Date,format = "%d-%b-%y") #data wrangle survey middate into usable format
 #SURVEY_MIDDATE <- as.numeric(format(SURVEY_MIDDATE, "%j")) #nope, I want not julian
@@ -127,12 +106,10 @@ CPUE_postrec <- df$Post.recruit
 #CPUE_rec[is.na(CPUE_rec)] <- 0 #replace NA with 0
 #CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
 
-
 #pred survey CPUE
 pred_CPUE_prerec <- df$Estimated.Prerecruit
 pred_CPUE_rec <- df$Estimated.Recruits
 pred_CPUE_postrec <- df$Estimated.Postrecruits
-
 
 #mean of predicted prerecuits (the "recruitment") except the last year
 R_bar_1 <- mean(pred_CPUE_prerec[1:(length(pred_CPUE_prerec)-1)]) #mean of prerecruit CPUE
@@ -146,16 +123,7 @@ for (i in 1:length(pred_CPUE_prerec)){
 }
 
 
-##model does bad thinbgs if they are parameters (prerecruit CPUE expected = observed exactly)
-#SURVIVAL_PARAMS <- df$Survival.Parameters # this ALSO the estimated prerecriuits for that year? WHY? Idk theory but replicating the excel. **FLAG**
-
-
-#Tyler says change cpue inputs
-##data as a list with a matrix for each stage and with columns for year, CPUE, and CV
-##I don't really understand lists, so I'm going to make these their own matrices
-##Also I prefer arrays.
-#temp1 <- data.frame(YEARS, CPUE_prerec, WEIGHTS) #year, cpue, CV
-##I just replaced WEIGHTS with CV in all 3 of these. Need to 6/16/25. Need to go into function and turn CV back into weights?
+##data as an array for each stage and with columns for year, CPUE, and CV
 array_prerec_cpue <- array(c(YEARS, CPUE_prerec, CV), #weights will be replaced with CV once I... do that calc
                   dim = c(nrow(df), 3), 
                   dimnames = list(NULL, c("YEARS", "CPUE_prerec", "CV")))
@@ -188,12 +156,6 @@ q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
 S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED #enentially the mortality but in survival form. This dataset is not good for estimating mortality but I can do a likelihood profile later (low priority)
 Z <- exp(-S)#total instantaneous mortality #FIXED
 #SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
-
-#AGR add 5/29/25
-#what is the observed sd of the prerecruits (recruitment)
-obs_sigmaR <- sd(df$Pre.recruit, na.rm = TRUE) #observed standard deviation of the prerecruits
-existing_sigmaR <- sd(df$Estimated.Prerecruit, na.rm = TRUE) #existing standard deviation of the prerecruits
-##dang that is too large to use...
 
 
 ####################
@@ -231,18 +193,9 @@ pars <- list(
 rm(list = ls()[!(ls() %in% c("pars", "data"))]) #remove everything except pars and data
 
 
-#quick graph to check CPUE distributions
+#data I pulled in up here for graphing relevance below
 df <- data.frame(data$wt_prerec, data$wt_legal, data$wt_mature) 
 names(df) <- c("wt_prerec", "wt_legal", "wt_mature") #prep for graphing
-#graph the distribution of the observed survey CPUE
-#ggplot(df)+ aes(x=CPUE_prerec) + geom_density()
-#ggplot(df)+ aes(x=log(CPUE_prerec)) + geom_density() 
-#ggplot(df)+ aes(x=CPUE_rec) + geom_density()
-#ggplot(df)+ aes(x=log(CPUE_rec)) + geom_density() 
-#ggplot(df)+ aes(x=CPUE_postrec) + geom_density()
-#ggplot(df)+ aes(x=log(CPUE_postrec)) + geom_density() 
-##ok ok I don't need to log...
-#arguably CPUE_prerec and CPUE_rec could be logged
 
 
 #map- to fix parameters!!
@@ -368,7 +321,7 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
          y_row <- which(YEARS == survey_data[y,1,h])#[y, 1]) #index the nrow of the model matrix that year y of survey data corresponds to
          pred[y] <- PredSrvCPUE[y_row, h] # vector of predictions for stage h in only years that we have data. FLAG Negatives. NEgatives not ok? No negative CPUE... Log?
        }
-    SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * survey_data[,4,h] ) #the likelihood. Pred is going negative. this bad? FLAG** #survey data is labda
+    SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * survey_data[,4,h] ) #the likelihood. Pred is going negative. this bad? FLAG** #survey_data[,4,h] is weights
     # add predictions to the data for the report however you want to
     #holder[,,h] <- cbind(survey_data[,,h], pred) #I dont get why I have this. FLAG. MY data is spit out elsewhere.
      } #end of st(stage) loop
@@ -387,9 +340,11 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
   #jnLL = sum(SrvIdx_nLL) + sum(Rec_nLL) #we're keeping it simple for the crab CSA
 
   
-  
  
   # Report Section
+  #I'll want CV's for graphing
+  #CVs <- survey_data[,3,1]
+  
   #RTMB::ADREPORT(SSB)# Mature and Legal biomasses, and error
   RTMB::REPORT(sigma_survey) #I want my error. Will have to add in other error sources later??
   #RTMB::ADREPORT(PredSrvIdx) #survey biomass by stage
@@ -402,6 +357,7 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
   #RTMB::REPORT(holder) # a better name for this one perhaps. #does not convert to df because only 44 entries.
   #RTMB::ADREPORT(mean_rec)
   RTMB::REPORT(Eps_R) #annual recruitment
+  RTMB::REPORT(survey_data)
 
   return(jnLL) #do I need this too?
 }
@@ -411,36 +367,36 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
 # Run Model ---------------------------------------------------------------
 
 
-pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #sigh, she fails. 6/12/24
-#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map, random=c("Eps_R"))
+pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) 
+#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map, random=c("Eps_R")) #if random effects. We decided no for this model.
 
 ##################
 #troubleshoot 2 6/13/25
-out <- basic_pop_model(pars)
-out #that is a number
-map
-str(pars)
-str(map)
+#out <- basic_pop_model(pars)
+#out #that is a number
+#map
+#str(pars)
+#str(map)
 
 #TORUBLESHOOT
 # Check initial parameter values
-print(pop_mod$par)
+#print(pop_mod$par)
 
 # Evaluate the objective function and gradient at initial parameter values
-initial_fn <- pop_mod$fn(pop_mod$par)
-initial_gr <- pop_mod$gr(pop_mod$par)
+#initial_fn <- pop_mod$fn(pop_mod$par)
+#initial_gr <- pop_mod$gr(pop_mod$par)
 
-print(initial_fn) #if NA's there is problem
-print(initial_gr) #if NA's, problem
+#print(initial_fn) #if NA's there is problem
+#print(initial_gr) #if NA's, problem
 
 # Ensure no NA/NaN values in the function and gradient evaluations
-if (any(is.na(initial_fn)) || any(is.nan(initial_fn))) {
-  stop("Objective function evaluation returned NA/NaN values.")
-}
+#if (any(is.na(initial_fn)) || any(is.nan(initial_fn))) {
+#  stop("Objective function evaluation returned NA/NaN values.")
+#}
 
-if (any(is.na(initial_gr)) || any(is.nan(initial_gr))) {
-  stop("Gradient evaluation returned NA/NaN values.")
-}
+#if (any(is.na(initial_gr)) || any(is.nan(initial_gr))) {
+#  stop("Gradient evaluation returned NA/NaN values.")
+#}
 
 ##END TROUBLESHOOT
 ################
@@ -467,9 +423,7 @@ opt
 
 # Model summaries
 sdrep <- sdreport(pop_mod)
-sdrep #maximum gradient component is here - # 0.001 or smaller considered converged, can use newtonsteps (can I tho??) to make it smaller
-## **FIXED** Crap- does not consistently have a positive definite hessian- maybe I do need more newtonsteps **FIXED**
-#update- I think I fixed the hessian issue - moved surival params to data instead of parameters
+sdrep 
 summary(sdrep)
 
 names(pop_mod)
@@ -502,7 +456,14 @@ Temp<- df_juneau_24_compare%>%
 Year <- c(min(Temp$Survey.Year):max(Temp$Survey.Year)) #get the years from the data
 
 #EXTRACT FINAL VALUES
-result_df <- data.frame(pop_mod$report(pop_mod$env$last.par.best))
+temp <- pop_mod$report(pop_mod$env$last.par.best)
+class(temp[8])
+
+temp2<- array(temp[[8]], dim=c(44,4,3))
+cv_df <- data.frame(temp2[,c(1,3),1])
+colnames(cv_df) <- c("year", "CV")
+result_df <- data.frame(temp[-8])
+#result_df <- left_join(result_df, )
 #change result df names to prerecruit, recruit, postrectuit
 names(result_df) <- c("sd","prerecruit_biomass", "legal_biomass", "mature_biomass", 
                       "prerecuit_cpue", "recruit_cpue", "postrecuit_cpue",
@@ -527,7 +488,20 @@ results_df_relevant <- result_df %>%
         legal_biomass_lower = (recruit_cpue_lower + postrecuit_cpue_lower) * legal_weight / q,
         mature_biomass_upper = (prerecruit_biomass_upper + legal_biomass_upper),
         mature_biomass_lower = (prerecruit_biomass_lower + legal_biomass_lower),
-        year = Year) #that could have been cleaner but I added year
+        year = Year)  #%>% #that could have been cleaner but I added year
+        #left_join(cv_df) %>% #pull in the cv
+        #mutate
+
+
+#I should add CV to the raw data (juenau 2024 compare)
+df_juneau_2024_compare <- df_juneau_24_compare %>% 
+  mutate(year = Survey.Year) %>% #added a matching year column
+  left_join(cv_df) %>% #joined cv
+  #now calculate upper and lower CI when possible, on a normal distribution
+  mutate(
+    #ok unsure if I should show as CV or CI on the graph. Pending a phone a friend.
+  )
+ 
 
 #add in blank rows for the missing years:
 #results_df_relevant <- results_df_relevant %>%
@@ -549,7 +523,7 @@ p1 <- ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) +
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(color="lightblue")+
   geom_point(data=df_juneau_24_compare ,aes(y=Pre.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
-  ##probs should add the SE for that at some point- I'm sure it exists
+  #geom_errorbar()
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Prerecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
   labs(title="JNU Prerec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE") +
