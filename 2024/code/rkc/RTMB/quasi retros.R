@@ -198,6 +198,13 @@ colnames(df_bin) <- c("Year", "Legal biomass", "Mature biomass")
 ###Graph
 #load in the "each year we predicted this" data
 ##hmm where was that - bring in from S drive.
+##found it (Table 2 in the 2024 analysis)- made a new csv file just for compariosn
+SSQ_retros_old <- read.csv("CSA_excel/Juneau 2024 quasi retros.csv") #upload this to the repo!! To do!!
+#get rid of commas in the dataframe
+SSQ_retros_old$Legal.biomass <- as.numeric(gsub(",", "", SSQ_retros_old$Legal.biomass))
+SSQ_retros_old$Mature.biomass <- as.numeric(gsub(",", "", SSQ_retros_old$Mature.biomass))
 
-#perhaps add the end year to this year's data
-#graph that vs the df I just created
+#rename my bin
+Likelihodd_retros_new <- df_bin
+
+#graph the likelihood (new) vs sum of squares (old) quasi-retros
