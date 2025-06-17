@@ -13,10 +13,14 @@ library(knitr)
 
 # Juneau SE RKC RTMB Version 8
 
+This RMD is a summary of RTMB_CSA_Juneau8.R results, which is located in the SE_crab_assessments/2024/code/rkc/RTMB folder.
+This summary also references quasi retros.R, in that same folder.
+All code and data are available on the github SE_crab_assessments.
+
 Thanks for your help with the likelihood and NA dodging Tyler. I fixed that part of the code and it seems to work smoothly.
 (That part also might have been working before and tripping up with the problem described below.)
 
-I had issues with negative starting values predicted CPUE from my population projection (this is what was causing the singularities error). I ended up doing a log-unlog trick that effectively removes any negative values from the postrecrutis, but also inflates their values a tiny bit. Please take a look at lines (269, 277; function softplus) and let me know if you have a better workaround to undesirable negative starting values. RTMB does not work with pmax (tried and failed) or ifelse (says the internet). Alternatively, I could inflate my starting values so that the model does not go negative in the population calculation, but that doesn’t seem… right… The reason why this issue is popping up now and not before now is because when I changed PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec to PredSrvCPUE[t,1] = Eps_R[t] * mean_rec (line 275), the prerecruit CPUE is now lower.
+I had issues with negative starting values predicted CPUE from my population projection (this is what was causing the singularities error). I ended up doing a log-unlog trick that effectively removes any negative values from the postrecrutis, but also inflates their values a tiny bit. Please take a look at lines (269, 277; function softplus) in RTMB_CSA_Juneau8.R and let me know if you have a better workaround to undesirable negative starting values. RTMB does not work with pmax (tried and failed) or ifelse (says the internet). Alternatively, I could inflate my starting values so that the model does not go negative in the population calculation, but that doesn’t seem… right… The reason why this issue is popping up now and not before now is because when I changed PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec to PredSrvCPUE[t,1] = Eps_R[t] * mean_rec (line 275), the prerecruit CPUE is now lower.
 
 ```{r CPUE, fig.cap = "Juneau RKC CPUE: likelihood (blue) vs sum of squares (green) results."}
 #put image here
@@ -26,8 +30,35 @@ knitr::include_graphics('../figures/CSA_JNU_8_CPUE.png', dpi = 125)
 
 ```
 
+CPUE: Postrecruits are inflated in the early years. Prerecruits look better. Missing value years look... different, especially for postrecruits. 
+
+
 ```{r Biomass, fig.cap = "Juneau RKC Biomass comparison between likelihood and sum of squares methodology."}
 #put image here
 knitr::include_graphics('../figures/CSA_JNU_8_Biomass.png', dpi = 125)
 
 ```
+Biomass: Recent biomass estimates are lower for both mature and legal biomass. This is likely driven by the increase in estimated catchability (q starting value:0.0001055574, which is the starting value for the 2024 CSA Excel analysis; q estimated value: 0.0001151898).
+
+This is what the biomass looks like when I run the same model with q fixed:
+```{r Biomass fixed q, fig.cap = "Juneau RKC Biomass comparison between likelihood and sum of squares methodology with q fixed."}
+
+knitr::include_graphics('../figures/CSA_JNU_8_Biomass_fixedq.png', dpi = 125)
+```
+
+# Quasi-retros
+
+See graph below. The likelihood RTMB model consistently estimates lower than the Excel SSQ model. I'm sure you guys have opinions about this and I look forward to hearing them. I only ran the retros on the likelihood method back to 1995 because it seemed excessive to go further, but I can adjust upon request.
+
+
+
+```{r Quasi retros, fig.cap = "Juneau RKC Quasi-retrospective analysis of likelihood vs sum of squares methodology."}
+knitr::include_graphics('../figures/compare_quasi_retros.png', dpi = 125)
+```
+
+Here are the quasi-retros with q fixed:
+```{r Quasi retros fixed q, fig.cap = "Juneau RKC Quasi-retrospective analysis of likelihood vs sum of squares methodology with q fixed."}
+knitr::include_graphics('../figures/compare_quasi_retros_fixedq.png', dpi = 125)
+
+```
+

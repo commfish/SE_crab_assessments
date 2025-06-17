@@ -171,6 +171,7 @@ pars <- list(
 map <- list()
 map$S <- factor(NA) 
 map$ln_mean_rec <- factor(NA)
+#map$ln_q <- factor(NA) #testing
 
 #run the analysis
 pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #idk if I need this step each time but better safe than sorry

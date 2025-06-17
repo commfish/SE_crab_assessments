@@ -196,7 +196,8 @@ names(df) <- c("wt_prerec", "wt_legal", "wt_mature") #prep for graphing
 
 #map- to fix parameters!!
 map <- list()
-map$S <- factor(NA) #fix survival #when I let the model estimate survival, it estimates 0.229 (a good bit lower than what we typically fix) and model does not converge great (but what if I were to add more newtonsteps...)
+map$S <- factor(NA) 
+#map$ln_q <- factor(NA) 
 #map$ln_sigma_R <- factor(NA) #prerecurits is overfit when I let this estimate
 map$ln_mean_rec <- factor(NA) #fix mean recruitment - not dealing with this right now
 #map$Eps_R <- factor(rep(NA, length(pars$Eps_R))) #fix recruitment deviates - a test
