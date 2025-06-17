@@ -150,13 +150,9 @@ array_all_stages <- array_all_stages[!is.na(array_all_stages[,2,1]), , ] #remove
 ###########
 #REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
 T12 <- 84.6347230128254/100  #starting value from 2023 to 2024 analysis (last year)
-  ##(do we HAVE a rec -> postrec survival???) #THIS IS ALLOWED TO CHANGE
 #q <- 104.187334848418/1000000 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
 q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
-S <- 0.32 #I think this is fixed.  #neg or positive tho? #FIXED #enentially the mortality but in survival form. This dataset is not good for estimating mortality but I can do a likelihood profile later (low priority)
-Z <- exp(-S)#total instantaneous mortality #FIXED
-#SURVIVAL_PARAMS <- df$Survival.Parameters #FLAG- is this ALSO the estimated prerecriuits for that year? seems like it... #THIS IS ALLOWED TO CHANGE
-
+S <- 0.32 
 
 ####################
 #SETUP

@@ -13,7 +13,8 @@ library(TMBhelper)
 library(abind)
 
 #load the functions
-##to go here I'm being lazy and running this after I load the function in RTMB_CSA_Juneau_8.R right now
+##source the draft rtmb function
+source("code/RTMB_functions.R")
 
 #load the starting data- I will copy-paste from the Juneau CSA setup
 df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv") #this is the analysis at the end of 2024
@@ -113,23 +114,35 @@ dimnames(array_all_stages)[[3]] <- c("Stage_1", "Stage_2", "Stage_3")
 array_all_stages <- array_all_stages[!is.na(array_all_stages[,2,1]), , ] #remove rows with NA's in the second column (missing years of data)
 
 
+#params
+##hm, this starting value going back all years isn;t quite accurate. Can be approximate, tho. FLAG**
+#REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
+T12 <- 84.6347230128254/100  #starting value from 2023 to 2024 analysis (last year)
+#q <- 104.187334848418/1000000 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
+q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
+S <- 0.32 #surval/mortality proxy
+
+
 #set up some bins
-bin <- data.frame( )  #my storage box of numbers
 t <- 47 # my counter. Will max length +1
 w <- 45 #my counter for the observed array (2 less becuse there are two NA's in the data that I need to dance around)
+i <-1
+
+bin <- array(20, dim =c(1, 3) )  #my storage box of numbers. Pre-set to hold 20.
 
 #for loop 
-#for (i in 1:19){ #Let's go back to 1994
+for (i in 1:19){ #Let's go back to 1994
 
 #remove one row from the data
 c <- t-i #ok this can be my counter
 d <- w-i #my counter for the survet data
 
+
 #remove the bottom row from the df, from everything relevant to the data list (below)
 YEARS <- YEARS[1:c]
 CATCH <- CATCH[1:c]
 array_all_stages <- array_all_stages[c(1:d),,]
-df <- df[1:c,] 
+df <- df[c(1:c),] 
 
 #load the parameters and data with that row removed
 data <- list(
@@ -160,10 +173,22 @@ map$S <- factor(NA)
 map$ln_mean_rec <- factor(NA)
 
 #run the analysis
+pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #idk if I need this step each time but better safe than sorry
+
+#opt <- nlminb(pop_mod$par, pop_mod$fn, pop_mod$gr) #simpler option of running the model
+opt <- TMBhelper::fit_tmb(obj = pop_mod, #**some warning about reordering parameters 6/13/25
+                          fn = pop_mod$fn,
+                          gr = pop_mod$gr, 
+                          newtonsteps = 2, # do I WANT newtonsteps if I don't need them??
+                          getsd = TRUE)
+
 
 #store the result
+box <- pop_mod$report(pop_mod$env$last.par.best)
+Index_thisyear <- box$PredSrvIdx #prerec, legal, mature
+bin[i,] = c(2025-i, Index_thisyear[c,2], Index_thisyear[c,3]) #switch cur_year+1 with 2025. Year, legal, mature.
 
-#}#end for loop
+}#end for loop
 
 ###Graph
 #load in the "each year we predicted this" data
