@@ -1,0 +1,33 @@
+---
+title: "RTMB intermediate writeup Juneau V8"
+author: "Alex Reich"
+date: "2025-06-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+```
+
+
+# Juneau SE RKC RTMB Version 8
+
+Thanks for your help with the likelihood and NA dodging Tyler. I fixed that part of the code and it seems to work smoothly.
+(That part also might have been working before and tripping up with the problem described below.)
+
+I had issues with negative starting values predicted CPUE from my population projection (this is what was causing the singularities error). I ended up doing a log-unlog trick that effectively removes any negative values from the postrecrutis, but also inflates their values a tiny bit. Please take a look at lines (269, 277; function softplus) and let me know if you have a better workaround to undesirable negative starting values. RTMB does not work with pmax (tried and failed) or ifelse (says the internet). Alternatively, I could inflate my starting values so that the model does not go negative in the population calculation, but that doesn’t seem… right… The reason why this issue is popping up now and not before now is because when I changed PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec to PredSrvCPUE[t,1] = Eps_R[t] * mean_rec (line 275), the prerecruit CPUE is now lower.
+
+```{r CPUE, fig.cap = "Juneau RKC CPUE: likelihood (blue) vs sum of squares (green) results."}
+#put image here
+knitr::include_graphics('../figures/CSA_JNU_8_CPUE.png', dpi = 125)
+#knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/jnu_rkc_fig1_edited_v2.png'), dpi = 125)
+#getwd()
+
+```
+
+```{r Biomass, fig.cap = "Juneau RKC Biomass comparison between likelihood and sum of squares methodology."}
+#put image here
+knitr::include_graphics('../figures/CSA_JNU_8_Biomass.png', dpi = 125)
+
+```
