@@ -173,12 +173,12 @@ data <- list(
 )
 
 pars <- list(
-  ln_mean_rec = log(1.7), #could also try 1. 1.7 was close to juneau mean
-  ln_Eps_R = log(rep(1, length(df$Survey.Year))), #very small value if additive. close to 1 if multiplicative
+  ln_mean_rec = log(1.7), #could also try 1. 1.7 was close to juneau mean. 1 and 1.7 give the same answer
+  ln_Eps_R = log(rep(1, length(df$Survey.Year))), #very small value if additive. close to 1 if multiplicative. 
   ln_q = log(q), # catchability 
   ln_T12 = log(T12), # preR to R survival rate and molt rate, both
   S = S, #fixed!!survival. do I need to log??
-  ln_sigma_survey = log(0.25), #0.1,
+  ln_sigma_survey = log(0.25), #0.1, #0.25 is my starting value
   #ln_InitDevs = rep(0, n_ages - 2), # Initial Recruitment penalty
   #ln_RecDevs = rep(0, n_yrs) # Recruitment penalty
   ln_init_rec_cpue = log(pred_CPUE_rec[1]), #initial recruit CPUE, to be estimated #log-tranform perhaps? can't go neg.
@@ -411,7 +411,7 @@ pop_mod$gr()
 opt <- TMBhelper::fit_tmb(obj = pop_mod, #**some warning about reordering parameters 6/13/25
                                 fn = pop_mod$fn,
                                gr = pop_mod$gr, 
-                               newtonsteps = 2, # additional steps helps get the gradient lower
+                               newtonsteps = 1, # additional steps helps get the gradient lower; the retros need 1 so I'll have 1 here too
                          getsd = TRUE) #can check out this model results, how different from nlmimb
 opt
 
