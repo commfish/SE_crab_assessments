@@ -30,6 +30,8 @@ knitr::include_graphics('../figures/CSA_JNU_8_CPUE.png', dpi = 125)
 
 ```
 
+## CPUE
+
 CPUE: Postrecruits are inflated in the early years. Prerecruits look better. Missing value years look... different, especially for postrecruits. 
 
 
@@ -38,6 +40,8 @@ CPUE: Postrecruits are inflated in the early years. Prerecruits look better. Mis
 knitr::include_graphics('../figures/CSA_JNU_8_Biomass.png', dpi = 125)
 
 ```
+## Biomass
+
 Biomass: Recent biomass estimates are lower for both mature and legal biomass. This is likely driven by the increase in estimated catchability (q starting value:0.0001055574, which is the starting value for the 2024 CSA Excel analysis; q estimated value: 0.0001151898).
 
 This is what the biomass looks like when I run the same model with q fixed:
@@ -46,7 +50,7 @@ This is what the biomass looks like when I run the same model with q fixed:
 knitr::include_graphics('../figures/CSA_JNU_8_Biomass_fixedq.png', dpi = 125)
 ```
 
-# Quasi-retros
+## Quasi-retros
 
 See graph below. The likelihood RTMB model consistently estimates lower than the Excel SSQ model. I'm sure you guys have opinions about this and I look forward to hearing them. I only ran the retros on the likelihood method back to 1995 because it seemed excessive to go further, but I can adjust upon request.
 
@@ -61,4 +65,9 @@ Here are the quasi-retros with q fixed:
 knitr::include_graphics('../figures/compare_quasi_retros_fixedq.png', dpi = 125)
 
 ```
+## Conclusion
+I'm interested to hear your opinions about both the fix to the negative starting values in the population dynamics and also your overall impressions. The only reason I tried fixing the q was to see if it produced results closer to the Excel SSQ model, and it did. But leaving q to be estimated more accurately mimics the Excel SSQ model methodology.
+
+Parameters estimated in Juneau8: recruitment deviates, q, T12 (transition and survival value from prerecruits to recruits), sigma_survey, initial recruit CPUE, intial postrecruit CPUE.  
+Fixed parameters: S, mean recruitment
 
