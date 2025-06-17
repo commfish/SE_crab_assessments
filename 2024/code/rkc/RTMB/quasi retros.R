@@ -199,7 +199,7 @@ colnames(df_bin) <- c("Year", "Legal_biomass", "Mature_biomass")
 #load in the "each year we predicted this" data
 ##hmm where was that - bring in from S drive.
 ##found it (Table 2 in the 2024 analysis)- made a new csv file just for compariosn
-SSQ_retros_old <- read.csv("CSA_excel/Juneau 2024 quasi retros.csv") #upload this to the repo!! To do!!
+SSQ_retros_old <- read.csv("Juneau 2024 quasi retros.csv") #nonsensically, I can only put this file in the main folder. Thanks, github.
 #get rid of commas in the dataframe
 SSQ_retros_old$Legal.biomass <- as.numeric(gsub(",", "", SSQ_retros_old$Legal.biomass))
 SSQ_retros_old$Mature.biomass <- as.numeric(gsub(",", "", SSQ_retros_old$Mature.biomass))
