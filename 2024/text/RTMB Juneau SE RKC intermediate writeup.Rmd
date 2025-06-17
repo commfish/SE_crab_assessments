@@ -22,6 +22,8 @@ Thanks for your help with the likelihood and NA dodging Tyler. I fixed that part
 
 I had issues with negative starting values predicted CPUE from my population projection (this is what was causing the singularities error). I ended up doing a log-unlog trick that effectively removes any negative values from the postrecrutis, but also inflates their values a tiny bit. Please take a look at lines (269, 277; function softplus) in RTMB_CSA_Juneau8.R and let me know if you have a better workaround to undesirable negative starting values. RTMB does not work with pmax (tried and failed) or ifelse (says the internet). Alternatively, I could inflate my starting values so that the model does not go negative in the population calculation, but that doesn’t seem… right… The reason why this issue is popping up now and not before now is because when I changed PredSrvCPUE[t,1] = Eps_R[t] * mean_rec + mean_rec to PredSrvCPUE[t,1] = Eps_R[t] * mean_rec (line 275), the prerecruit CPUE is now lower.
 
+## CPUE
+
 ```{r CPUE, fig.cap = "Juneau RKC CPUE: likelihood (blue) vs sum of squares (green) results."}
 #put image here
 knitr::include_graphics('../figures/CSA_JNU_8_CPUE.png', dpi = 125)
@@ -30,9 +32,10 @@ knitr::include_graphics('../figures/CSA_JNU_8_CPUE.png', dpi = 125)
 
 ```
 
-## CPUE
 
-CPUE: Postrecruits are inflated in the early years. Prerecruits look better. Missing value years look... different, especially for postrecruits. 
+CPUE: Postrecruits are inflated in the early years. Prerecruits look better. Missing value years look... different, especially for postrecruits.
+
+## Biomass
 
 
 ```{r Biomass, fig.cap = "Juneau RKC Biomass comparison between likelihood and sum of squares methodology."}
@@ -40,7 +43,6 @@ CPUE: Postrecruits are inflated in the early years. Prerecruits look better. Mis
 knitr::include_graphics('../figures/CSA_JNU_8_Biomass.png', dpi = 125)
 
 ```
-## Biomass
 
 Biomass: Recent biomass estimates are lower for both mature and legal biomass. This is likely driven by the increase in estimated catchability (q starting value:0.0001055574, which is the starting value for the 2024 CSA Excel analysis; q estimated value: 0.0001151898).
 
