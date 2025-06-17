@@ -128,10 +128,10 @@ t <- 47 # my counter. Will max length +1
 w <- 45 #my counter for the observed array (2 less becuse there are two NA's in the data that I need to dance around)
 i <-1
 
-bin <- array(20, dim =c(1, 3) )  #my storage box of numbers. Pre-set to hold 20.
+bin <- array(0, dim =c(29, 3) )  #my storage box of numbers. Pre-set to hold 20.
 
 #for loop 
-for (i in 1:19){ #Let's go back to 1994
+for (i in 1:29){ #Let's go back to 1995
 
 #remove one row from the data
 c <- t-i #ok this can be my counter
@@ -179,7 +179,7 @@ pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) #idk if 
 opt <- TMBhelper::fit_tmb(obj = pop_mod, #**some warning about reordering parameters 6/13/25
                           fn = pop_mod$fn,
                           gr = pop_mod$gr, 
-                          newtonsteps = 2, # do I WANT newtonsteps if I don't need them??
+                          newtonsteps = 1, # do I WANT newtonsteps if I don't need them?? - actually I need at least one for the gradient to be decent
                           getsd = TRUE)
 
 
@@ -190,7 +190,14 @@ bin[i,] = c(2025-i, Index_thisyear[c,2], Index_thisyear[c,3]) #switch cur_year+1
 
 }#end for loop
 
+#data there?
+bin #yep.
+df_bin <- data.frame(bin)
+colnames(df_bin) <- c("Year", "Legal biomass", "Mature biomass")
+
 ###Graph
 #load in the "each year we predicted this" data
+##hmm where was that - bring in from S drive.
+
 #perhaps add the end year to this year's data
 #graph that vs the df I just created
