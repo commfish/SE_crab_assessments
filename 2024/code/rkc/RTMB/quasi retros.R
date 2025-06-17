@@ -259,12 +259,16 @@ Compare_retros_long <- Compare_retros %>%
                names_to = "Biomass_Type", 
                values_to = "Biomass_Value")
 
-ggplot(Compare_retros_long) + aes(x=Year, y=Biomass_Value, color=Method, shape=Biomass_Type) +
+(compare_retros_graph <- ggplot(Compare_retros_long) + aes(x=Year, y=Biomass_Value, color=Method, shape=Biomass_Type) +
   geom_point(size=3) +
   geom_line() +
   theme_bw() +
   labs(y="Biomass") +
-  scale_color_manual(values=c("blue", "darkgrey")) #color the lines
+  scale_color_manual(values=c("blue", "darkgrey"))+
+    labs(title = "Quasi-retros by year and method")) #color the lines
+
+#save that graph
+ggsave("2024/figures/compare_quasi_retros.png", plot = compare_retros_graph, width = 12, height = 6)
 
 
 
