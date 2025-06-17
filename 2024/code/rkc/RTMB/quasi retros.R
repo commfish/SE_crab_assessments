@@ -193,7 +193,7 @@ bin[i,] = c(2025-i, Index_thisyear[c,2], Index_thisyear[c,3]) #switch cur_year+1
 #data there?
 bin #yep.
 df_bin <- data.frame(bin)
-colnames(df_bin) <- c("Year", "Legal biomass", "Mature biomass")
+colnames(df_bin) <- c("Year", "Legal_biomass", "Mature_biomass")
 
 ###Graph
 #load in the "each year we predicted this" data
@@ -203,8 +203,68 @@ SSQ_retros_old <- read.csv("CSA_excel/Juneau 2024 quasi retros.csv") #upload thi
 #get rid of commas in the dataframe
 SSQ_retros_old$Legal.biomass <- as.numeric(gsub(",", "", SSQ_retros_old$Legal.biomass))
 SSQ_retros_old$Mature.biomass <- as.numeric(gsub(",", "", SSQ_retros_old$Mature.biomass))
+colnames(SSQ_retros_old) <- c("Year", "Legal_biomass", "Mature_biomass")
+SSQ_retros_old$Method <- rep("SSQ", length(SSQ_retros_old$Year)) #add a method column)
 
 #rename my bin
 Likelihodd_retros_new <- df_bin
+Likelihodd_retros_new$Method <- rep("Likelihood", length(Likelihodd_retros_new$Year)) #add a method column
+
+#stack em
+Compare_retros <- rbind(SSQ_retros_old, Likelihodd_retros_new) #stack the two dataframes
 
 #graph the likelihood (new) vs sum of squares (old) quasi-retros
+library(ggplot2)
+ggplot() + aes()+
+  geom_point(data=SSQ_retros_old, aes(x=Year, y=Legal_biomass), size=3, shape=15, color="darkgrey") +
+  geom_line(data=SSQ_retros_old,aes(x=Year, y=Legal_biomass), color="darkgrey") +
+  geom_point(data=Likelihodd_retros_new, aes(x=Year, y=Legal_biomass), size=3) +
+  geom_line(data=Likelihodd_retros_new,aes(x=Year, y=Legal_biomass))+
+  theme_bw()+
+  labs(y="Legal biomass")
+
+a<- ggplot(Compare_retros) + aes(x=Year, y=Legal_biomass, color=Method, shape=Method) +
+  geom_point(size=3) +
+  geom_line() +
+  theme_bw() +
+  labs(y="Legal biomass") +
+  scale_color_manual(values=c("Likelihood"="blue", "SSQ"="darkgrey")) #color the lines
+ 
+
+
+ggplot() + aes()+
+  geom_point(data=SSQ_retros_old, aes(x=Year, y=Mature_biomass), size=3, shape=15, color="darkgrey") +
+  geom_line(data=SSQ_retros_old,aes(x=Year, y=Mature_biomass), color="darkgrey") +
+  geom_point(data=Likelihodd_retros_new, aes(x=Year, y=Mature_biomass), size=3) +
+  geom_line(data=Likelihodd_retros_new,aes(x=Year, y=Mature_biomass))+
+  theme_bw()+
+  labs(y="Legal biomass")
+
+
+b <- ggplot(Compare_retros) + aes(x=Year, y=Mature_biomass, color=Method, shape=Method) +
+  geom_point(size=3) +
+  geom_line() +
+  theme_bw() +
+  labs(y="Mature biomass") +
+  scale_color_manual(values=c("Likelihood"="blue", "SSQ"="darkgrey")) #color the lines
+
+library(patchwork)
+a/b + plot_layout(guides="collect")
+
+#meh, I kind of want everything on the same graph
+#make compare retros pivot longer
+library(tidyverse)
+Compare_retros_long <- Compare_retros %>%
+  pivot_longer(cols = c("Legal_biomass", "Mature_biomass"), 
+               names_to = "Biomass_Type", 
+               values_to = "Biomass_Value")
+
+ggplot(Compare_retros_long) + aes(x=Year, y=Biomass_Value, color=Method, shape=Biomass_Type) +
+  geom_point(size=3) +
+  geom_line() +
+  theme_bw() +
+  labs(y="Biomass") +
+  scale_color_manual(values=c("blue", "darkgrey")) #color the lines
+
+
+
