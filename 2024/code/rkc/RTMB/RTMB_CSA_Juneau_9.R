@@ -576,8 +576,8 @@ p1_g <- ggplot(results_df_relevant, aes(x = year)) +
              aes(x = Survey.Year, y = Pre.recruit, shape = "Observed"), 
              color = "black") +
   geom_errorbar(data = df_juneau_24_compare, 
-                aes(x = Survey.Year, ymin = cv_lower_prerec, ymax = cv_upper_prerec), 
-                color = "black", width = 0.2) +
+                aes(x = Survey.Year, ymin = cv_lower_prerec, ymax = cv_upper_prerec, y=NULL), 
+                color = "black") +
   
   # Excel-predicted CPUE
   geom_line(data = df_juneau_24_compare, 
@@ -609,8 +609,8 @@ p2_g <- ggplot(results_df_relevant, aes(x = year)) +
              aes(x = Survey.Year, y = Recruit, shape = "Observed"), 
              color = "black") +
   geom_errorbar(data = df_juneau_24_compare, 
-                aes(x = Survey.Year, ymin = cv_lower_rec, ymax = cv_upper_rec), 
-                color = "black", width = 0.2) +
+                aes(x = Survey.Year, ymin = cv_lower_rec, ymax = cv_upper_rec, y=NULL), 
+                color = "black") +
   
   # Excel-predicted CPUE
   geom_line(data = df_juneau_24_compare, 
@@ -642,8 +642,8 @@ p3_g <- ggplot(results_df_relevant, aes(x = year)) +
              aes(x = Survey.Year, y = Post.recruit, shape = "Observed"), 
              color = "black") +
   geom_errorbar(data = df_juneau_24_compare, 
-                aes(x = Survey.Year, ymin = cv_lower_postrec, ymax = cv_upper_postrec), 
-                color = "black", width = 0.2) +
+                aes(x = Survey.Year, ymin = cv_lower_postrec, ymax = cv_upper_postrec, y=NULL), 
+                color = "black") +
   
   # Excel-predicted CPUE
   geom_line(data = df_juneau_24_compare, 
@@ -665,7 +665,7 @@ p3_g <- ggplot(results_df_relevant, aes(x = year)) +
 #save save
 (p123_g <- p1_g/p2_g/p3_g + plot_layout(guides = "collect")) #combine the plots and collect the legends)
 
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_9_CPUE_grey.png"), plot = p123, width = 8, height = 10, dpi = 300)
+ggsave(paste0(cur_yr,"/figures/CSA_JNU_9_CPUE_grey.png"), plot = p123_g, width = 8, height = 10, dpi = 300)
 
 
 ##################################################
@@ -717,7 +717,7 @@ p5 <- ggplot(results_df_relevant, aes(x = year)) +
             color = "black", size = 1) +
   
   scale_linetype_manual(values = c("RTMB" = "solid", "Excel" = "dashed")) +
-  labs(title = "JNU Mature, Legal, and Pre-recruit Biomass Estimates – Excel (dashed), RTMB (solid) with CI",
+  labs(title = "JNU Mature, Legal, and Pre-recruit Biomass– Excel (dashed), RTMB (solid) with CI",
        x = "Year", y = "Biomass",
        linetype = "Model") +
   theme_minimal()
