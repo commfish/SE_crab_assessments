@@ -528,7 +528,7 @@ p1 <- ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) +
   geom_errorbar(data=df_juneau_24_compare, aes(ymin=cv_lower_prerec, ymax=cv_upper_prerec, x=Survey.Year, y=NULL))+
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Prerecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="JNU Prerec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE", subtitle = "obs CPUE as black points with CV error bars") +
+  labs(title="JNU Pre-recruit CPUE - Excel as dark green line, RTMB light blue with CI", x="Year", y="CPUE", subtitle = "observed CPUE as black points with CV error bars") +
   theme_minimal()
 #there we go.pre-rec is being estimated now.
 
@@ -541,7 +541,7 @@ p2 <- ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) +
   geom_errorbar(data=df_juneau_24_compare, aes(ymin=cv_lower_rec, ymax=cv_upper_rec, x=Survey.Year, y=NULL))+
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Recruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="JNU Rec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE", subtitle = "obs CPUE as black points with CV error bars") +
+  labs(title="JNU Recruit CPUE", x="Year", y="CPUE", subtitle = "obs CPUE as black points with CV error bars") +
   theme_minimal()
 
 #and postrecruit CPUE
@@ -553,7 +553,7 @@ p3 <- ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) +
   geom_errorbar(data=df_juneau_24_compare, aes(ymin=cv_lower_postrec, ymax=cv_upper_postrec, x=Survey.Year, y=NULL))+
   #add the CSA excel model CPUE
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Postrecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="JNU Postrec CPUE - Excel in dark, RTMB light with CI", x="Year", y="CPUE", subtitle = "obs CPUE as black points with CV error bars") +
+  labs(title="JNU Post-recruit CPUE", x="Year", y="CPUE", subtitle = "obs CPUE as black points with CV error bars") +
   theme_minimal()
 
 library(patchwork)
