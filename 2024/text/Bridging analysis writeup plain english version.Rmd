@@ -34,7 +34,7 @@ knitr::include_graphics('../figures/CSA_JNU_9_Biomass_greyscale.png', dpi = 125)
 ```
 
 ## Differences between the two models
-The two models are very similar. The effectively have the same fixed and estimated parameters and both assume normally distributed error. In this framework, the RTMB likelihood model will produce similar results to the Excel RSS model. The slight discrepancy in results is due to slight differences in the underlying mechanisms of Excel vs. R. RTMB also handles missing values differently than Excel. The main model difference is that the RTMB likelihood version has a confidence interval and it is easier to run (meaning less potential for biometrician mistakes).
+The two models are very similar. The effectively have the same fixed and estimated parameters and both assume normally distributed error. In this framework, the RTMB likelihood model will produce similar results to the Excel RSS model. The discrepancy in results is due to slight differences in the underlying mechanisms of Excel vs. R. RTMB also handles missing values differently than Excel. The main model difference is that the RTMB likelihood version has a confidence interval and it is easier to run (meaning less potential for biometrician mistakes).
 
 ### Statistical differences between the two models
 The Excel RSS model uses residual sum of squares. This means that it is finding parameter estimates that make the difference between the observed values and predicted values as small as possible, aiming to minimize the error. The RTMB likelihood model uses negative log likelihood. It estimates the parameter values that maximize the likelihood (or minimize the negative log likelihood). In plain English, it selects parameters that makes the observed data most plausible under the defined model.
@@ -43,10 +43,10 @@ The Excel RSS model uses residual sum of squares. This means that it is finding 
 - R is a more powerful and reproducible analysis template compared to Excel. The potential for user error is reduced.
 - The RTMB likelihood analysis produces confidence intervals, which the Excel analysis does not. Confidence intervals are
  useful for understanding the uncertainty in the point estimates.
-- The RTMB likelihood model can be made more complex. We can add more complexity/robustness to this model in the future if we choose to do so.
+- The RTMB likelihood model can be made more complex. We can add more robustness to this model in the future if we choose to do so.
 
 ## What now?
-I plan to run both models for the Juneau Area. This will allow you to look at the results from both model versions when deciding the personal use opener for the Juneau Area personal use RKC fishery. The results from both models should be close to identical. 
+I plan to run both models for the Juneau Area. This will allow you to look at the results from both model versions when deciding the personal use opener for the Juneau Area personal use RKC fishery. The results from both models should be similar. 
 
 
 
