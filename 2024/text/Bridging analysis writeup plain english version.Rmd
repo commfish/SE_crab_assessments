@@ -1,5 +1,5 @@
 ---
-title: "RTMB Juneau Bridging Analysis"
+title: "RTMB Juneau Bridging Analysis: A Clear and Simple Overview"
 author: "Alex Reich"
 date: "2025-06-27"
 output: html_document
@@ -13,7 +13,7 @@ library(knitr)
 
 # Juneau SE RKC RTMB Bridging Analysis: Excel RSS CSA to RTMB likelihood CSA
 
-This is a plain English write up of the bridging analysis from the Excel residual sum of squares (RSS) catch-survey analysis (CSA) to the RTMB likelihood CSA. I re-ran the Juneau 2024 CSA analysis and compare the standardized CPUE and biomass outputs from both models.
+This is a write up of the bridging analysis from the Excel residual sum of squares (RSS) catch-survey analysis (CSA) to the RTMB likelihood CSA. I re-ran the Juneau 2024 CSA analysis and compare the standardized CPUE and biomass outputs from both models.
 
 ## CPUE
 
