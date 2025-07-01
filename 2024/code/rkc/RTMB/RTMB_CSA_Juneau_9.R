@@ -1,9 +1,8 @@
 ###Juneau RTMB CSA###
 ##Alex Reich
 ##start of development (on version 8):6/12/25
-##recent work: 6/16/25
-##Version  8: I deal with the NA's instead of ignoring them, and add CV into the model and graphs, and add a quasi-retro graph
-##IN DEVELOPMENT###
+##recent work: 7/1/25
+##Version  9: Final fixes
 
 ##############################################################################
 #POTENTIAL PROBLEMS

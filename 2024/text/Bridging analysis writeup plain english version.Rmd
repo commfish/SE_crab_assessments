@@ -16,7 +16,7 @@ library(knitr)
 This is a write up of the bridging analysis from the Excel residual sum of squares (RSS) catch-survey analysis (CSA) to the RTMB likelihood CSA. I re-ran the Juneau 2024 CSA analysis and compare the standardized CPUE and biomass outputs from both models. 
 
 ## Introduction
-Excel, while a great and useful tool for simple data analysis and visualization, has a limited functionality for more complex stock assessments and is prone to user error. The prior Southeast Alaska Red King Crab (RKC) catch-survey analysis (CSA) was done in Excel using a RSS approach, involving a series manual steps for the program to calculate the CPUE and biomass estimates. The manual steps introduce the potential for user error and make the analysis less reproducible. Moving the analysis into R removes the manual steps by instead turning them into a series of code commands to be run, which reduces the potential for user error and makes the analysis more reproducible. 
+Excel, while a great and useful tool for simple data analysis and visualization, has a limited functionality for more complex stock assessments and is prone to user error. The prior Southeast Alaska Red King Crab (RKC) catch-survey analysis (CSA) was done in Excel using a RSS approach, involving a series manual steps for the program to calculate the CPUE and biomass estimates. The manual steps introduce the potential for user error and make the analysis less reproducible. Moving the analysis into R removes the manual steps by instead turning them into a series of code commands to be run, which makes the analysis more reproducible. 
 
 Template Model Builder (TMB) is a model-building framework in C++ that can be used to create both simple and complex models (Kristensen et al 2016). R Template Model Builder (RTMB) is an R package that allows users to design TMB models using R instead of C++ (Kristensen 2024). Given that most biometricians and fisheries biologists are more comfortable in R than C++, using RTMB makes the model code more accessible and easier to understand. Some federal stock assessments use RTMB (Gulf of Alaska Northern Rockfish, Williams and Hulson 2024) or plan to use RTMB in the future (Eastern Bering Sea Pollock, Ianelli et al. 2024).
 
@@ -40,11 +40,11 @@ knitr::include_graphics('../figures/CSA_JNU_9_Biomass_greyscale.png', dpi = 125)
 
 ```
 
-## Differences between the two models
-The two models are very similar. The effectively have the same fixed and estimated parameters and both assume normally distributed error. In this framework, the RTMB likelihood model will produce similar results to the Excel RSS model. The discrepancy in results is due to slight differences in the underlying mechanisms of Excel vs. R. RTMB also handles missing values differently than Excel. The main model difference is that the RTMB likelihood version has a confidence interval and it is easier to run (meaning less potential for biometrician mistakes).
+## Comparison of the two models
+The two models are very similar. They have the same estimated parameters and both assume normally distributed error. In this framework, the RTMB likelihood model will produce similar results to the Excel RSS model. The discrepancy in results is due to slight differences in the underlying mechanisms of Excel vs. R. RTMB also handles missing values differently than Excel. Excel ignores missing values and continues calculations, while the RTMB model is written so that the likelihood calculation skips the missing years, but the population model will still calculate values for these years. The underlying modeling mechanics create a discrepancy around the missing survey years 1990 and 1992, especially for the post-recruits. The main practical differences are that 1) the RTMB likelihood version of the model allows calculation of confidence intervals around model estimates, and 2) the RTMB workflow is more reproducible and has fewer opportunities for human error.
 
 ### Statistical differences between the two models
-The Excel RSS model uses residual sum of squares. This means that it is finding parameter estimates that make the difference between the observed values and predicted values as small as possible, aiming to minimize the error. The RTMB likelihood model uses negative log likelihood. It estimates the parameter values that maximize the likelihood (or minimize the negative log likelihood). In plain English, it selects parameters that makes the observed data most plausible under the defined model.
+The Excel RSS model uses residual sum of squares. This means that it is finding parameter estimates that make the difference between the observed values and predicted values as small as possible, aiming to minimize the error. The RTMB likelihood model uses negative log likelihood. It estimates the parameter values that maximize the likelihood (or minimize the negative log likelihood). Basically, the RTMB likelihood model does the same thing as the Excel RSS model - estimating the best-fitting parameters - but the framework is more flexible and the RTMB likelihood model also estimates standard error.
 
 ## Reasons for switching to the RTMB likelihood CSA
 - R is a more powerful and reproducible analysis template compared to Excel. The potential for user error is reduced.
@@ -53,12 +53,17 @@ The Excel RSS model uses residual sum of squares. This means that it is finding 
 - The RTMB likelihood model can be made more complex. We can add more robustness to this model in the future if we choose to do so.
 
 ## What now?
-I plan to run both models for the Juneau Area. This will allow you to look at the results from both model versions when deciding the personal use opener for the Juneau Area personal use RKC fishery. The results from both models should be similar. 
+For the 2025 SE RKC Juneau Area stock assessment, I plan to run both the RTMB likelihood and Excel CSA models. This will allow you to look at the results from both model versions when deciding the personal use opener for the Juneau Area personal use RKC fishery. The results from both models should be similar. 
 
 # References
-Kristensen, K., Nielsen, A., Berg, C.W., Skaug, H.J., Bell, B.M., and Kristensen, K. (2016). TMB: Automatic Differentiation and Laplace Approximation. Journal of Statistical Software, 70(5), 1-21. doi:10.18637/jss.v070.i05.
+Ianelli, J., T. Honkalehto, S. Wassermann, A. McCarthy, S. Steinessen, C. McGilliard, and E. Siddon. 2024. Assessment of walleye pollock in the eastern Bering Sea. North Pacific Fishery Management Council, Anchorage, AK. https://www.npfmc.org/library/safe-reports/
 
 Kristensen, K. (2024). RTMB: 'R' Bindings for 'TMB.' https://CRAN.R-project.org/package=RTMB.
+
+Kristensen, K., Nielsen, A., Berg, C.W., Skaug, H.J., Bell, B.M., and Kristensen, K. (2016). TMB: Automatic Differentiation and Laplace Approximation. Journal of Statistical Software, 70(5), 1-21. doi:10.18637/jss.v070.i05.
+
+Williams, B. and Hulson, P. (2024). Gulf of Alaska Northern Rockfish Model Updates. North Pacific Fishery Management Council, Anchorage, AK. https://meetings.npfmc.org/CommentReview/DownloadFile?p=6e9d4a6f-16f7-4804-af5d-04e91258f91f.pdf&fileName=GOAnorthernrockfish.pdf.
+
 
 
 
