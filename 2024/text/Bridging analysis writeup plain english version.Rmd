@@ -13,7 +13,14 @@ library(knitr)
 
 # Juneau SE RKC RTMB Bridging Analysis: Excel RSS CSA to RTMB likelihood CSA
 
-This is a write up of the bridging analysis from the Excel residual sum of squares (RSS) catch-survey analysis (CSA) to the RTMB likelihood CSA. I re-ran the Juneau 2024 CSA analysis and compare the standardized CPUE and biomass outputs from both models.
+This is a write up of the bridging analysis from the Excel residual sum of squares (RSS) catch-survey analysis (CSA) to the RTMB likelihood CSA. I re-ran the Juneau 2024 CSA analysis and compare the standardized CPUE and biomass outputs from both models. 
+
+## Introduction
+Excel, while a great and useful tool for simple data analysis and visualization, has a limited functionality for more complex stock assessments and is prone to user error. The prior Southeast Alaska Red King Crab (RKC) catch-survey analysis (CSA) was done in Excel using a RSS approach, involving a series manual steps for the program to calculate the CPUE and biomass estimates. The manual steps introduce the potential for user error and make the analysis less reproducible. Moving the analysis into R removes the manual steps by instead turning them into a series of code commands to be run, which reduces the potential for user error and makes the analysis more reproducible. 
+
+Template Model Builder (TMB) is a model-building framework in C++ that can be used to create both simple and complex models (Kristensen et al 2016). R Template Model Builder (RTMB) is an R package that allows users to design TMB models using R instead of C++ (Kristensen 2024). Given that most biometricians and fisheries biologists are more comfortable in R than C++, using RTMB makes the model code more accessible and easier to understand. 
+
+The RTMB likelihood CSA uses the same data and model structure as the Excel RSS CSA, but it is built in R using the RTMB package. The notable difference is that the RTMB likelihood CSA uses a negative log likelihood approach to estimate the parameters, while the Excel RSS CSA uses a residual sum of squares approach. The RTMB likelihood CSA also produces confidence intervals for the estimates, which the Excel RSS CSA does not. The following sections will compare the results from the RTMB likelihood CSA to the results from the Excel RSS CSA. The goal is to show that the two models produce similar results, while also highlighting the benefits of using RTMB likelihood over Excel RSS.
 
 ## CPUE
 
@@ -47,6 +54,12 @@ The Excel RSS model uses residual sum of squares. This means that it is finding 
 
 ## What now?
 I plan to run both models for the Juneau Area. This will allow you to look at the results from both model versions when deciding the personal use opener for the Juneau Area personal use RKC fishery. The results from both models should be similar. 
+
+# References
+Kristensen, K., Nielsen, A., Berg, C.W., Skaug, H.J., Bell, B.M., and Kristensen, K. (2016). TMB: Automatic Differentiation and Laplace Approximation. Journal of Statistical Software, 70(5), 1-21. doi:10.18637/jss.v070.i05.
+
+Kristensen, K. (2024). RTMB: 'R' Bindings for 'TMB.' https://CRAN.R-project.org/package=RTMB.
+
 
 
 
