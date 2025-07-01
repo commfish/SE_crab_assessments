@@ -576,34 +576,6 @@ cur_yr <- 2024 #the current year
 ggsave(paste0(cur_yr,"/figures/CSA_JNU_9_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
 
 #C doesn't like dashed lines version
-# Prep RTMB model data
-#combine the two df's
-###DRAFT DRAFT DRAFT
-compare_cpue_df_prerec <- results_df_relevant %>%
-  select(prerecuit_cpue, prerecuit_cpue_upper,
-         prerecuit_cpue_lower, year) %>%
-  mutate(model = "RTMB")
-temp_prerec_cpue <- df_juneau_24_compare %>%
-  #make column names the same names as compare_cpue_df_prerec
-  select(Pre.recruit, cv_upper_prerec, cv_lower_prerec, Survey.Year) %>%
-  rename(prerecuit_cpue = Pre.recruit,
-         prerecuit_cpue_upper = cv_upper_prerec,
-         prerecuit_cpue_lower = cv_lower_prerec,
-         year = Survey.Year) %>%
-  
-
-df_rtmb <- results_df_relevant %>%
-  select(year,
-         prerecuit_cpue, prerecuit_cpue_lower, prerecuit_cpue_upper,
-         recruit_cpue, recruit_cpue_lower, recruit_cpue_upper,
-         postrecuit_cpue, postrecuit_cpue_lower, postrecuit_cpue_upper) %>%
-  pivot_longer(
-    cols = -year,
-    names_to = c("stage", "metric"),
-    names_pattern = "(.*)_cpue(?:_(.*))?"
-  ) %>%
-  mutate(model = "RTMB")
-###DRAFT DRAFT DRAFT
 
 
 #greyscale version
@@ -671,7 +643,12 @@ p2_g <- ggplot(results_df_relevant, aes(x = year)) +
     linetype = "Model Type",
     shape = "Data Source"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  theme(  legend.position = c(0.95, 0.95),    # x=95% right, y=95% top inside plot area
+          # legend.justification = c("right", "top"),  # anchor legend box by its top-right corner
+          # legend.background = element_rect(fill = alpha("white", 0.7), color = "gray80"),  # semi-transparent background for readability
+          legend.box.background = element_rect(color = "gray80")
+  )
 
 #postrecruit greyscale
 p3_g <- ggplot(results_df_relevant, aes(x = year)) + 
@@ -709,26 +686,38 @@ p3_g <- ggplot(results_df_relevant, aes(x = year)) +
 #save save
 (p123_g <- p1_g/p2_g/p3_g + plot_layout(guides = "collect")) #combine the plots and collect the legends)
 
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_9_CPUE_grey.png"), plot = p123_g, width = 8, height = 10, dpi = 300)
+#ggsave(paste0(cur_yr,"/figures/CSA_JNU_9_CPUE_grey.png"), plot = p123_g, width = 8, height = 10, dpi = 300)
 
 
 ##################################################
 #graph CSA excel biomass vs. RTMB biomass estimates
 #mature biomass
+color_levels_2 <- c("Mature RTMB", "Mature Excel", "Legal RTMB", "Legal Excel", "Pre-recruit RTMB", "Pre-recruit Excel")
+
 p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
-  geom_ribbon(aes(ymin=mature_biomass_lower, ymax=mature_biomass_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
-  geom_line(color ="lightblue", size=1) + #the model-predicted RTMB biomasss
-  geom_line(data=df_juneau_24_compare ,aes(y=Mature.Biomass, x=Survey.Year), color="blue") + #this is excel model mature biomass
+  geom_ribbon(aes(ymin=mature_biomass_lower, ymax=mature_biomass_upper), alpha = 0.3, fill = "#56B4E9") + #uncertainty
+  geom_line(aes(color =factor("Mature RTMB", levels=color_levels_2)), size=1) + #the model-predicted RTMB biomasss
+  geom_line(data=df_juneau_24_compare ,aes(y=Mature.Biomass, x=Survey.Year, color=factor("Mature Excel", levels=color_levels_2))) + #this is excel model mature biomass
   #add legal biomass
-  geom_ribbon(aes(ymin=legal_biomass_lower, ymax=legal_biomass_upper), alpha = 0.2, fill = "lightgreen") + #uncertainty
-  geom_line(aes(y=legal_biomass),color ="lightgreen", size=1) + #the RTMB model-predicted biomasss
-  geom_line(data=df_juneau_24_compare ,aes(y=Legal.Biomass, x=Survey.Year), color="darkgreen") + #this is the excel moodel
+  geom_ribbon(aes(ymin=legal_biomass_lower, ymax=legal_biomass_upper), alpha = 0.2, fill = "#009E73") + #uncertainty
+  geom_line(aes(y=legal_biomass,color =factor("Legal RTMB", levels=color_levels_2)), size=1) + #the RTMB model-predicted biomasss
+  geom_line(data=df_juneau_24_compare ,aes(y=Legal.Biomass, x=Survey.Year, color=factor("Legal Excel", levels=color_levels_2))) + #this is the excel moodel
   #add prerecruit biomass
-  geom_ribbon(aes(ymin=prerecruit_biomass_lower, ymax=prerecruit_biomass_upper), alpha = 0.2, fill = "lightpink") + #uncertainty
-  geom_line(aes(y=prerecruit_biomass),color ="lightpink", size=1) + #the RTMB model-predicted biomass
-  geom_line(data=df_juneau_24_compare ,aes(y=Prerecruit.Biomass, x=Survey.Year), color="pink") + #this is the excel-predicted biomass
-  labs(title="JNU Biomass - Excel dark lines, RTMB light lines with CI", x="Year", y="Biomass") +
-  theme_minimal() #not colorblind friendly
+  geom_ribbon(aes(ymin=prerecruit_biomass_lower, ymax=prerecruit_biomass_upper), alpha = 0.2, fill = "#CC79A7") + #uncertainty
+  geom_line(aes(y=prerecruit_biomass,color =factor("Pre-recruit RTMB", levels=color_levels_2)), size=1) + #the RTMB model-predicted biomass
+  geom_line(data=df_juneau_24_compare ,aes(y=Prerecruit.Biomass, x=Survey.Year, color=factor("Pre-recruit Excel", levels = color_levels_2))) + #this is the excel-predicted biomass
+  labs(title="JNU Mature, Legal, and Pre-recruit Biomass", x="Year", y="Biomass") +
+  theme_minimal() +
+  scale_color_manual(
+    name=NULL,
+    values = c(
+      "Mature RTMB" = "#56B4E9",
+      "Mature Excel" = "darkblue",
+      "Legal RTMB" = "#009E73",
+      "Legal Excel" = "darkgreen",
+      "Pre-recruit RTMB" = "#CC79A7",
+      "Pre-recruit Excel" = "#542788"
+    )) 
 
 p4
 #ggsave to current year figures folder
@@ -766,7 +755,7 @@ p5 <- ggplot(results_df_relevant, aes(x = year)) +
        linetype = "Model") +
   theme_minimal()
 
-ggsave(paste0(cur_yr,"/figures/CSA_JNU_9_Biomass_greyscale.png"), plot = p5, width = 8, height = 5, dpi = 300)
+#ggsave(paste0(cur_yr,"/figures/CSA_JNU_9_Biomass_greyscale.png"), plot = p5, width = 8, height = 5, dpi = 300)
 
 #C did not like the dashed lines, going back to color.
 
