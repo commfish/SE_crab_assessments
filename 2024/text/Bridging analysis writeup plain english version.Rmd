@@ -16,7 +16,7 @@ library(knitr)
 This is a write up of the bridging analysis from the Excel residual sum of squares (RSS) catch-survey analysis (CSA) to the RTMB likelihood CSA. I re-ran the Juneau 2024 CSA analysis and compare the standardized CPUE and biomass outputs from both models. 
 
 ## Introduction
-Excel, while a great and useful tool for simple data analysis and visualization, has a limited functionality for more complex stock assessments and is prone to user error. The prior Southeast Alaska Red King Crab (RKC) catch-survey analysis (CSA) was done in Excel using a RSS approach, involving a series manual steps for the program to calculate the CPUE and biomass estimates. The manual steps introduce the potential for user error and make the analysis less reproducible. Moving the analysis into R removes the manual steps by instead turning them into a series of code commands to be run, which makes the analysis more reproducible. 
+Excel, while a great and useful tool for simple data analysis and visualization, has a limited functionality for more complex stock assessments and is prone to user error. The prior Southeast Alaska Red King Crab (RKC) CSA was done in Excel using a RSS approach, involving a series manual steps for the program to calculate the CPUE and biomass estimates. The manual steps introduce the potential for user error and make the analysis less reproducible. Moving the analysis into R removes the manual steps by instead turning them into a series of code commands to be run, which makes the analysis more reproducible. 
 
 Template Model Builder (TMB) is a model-building framework in C++ that can be used to create both simple and complex models (Kristensen et al 2016). R Template Model Builder (RTMB) is an R package that allows users to design TMB models using R instead of C++ (Kristensen 2024). Given that most biometricians and fisheries biologists are more comfortable in R than C++, using RTMB makes the model code more accessible and easier to understand. Some federal stock assessments use RTMB (Gulf of Alaska Northern Rockfish, Williams and Hulson 2024) or plan to use RTMB in the future (Eastern Bering Sea Pollock, Ianelli et al. 2024).
 
@@ -24,7 +24,7 @@ The RTMB likelihood CSA uses the same data and model structure as the Excel RSS 
 
 ## CPUE
 
-```{r CPUE, fig.cap = "Juneau RKC CPUE: RTMB likelihood (light blue, with 95% confidence intervals) vs Excel residual sum of squares (dark green) results. The observed CPUE is depicted by the black points, with CV error bars based on the historic weighting system."}
+```{r CPUE, fig.cap = "Figure 1. Juneau RKC CPUE: RTMB likelihood (light blue, with 95% confidence intervals) vs Excel residual sum of squares (dark green) results. The observed CPUE is depicted by the black points, with CV error bars based on the historic weighting system."}
 #put image here
 knitr::include_graphics('../figures/CSA_JNU_9_CPUE.png', dpi = 125)
 
@@ -34,7 +34,7 @@ knitr::include_graphics('../figures/CSA_JNU_9_CPUE.png', dpi = 125)
 
 ## Biomass
 
-```{r Biomass, fig.cap = "Juneau RKC mature, legal, and pre-recruit biomass comparison between RTMB likelihood and Excel residual sum of squares methodology. The RTMB likelihood estimates have 95% confidence intervals."}
+```{r Biomass, fig.cap = "Figure 2. Juneau RKC mature, legal, and pre-recruit biomass comparison between RTMB likelihood and Excel residual sum of squares methodology. The RTMB likelihood estimates have 95% confidence intervals."}
 #put image here
 knitr::include_graphics('../figures/CSA_JNU_9_Biomass.png', dpi = 125)
 
