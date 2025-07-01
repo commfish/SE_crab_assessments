@@ -528,7 +528,7 @@ p1 <- ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) +
   geom_line(data=df_juneau_24_compare ,aes(y=Estimated.Prerecruits, x=Survey.Year, color=factor("Excel", levels=color_levels),)) + #this is the observed survey CPUE values
   geom_point(data=df_juneau_24_compare, aes(y=Pre.recruit, x=Survey.Year, color=factor("Observed", levels=color_levels))) + #this is the observed survey CPUE values
   geom_errorbar(data=df_juneau_24_compare, aes(ymin=cv_lower_prerec, ymax=cv_upper_prerec, x=Survey.Year, y=NULL))+
-  labs(title="JNU Pre-recruit CPUE - Excel as dark green line, RTMB light blue with CI", x="Year", y="CPUE", subtitle = "observed CPUE as black points with CV error bars") +
+  labs(title="JNU Pre-recruit CPUE", x="Year", y="CPUE", subtitle = "observed CPUE as black points with CV error bars") +
   scale_color_manual(
     name=NULL,
     values = c(
@@ -537,7 +537,7 @@ p1 <- ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) +
     "Observed" = "black"
   )) +
   theme_minimal() +
-  theme(  legend.position = c(0.87, 0.9),    # x=95% right, y=95% top inside plot area
+  theme(  legend.position = c(0.95, 0.95),    # x=95% right, y=95% top inside plot area
          # legend.justification = c("right", "top"),  # anchor legend box by its top-right corner
          # legend.background = element_rect(fill = alpha("white", 0.7), color = "gray80"),  # semi-transparent background for readability
           legend.box.background = element_rect(color = "gray80")
