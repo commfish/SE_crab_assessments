@@ -56,11 +56,11 @@ The Excel RSS model uses residual sum of squares. This means that it is finding 
 For the 2025 SE RKC Juneau Area stock assessment, I plan to run both the RTMB likelihood and Excel CSA models. This will allow you to look at the results from both model versions when deciding the personal use opener for the Juneau Area personal use RKC fishery. The results from both models should be similar. 
 
 # References
-Ianelli, J., T. Honkalehto, S. Wassermann, A. McCarthy, S. Steinessen, C. McGilliard, and E. Siddon. 2024. Assessment of walleye pollock in the eastern Bering Sea. North Pacific Fishery Management Council, Anchorage, AK. https://www.npfmc.org/library/safe-reports/
+Ianelli, J., Honkalehto, T., Wassermann, S., McCarthy, A., Steinessen, S., McGilliard, C., and Siddon, E. (2024). Assessment of walleye pollock in the eastern Bering Sea. North Pacific Fishery Management Council, Anchorage, AK. https://www.npfmc.org/library/safe-reports/
 
 Kristensen, K. (2024). RTMB: 'R' Bindings for 'TMB.' https://CRAN.R-project.org/package=RTMB.
 
-Kristensen, K., Nielsen, A., Berg, C.W., Skaug, H.J., Bell, B.M., and Kristensen, K. (2016). TMB: Automatic Differentiation and Laplace Approximation. Journal of Statistical Software, 70(5), 1-21. doi:10.18637/jss.v070.i05.
+Kristensen, K., Nielsen, A., Berg, C.W., Skaug, H.J., and Bell, B.M. (2016). TMB: Automatic Differentiation and Laplace Approximation. Journal of Statistical Software, 70(5), 1-21. doi:10.18637/jss.v070.i05.
 
 Williams, B. and Hulson, P. (2024). Gulf of Alaska Northern Rockfish Model Updates. North Pacific Fishery Management Council, Anchorage, AK. https://meetings.npfmc.org/CommentReview/DownloadFile?p=6e9d4a6f-16f7-4804-af5d-04e91258f91f.pdf&fileName=GOAnorthernrockfish.pdf.
 
