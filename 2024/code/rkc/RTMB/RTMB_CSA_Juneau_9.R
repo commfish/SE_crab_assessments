@@ -717,7 +717,12 @@ p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
       "Legal Excel" = "darkgreen",
       "Pre-recruit RTMB" = "#CC79A7",
       "Pre-recruit Excel" = "#542788"
-    )) 
+    )) +
+  theme(  legend.position = c(0.15, 0.8),    # x=95% right, y=95% top inside plot area
+          # legend.justification = c("right", "top"),  # anchor legend box by its top-right corner
+           legend.background = element_rect(fill = alpha("white", 0.7), color = "gray80"),  # semi-transparent background for readability
+          legend.box.background = element_rect(color = "gray80")
+  )
 
 p4
 #ggsave to current year figures folder

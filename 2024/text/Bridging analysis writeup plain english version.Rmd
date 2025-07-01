@@ -24,9 +24,9 @@ The RTMB likelihood CSA uses the same data and model structure as the Excel RSS 
 
 ## CPUE
 
-```{r CPUE, fig.cap = "Juneau RKC CPUE: RTMB likelihood (solid, with 95% confidence intervals) vs Excel residual sum of squares (dashed) results. The observed CPUE is depicted by the black points, with CV error bars based on the historic weighting system."}
+```{r CPUE, fig.cap = "Juneau RKC CPUE: RTMB likelihood (light blue, with 95% confidence intervals) vs Excel residual sum of squares (dark green) results. The observed CPUE is depicted by the black points, with CV error bars based on the historic weighting system."}
 #put image here
-knitr::include_graphics('../figures/CSA_JNU_9_CPUE_grey.png', dpi = 125)
+knitr::include_graphics('../figures/CSA_JNU_9_CPUE.png', dpi = 125)
 
 
 ```
@@ -36,7 +36,7 @@ knitr::include_graphics('../figures/CSA_JNU_9_CPUE_grey.png', dpi = 125)
 
 ```{r Biomass, fig.cap = "Juneau RKC mature, legal, and pre-recruit biomass comparison between RTMB likelihood and Excel residual sum of squares methodology. The RTMB likelihood estimates have 95% confidence intervals."}
 #put image here
-knitr::include_graphics('../figures/CSA_JNU_9_Biomass_greyscale.png', dpi = 125)
+knitr::include_graphics('../figures/CSA_JNU_9_Biomass.png', dpi = 125)
 
 ```
 
