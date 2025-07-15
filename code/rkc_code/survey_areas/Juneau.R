@@ -1,6 +1,7 @@
 # K.Palof    katie.palof@alaska.gov
 # recent date updated: 7-14-2020/ 6-8-2021
 # ADF&G updated for JUNEAU area
+##AR update: 7/10/24 - for 23-24 rkc stock assessment
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -14,7 +15,7 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2023 # change this upon receiving new data
+cur_yr <- 2024 # change this upon receiving new data
 pr_yr <- cur_yr -1
 survey.location <- 'Juneau'
 
@@ -23,11 +24,11 @@ dir.create(file.path(paste0('text'), cur_yr))
 dir.create(file.path(paste0('figures/rkc/'), cur_yr))
 
 ## data -------------------
-dat <- read.csv("./data/rkc/Juneau/jnu_22_23_oceanAK_out_raw.csv") # file name will change annually
+dat <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_23_24.csv")) # file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 #   Juneau area includes Juneau and Barlow
-area <- read.csv("./data/rkc/Juneau/Juneau_Barlow_strata_area.csv") # same every year
+area <- read.csv(paste0(here::here(), "/data/rkc/Juneau/Juneau_Barlow_strata_area.csv")) # same every year
 
 histdat <- read.csv(paste0('./results/rkc/', survey.location, 
                            '/', pr_yr, '/JNU_perpot_all_', pr_yr,'.csv'))
@@ -102,6 +103,24 @@ ggplot(juvies20, aes(Length.Millimeters)) +
 
 ggplot(juvies20, aes(x = Length.Millimeters, fill = cohort)) +
   geom_histogram(binwidth=.5, alpha=.5, position="identity")
+
+#ar- graph of lengths -exploratory
+ggplot(dat1) + aes(x=Length.Millimeters) + geom_density()
+ggplot(dat1) + aes(x=Length.Millimeters, color=factor(Year), fill=factor(Year), group = factor(Year)) + geom_density(alpha=0.3)+
+  facet_wrap(~Recruit.Status) + scale_color_manual(values=c("lightgreen", "violet"))+
+  scale_fill_manual(values=c("lightgreen", "violet"))
+
+ggplot(dat1) + aes(x=Length.Millimeters, color=factor(Year), fill=factor(Year), group = factor(Year)) + geom_density(alpha=0.3)+
+  facet_wrap(~Recruit.Status) + scale_color_manual(values=c("lightgreen", "violet"))+
+  scale_fill_manual(values=c("lightgreen", "violet"))
+
+ggplot(dat1) + aes(x=Length.Millimeters, color=factor(Year), fill=factor(Year), group = factor(Year)) + geom_histogram(alpha=0.3, position="dodge")+
+  facet_wrap(~Recruit.Status) + scale_color_manual(values=c("lightgreen", "violet"))+
+  scale_fill_manual(values=c("lightgreen", "violet"))
+
+ggplot(dat1) + aes(x=Length.Millimeters, color=Recruit.Status, fill=Recruit.Status, group = Recruit.Status) + geom_histogram(alpha=0.3, position="dodge")+
+  facet_wrap(~factor(Year)) #+ scale_color_manual(values=c("lightgreen", "violet"))+
+  #scale_fill_manual(values=c("lightgreen", "violet"))
 
 ## CPUE calc --------------
 ##### By Pot -------------------------------
@@ -211,8 +230,8 @@ write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/',
 
 # number of pots per year --
 CPUE_ALL_YEARS %>% 
-  group_by(Year) %>% 
-  summarize(n = n())
+  dplyr::group_by(Year) %>% 
+  dplyr::summarize(n = n()) #AR - "by is missing with no default"- added dplyr:: to code
 
 CPUE_ALL_YEARS %>% count(Year)
 
@@ -239,7 +258,7 @@ long_t(dat5_cur_yr, baseline, cur_yr, 'Juneau', 'Juneau')
 # output is saved as longterm.csv
 
 
-##### Weights from length - weight relationship.-----------------
+##### Weights from length - weight relationship-----------------
 # Linear model is changed for each area
 # Juneau linear model: exp(3.03*log(length in mm)-7.23)*2.2/1000
 glimpse(dat1) # raw data for last 2 years
@@ -248,6 +267,34 @@ glimpse(dat1) # raw data for last 2 years
 # use function found in functions.R code file
 weights(dat1, 3.03, 7.23, "Juneau", cur_yr)
 # output saved as maleweights.csv
+
+# weights by stage for GMACS
+
+dat_allyrs <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_all_years.csv")) %>%
+  filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed")
+
+weights_stage <- function(dat, slope, intercept, area, year){
+  dat2 <- dat %>%
+    mutate(weight_lb = (exp((slope*log(Length.Millimeters))-intercept))*(2.2/1000))
+  
+  Mature = c("Pre_Recruit", "Recruit", "Post_Recruit")
+  Legal =c("Recruit", "Post_Recruit")
+  # summary of weights all together - would like these in one calc and one summary table
+  male_weights <- dat2 %>% 
+    group_by(Year) %>% 
+    filter(Sex.Code == 1) %>% 
+    summarise(prer_lbs = weighted.mean(weight_lb[Recruit.Status == "Pre_Recruit"], 
+                                       Number.Of.Specimens[Recruit.Status == "Pre_Recruit"], na.rm = TRUE),
+              rec_lbs = weighted.mean(weight_lb[Recruit.Status == "Recruit"], 
+                                         Number.Of.Specimens[Recruit.Status == "Recruit"], na.rm = TRUE), 
+              postr_lbs = weighted.mean(weight_lb[Recruit.Status == "Post_Recruit"], 
+                                        Number.Of.Specimens[Recruit.Status == "Post_Recruit"], na.rm = TRUE)) %>%
+    mutate(across(where(is.numeric), round, 3))
+  # final results with score - save here
+  write_csv(male_weights, paste0('results/rkc/', area, '/', year, '/maleweights_stage.csv'))
+}
+
+weights_stage(dat_allyrs, 3.03, 7.23, "Juneau", cur_yr) # warning: depreciated- AR - still works tho?
 
 ###### Females ----------------------------------------------------------
 # large or mature females
@@ -369,3 +416,182 @@ panel_figure('Juneau', cur_yr, 'Juneau', 3, 0) # female panel
 ### presentation figure -----
 panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 2, 0, 'Juneau Area')
 panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 3, 0, 'Juneau Area')
+
+### presentation figures with different titles -----
+panel_figure_NC_PRES_title('Juneau', cur_yr, 'Juneau', 2, 0, "Males", "Females and juveniles")
+panel_figure_NC_PRES_title('Juneau', cur_yr, 'Juneau', 3, 0, "Males", "Females and juveniles")
+
+
+### total mature male CPUE and CV -----
+
+mat_male_cpue <- CPUE_ALL_YEARS %>%
+  ungroup() %>%
+  rowwise() %>%
+  mutate(mat_males = sum(Pre_Recruit, Recruit, Post_Recruit)) %>%
+  group_by(Year) %>%
+  summarise(mat_males_wt = weighted.mean(mat_males, weighting), mat_males_SE = (weighted.sd(mat_males, weighting)/(sqrt(sum(!is.na(mat_males))))), weighted.cv = (weighted.sd(mat_males, weighting)/weighted.mean(mat_males, weighting))/10) 
+
+# format for GMACS
+mat_male_cpue1 <- mat_male_cpue %>%
+  mutate(Index = 1, Seas = 1, Fleet = 2, Sex = 1, Maturity = 0, Abundance = round(mat_males_wt*1000, 3), CV = round(weighted.cv, 4), abundance_units = 2, timing = 0) %>%
+  select(Index, Year, Seas, Fleet, Sex, Maturity, Abundance, CV, abundance_units, timing)
+
+# write out data file
+
+write.csv(mat_male_cpue1, file = paste0(here::here(), "/data/rkc/Juneau/RKC_matmale_cpue.csv"), row.names=FALSE)
+
+write.table(mat_male_cpue1, file = paste0(here::here(), "/data/rkc/Juneau/RKC_matmale_cpue.txt"), sep = "\t",
+            row.names = FALSE, quote = FALSE)
+
+
+
+
+# CPUE by stage
+
+CPUE_wt_gmacs <- CPUE_ALL_YEARS %>%
+  group_by(Year) %>%
+  summarise(Pre_Recruit_wt = weighted.mean(Pre_Recruit, weighting), PreR_SE = (weighted.sd(Pre_Recruit, weighting)/(sqrt(sum(!is.na(Pre_Recruit))))), PreR_cv = (weighted.sd(Pre_Recruit, weighting)/weighted.mean(Pre_Recruit, weighting))/10,
+            Recruit_wt = weighted.mean(Recruit, weighting), Rec_SE = (weighted.sd(Recruit, weighting)/(sqrt(sum(!is.na(Recruit))))), Recruit_cv = (weighted.sd(Recruit, weighting)/weighted.mean(Recruit, weighting))/10,
+            Post_Recruit_wt = weighted.mean(Post_Recruit, weighting), PostR_SE = (weighted.sd(Post_Recruit, weighting)/(sqrt(sum(!is.na(Post_Recruit))))), PostR_cv = (weighted.sd(Post_Recruit, weighting)/weighted.mean(Post_Recruit, weighting))/10)
+
+
+# format for GMACS - does not work - AR 7/12
+#male_cpue_gmacs <- CPUE_wt_gmacs %>%
+ # unite(col="DataVec", c(Pre_Recruit_wt, Recruit_wt, Post_Recruit_wt), sep="\t") %>%
+#  dplyr::mutate(Index = 1, Seas = 1, Fleet = 1, Sex = 1, Type = 0, Shell = 0, Maturity = 0, Nsamp = total.crab) %>% #added the dyplr spec - AR
+#  select(Index, Year, Seas, Fleet, Sex, Maturity, Abundance, CV, abundance_units, DataVec)
+
+# write out data file
+
+#write.csv(male_cpue_gmacs, file = paste0(here::here(), "/data/rkc/Juneau/RKC_male_cpue.csv"), row.names=FALSE)
+
+#write.table(male_cpue_gmacs, file = paste0(here::here(), "/data/rkc/Juneau/RKC_male_cpue.txt"), sep = "\t",
+        #    row.names = FALSE, quote = FALSE)
+
+#caitlin made figure 2- added 7/18/24
+
+# create model fit plot ---
+
+# note: each year, add one row to the import ranges (e.g., if in 2023 ranges are A8:F53 and R8:T53, then in 2024 ranges are A8:F54 and R8:T54)
+
+library(readxl)
+
+cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Estimates 3 Stage", range = "A8:F54") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Estimates 3 Stage", range = "R8:T54")) %>%
+  select(-c(`...2`, `...3`)) %>%
+  dplyr::rename(Year = `...1`, Obs_prerecruits = `...4`, Obs_recruits = `...5`, Obs_postrecruits = `...6`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>%
+  mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- ar
+  pivot_longer(cols = c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), values_to = "survey_index") %>%
+  mutate(type = case_when(
+    grepl("Obs", name) ~ "Observed",
+    grepl("Est", name) ~ "Estimated"
+  )) %>%
+  mutate(stage = case_when(
+    name == "Obs_prerecruits" ~ "Pre-recruits",
+    name == "Obs_recruits" ~ "Recruits",
+    name == "Obs_postrecruits" ~ "Post-recruits",
+    name == "Est_prerecruits" ~ "Pre-recruits",
+    name == "Est_recruits" ~ "Recruits",
+    name == "Est_postrecruits" ~ "Post-recruits"
+  )) %>%
+  mutate(stage = factor(stage, levels = c("Pre-recruits", "Recruits", "Post-recruits")))
+
+cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)) +
+  geom_point(data = subset(cpue_fit, type == "Observed")) +
+  geom_line(data = subset(cpue_fit, type == "Estimated"), color = "blue") + 
+  #facet_grid(. ~ stage)
+  facet_wrap(vars(stage)) + #ncol=1 to make it long form
+  theme_bw() +
+  ylab("CPUE")
+
+ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
+                         'Juneau_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
+
+
+#catlin additional fig 7/23/24- might be incorrect, oops
+biom_change_closure <- read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Table 2", range = "A5:A50") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Table 2", range = "F5:F50")) %>%
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Table 2", range = "J5:J50")) %>%
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Table 2", range = "N5:N50")) %>%
+  dplyr::rename("Year" = "...1") %>%
+  dplyr::rename("Status" = "...1") %>%
+  filter(Year > 2004) %>%
+  mutate("Est. harvest rate in previous year" = lag(`Harvest Rate`)) %>%
+  mutate("Fishery status in previous year" = lag(`Status`))
+
+biom_change_plot <- biom_change_closure %>% filter(Year > 2005)
+
+ggplot(biom_change_plot, aes(x = `Est. harvest rate in previous year`, y = `pop change`, color = `Fishery status in previous year`)) +
+  geom_point() + 
+  geom_hline(yintercept=0, linetype="dashed", 
+             color = "grey", size=1) +
+  ylab("Est. % change in mature population") + 
+  geom_text(aes(label = Year), hjust = -0.25,  vjust = 0.5)
+
+#################
+#Adam's requested graph of just the top panel from Juneau figure 2-specific to 2024
+
+CPUE_wt_graph <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr,
+                                 '/cpue_wt_since_95.csv'))
+mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv')
+baseline <- read.csv("./data/rkc/longterm_means.csv")
+biomass <- read.csv("./data/rkc/biomass.csv") 
+CPUE_wt_graph %>% 
+  select(Year,Pre_Recruit_wt, Recruit_wt, Post_Recruit_wt, 
+         PreR_SE, Rec_SE, PR_SE) -> males
+males_long <- gather(males, recruit.status, value1, Pre_Recruit_wt:PR_SE, factor_key = TRUE)
+males_long %>% 
+  mutate(recruit.class = ifelse(recruit.status == "Pre_Recruit_wt",
+                                "pre.recruit", ifelse(recruit.status == "Recruit_wt", 
+                                                      "recruit", ifelse(recruit.status == "PreR_SE", 
+                                                                        "pre.recruit", ifelse(recruit.status == "Rec_SE", 
+                                                                                              "recruit", "post.recruit "))))) %>% 
+  mutate(type = ifelse(recruit.status == "PreR_SE",
+                       "se", 
+                       ifelse(recruit.status == "Rec_SE", 
+                              "se", ifelse(recruit.status == "PR_SE", 
+                                           "se", "mean"))))-> males_long
+males_long %>% select (-recruit.status) %>% spread(type, value1) -> males_graph
+
+# baseline cpue values -----
+baseline %>% 
+  filter(Location == "Juneau") -> baseline2
+
+
+p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
+  geom_point(aes(colour = recruit.class, shape = recruit.class, 
+                 fill = recruit.class), size =3) +
+  geom_line(aes(group = recruit.class, colour = recruit.class))+
+  #scale_colour_manual(name = "", values = c("grey1", "grey65", "grey34"))+
+  #scale_fill_manual(name = "", values = c("grey1", "grey65", "grey34")) +
+  scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
+  scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
+  scale_shape_manual(name = "", values = c(15, 16, 17))+
+  scale_y_continuous(breaks = seq(min(0),max((max(males_graph$mean) + max(males_graph$se))), by = 1)) + # change to have more tick marks
+  #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
+  #                   oob = rescale_none) +
+  #ylim(0,(max(males_graph$mean) + max(males_graph$se))) + 
+  ggtitle(survey.location) + ylab("CPUE (number/pot)")+ xlab(NULL)+
+  theme(plot.title = element_text(hjust =0.5)) + #got rid of: axis.text.x = element_blank(),
+  scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+  geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+              alpha = 0.2) +
+  #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
+  #              width =.4) +
+  geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", 
+             linetype = "dotdash", lwd = 0.75)+
+  geom_hline(yintercept = baseline2$Recruit, color = "#56B4E9", 
+             linetype = "longdash", lwd = 0.75)+
+  geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
+             lwd = 0.75)+
+  theme(legend.position = c(0.5,0.8), 
+        axis.text = element_text(size = 12), 
+        axis.title=element_text(size=14,face="bold"), 
+        plot.title = element_text(size = 24))
+
+#save the requested plot
+ggsave(paste0('./figures/rkc/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
+              'justJuneauCPUE', '.png'), p1,  #save teh plot
+       dpi = 800, width = 8, height = 5)
+
+
