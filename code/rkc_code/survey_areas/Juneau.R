@@ -234,7 +234,7 @@ write.csv(CPUE_ALL_YEARS, paste0('./results/rkc/',
 # number of pots per year --
 CPUE_ALL_YEARS %>% 
   dplyr::group_by(Year) %>% 
-  dplyr::summarize(n = n()) #AR - "by is missing with no default"- added dplyr:: to code
+  dplyr::summarize(n = n()) #AR 24 - "by is missing with no default"- added dplyr:: to code
 
 CPUE_ALL_YEARS %>% count(Year)
 
@@ -273,7 +273,7 @@ weights(dat1, 3.03, 7.23, "Juneau", cur_yr)
 
 # weights by stage for GMACS
 
-dat_allyrs <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_all_years.csv")) %>%
+dat_allyrs <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_all_years.csv")) %>% #AGR 25 here- need to pull from OceanAK
   filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed")
 
 weights_stage <- function(dat, slope, intercept, area, year){
