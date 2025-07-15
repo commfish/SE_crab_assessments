@@ -307,7 +307,7 @@ dat1 %>%
 # This selects those rows that do not have an egg percentage.
 # if these rows have a egg. development code and egg condition code then the egg percentage should be there
 # if development = 3 and condition is 4 or 5 then egg percentage should be 0.
-LgF_dat1[is.na(LgF_dat1$Egg.Percent),] #AGR 25 here. A female is missing eggs or a male is miscoded as a female. 2025 pot 76 specimen 36
+LgF_dat1[is.na(LgF_dat1$Egg.Percent),]
 # need to change these to 0 if applicable. 
 #LgF_dat1 %>%
 #  mutate(Egg.Percent =ifelse(is.na(Egg.Percent), 0, Egg.Percent)) -> LgF_dat1
@@ -362,7 +362,7 @@ egg_percent(largef_all, 'Juneau', cur_yr)
 total_health('Juneau', cur_yr)
 # works as long as all files are saved in folder with area name
 
-
+#AGR 25 here
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
