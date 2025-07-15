@@ -11,32 +11,36 @@
 # Species Code (=921), Sex Code, Length Millimeters, Legal Size Code, Shell 
 # Condition Code, Egg Percent, Egg Development Code, Egg Condition Code
 
-
 # Tanner
 # These files must have fields Year, Project Code (=7 for data collected on the summer crab survey), 
 # Trip No, Location Code, Location, Pot No, Depth Fathoms, Time Set, Time Hauled, Pot Condition, 
 # Density Strata Code, Density Strata, Specimen No, Number of Specimens, Recruit Status, Species Code (=931), 
 # Sex Code, Width Millimeters, Shell Condition Code, Egg Percent, Egg Development Code, Egg Condition Code, Pot Comment
 
-# Date written: July 2023
+# Date written: July-October 2023
 # Author: Caitlin Stern
+#updated Sept 19 2024 AGR
+#again July 15 AGR
 # *****************************************************************************************************************************
 
-# load packages
+# *****************************************************************************************************************************
+# load packages, set global variables ----
+# *****************************************************************************************************************************
+
 library(odbc)
 library(DBI)
 library(RODBC)
 library(tidyverse)
 
 # set current year
-cur_yr <- 2023
+cur_yr <- 2024 #new year
 pr_yr <- cur_yr - 1
 
-cur_yr2 <- 23
-pr_yr2 <- 22
+cur_yr2 <- 24
+pr_yr2 <- 23
 
 # *****************************************************************************************************************************
-# establish database connection
+# establish database connection ----
 # *****************************************************************************************************************************
 
 # check that crab survey database is listed as a data source
@@ -58,14 +62,14 @@ tables <- dbListTables(con)
 # this is how you import the data if you need the entire table from the database in R's memory. I recommend skipping this step and 
 # filtering the data before bringing it into R's memory because loading these tables takes a long time. Using the 
 # tbl(con, "EXAMPLE") method lets you run commands on the "EXAMPLE" table in the database without bringing it into R's memory.
-# trip <- dbReadTable(con, "TRIP")
+ #trip <- dbReadTable(con, "TRIP")
 # effort <- dbReadTable(con, "EFFORT")
 # catch <- dbReadTable(con, "CATCH") [this is information on bycatch; prob not necessary]
 # specimen <- dbReadTable(con, "SPECIMEN") # this is very slow to add to R's memory because it is a large table
 
 
 # *****************************************************************************************************************************
-# For pulling red king crab data
+# For pulling red king crab data ----
 # *****************************************************************************************************************************
 
 # set location to filter data
@@ -146,8 +150,163 @@ data_for_csa <- spec_year %>%
 write.csv(data_for_csa, paste0('./data/rkc/', survey.location, '/RKC_survey_CSA_', survey.location, '_', pr_yr2, '_', cur_yr2, '.csv'), row.names = FALSE) 
 
 
+
 # *****************************************************************************************************************************
-# For pulling Tanner crab data collected on the summer crab survey
+# For pulling information on the number of pots set in RKC areas ----
+# *****************************************************************************************************************************
+
+# find trip IDs (use PROJECT_CODE = 007 which should correspond to PROJECT = "Red King Crab Survey")
+trip_year <- tbl(con, "TRIP") %>%
+  filter(PROJECT_CODE == "007" & YEAR %in% c(1979:cur_yr)) %>%
+  # fields needed from trip table: TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO) %>%
+  as.data.frame()
+
+# vector of trip IDs to use in filtering effort table
+trip_sel <- trip_year %>%
+  # get qualifying trip IDs as a vector
+  select(TRIP_ID) %>%
+  as.vector() %>%
+  unname() %>%
+  unlist()
+
+# filter effort table to include only effort from the relevant trips
+effort_tab <- tbl(con, "EFFORT") %>%
+  filter(TRIP_ID %in% trip_sel) %>%
+  as.data.frame()
+
+# join trip with effort table on TRIP_ID and filter for survey location
+# fields needed from effort table: EFFORT_ID, LOCATION, POT_NO, TIME_SET, TIME_HAULED, POT_CONDITION_CODE, POT_CONDITION
+effort_year <- trip_year %>%
+  inner_join(effort_tab, by = "TRIP_ID") %>%
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, POT_NO, TIME_SET, TIME_HAULED, POT_CONDITION_CODE, POT_CONDITION) 
+
+# format data set
+data_all_pots <- effort_year %>%
+  # rename columns and change column types
+  mutate(Year = as.integer(YEAR), Project.Code = as.integer(PROJECT_CODE), Trip.No = as.integer(TRIP_NO), Location = LOCATION, Pot.No = as.integer(POT_NO), Time.Set = TIME_SET, Time.Hauled = TIME_HAULED, Pot.Condition.Code = as.integer(POT_CONDITION_CODE), Pot.Condition = POT_CONDITION) %>%
+  # get rid of old columns
+  select(-c(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, POT_NO, TIME_SET, TIME_HAULED, POT_CONDITION_CODE, POT_CONDITION)) %>%
+  arrange(Year, Location, Pot.No)
+
+# export csv
+write.csv(data_all_pots, paste0('./data/rkc/survey_pots_all_years.csv'), row.names = FALSE) 
+
+# *****************************************************************************************************************************
+# For pulling ALL red king crab data (for use in GMACS) ----
+# *****************************************************************************************************************************
+
+# set location to filter data
+# should be one of c("Barlow Cove", "Juneau"), "Excursion Inlet", "Lynn Sisters", "Gambier Bay", "Pybus Bay", "Peril Strait", 
+# "Seymour Canal"
+sur.location <- c("Barlow Cove", "Juneau")
+
+# set location to export files
+# should be one of "Excursion", "Gambier", "Juneau", "LynnSisters", "Peril", "Pybus", "Seymour"
+survey.location <- "Juneau"
+
+# find trip IDs (use PROJECT_CODE = 007 which should correspond to PROJECT = "Red King Crab Survey")
+trip_year <- tbl(con, "TRIP") %>%
+  filter(PROJECT_CODE == "007" & YEAR %in% c(1979:cur_yr)) %>%
+  # fields needed from trip table: TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO) %>%
+  as.data.frame()
+
+# vector of trip IDs to use in filtering effort table
+trip_sel <- trip_year %>%
+  # get qualifying trip IDs as a vector
+  select(TRIP_ID) %>%
+  as.vector() %>%
+  unname() %>%
+  unlist()
+
+# filter effort table to include only effort from the relevant trips
+effort_tab <- tbl(con, "EFFORT") %>%
+  filter(TRIP_ID %in% trip_sel) %>%
+  as.data.frame()
+
+# join trip with effort table on TRIP_ID and filter for survey location
+# fields needed from effort table: EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, POT_CONDITION_CODE,
+# POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA
+effort_year <- trip_year %>%
+  inner_join(effort_tab, by = "TRIP_ID") %>%
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, POT_CONDITION_CODE, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA) %>%
+  filter(LOCATION %in% sur.location)
+
+# vector of effort IDs to use in filtering specimen table
+effort_sel <- effort_year %>%
+  # get qualifying effort IDs as a vector
+  select(EFFORT_ID) %>%
+  as.vector() %>%
+  unname() %>%
+  unlist()
+
+# each list cannot contain more than 1000 effort IDs so have to split list
+effort_sel01 <- effort_sel[1:1000]
+effort_sel02 <- effort_sel[1001:2000]
+effort_sel03 <- effort_sel[2001:3000]
+effort_sel04 <- effort_sel[3001:4000]
+effort_sel05 <- effort_sel[4001:5000]
+effort_sel06 <- effort_sel[5001:length(effort_sel)]
+
+# select only specimens with wanted effort IDs
+spec_effort01 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 921 & EFFORT_ID %in% effort_sel01) %>%
+  as.data.frame()
+
+spec_effort02 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 921 & EFFORT_ID %in% effort_sel02) %>%
+  as.data.frame()
+
+spec_effort03 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 921 & EFFORT_ID %in% effort_sel03) %>%
+  as.data.frame()
+
+spec_effort04 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 921 & EFFORT_ID %in% effort_sel04) %>%
+  as.data.frame()
+
+spec_effort05 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 921 & EFFORT_ID %in% effort_sel05) %>%
+  as.data.frame()
+
+spec_effort06 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 921 & EFFORT_ID %in% effort_sel06) %>%
+  as.data.frame()
+
+spec_effort <- rbind(spec_effort01, spec_effort02, spec_effort03, spec_effort04, spec_effort05, spec_effort06)
+
+
+# join effort with specimens on EFFORT_ID
+# fields needed from specimen table: SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES, SPECIES_CODE, SEX_CODE, 
+# LENGTH_MILLIMETERS, LEGAL_SIZE_CODE, SHELL_CONDITION_CODE, EGG_PERCENT, EGG_DEVELOPMENT_CODE, EGG_CONDITION_CODE
+spec_year <- merge(effort_year, spec_effort, by="EFFORT_ID", all=T) %>%
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, POT_CONDITION_CODE, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES, SPECIES_CODE, SEX_CODE, LENGTH_MILLIMETERS, LEGAL_SIZE_CODE, SHELL_CONDITION_CODE, EGG_PERCENT, EGG_DEVELOPMENT_CODE, EGG_CONDITION_CODE)
+
+# format data set (so it will work with existing data processing script)
+data_for_gmacs <- spec_year %>%
+  # rename columns and change column types
+  mutate(Year = as.integer(YEAR), Project.Code = as.integer(PROJECT_CODE), Trip.No = as.integer(TRIP_NO), Location.Code = as.integer(LOCATION_CODE), Location = LOCATION, Pot.No = as.integer(POT_NO), Time.Set = TIME_SET, Time.Hauled = TIME_HAULED, Pot.Condition.Code = as.integer(POT_CONDITION_CODE), Pot.Condition = POT_CONDITION, Density.Strata.Code = as.integer(DENSITY_STRATA_CODE), Density.Strata = DENSITY_STRATA, Specimen.No = as.integer(SPECIMEN_NO), Number.Of.Specimens = as.integer(SUBSAMPLE_RATE), Recruit.Status = RECRUIT_STATUS, Species = SPECIES, Species.Code = as.integer(SPECIES_CODE), Sex.Code = as.integer(SEX_CODE), Length.Millimeters = as.integer(LENGTH_MILLIMETERS), Legal.Size.Code = as.integer(LEGAL_SIZE_CODE), Shell.Condition.Code = as.integer(SHELL_CONDITION_CODE), Egg.Percent = as.integer(EGG_PERCENT), Egg.Development.Code = as.integer(EGG_DEVELOPMENT_CODE), Egg.Condition.Code = as.integer(EGG_CONDITION_CODE)) %>%
+  # get rid of old columns
+  select(-c(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, POT_CONDITION_CODE, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES, SPECIES_CODE, SEX_CODE, LENGTH_MILLIMETERS, LEGAL_SIZE_CODE, SHELL_CONDITION_CODE, EGG_PERCENT, EGG_DEVELOPMENT_CODE, EGG_CONDITION_CODE)) %>%
+  arrange(Year, Pot.No, Specimen.No) #%>%
+  # replace NA in Number.Of.Specimens column with 0
+  #mutate_at(vars(Number.Of.Specimens), ~replace(., is.na(.), as.integer(0))) %>%
+  # replace NA in Species.Code column with 921
+  #mutate_at(vars(Species.Code), ~replace(., is.na(.), as.integer(921))) %>%
+  # replace NAs in Species column with "Red king crab"
+  #mutate_at(vars(Species), ~replace(., is.na(.), "Red king crab")) %>%
+  # replace NAs in Recruit.Status column with ""
+  #mutate_at(vars(Recruit.Status), ~replace(., is.na(.), "")) %>%
+  # replace 0 in Egg.Condition.Code with NA
+  #mutate_at(vars(Egg.Condition.Code), ~replace(., . == 0, NA))
+
+# export csv to use in GMACS model
+write.csv(data_for_gmacs, paste0('./data/rkc/', survey.location, '/RKC_survey_CSA_', survey.location, '_all_years.csv'), row.names = FALSE) 
+
+
+# *****************************************************************************************************************************
+# For pulling Tanner crab data collected on the summer crab survey ----
 # *****************************************************************************************************************************
 
 # find trip ID for current year (use PROJECT_CODE = 007 which should correspond to PROJECT = "Red King Crab Survey")
@@ -185,13 +344,14 @@ effort_sel <- effort_year %>%
   unname() %>%
   unlist()
 
-# each list cannot contain more than 1000 effort IDs so have to split list
+# each list cannot contain more than 1000 effort IDs so have to split list #AGR I had to adjust this and make an additional thing to bind
 effort_sel01 <- effort_sel[1:1000]
 effort_sel02 <- effort_sel[1001:2000]
 effort_sel03 <- effort_sel[2001:3000]
 effort_sel04 <- effort_sel[3001:4000]
 effort_sel05 <- effort_sel[4001:5000]
-effort_sel06 <- effort_sel[5001:length(effort_sel)]
+effort_sel06 <- effort_sel[5001:6000]
+effort_sel07 <- effort_sel[6001:length(effort_sel)]
 
 # select only Tanner specimens with wanted effort IDs
 spec_effort01 <- tbl(con, "SPECIMEN") %>%
@@ -214,11 +374,15 @@ spec_effort05 <- tbl(con, "SPECIMEN") %>%
   filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel05) %>%
   as.data.frame()
 
-spec_effort06 <- tbl(con, "SPECIMEN") %>%
+spec_effort06 <- tbl(con, "SPECIMEN") %>% 
   filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel06) %>%
   as.data.frame()
 
-spec_effort <- rbind(spec_effort01, spec_effort02, spec_effort03, spec_effort04, spec_effort05, spec_effort06)
+spec_effort07 <- tbl(con, "SPECIMEN") %>% #AGR added so code does not blow up
+  filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel07) %>%
+  as.data.frame()
+
+spec_effort <- rbind(spec_effort01, spec_effort02, spec_effort03, spec_effort04, spec_effort05, spec_effort06, spec_effort07)
 
 # join effort with specimens on EFFORT_ID
 # fields needed from specimen table: SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES_CODE, SEX_CODE, 
@@ -255,5 +419,181 @@ write.csv(data_for_csa, paste0('./data/tanner/tanner_rkc/red crab survey for Tan
 
 
 # *****************************************************************************************************************************
+# For pulling Tanner crab data collected on the summer crab survey for Juneau/Stephens Passage only ----
+# for file Juneau_red_crab_survey_for_Tanner_crab_CSA_cur_yr
+# *****************************************************************************************************************************
+
+# fields needed: Year, Project Code, Trip No, Location Code, Location, Pot No, Depth Fathoms, Time Set, Time Hauled, 
+# Latitude Decimal Degrees, Longitude Decimal Degrees, Pot Condition, Density Strata Code, Density Strata, Specimen No,
+# Number of Specimens, Recruit Status, Species Code, Sex Code, Width Millimeters, Shell Condition Code, Egg Percent,
+# Egg Development Code, Egg Condition Code, Pot Comment
+
+# find trip ID for current year (use PROJECT_CODE = 007 which should correspond to PROJECT = "Red King Crab Survey")
+trip_year <- tbl(con, "TRIP") %>%
+  filter(PROJECT_CODE == "007" & YEAR == cur_yr) %>%
+  # fields needed from trip table: TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO) %>%
+  as.data.frame()
+
+# vector of trip IDs to use in filtering effort table
+trip_sel <- trip_year %>%
+  # get qualifying trip IDs as a vector
+  select(TRIP_ID) %>%
+  as.vector() %>%
+  unname() %>%
+  unlist()
+
+# filter effort table to include only effort from the relevant trips
+effort_tab <- tbl(con, "EFFORT") %>%
+  filter(TRIP_ID %in% trip_sel) %>%
+  as.data.frame()
+
+# join trip with effort table on TRIP_ID
+# fields needed from effort table: EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, LATITUDE_DECIMAL_DEGREES, 
+# LONGITUDE_DECIMAL_DEGREES, POT_CONDITION_CODE, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, COMMENTS
+effort_year <- trip_year %>%
+  inner_join(effort_tab, by = "TRIP_ID") %>%
+  filter(LOCATION %in% c("Barlow Cove", "Juneau")) %>%
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION_CODE, LOCATION, POT_NO, DEPTH_FATHOMS, TIME_SET, TIME_HAULED, LATITUDE_DECIMAL_DEGREES, LONGITUDE_DECIMAL_DEGREES, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, COMMENTS)
+
+# vector of effort IDs to use in filtering specimen table
+effort_sel <- effort_year %>%
+  # get qualifying effort IDs as a vector
+  select(EFFORT_ID) %>%
+  as.vector() %>%
+  unname() %>%
+  unlist()
+
+# select only Tanner specimens with wanted effort IDs
+spec_effort <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel) %>%
+  as.data.frame()
+
+# join effort with specimens on EFFORT_ID
+# fields needed from specimen table: SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES_CODE, SEX_CODE, 
+# WIDTH_MILLIMETERS, LEGAL_SIZE_CODE, SHELL_CONDITION_CODE, EGG_PERCENT, EGG_DEVELOPMENT_CODE, EGG_CONDITION_CODE, COMMENTS
+spec_year <- merge(effort_year, spec_effort, by="EFFORT_ID", all=T) %>%
+  rename(COMMENTS = COMMENTS.x) %>%
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION_CODE, LOCATION, POT_NO, DEPTH_FATHOMS, TIME_SET, TIME_HAULED, LATITUDE_DECIMAL_DEGREES, LONGITUDE_DECIMAL_DEGREES, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES_CODE, SEX_CODE, WIDTH_MILLIMETERS, SHELL_CONDITION_CODE, EGG_PERCENT, EGG_DEVELOPMENT_CODE, EGG_CONDITION_CODE, COMMENTS)
+
+# Fields needed: Year, Project Code (=7 for data collected on the summer crab survey), 
+# Trip No, Location Code, Location, Pot No, Depth Fathoms, Time Set, Time Hauled, Pot Condition, 
+# Density Strata Code, Density Strata, Specimen No, Number of Specimens, Recruit Status, Species Code (=931), 
+# Sex Code, Width Millimeters, Shell Condition Code, Egg Percent, Egg Development Code, Egg Condition Code, Pot Comment
+
+# format data set (so it will work with existing data processing script)
+data_for_csa <- spec_year %>%
+  # rename columns and change column types
+  mutate(Year = as.integer(YEAR), `Project Code` = as.integer(PROJECT_CODE), `Trip No` = as.integer(TRIP_NO), `Location Code` = as.integer(LOCATION_CODE), Location = LOCATION, `Pot No` = as.integer(POT_NO), `Depth Fathoms` = as.integer(DEPTH_FATHOMS), `Time Set` = TIME_SET, `Time Hauled` = TIME_HAULED, `Latitude Decimal Degrees` = LATITUDE_DECIMAL_DEGREES, `Longitude Decimal Degrees` = LONGITUDE_DECIMAL_DEGREES, `Pot Condition` = POT_CONDITION, `Density Strata Code` = as.integer(DENSITY_STRATA_CODE), `Density Strata` = DENSITY_STRATA, `Specimen No` = as.integer(SPECIMEN_NO), `Number Of Specimens` = as.integer(SUBSAMPLE_RATE), `Recruit Status` = RECRUIT_STATUS, `Species Code` = as.integer(SPECIES_CODE), `Sex Code` = as.integer(SEX_CODE), `Width Millimeters` = as.integer(WIDTH_MILLIMETERS), `Shell Condition Code` = as.integer(SHELL_CONDITION_CODE), `Egg Percent` = as.integer(EGG_PERCENT), `Egg Development Code` = as.integer(EGG_DEVELOPMENT_CODE), `Egg Condition Code` = as.integer(EGG_CONDITION_CODE), `Pot Comment` = COMMENTS) %>%
+  # get rid of old columns
+  select(-c(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, DEPTH_FATHOMS, TIME_SET, TIME_HAULED, LATITUDE_DECIMAL_DEGREES, LONGITUDE_DECIMAL_DEGREES, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES_CODE, SEX_CODE, WIDTH_MILLIMETERS, SHELL_CONDITION_CODE, EGG_PERCENT, EGG_DEVELOPMENT_CODE, EGG_CONDITION_CODE, COMMENTS)) %>%
+  arrange(Year, `Pot No`, `Specimen No`) %>%
+  # replace NA in Number.Of.Specimens column with 0
+  mutate_at(vars(`Number Of Specimens`), ~replace(., is.na(.), as.integer(0))) %>%
+  # replace NAs in Recruit.Status column with ""
+  mutate_at(vars(`Recruit Status`), ~replace(., is.na(.), "")) %>%
+  # replace 0 in Egg.Condition.Code with NA
+  mutate_at(vars(`Egg Condition Code`), ~replace(., . == 0, NA))
+
+# error check - this should contain zero rows
+error_check <- data_for_csa %>%
+  filter(`Number Of Specimens` > 0 & `Recruit Status` == "")
+
+# export csv to use in CSA model
+write.csv(data_for_csa, paste0('./data/tanner/nj_stp/Juneau_red_crab_survey_for_Tanner_crab_CSA_', cur_yr, '.csv'), row.names = FALSE) 
+
+
+# *****************************************************************************************************************************
 # For pulling Tanner crab data collected on the fall crab survey
+# *****************************************************************************************************************************
+
+# find trip ID for current year (use PROJECT_CODE = 008 which should correspond to PROJECT = "Tanner Crab Survey")
+trip_year <- tbl(con, "TRIP") %>%
+  filter(PROJECT_CODE == "008" & YEAR %in% 2013:cur_yr) %>%
+  # fields needed from trip table: TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO) %>%
+  as.data.frame()
+
+# vector of trip IDs to use in filtering effort table
+trip_sel <- trip_year %>%
+  # get qualifying trip IDs as a vector
+  select(TRIP_ID) %>%
+  as.vector() %>%
+  unname() %>%
+  unlist()
+
+# filter effort table to include only effort from the relevant trips
+effort_tab <- tbl(con, "EFFORT") %>%
+  filter(TRIP_ID %in% trip_sel) %>%
+  as.data.frame()
+
+# join trip with effort table on TRIP_ID and filter for survey location
+# fields needed from effort table: EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, LATITUDE_DECIMAL_DEGREES, 
+# LONGITUDE_DECIMAL_DEGREES, POT_CONDITION_CODE, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, COMMENTS
+effort_year <- trip_year %>%
+  inner_join(effort_tab, by = "TRIP_ID") %>%
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, LATITUDE_DECIMAL_DEGREES, LONGITUDE_DECIMAL_DEGREES, POT_CONDITION_CODE, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, COMMENTS)
+
+# vector of effort IDs to use in filtering specimen table
+effort_sel <- effort_year %>%
+  # get qualifying effort IDs as a vector
+  select(EFFORT_ID) %>%
+  as.vector() %>%
+  unname() %>%
+  unlist()
+
+# each list cannot contain more than 1000 effort IDs so have to split list
+effort_sel01 <- effort_sel[1:1000]
+effort_sel02 <- effort_sel[1001:2000]
+#effort_sel03 <- effort_sel[2001:length(effort_sel)]
+effort_sel03 <- effort_sel[2001:3000]
+effort_sel04 <- effort_sel[3001:length(effort_sel)]
+
+# select only Tanner specimens with wanted effort IDs
+spec_effort01 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel01) %>%
+  as.data.frame()
+
+spec_effort02 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel02) %>%
+  as.data.frame()
+
+spec_effort03 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel03) %>%
+  as.data.frame()
+
+spec_effort04 <- tbl(con, "SPECIMEN") %>%
+  filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel04) %>%
+  as.data.frame()
+
+spec_effort <- rbind(spec_effort01, spec_effort02, spec_effort03, spec_effort04)
+
+# join effort with specimens on EFFORT_ID
+# fields needed from specimen table: SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES_CODE, SEX_CODE, 
+# WIDTH_MILLIMETERS, SHELL_CONDITION_CODE, EGG_PERCENT, EGG_DEVELOPMENT_CODE, EGG_CONDITION_CODE
+spec_year <- merge(effort_year, spec_effort, by="EFFORT_ID", all=T) %>%
+  select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, LATITUDE_DECIMAL_DEGREES, LONGITUDE_DECIMAL_DEGREES, POT_CONDITION_CODE, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES_CODE, SEX_CODE, WIDTH_MILLIMETERS, SHELL_CONDITION_CODE, EGG_PERCENT, EGG_DEVELOPMENT_CODE, EGG_CONDITION_CODE, COMMENTS.x)
+
+# format data set (so it will work with existing data processing script)
+data_for_csa <- spec_year %>%
+  # rename columns and change column types
+  mutate(Year = as.integer(YEAR), Project.Code = as.integer(PROJECT_CODE), Trip.No = as.integer(TRIP_NO), Location.Code = as.integer(LOCATION_CODE), Location = LOCATION, Pot.No = as.integer(POT_NO), Time.Set = TIME_SET, Time.Hauled = TIME_HAULED, Latitude.Decimal.Degrees = LATITUDE_DECIMAL_DEGREES, Longitude.Decimal.Degrees = LONGITUDE_DECIMAL_DEGREES, Pot.Condition.Code = as.integer(POT_CONDITION_CODE), Pot.Condition = POT_CONDITION, Density.Strata.Code = as.integer(DENSITY_STRATA_CODE), Density.Strata = DENSITY_STRATA, Specimen.No = as.integer(SPECIMEN_NO), Number.Of.Specimens = as.integer(SUBSAMPLE_RATE), Recruit.Status = RECRUIT_STATUS, Species.Code = as.integer(SPECIES_CODE), Sex.Code = as.integer(SEX_CODE), Width.Millimeters = as.integer(WIDTH_MILLIMETERS), Shell.Condition.Code = as.integer(SHELL_CONDITION_CODE), Egg.Percent = as.integer(EGG_PERCENT), Egg.Development.Code = as.integer(EGG_DEVELOPMENT_CODE), Egg.Condition.Code = as.integer(EGG_CONDITION_CODE), Pot.Comment = COMMENTS.x) %>%
+  # get rid of old columns
+  select(-c(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, LATITUDE_DECIMAL_DEGREES, LONGITUDE_DECIMAL_DEGREES, POT_CONDITION_CODE, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA, SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES_CODE, SEX_CODE, WIDTH_MILLIMETERS, SHELL_CONDITION_CODE, EGG_PERCENT, EGG_DEVELOPMENT_CODE, EGG_CONDITION_CODE, COMMENTS.x)) %>%
+  arrange(Year, Pot.No, Specimen.No) %>%
+  # replace NA in Number.Of.Specimens column with 0
+  mutate_at(vars(Number.Of.Specimens), ~replace(., is.na(.), as.integer(0))) %>%
+  # replace NA in Species.Code column with 921
+  mutate_at(vars(Species.Code), ~replace(., is.na(.), as.integer(931))) %>%
+  # replace NAs in Recruit.Status column with ""
+  mutate_at(vars(Recruit.Status), ~replace(., is.na(.), "")) %>%
+  # replace 0 in Egg.Condition.Code with NA
+  mutate_at(vars(Egg.Condition.Code), ~replace(., . == 0, NA))
+
+# export csv to use in CSA model
+write.csv(data_for_csa, paste0('./data/tanner/tanner_tcs/tanner crab survey for CSA_13_', cur_yr2, '.csv'), row.names = FALSE) 
+
+
+# *****************************************************************************************************************************
+# End of script
 # *****************************************************************************************************************************

@@ -4,13 +4,27 @@ Southeast Alaska crab assessments; red king crab and Tanner crab currently using
 
 Both Southeast Alaska species have annual pot surveys that results in a weighted stratified CPUE estimate of 3 length bins.  These are used in a catch-survey-analysis (CSA) model to estimate biomass of mature and legal male crab for each survey area.
 
+## How to run the assessment - Juneau area
+
+The Juneau area is run first and has its own deadline, and own memo.
+
+1. Read in data
+Ideally using SE_crab_assessments/code/pull_data_for_csa and SE_crab_assessments/code/pull_personal_use_data. I do not know if the Oracle connection is active as of 2025. Alternatively, read in from OceanAK and put that OceanAK link HERE!!
+
+2. Open SE_crab_assessments/code/rkc_code/survey_areas/Juneau.R
+Work through the script, checking each output that is produced as you go. When you get to the part that says
+
+#### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+## How to run the assessment - all other areas
+
+# Notes
+
 ## RTMB development
-AGR here. I developed an RTMB model for the Juneau area
+Juneau area model is complete, and tested for 2024. 2025 Juneau and other area models pending, as is finagling the output and input to run smoothlu
 
-### Problems
-- inconsistent hessian issues
-- "4: relative convergence" - does better than sablefish but implies not the most ideal fit
-
+# OLD STUFF BELOW
 ## CSA model
 Ref: Collie and DeLong 1998, Clark et al. 2003, Kruse and Collie 1991, Collie and Kruse 1998, Zheng et al. 1997
 See ROP for red king crab (reference below) for complete reference citations.
