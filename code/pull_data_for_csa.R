@@ -33,11 +33,11 @@ library(RODBC)
 library(tidyverse)
 
 # set current year
-cur_yr <- 2024 #new year
+cur_yr <- 2025 #new year
 pr_yr <- cur_yr - 1
 
-cur_yr2 <- 24
-pr_yr2 <- 23
+cur_yr2 <- 25
+pr_yr2 <- 24
 
 # *****************************************************************************************************************************
 # establish database connection ----
@@ -49,7 +49,7 @@ odbcDataSources()
 # load database password
 password <- read_file("./code/crab_survey_password.txt")
 
-# connect to crab survey database
+# connect to crab survey database #AAAAAnd as of 2025 there's a connection error, oh joy
 con <- DBI::dbConnect(odbc::odbc(), 
                       Driver = "Oracle in OraClient19Home1",
                       DBQ = "soaora7-scan.us1.ocm.s7134325.oraclecloudatcustomer.com:1521/dfgr1p.us1.ocm.s7134325.oraclecloudatcustomer.com",

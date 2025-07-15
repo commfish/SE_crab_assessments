@@ -10,6 +10,7 @@ The Juneau area is run first and has its own deadline, and own memo.
 
 1. Read in data
 Ideally using SE_crab_assessments/code/pull_data_for_csa and SE_crab_assessments/code/pull_personal_use_data. I do not know if the Oracle connection is active as of 2025. Alternatively, read in from OceanAK and put that OceanAK link HERE!!
+- for the pull_data_for_csa.R, one will need the crab_survey_password text file. For obvious reasons, that password won't be stored on the GitHub. It will be on the S drive HERE. Save it into the code on your local project.
 
 2. Open SE_crab_assessments/code/rkc_code/survey_areas/Juneau.R
 Work through the script, checking each output that is produced as you go. When you get to the part that says
