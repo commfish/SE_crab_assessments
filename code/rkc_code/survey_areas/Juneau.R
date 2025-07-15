@@ -273,7 +273,7 @@ weights(dat1, 3.03, 7.23, "Juneau", cur_yr)
 
 # weights by stage for GMACS
 
-dat_allyrs <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_all_years.csv")) %>% #AGR 25 here- need to pull from OceanAK
+dat_allyrs <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_all_years.csv")) %>% 
   filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed")
 
 weights_stage <- function(dat, slope, intercept, area, year){
@@ -307,7 +307,7 @@ dat1 %>%
 # This selects those rows that do not have an egg percentage.
 # if these rows have a egg. development code and egg condition code then the egg percentage should be there
 # if development = 3 and condition is 4 or 5 then egg percentage should be 0.
-LgF_dat1[is.na(LgF_dat1$Egg.Percent),]
+LgF_dat1[is.na(LgF_dat1$Egg.Percent),] #AGR 25 here. A female is missing eggs or a male is miscoded as a female. 2025 pot 76 specimen 36
 # need to change these to 0 if applicable. 
 #LgF_dat1 %>%
 #  mutate(Egg.Percent =ifelse(is.na(Egg.Percent), 0, Egg.Percent)) -> LgF_dat1

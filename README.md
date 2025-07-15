@@ -16,6 +16,9 @@ Manual data pulls: https://oceanak.adfg.alaska.gov/analytics/saw.dll?Answers#res
 - update the filtered years to the current year and previous year. Re-save the downloaded file as a csv instead of csv-8
 - the sablefish analysis did not like csv-8
 
+For RKC_survey_CSA_Juneau_all_years.csv - had to import two csv's from OCeanAK, by changing the years on the aforementioned link.
+Careful! OceakAK has a silent row max
+
 2. Open SE_crab_assessments/code/rkc_code/survey_areas/Juneau.R
 Work through the script, checking each output that is produced as you go. When you get to the part that says
 
