@@ -2,6 +2,7 @@
 # recent date updated: 7-14-2020/ 6-8-2021
 # ADF&G updated for JUNEAU area
 ##AR update: 7/10/24 - for 23-24 rkc stock assessment
+#AGR 7/15/25 - 24-25 stock assessment
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -15,16 +16,16 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2024 # change this upon receiving new data
+cur_yr <- 2025 # change this upon receiving new data
 pr_yr <- cur_yr -1
 survey.location <- 'Juneau'
 
-dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
+dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr)) 
 dir.create(file.path(paste0('text'), cur_yr))
 dir.create(file.path(paste0('figures/rkc/'), cur_yr))
 
 ## data -------------------
-dat <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_23_24.csv")) # file name will change annually
+dat <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_24_25.csv")) # file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 #   Juneau area includes Juneau and Barlow
@@ -187,10 +188,12 @@ dat5 %>%
 #### survey mid date -----  
 
 # list of unique dates (day only, excluding time)
-dates <- unique(round_date(ymd_hms(dat$Time.Hauled), unit="day"))
+#dates <- unique(round_date(ymd_hms(dat$Time.Hauled), unit="day")) #sigh, formats failing to parse- 25 AGR. 
+dates <- unique(round_date(mdy_hm(dat$Time.Hauled), unit="day")) #agr 25 fix
 
 # only survey dates from the current year
-dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
+dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))] 
+#agr 25- an NA in there
 
 # interval of minimum and maximum survey dates
 date.int <- interval(min(dates.cur, na.rm=TRUE), max(dates.cur, na.rm=TRUE))
