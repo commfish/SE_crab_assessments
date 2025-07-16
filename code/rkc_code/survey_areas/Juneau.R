@@ -204,6 +204,10 @@ sur.midpoint <- int_midpoint(date.int)
 # convert to Julian day
 sur.midpoint.jul <- yday(sur.midpoint)
 
+#save the survey midpoint in results
+write.csv(data.frame(sur.midpoint, sur.midpoint.jul), 
+          paste0('./results/rkc/', survey.location, '/', cur_yr, '/survey_midpoint_', cur_yr, '.csv'))
+
 ##### Historic file ---------------------------------------
 # need to add current years pot summary to the historic pot summary file.  
 # For simplicity reasons this will be inputed for each of the bays.  This will avoid

@@ -191,10 +191,13 @@ source("code/functions.R")
 pu.date.int <- interval(min(pu.dates), max(pu.dates))
 
 # personal use catch midpoint; see functions script for the int_midpoint function
-pu.midpoint <- int_midpoint(pu.date.int)#agr flag- no work
+pu.midpoint <- int_midpoint(pu.date.int)#AGR- save this value...
 
 # convert to Julian day
 pu.midpoint.jul <- yday(pu.midpoint)
+
+data.frame(pu.midpoint, pu.midpoint.jul) %>%
+  write.csv(paste0(here::here(), "/results/rkc/Juneau/pu_midpoint_", cur_yr, ".csv"))
 
 ###############################################################################################################
 ## summary of harvest and permits fished since 2018 --------------

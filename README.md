@@ -36,6 +36,8 @@ Run through the script and check the outputs
 5. Run the Juneau CSA model, using the outputs from the Juneau.R and personal_use.R scripts
 SE_crab_assessments/CSA excel/Juneau 2023 new weightin
 
+5. ALT -  run the Juneau CSA RTMB model, using R and necessary imputs
+
 
 ## How to run the assessment - all other areas
 
