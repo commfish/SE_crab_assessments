@@ -1,5 +1,7 @@
 # K.Palof  ADF&G
-# 7-11-18, updated 7-8-19 / 7-14-20 / 9-6-21/ 7-6-22 / 7-14-2023
+# 7-11-18, updated 7-8-19 / 7-14-20 / 9-6-21/ 7-6-22 / 7-14-2023 
+# AGR updated 7-10-24, run with r version 4.4.0
+#AGR run 7 16 25
 
 # PU data for 11-A Juneau area -- see line 17
 ## PU data for regionwide permit - see below starting at line 105
@@ -10,22 +12,22 @@
 library(tidyverse)
 library(xlsx)
 
-cur_yr = 2023 # survey year
+cur_yr = 2025 # survey year
 
 prv_yr = cur_yr-1 # fishery year NOT survey year
 
 
 # 11-A personal use summary for 11-A -----------------
 #####Load Data ---------------------------------------------------
-personal_use <- read.csv(paste0(here::here(), "/data/harvest/11-A rkc pu_catch_updated2023.csv"))
-permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2021 2022 2023 permit status summary.csv"))
-permit_type_18 <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau permit status summary 2018 to present_updated 2023.csv"))
+personal_use1 <- read.csv(paste0(here::here(), "/data/harvest/11-A rkc pu_catch_updated2025.csv")) #AR edited to avoid df conflict #AR 25 in hand
+permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2023 2024 2025 permit status summary.csv")) #current year and last two, it appears - AR #AR pulled 25
+permit_type_18 <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau permit status summary 2018 to present_updated 2025.csv")) #AGR got for 2025 - from Caitlin's user reports
 # **FIX** get biologist to help summarize this in future...way to time consuming for me and they have to do it already.
 
 ## reported number ----
 # ** in order to get permits not returned that do NOT have catch need to click on "xyz" and select "include rows with only null values"
 # this does NOT translate to .csv output..... **FIX**
-personal_use %>% # *
+personal_use1 %>% # *
   filter(Year == cur_yr | Year == prv_yr | Year == prv_yr-1) %>%  # remove this to do all years, currently just want current 18/19 season
   group_by(Personal.Use.Area, Year, Season, Permit.Returned.Status) %>% 
   summarise(n = length(unique(Permit.Number)), 
@@ -113,7 +115,7 @@ write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_t
 # OR by downloading from OceanAK using the query "KC PU permit details 2018-present"
 
 # load data -----
-personal_use <- read.csv(paste0(here::here(), "/data/harvest/KC PU permit details 2018-2023.csv"))
+personal_use <- read.csv(paste0(here::here(), "/data/harvest/KC PU permit details 2018-2024.csv"))
 
 personal_use %>% 
   summarise(total = sum(Harvest.Reported))
@@ -141,7 +143,8 @@ pu_sum %>%
 write.csv(step2, paste0(here::here(), "/results/rkc/Region1/", cur_yr, "/pu_regional_harvest2.csv"))
 
 step2 %>% 
-  sort(harvest)
+  #sort(harvest)
+  dplyr::arrange(harvest) #I think sort was depreciated?- AR
 
 ## summary of catch by survey area --------------------
 survey.area <- c("Pybus Bay", "Seymour Canal", "East Peril Strait", "West Peril Strait", "Excursion Inlet", 
@@ -167,9 +170,9 @@ pu_sum %>%
 # (August of the previous year and January of the current year), and
 # calculate the cumulative percentage of total catch for each catch date 
 
-pu_catch_dates <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2022_2023 catch dates.csv")) %>%
+pu_catch_dates <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2023_2024 catch dates.csv")) %>%
   mutate(Date = round_date(ymd_hms(Catch.Date), unit="day")) %>%
-  filter(Date > as.Date("2022-02-01")) %>%  
+  filter(Date > as.Date("2023-02-01")) %>%  #uh, do I need to change this? -AR
   mutate(cum.per = 100*cumsum(Number.of.Crab)/sum(Number.of.Crab))
 
 # select the two dates that have the percentage of cumulative catch closest to 50
@@ -195,7 +198,7 @@ pu.midpoint.jul <- yday(pu.midpoint)
 ###############################################################################################################
 
 # personal use harvest by year, season, and permit returned status since 2018
-by_status_18 <- personal_use %>%
+by_status_18 <- personal_use1 %>%
   filter(Year > 2017) %>% 
   group_by(Personal.Use.Area, Year, Season, Permit.Returned.Status) %>% 
   summarise(n = length(unique(Permit.Number)), 
@@ -310,6 +313,12 @@ pu_tab_export <- pu_tab %>%
   mutate(Year = crab_year, `Summer Permits` = season_permits_S, `Summer % fished` = round(per_fished_S, 0), `Summer % returned but not fished` = round(per_notfished_S, 0), `Summer % not returned` = round(per_no_return_S, 0), `Summer estimated harvest` = round(est.total.catch.numbers_S, 0), `Winter Permits` = season_permits_W, `Winter % fished` = round(per_fished_W, 0), `Winter % returned but not fished` = round(per_notfished_W, 0), `Winter % not returned` = round(per_no_return_W, 0), `Winter estimated harvest` = round(est.total.catch.numbers_W, 0), `Total harvest` = round(est.total.catch.numbers_S + est.total.catch.numbers_W, 0)) %>%
   select(Year, `Summer Permits`, `Summer % fished`, `Summer % returned but not fished`, `Summer % not returned`, `Summer estimated harvest`, `Winter Permits`, `Winter % fished`, `Winter % returned but not fished`, `Winter % not returned`, `Winter estimated harvest`, `Total harvest`)
 
+#table for totals
+pu_tab_tot <- pu_tab %>% #I made this to calc the ratios of permits not returned in a season - ar
+  mutate(total_permits = season_permits_S + season_permits_W,
+         total_permits_not_returned = season_no_return_S + season_no_return_W,
+         ratio_permits_not_returned = total_permits_not_returned/total_permits)
+
 # export
 
-write.csv(pu_tab_export, paste0(here::here(), "/results/rkc/Juneau/PU_since_2018_updated2023.csv"), row.names = F)
+write.csv(pu_tab_export, paste0(here::here(), "/results/rkc/Juneau/PU_since_2018_updated2024.csv"), row.names = F)

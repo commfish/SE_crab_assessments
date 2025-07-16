@@ -25,6 +25,9 @@ Work through the script, checking each output that is produced as you go. When y
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
+
+
 ## How to run the assessment - all other areas
 
 # Notes

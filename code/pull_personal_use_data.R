@@ -11,6 +11,7 @@
 
 # Date written: July 2023
 # Author: Caitlin Stern
+# AGR updated July 2025 to update the connection to new oracle (thanks Justin)
 ############################################################################################
 
 # load packages
@@ -24,20 +25,26 @@ library(lubridate)
 odbcDataSources()
 
 # set current year
-cur_yr <- 2023
+cur_yr <- 2025
 pr_yr <- cur_yr - 1
 st_yr <- 2018
 
-cur_yr2 <- 23
-pr_yr2 <- 22
+cur_yr2 <- 25
+pr_yr2 <- 24
 
 # load database password
 password <- read_file("./code/crab_survey_password.txt")
 
 # connect to crab personal use database
+#con <- DBI::dbConnect(odbc::odbc(), 
+ #                     Driver = "Oracle in OraClient19Home1",
+  #                    DBQ = "soaora7-scan.us1.ocm.s7134325.oraclecloudatcustomer.com:1521/dfgr1p.us1.ocm.s7134325.oraclecloudatcustomer.com",
+  #                    UID = "i_cat_pu_reporter",
+   #                   PWD = password)
+
 con <- DBI::dbConnect(odbc::odbc(), 
                       Driver = "Oracle in OraClient19Home1",
-                      DBQ = "soaora7-scan.us1.ocm.s7134325.oraclecloudatcustomer.com:1521/dfgr1p.us1.ocm.s7134325.oraclecloudatcustomer.com",
+                      DBQ = "soaocip-ovpnc-scan.exa.sjcprod.oraclevcn.com:1521/dfgr1p.exa.sjcprod.oraclevcn.com",
                       UID = "i_cat_pu_reporter",
                       PWD = password)
 

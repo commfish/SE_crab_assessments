@@ -50,10 +50,16 @@ odbcDataSources()
 password <- read_file("./code/crab_survey_password.txt")
 
 # connect to crab survey database #AAAAAnd as of 2025 there's a connection error, oh joy
-con <- DBI::dbConnect(odbc::odbc(), 
+#con <- DBI::dbConnect(odbc::odbc(), 
+ #                     Driver = "Oracle in OraClient19Home1",
+  #                    DBQ = "soaora7-scan.us1.ocm.s7134325.oraclecloudatcustomer.com:1521/dfgr1p.us1.ocm.s7134325.oraclecloudatcustomer.com",
+   #                   UID = "i_sur_crab_reporter",
+    #                  PWD = password)
+
+con <- DBI::dbConnect(odbc::odbc(), #2025 update
                       Driver = "Oracle in OraClient19Home1",
-                      DBQ = "soaora7-scan.us1.ocm.s7134325.oraclecloudatcustomer.com:1521/dfgr1p.us1.ocm.s7134325.oraclecloudatcustomer.com",
-                      UID = "i_sur_crab_reporter",
+                      DBQ = "soaocip-ovpnc-scan.exa.sjcprod.oraclevcn.com:1521/dfgr1p.exa.sjcprod.oraclevcn.com",
+                      UID = "i_cat_pu_reporter",
                       PWD = password)
 
 # list of tables
@@ -75,11 +81,11 @@ tables <- dbListTables(con)
 # set location to filter data
 # should be one of c("Barlow Cove", "Juneau"), "Excursion Inlet", "Lynn Sisters", "Gambier Bay", "Pybus Bay", "Peril Strait", 
 # "Seymour Canal"
-sur.location <- "Gambier Bay"
+sur.location <- c("Barlow Cove", "Juneau") #CAUTION POTENTIAL BUG!! AGR 25
 
 # set location to export files
 # should be one of "Excursion", "Gambier", "Juneau", "LynnSisters", "Peril", "Pybus", "Seymour"
-survey.location <- "Gambier"
+survey.location <- c("Barlow Cove", "Juneau")
 
 # find trip ID for current year (use PROJECT_CODE = 007 which should correspond to PROJECT = "Red King Crab Survey")
 trip_year <- tbl(con, "TRIP") %>%
@@ -107,7 +113,8 @@ effort_tab <- tbl(con, "EFFORT") %>%
 effort_year <- trip_year %>%
   inner_join(effort_tab, by = "TRIP_ID") %>%
   select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO, EFFORT_ID, LOCATION, LOCATION_CODE, POT_NO, TIME_SET, TIME_HAULED, POT_CONDITION_CODE, POT_CONDITION, DENSITY_STRATA_CODE, DENSITY_STRATA) %>%
-  filter(LOCATION == sur.location)
+  #filter(LOCATION == sur.location)
+  filter(LOCATION %in% sur.location)
 
 # vector of effort IDs to use in filtering specimen table
 effort_sel <- effort_year %>%
@@ -147,7 +154,7 @@ data_for_csa <- spec_year %>%
   mutate_at(vars(Egg.Condition.Code), ~replace(., . == 0, NA))
 
 # export csv to use in CSA model
-write.csv(data_for_csa, paste0('./data/rkc/', survey.location, '/RKC_survey_CSA_', survey.location, '_', pr_yr2, '_', cur_yr2, '.csv'), row.names = FALSE) 
+write.csv(data_for_csa, paste0('./data/rkc/', survey.location, '/TEST25_RKC_survey_CSA_', survey.location, '_', pr_yr2, '_', cur_yr2, '.csv'), row.names = FALSE) 
 
 
 
