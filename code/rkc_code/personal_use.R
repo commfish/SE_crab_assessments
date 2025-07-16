@@ -1,7 +1,7 @@
 # K.Palof  ADF&G
 # 7-11-18, updated 7-8-19 / 7-14-20 / 9-6-21/ 7-6-22 / 7-14-2023 
 # AGR updated 7-10-24, run with r version 4.4.0
-#AGR run 7 16 25
+#AGR run 7-16-25
 
 # PU data for 11-A Juneau area -- see line 17
 ## PU data for regionwide permit - see below starting at line 105
@@ -112,10 +112,10 @@ write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_t
 ## regionwide PU data ----------
 
 # before loading data, create the .csv by running the script /code/pull_personal_use_data.R
-# OR by downloading from OceanAK using the query "KC PU permit details 2018-present"
+# OR by downloading from OceanAK using the query "KC PU permit details 2018-present" (and save "present" as the current year)
 
 # load data -----
-personal_use <- read.csv(paste0(here::here(), "/data/harvest/KC PU permit details 2018-2024.csv"))
+personal_use <- read.csv(paste0(here::here(), "/data/harvest/KC PU permit details 2018-2025.csv")) #update the end year every year
 
 personal_use %>% 
   summarise(total = sum(Harvest.Reported))
@@ -160,7 +160,7 @@ write.csv(survey.area1, paste0(here::here(), "/results/rkc/Region1/", cur_yr, "/
 pu_sum %>% 
   group_by(Year) %>% 
   summarise(harvest = sum(Harvest.Reported)) %>% 
-  mutate(crab_lbs = harvest *8.5) # using an average legal weight of 8.5 lbs
+  mutate(crab_lbs = harvest *8.5) # using an average legal weight of 8.5 lbs #AGR flag do I need to change this over time??
 
 ###############################################################################################################
 ## catch midpoint date --------

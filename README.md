@@ -25,7 +25,16 @@ Work through the script, checking each output that is produced as you go. When y
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+then...
 
+3. Open SE_crab_assessments/text/2023/juneau.Rmd
+Run the script and check the resulting html file against the one on the S: drive.
+
+4. Open SE_crab_assessments/code/rkc_code/personal_use.R
+Run through the script and check the outputs
+
+5. Run the Juneau CSA model, using the outputs from the Juneau.R and personal_use.R scripts
+SE_crab_assessments/CSA excel/Juneau 2023 new weightin
 
 
 ## How to run the assessment - all other areas
