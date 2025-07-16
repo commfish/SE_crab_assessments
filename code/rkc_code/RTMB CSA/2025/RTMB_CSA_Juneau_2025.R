@@ -17,7 +17,6 @@
 ##look at RTMB outputs and convergence
 ##graph things (Excel CSA 2024 output compared to RTMB CSA 2024 output (I re-did the 2024 analysis in RTMB, essentially))
 
-#I used the 2023 and 2024 Juneau Excel CSA's, Basic_Pop_Model_RTMB.Day3.R (from the RTMB workshop), and Tyler's TMB code for SE Tanner crab (on S drive) to draft this model.
 ##################################################################################
 
 
@@ -26,7 +25,7 @@
 ##adding in new values manually for now (best way?? probs not but I can adjust later)
 
 ##TO DO
-#Draft plain-enlgish bridging analysis write up
+#make this model more general- for use in any area, not just Juneau
 #Draft stats-dense bridging analysis write up
 
 #load libraries
@@ -43,9 +42,58 @@ set.seed(100)
 #DATA
 #######
 
-df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv") #this is the analysis at the end of 2024
-df <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv") #this is the analysis at the end of 2023
+#df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv") #this is the analysis at the end of 2024  TEST FROM EARLIER MODELS
+df1 <- read.csv("CSA_excel/JNU_test_2023to2024_replication.csv") #this is the analysis at the end of 2023 TEST FROM EARLIER MODELS
+df <- read.csv("CSA_excel/Juneau 2024 CPUE correction.csv") #for initial years of running the RTMB, the data input will have to be saved from the 2024 csv
 
+#TO AVOID A VERY UNESSESARY DATA HEADACHE, THE BELOW INFO WILL BE AUTOMATED IN THE FUTURE AND NOT RIGHT NOW.
+#middate_catch_curyr <- read.csv("results/rkc/Juneau/pu_midpoint_2025.csv") #UPDATE year each year
+#middate_c <- middate_catch_curyr[2]
+#as.Date(middate_c$pu.midpoint, format = "%d-%b-%y") #convert to date format
+
+#survey_middate_curyr <- read.csv("results/rkc/Juneau/2025/survey_midpoint_2025.csv") #UPDATE year each year
+#middate_s <- survey_middate_curyr[2]
+
+this_year_cpue <- read.csv("results/rkc/Juneau/2025/JNU_CPUE_2025.csv")%>% #change for each area. update each year
+  filter(Year==2025)
+this_year_crab_weights <- read.csv("results/rkc/Juneau/2025/maleweights.csv") %>% #change for each area. update each year
+  filter(Year==2025)
+
+df$Catch..Number.[46] <- 2985 #this needs to be automated.. both for the row number updated (curyr-1) and the PU number( from the PU R code output)
+df$Catch.Mid.Date[46] <- "22-Aug-24" #dates are a pain. Automate later
+
+#add another line for the new data
+##OK I should automate more of this below.... *FLAG*
+new_line <- data.frame(
+  Survey.Year = 2025, #this year UPDATE EACH YEAR
+  Catch.Season = "2025/26", #this year and next year UPDATE EACH YEAR
+  #Juv..Male = 3.176402, #cpue from summary this year
+  Pre.recruit = this_year_cpue$Pre_Recruit_wt, #cpue from summary this yera
+  Recruit = this_year_cpue$Recruit_wt, #cpue from summary this yera
+  Post.recruit = this_year_cpue$Post_Recruit_wt ,#cpue from summary this yera
+  #legal = , #I actually dont think I use this column
+  Catch..Number. = NA, #no info for the last year
+  Catch.Mid.Date = NA, #no info in most recent year (the fishing hasnt started yet!)
+  Survey.Mid.Date = "11-Jul-25", #dates are a pain. Automate when I have some more time
+  Mature.Weight = this_year_crab_weights$mature_lbs ,
+  Legal.Weight = this_year_crab_weights$legal_lbs,
+  Prerecruit.Weight = this_year_crab_weights$prer_lbs,
+  Catch..Survey.Tau =  0,#this gets calced?? FLAG!!
+  Survey.Tau = 0, #this gets calced?? FLAG!!
+  Estimated.Prerecruits = df$Estimated.Prerecruits[46] , #starting value will be same as last year. UPDATE EACH YEAR
+  Estimated.Recruits = 0,
+  Estimated.Postrecruits = 0,
+  Weight = 12,#by the established subjective weighting mechanism
+  Prerecruit.Biomass = 0,
+  Legal.Biomass = 0,
+  Mature.Biomass = 0,
+  GHL..pounds. = 0
+ 
+)
+
+df<- rbind(df,new_line) #names do not match previous names
+
+#agr new ends here
 #put data into individual stored places for RTMB
 YEARS <- df$Survey.Year
 WEIGHTS <- df$Weight #weighing. MAy need to add one for the new year
@@ -145,10 +193,12 @@ array_all_stages <- array_all_stages[!is.na(array_all_stages[,2,1]), , ] #remove
 #PARAMS
 ###########
 #REC <- 82.7928907453614/100  #preR to R suvival rate #I took the starting value from the 2024 analysis
-T12 <- 84.6347230128254/100  #starting value from 2023 to 2024 analysis (last year)
+#T12 <- 84.6347230128254/100  #starting value from 2023 to 2024 analysis (last year)
+T12 <- 83.0319247141511/100 #starting value for the 2025 analysis (automate later!!) #Q2 in excel
 #q <- 104.187334848418/1000000 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
-q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
-S <- 0.32 
+#q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
+q <- 103.799911855061/1000000 #starting point for 2025 analysis (Q3 in excel - juneau 2024 CPUE correction)
+S <- 0.32 #fixed
 
 ####################
 #SETUP
@@ -437,7 +487,7 @@ pop_mod$env$last.par.best
 #corrplot(cor, type='lower')
 
 
-#load in the CSA 2024 analysis (again...) for comparison of methods: RTMB to Ecvel
+#space to compare 2025 excel to RTMB model AGR HERE 2025
 df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv")
 #get rid of commas in the numbers for prerecuit biomass, legal biomass, and mature biomass
 df_juneau_24_compare$Mature.Biomass <- as.numeric(gsub(",", "", df_juneau_24_compare$Mature.Biomass))
