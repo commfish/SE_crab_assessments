@@ -168,11 +168,11 @@ pu_sum %>%
 
 # bring in catch data, reformat date, keep only dates for the current catch season
 # (August of the previous year and January of the current year), and
-# calculate the cumulative percentage of total catch for each catch date 
+# calculate the cumulative percentage of total catch for each catch date #get from oceanAK- and update the year when saved
 
-pu_catch_dates <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2023_2024 catch dates.csv")) %>%
-  mutate(Date = round_date(ymd_hms(Catch.Date), unit="day")) %>%
-  filter(Date > as.Date("2023-02-01")) %>%  #uh, do I need to change this? -AR
+pu_catch_dates <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2024_2025 catch dates.csv")) %>%
+  mutate(Date = round_date(mdy_hm(Catch.Date), unit="day")) %>%
+  filter(Date > as.Date("2024-02-01")) %>%  #update the year to cur_yr-1 each year. I'm not interested in the 2024 winter catch in 2025
   mutate(cum.per = 100*cumsum(Number.of.Crab)/sum(Number.of.Crab))
 
 # select the two dates that have the percentage of cumulative catch closest to 50
@@ -184,11 +184,14 @@ pu_catch_50 <- pu_catch_dates %>%
 # list of these two catch dates 
 pu.dates <- pu_catch_50$Date
 
+#agr 25 added in a functions source because it's not sourced above
+source("code/functions.R")
+
 # interval of these two catch dates
 pu.date.int <- interval(min(pu.dates), max(pu.dates))
 
 # personal use catch midpoint; see functions script for the int_midpoint function
-pu.midpoint <- int_midpoint(pu.date.int)
+pu.midpoint <- int_midpoint(pu.date.int)#agr flag- no work
 
 # convert to Julian day
 pu.midpoint.jul <- yday(pu.midpoint)
@@ -319,6 +322,6 @@ pu_tab_tot <- pu_tab %>% #I made this to calc the ratios of permits not returned
          total_permits_not_returned = season_no_return_S + season_no_return_W,
          ratio_permits_not_returned = total_permits_not_returned/total_permits)
 
-# export
+# export- UPDATE YEAR EVERY YEAR
 
-write.csv(pu_tab_export, paste0(here::here(), "/results/rkc/Juneau/PU_since_2018_updated2024.csv"), row.names = F)
+write.csv(pu_tab_export, paste0(here::here(), "/results/rkc/Juneau/PU_since_2018_updated2025.csv"), row.names = F)
