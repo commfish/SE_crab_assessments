@@ -370,7 +370,10 @@ total_health('Juneau', cur_yr)
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-## see 'personal_use.R' and 'rkc_harvest_XX.R' to get all data for CSA model
+## see 'personal_use.R' and 'rkc_harvest_XX.R' - the latter is obsolete-agr 25- to get all data for CSA model
+
+##and then I need to load in the biomass file again...Right? AGR 25
+#biomass <- read.csv("./data/rkc/biomass.csv")
 
 ### raw sample size -----------
 head(dat5)
@@ -483,8 +486,8 @@ CPUE_wt_gmacs <- CPUE_ALL_YEARS %>%
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Estimates 3 Stage", range = "A8:F54") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Estimates 3 Stage", range = "R8:T54")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Estimates 3 Stage", range = "A8:F55") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Estimates 3 Stage", range = "R8:T55")) %>%
   select(-c(`...2`, `...3`)) %>%
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...4`, Obs_recruits = `...5`, Obs_postrecruits = `...6`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>%
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- ar
@@ -516,10 +519,10 @@ ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/',
 
 
 #catlin additional fig 7/23/24- might be incorrect, oops
-biom_change_closure <- read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Table 2", range = "A5:A50") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Table 2", range = "F5:F50")) %>%
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Table 2", range = "J5:J50")) %>%
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Juneau ", cur_yr, " new weighting.xls"), sheet = "Table 2", range = "N5:N50")) %>%
+biom_change_closure <- read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Table 2", range = "A5:A52") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Table 2", range = "F5:F52")) %>% #51 or 52??
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Table 2", range = "J5:J52")) %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Table 2", range = "N5:N52")) %>%
   dplyr::rename("Year" = "...1") %>%
   dplyr::rename("Status" = "...1") %>%
   filter(Year > 2004) %>%
