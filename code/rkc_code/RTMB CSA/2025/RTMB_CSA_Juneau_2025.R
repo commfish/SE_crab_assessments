@@ -64,6 +64,10 @@ this_year_crab_weights <- read.csv("results/rkc/Juneau/2025/maleweights.csv") %>
 df$Catch..Number.[46] <- 2985 #this needs to be automated.. both for the row number updated (curyr-1) and the PU number( from the PU R code output)
 df$Catch.Mid.Date[46] <- "22-Aug-24" #dates are a pain. Automate later
 
+#get rid of some non-relevant stuff
+df <- df %>% select(Survey.Year, Catch.Season, Pre.recruit, Recruit, Post.recruit, Catch..Number., Catch.Mid.Date, Survey.Mid.Date, Mature.Weight, Legal.Weight, Prerecruit.Weight, Weight,
+                    Estimated.Recruits, Estimated.Postrecruits) #select only the columns I need
+
 #add another line for the new data
 ##OK I should automate more of this below.... *FLAG*
 new_line <- data.frame(
@@ -80,16 +84,16 @@ new_line <- data.frame(
   Mature.Weight = this_year_crab_weights$mature_lbs ,
   Legal.Weight = this_year_crab_weights$legal_lbs,
   Prerecruit.Weight = this_year_crab_weights$prer_lbs,
-  Catch..Survey.Tau =  0,#this gets calced?? FLAG!!
-  Survey.Tau = 0, #this gets calced?? FLAG!!
-  Estimated.Prerecruits = df$Estimated.Prerecruits[46] , #starting value will be same as last year. UPDATE EACH YEAR
+ # Catch..Survey.Tau =  0,#this gets calced?? FLAG!!
+#  Survey.Tau = 0, #this gets calced?? FLAG!!
+  #Estimated.Prerecruits = df$Estimated.Prerecruits[46] , #starting value will be same as last year. UPDATE EACH YEAR
   Estimated.Recruits = 0,
   Estimated.Postrecruits = 0,
-  Weight = 12,#by the established subjective weighting mechanism
-  Prerecruit.Biomass = 0,
-  Legal.Biomass = 0,
-  Mature.Biomass = 0,
-  GHL..pounds. = 0
+  Weight = 12#by the established subjective weighting mechanism
+  #Prerecruit.Biomass = 0,
+  #Legal.Biomass = 0,
+  #Mature.Biomass = 0,
+  #GHL..pounds. = 0
  
 )
 
@@ -99,10 +103,11 @@ df<- rbind(df,new_line) #names do not match previous names
 #put data into individual stored places for RTMB
 YEARS <- df$Survey.Year
 WEIGHTS <- df$Weight #weighing. MAy need to add one for the new year
+WEIGHTS[is.na(WEIGHTS)] <- 0.1#0.0001 #teh weights are 0 but lets not let the CV be inf. AGR
 
 #make the weights CV 6/16/25
 CV <- sqrt(exp(1/(2*WEIGHTS))-1)
-CV[is.na(CV)] <- 0 #replace NA with 0 #def want to weight these as 0. $leaving NA there might be ok too.
+#CV[is.na(CV)] <- 0 #replace NA with 0 #def want to weight these as 0. $leaving NA there might be ok too. FLAG!! might have to re-activate this
 
 CATCH <- as.numeric(gsub(",", "", df$Catch..Number.)) #get rid of commas, ideally before...
 #replace NA in catch with 0
@@ -144,29 +149,29 @@ SURVEY_TAU[1] <- 0 #first year as 0
 }
 #survey info
 ##survey CPUE (from summary table) #vectors over all the years
-CPUE_prerec <- df$Pre.recruit
+CPUE_prerec <- df$Pre.recruit 
 CPUE_rec <- df$Recruit
 CPUE_postrec <- df$Post.recruit
 #replace NA's in survey CPUEs with 0 #AGR 6/10/25 removed- I think I can make it esimate where NA's, and not loop over them in the likelihood
-#CPUE_prerec[is.na(CPUE_prerec)] <- 0 #replace NA with 0
-#CPUE_rec[is.na(CPUE_rec)] <- 0 #replace NA with 0
-#CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
+CPUE_prerec[is.na(CPUE_prerec)] <- 0 #replace NA with 0
+CPUE_rec[is.na(CPUE_rec)] <- 0 #replace NA with 0
+CPUE_postrec[is.na(CPUE_postrec)] <- 0 #replace NA with 0
 
 #pred survey CPUE
-pred_CPUE_prerec <- df$Estimated.Prerecruit
+#pred_CPUE_prerec <- df$Estimated.Prerecruit #AGR 25 tunrned off - extra I think
 pred_CPUE_rec <- df$Estimated.Recruits
 pred_CPUE_postrec <- df$Estimated.Postrecruits
 
 #mean of predicted prerecuits (the "recruitment") except the last year
-R_bar_1 <- mean(pred_CPUE_prerec[1:(length(pred_CPUE_prerec)-1)]) #mean of prerecruit CPUE
+#R_bar_1 <- mean(pred_CPUE_prerec[1:(length(pred_CPUE_prerec)-1)]) #mean of prerecruit CPUE
 #mean of predicted prerecruits("recruitment") for the last 10 years
 #R_bar_2 <- mean(pred_CPUE_prerec[(length(pred_CPUE_prerec)-9):length(pred_CPUE_prerec)]) #mean of prerecruit CPUE
 
 #vector of deviates from the mean precruit CPUE/ devaites from the average recruitment
-Eps_R <- rep(0, length(pred_CPUE_prerec)) #create a vector of zeros
-for (i in 1:length(pred_CPUE_prerec)){
-  Eps_R[i] <- (pred_CPUE_prerec[i] - R_bar_1)/R_bar_1 #deviate from the mean
-}
+#Eps_R <- rep(0, length(pred_CPUE_prerec)) #create a vector of zeros
+#for (i in 1:length(pred_CPUE_prerec)){
+#  Eps_R[i] <- (pred_CPUE_prerec[i] - R_bar_1)/R_bar_1 #deviate from the mean
+#}
 
 
 ##data as an array for each stage and with columns for year, CPUE, and CV
@@ -245,10 +250,11 @@ names(df) <- c("wt_prerec", "wt_legal", "wt_mature") #prep for graphing
 #map- to fix parameters!!
 map <- list()
 map$S <- factor(NA) 
-#map$ln_q <- factor(NA) 
+#map$ln_q <- factor(NA) #AGR turn back off
 #map$ln_sigma_R <- factor(NA) #prerecurits is overfit when I let this estimate
 map$ln_mean_rec <- factor(NA) #fix mean recruitment - not dealing with this right now
 #map$Eps_R <- factor(rep(NA, length(pars$Eps_R))) #fix recruitment deviates - a test
+#map$ln_T12 <- factor(NA)
 
 ############################3
 #SOMETHNG LIKE THIS:
@@ -356,6 +362,10 @@ basic_pop_model <- function(pars) {
   # Likelihoods -------------------------------------------------------------
 
   ## Survey Index ------------------------------------------------------------
+  #crap- I think below is estimating CV for the output?? how to stop?
+  ##add weights in as a separate thing?
+  ##survey data should NOT change...
+  
 #lambdas <- survey_data[,3,1] #the to, from CV conversion should be here (see tyler solution code and emails)
 #holder <- array(0, dim = c(44, 4, 3))
 pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
@@ -367,6 +377,7 @@ pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
          pred[y] <- PredSrvCPUE[y_row, h] # vector of predictions for stage h in only years that we have data. FLAG Negatives. NEgatives not ok? No negative CPUE... Log?
        }
     SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * survey_data[,4,h] ) #the likelihood. Pred is going negative. this bad? FLAG** #survey_data[,4,h] is weights
+    #AGR 25 crap- is it estimating CV here? We dont want that
     # add predictions to the data for the report however you want to
     #holder[,,h] <- cbind(survey_data[,,h], pred) #I dont get why I have this. FLAG. MY data is spit out elsewhere.
      } #end of st(stage) loop
@@ -506,7 +517,7 @@ Year <- c(min(Temp$Survey.Year):max(Temp$Survey.Year)) #get the years from the d
 temp <- pop_mod$report(pop_mod$env$last.par.best)
 class(temp[8])
 
-temp2<- array(temp[[8]], dim=c(44,4,3))
+temp2<- array(temp[[8]], dim=c(47,4,3)) #UPDATE THE DIM!! EACH YEAR!! FLAG FIX AGR!!!
 cv_df <- data.frame(temp2[,c(1,3),1])
 colnames(cv_df) <- c("year", "CV")
 result_df <- data.frame(temp[-8])
