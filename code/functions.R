@@ -310,6 +310,11 @@ write_csv(stock_health, paste0('results/rkc/', area, '/', year, '/stock_health.c
 
 ## CONF panel figure ---------------
 panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
+  survey.location = "Juneau"
+  cur_yr=2025
+  base.location="Juneau"
+  option=2
+  scale=0
   # survey.location and baseline.location are the same is most areas.  Check
   # baseline file to see if they differ
   # cur_yr is the current year
@@ -406,10 +411,12 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     mutate(Location = ifelse(area == "St_James", "LynnSisters", as.character(area))) %>% 
     select(-area) -> mr_adjust2
   
+  #if(survey.location != "Juneau") { #agr 2025 added this wrapper....
   biomass %>% 
     left_join(mr_adjust2) %>% 
     mutate(adj.legal = legal.biomass*weighted_ADJ, 
            adj.mature = mature.biomass*weighted_ADJ) -> biomass
+  #}
   
   if(survey.location != "Juneau") {
   biomass %>% 
@@ -571,10 +578,18 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   
   
   ### biomass harvest graph -------------- #AGR flag- tjhis is messed uip
+  if(survey.location!="Juneau"){ #agr added wrapper 25 to deal with naming crap
   baseline_lines <- data.frame( #AGR FLAG!! - might need an if statement right here
     label = c("Legal baseline", "Mature baseline"),
     y = c(baseline_means$legal_adj_mean, baseline_means$mature_adj_mean)
-  )
+  )}
+  
+  if(survey.location=="Juneau"){ #agr added wrapper 25 to deal with naming crap
+    baseline_lines <- data.frame( #AGR FLAG!! - might need an if statement right here
+      label = c("Legal baseline", "Mature baseline"),
+      y = c(baseline_means$legal_mean, baseline_means$mature_mean)
+    )}
+  
   
   if(survey.location != "Juneau" & survey.location != "Seymour"){ #if(survey.location != "Juneau"){ for better or worse I made some edits (to clean up seymour): AGR
   p4 <- ggplot(biomass_graph, aes(Year, pounds, group = type))+ 

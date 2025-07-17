@@ -21,13 +21,13 @@ theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
 
 # global --------
 # update each year
-cur_yr = 2023
+cur_yr = 2025
 
 #Load data ----------------
 #biomass <- read.csv("./data/redcrab/biomass.csv") no record of historic mature biomass point estimates
 # in each year so using 2017 model output
 
-hindcast <- read.csv("./data/rkc/Juneau/hind_fore_cast_JNU_current.csv") 
+hindcast <- read.csv("./data/rkc/Juneau/hind_fore_cast_JNU_current.csv") #updated 2025
     # **FIX** currently needs manual updating...fix this.
     # "these "forecast" are historic estimates in the "forecast" columns 
     # "cur_yr" needs to be updated with current years CSA model output for all years  
@@ -47,10 +47,16 @@ hindcast %>%
 baseline_mean_curyr <- as.data.frame(baseline_mean[1:2,])
 baseline_mean_forecast <- as.data.frame(baseline_mean[3:4,])  
 
+# when status for current year confirmed
+hindcast_updated <- hindcast %>%
+  mutate(status = case_when(status == "TBD" ~ "PU only",
+                            status != "TBD" ~ status))
+
 # Figure 1 redo ---------
     # should have current year's model with longterm baselines (1993-2007) and closure status. 
     #   also show current year's forecast as distinct from model output 
-jnu_rkc_fig1 <- hindcast %>% 
+jnu_rkc_fig1 <- #hindcast %>% 
+  hindcast_updated %>% # use this when know decision for current year
   dplyr::rename(legal_lb = legal_curyr, mature_lb = mature_curyr) %>% 
   select(-legal_forecast, -mature_forecast) %>% 
   gather(type, pounds, legal_lb:mature_lb, factor_key = TRUE) %>% 
@@ -74,8 +80,49 @@ jnu_rkc_fig1 <- hindcast %>%
             hjust = -0.45, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
   guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2)))
 
-ggsave(jnu_rkc_fig1, paste0('./figures/rkc/', cur_yr, '/juneau_fig1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+# this is the version when the current year has an asterisk symbol for TBD
+ggsave(filename = "jnu_rkc_fig1.png", path = paste0(here::here(), '/figures/rkc/', cur_yr, '/juneau_fig1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
+# this is for the version when the current year has decision
+ggsave(filename = "jnu_rkc_fig1_2.png", path = paste0(here::here(), '/figures/rkc/', cur_yr, '/juneau_fig1_', cur_yr, '_2.png'), dpi = 800, width = 7.5, height = 5.5)
+
+# figure 1 with edits requested by regional staff #THIS FIGURE IS THE ONE WE USE IN MEMO-AGR!!!!!!
+
+jnu_rkc_fig1_edited <- hindcast %>% 
+  #hindcast_updated %>% # use this when know decision for current year
+  mutate(status = case_when(
+    status == "open" ~ "Open",
+    status == "closed" ~ "Closed",
+    TRUE ~ status
+  )) %>%
+  dplyr::rename(Legal = legal_curyr, Mature = mature_curyr, `Fishery Status` = status) %>% 
+  select(-legal_forecast, -mature_forecast) %>% 
+  gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
+  ggplot(aes(year, pounds, group = type)) +
+  geom_line(aes(color = type, group = type, linetype = type))+
+  geom_point(aes(color = type, shape = `Fishery Status`), size =3) +
+  scale_colour_manual(name = "", values = c("black", "grey60"))+
+  scale_shape_manual(values = c(0, 16, 2, 8))+
+  scale_linetype_manual(name = "", values = c("solid", "dashed")) +
+  scale_y_continuous(labels = comma, limits = c(0,750000),
+                     breaks= seq(min(0), max(750000), by = 100000)) +
+  
+  #ggtitle(paste0("Juneau ", cur_yr," model")) + 
+  ylab("Biomass (lb)")+ xlab("Year") +
+  scale_x_continuous(breaks = seq(min(1976), max(max(hindcast$year)), by = 2)) +
+  #scale_x_continuous(breaks = seq(min(1975), max(max(hindcast$year) + 1), by = 2)) + #I dont like this so I did it differently (line immediately above) - AGR
+  #theme(plot.title = element_text(hjust =0.5)) +
+  #scale_x_continuous(breaks = seq(min(1975),max(cur_yr), by = 5)) +
+  geom_hline(yintercept =  baseline_mean_curyr$baseline[1], color = "grey1")+
+  geom_hline(yintercept = baseline_mean_curyr$baseline[2], color = "grey44", linetype = "dashed") +
+  theme(legend.position = c(0.15,0.793), legend.title = element_text(size = 11), 
+        legend.text = element_text(size = 11), axis.text = element_text(size = 14), 
+        axis.title = element_text(size = 14, face = "bold"), axis.text.x = element_text(angle = 90)) +
+  #geom_text(data = baseline_mean_curyr, aes(x = start_yr, y = baseline, label = label), 
+            #hjust = -0.45, vjust = 1.5, nudge_y = 0.05, size = 4) +
+  guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2)))
+
+ggsave(filename = "jnu_rkc_fig1_edited.png", path = paste0(here::here(), '/figures/rkc/', cur_yr), dpi = 800, width = 7.5, height = 5.5)
 
 # Figure A1 ---old Figure 1 - move to Appendix --------
 # forecast for each year 
@@ -104,10 +151,10 @@ jnu_rkc_annual_fore <- hindcast %>%
             hjust = -0.55, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
   guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2)))
 
-ggsave(jnu_rkc_annual_fore, paste0(here::here(), '/figures/rkc/', cur_yr, '/juneau_figA1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+ggsave(filename = "jnu_rkc_annual_fore.png", path = paste0(here::here(), '/figures/rkc/', cur_yr, '/juneau_figA1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
-#  select(year, legal_2023)figure of 2023 model with forecast in each year -----
+#  select(year, legal_2023)figure of 2023 model with forecast in each year ----- #ar- this one is not working. It also does not seem importabt?
 ggplot(hindcast_long, aes(year, pounds, group = type))+ 
   geom_point(aes(color = type, shape = type), size =3) +
   geom_line(aes(color = type, group = type, linetype = type))+
@@ -118,7 +165,7 @@ ggplot(hindcast_long, aes(year, pounds, group = type))+
   #ylim(0,700000) +
   ggtitle("Juneau 2023 model with annual forecast") + ylab("Estimated Biomass (lbs)")+ xlab("Year")+
   theme(plot.title = element_text(hjust =0.5)) +
-  scale_x_continuous(breaks = seq(min(1975),max(2023), by = 5))
+  scale_x_continuous(breaks = seq(min(1975),max(2024), by = 5)) #ar- sigh, have to update to 2024
 #  theme(legend.position = c(0.8,0.7)) + 
 
 
@@ -154,8 +201,8 @@ fig1_pres <- hindcast %>%
             hjust = -0.45, vjust = -1.0, nudge_y = 0.05, size = 3.5, show.legend = FALSE) +
   guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2)))
 
-ggsave(fig1_pres, paste0(here::here(), '/figures/rkc/', cur_yr,'/juneau_fig1_presentation_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
-
+ggsave(filename = "fig1_pres.png", plot=fig1_pres, paste0(here::here(), '/figures/rkc/', cur_yr,'/juneau_fig1_presentation_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+##this one isnt working but I don't think I need it? - AR
 
 # Figure 1 BOF doc  ---------
 # legal and matureonly
@@ -189,7 +236,7 @@ fig1BOF <- hindcast %>%
             hjust = -0.45, vjust = -1.0, nudge_y = 0.05, size = 3.5, show.legend = FALSE) +
   guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol =2)))
 
-ggsave(fig1BOF, paste0('./figures/rkc/2023/juneau_fig1_presentation2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+ggsave(fig1BOF, paste0('./figures/rkc/2024/juneau_fig1_presentation2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5) #ar updated year to 2024
 
   
  
