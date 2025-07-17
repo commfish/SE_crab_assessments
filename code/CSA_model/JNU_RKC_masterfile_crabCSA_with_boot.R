@@ -8,7 +8,7 @@
 
 # load ----
 library(tidyverse)
-cur_yr = 2024 #ar updated to 2024
+cur_yr = 2025 #ar updated to 2025
 dir.create(file.path(paste0('results/rkc/Juneau/', cur_yr), '/csa')) # creates csa folder in current year results
 
 # data -----
@@ -16,6 +16,7 @@ JNUred <- read.csv(paste0(here::here(), '/data/rkc/Juneau/Juneau', cur_yr, 'RKC.
 # **FIX** this pulls from old excel file, need to rework this to pull historic data from a file and recent data 
 #     from data summary coming out of the processing of the survey data **FIX**
 # !! need to paste current years line in from excel CSA file - 
+#AGr 25 very similar to my manual Excel -> CSV current year edits. Will need to streamline in future
 
 # file name needs to be changed to reflect area and species
 str(JNUred)
