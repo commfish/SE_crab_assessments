@@ -310,11 +310,11 @@ write_csv(stock_health, paste0('results/rkc/', area, '/', year, '/stock_health.c
 
 ## CONF panel figure ---------------
 panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
-  survey.location = "Juneau"
-  cur_yr=2025
-  base.location="Juneau"
-  option=2
-  scale=0
+  #survey.location = "Juneau"
+  #cur_yr=2025
+  #base.location="Juneau"
+  #option=2
+  #scale=0
   # survey.location and baseline.location are the same is most areas.  Check
   # baseline file to see if they differ
   # cur_yr is the current year

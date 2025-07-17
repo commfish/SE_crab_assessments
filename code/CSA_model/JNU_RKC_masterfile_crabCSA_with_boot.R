@@ -1,5 +1,6 @@
 # K.Palof    katie.palof@alaska.gov
 # recent date updated: 7-14-2020 / 7-18-2021 / 7-7-22
+#ar: 7-18-2024/ 7-17-25
 
 # Region: Southeast
 # Area : Juneau 
@@ -7,7 +8,7 @@
 
 # load ----
 library(tidyverse)
-cur_yr = 2023
+cur_yr = 2024 #ar updated to 2024
 dir.create(file.path(paste0('results/rkc/Juneau/', cur_yr), '/csa')) # creates csa folder in current year results
 
 # data -----
@@ -25,7 +26,7 @@ source("./code/CSA_model/RKC_RcrabCSA_fnc.R") # sources the file with the model 
 source("./code/CSA_model/graph_fnc_CSA.R") # sources the file with the graphing function for the bootstrap
 
 # Run model ----------------------------------
-## Notes: For RED KING CRAB need to adjust function for weighting variable to be different in each year.
+## Notes: For RED KING CRAB need to adjust function for weighting variable to be different in each year. #AR - WHAT ARE YOU TALKING ABOUT??
 #### HERE:
 # For other areas  - Name of file and variables will need to be changed, 
 #   initial(PreR initial each year, R in the 1st year, Post in the first year, q scaled by 100, 
@@ -49,7 +50,6 @@ write.csv(JNU_RKC_fit1$estimates, paste0('./results/rkc/Juneau/', cur_yr, '/csa/
 write.csv(JNU_RKC_fit1$CI, paste0('./results/rkc/Juneau/', cur_yr, '/csa/JNU_RKC_fit1_par&CI.csv'))
 write(JNU_RKC_fit1$SSQ, file = paste0('./results/rkc/Juneau/', cur_yr, '/csa/JNU_SSQ.txt'))
 ### save graphical output also - DO THIS manually, I have NOT automated this step.
-
 
 
 #########STOP  --------------------------
