@@ -34,9 +34,13 @@ Run the script and check the resulting html file against the one on the S: drive
 Run through the script and check the outputs
 
 5. Run the Juneau CSA model, using the outputs from the Juneau.R and personal_use.R scripts
-SE_crab_assessments/CSA excel/Juneau 2023 new weightin
+SE_crab_assessments/CSA excel/Juneau 2023 new weighting
+- note: most recent modle is Juneau 2025 CPUE fix exce; (and Juneau 2024 CPUE fix, accordingly)
 
-5. ALT -  run the Juneau CSA RTMB model, using R and necessary imputs
+5.1 ALT -  run the Juneau CSA RTMB model, using R and necessary imputs
+
+6. Update the biomass file (SE_crab_assessments/data/rkc/biomass.csv) with the estimates from the Juneau CSA model
+
 
 
 ## How to run the assessment - all other areas

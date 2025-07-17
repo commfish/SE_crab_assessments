@@ -304,7 +304,7 @@ basic_pop_model <- function(pars) {
   init_postrec_cpue = exp(ln_init_postrec_cpue) # initial postrecruit CPUE
   Eps_R = exp(ln_Eps_R) # recruitment deviates
   #survey_data = exp(log_survey_data) #delete later perhaps
-  WEIGHTS = 1.0/(2* sqrt(log(1.0+survey_data[,3,]^2))^2)   #turn CV into weights
+  WEIGHTS = 1.0/(2* sqrt(log(1.0+survey_data[,3,]^2))^2)   #turn CV into weights - I made it so years formerly weighted 0 are now weighted 0.1- agr 25
   survey_data <- abind(survey_data, WEIGHTS, along=2) ## add weights to the 3d array
 
   
