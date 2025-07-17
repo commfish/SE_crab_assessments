@@ -41,6 +41,8 @@ SE_crab_assessments/CSA excel/Juneau 2023 new weighting
 
 6. Update the biomass file (SE_crab_assessments/data/rkc/biomass.csv) with the estimates from the Juneau CSA model
 
+7. Return to SE_crab_assessments/code/rkc_code/suvey_areas/Juneau.R 
+
 
 
 ## How to run the assessment - all other areas
