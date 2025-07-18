@@ -962,7 +962,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (lbs)") + 
+      ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #agr 1995
@@ -989,7 +989,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (lbs)") + 
+      ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #min location was 1995 AGR
@@ -1277,7 +1277,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (100,000 lbs)") + 
+      ylab("Biomass (100,000 lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
@@ -1313,7 +1313,7 @@ panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, option,
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (100,000lbs)") + 
+      ylab("Biomass (100,000lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
@@ -1603,7 +1603,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (100,000 lbs)") + 
+      ylab("Biomass (100,000 lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
@@ -1639,7 +1639,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (100,000lbs)") + 
+      ylab("Biomass (100,000lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
@@ -1929,7 +1929,7 @@ panel_figure_NC_PRES_title <- function(survey.location, cur_yr, base.location, o
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (100,000 lbs)") + 
+      ylab("Biomass (100,000 lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
@@ -1965,7 +1965,7 @@ panel_figure_NC_PRES_title <- function(survey.location, cur_yr, base.location, o
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (100,000lbs)") + 
+      ylab("Biomass (100,000lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
@@ -2257,7 +2257,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (100,000 lbs)") + 
+      ylab("Biomass (100,000 lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
@@ -2293,7 +2293,7 @@ legend_panel_figure_NC_PRES <- function(survey.location, cur_yr, base.location, 
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"))+
       scale_shape_manual(name = "", values = c(1, 18, 32))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid")) +
-      ylab("Biomass (100,000lbs)") + 
+      ylab("Biomass (100,000lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) +
