@@ -433,18 +433,20 @@ knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/jnu_figA1
 ```
 
 
+
 \newpage
 
 # Appendix B. Model exploration.
 
-In 2025, we explored moving the Excel CSA model (the one used for this document) into R (the RTMB model). The goal of the RTMB model was to replicate the Excel model in the R framework. More details of this new model can be found in the bridging analysis (summary emailed to the SE Crab Team in late June 2025; publication forthcoming). The model comparison results are depicted below for both standardized CPUE and biomass (Figures B1, B2). When the new RTMB model was run for this year's dataset, there was enough discrepancy in results compared to the former model to warrant further discussion.
+In 2025, we explored moving the Excel CSA model (the one used for this document) into R (the RTMB model). The goal of the RTMB model was to replicate the Excel model in the R framework. More details of this new model can be found in the bridging analysis (summary emailed to the SE Crab Team in late June 2025; publication forthcoming). The model comparison results are depicted below for both standardized CPUE and biomass (Figures B1, B2). When the new RTMB model was run for this year's dataset, there was enough discrepancy in results compared to the former model to warrant further discussion. The difference in biomass results between the models seems to be largely driven by different parameter estimates of the catchability (q). We still have ambitions to switch the analysis over to the RTMB likelihood model, but more exploratory analysis is warranted.
 
-```{r}
-
+```{r B1, fig.cap = "Figure B1. Juneau RKC CPUE: RTMB likelihood (light blue, with 95% confidence intervals) vs Excel residual sum of squares (dark green) results. The observed CPUE is depicted by the black points, with CV error bars based on the historic weighting system." }
+knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/CSA_JNU_CPUE.png'), dpi = 125)
 ```
 
-```{r}
 
+```{r}
+knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/CSA_JNU_9_Biomass.png'), dpi = 125)
 ```
 
 \newpage
