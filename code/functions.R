@@ -965,7 +965,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #agr 1995
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #agr 1995
       scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                           na.rm = TRUE) + 25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -992,7 +992,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #min location was 1995 AGR
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #min location was 1995 AGR
       scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                           na.rm = TRUE) + 25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds, 
