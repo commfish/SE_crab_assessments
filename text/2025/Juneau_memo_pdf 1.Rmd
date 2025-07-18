@@ -92,7 +92,7 @@ cpue %>%
 
 - Due to the recent year increases in prerecruit and recruit CPUE, and steady post-recruit CPUE, a harvest rate of 10% for the 2025/2026 season is recommended.
 
-- The Excel CSA model (the old model) was used to calculate these results. The RTMB likelihood model results are depicted and discussed in Appendix B.
+- The Excel CSA model (the old model) was used to calculate these results. The RTMB likelihood model results are discussed in Appendix B.
 
 
 # STOCK ASSESSMENT {-}
