@@ -487,7 +487,7 @@ pandoc.table(cp, split.tables = Inf, caption = "Standardized catch per unit effo
 
 \newpage
 
-# Appendix B. Model exploration. {-}
+# Appendix B. Model exploration {-}
 
 In 2025, we explored moving the Excel CSA model (the one used for this document) into R (the RTMB model). The goal of the RTMB model was to replicate the Excel model in the R framework. More details of this new model can be found in the bridging analysis (summary emailed to the SE Crab Team in late June 2025; publication forthcoming). The model comparison results are depicted below for both standardized CPUE and biomass (Figures B1, B2). When the new RTMB model was run for this year's dataset, there was enough discrepancy in results compared to the former model to warrant further discussion. The difference in biomass results between the models seems to be largely driven by different parameter estimates of the catchability (q). We still have ambitions to switch the analysis over to the RTMB likelihood model, but more exploratory analysis is warranted.
 
