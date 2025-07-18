@@ -127,7 +127,7 @@ The harvest rate (7%) set in the  years 2020, 2021, and 2022 produced a relative
 
 # TABLES {-}
 
-```{r stock-status, results = "asis", tab.cap="Determination of stock status for the Juneau area for the 2020–2024 surveys.  Values for long-term baseline analyses represent the percentage above or below the average CPUEs from 1995–2007 baseline (historically 1993 – 2007; see memo dated 6/23/2008 for discussion of baselines). Significant relationships result in $\\alpha$ < 0.05. Values for the short-term trends (last 4 years) are either significant increase, significant decrease, or no trend. Long-term scores are +1 for significantly above, 0 for not significantly different, or -1 for significantly below the baseline, except for clutch fullness < 25%, in which the signs are reversed because a score significantly below the baseline of 10% is considered a positive indicator of stock health. Short-term scores are +0.25 for significantly increasing trends, 0 for no trend, or -0.25 for significantly decreasing trends.  The total score is the sum of long- and short-term scores for each year. Stock status is defined by the total score: < -4.25 = Poor, -4.25 to -1.75 = Below Ave, -1.5 to 1.5 = Moderate, 1.75 to 4.25 = Above Ave, and > 4.25 = Healthy."}
+```{r stock-status, results = "asis", tab.cap="Determination of stock status for the Juneau area for the 2021–2025 surveys.  Values for long-term baseline analyses represent the percentage above or below the average CPUEs from 1995–2007 baseline (historically 1993 – 2007; see memo dated 6/23/2008 for discussion of baselines). Significant relationships result in $\\alpha$ < 0.05. Values for the short-term trends (last 4 years) are either significant increase, significant decrease, or no trend. Long-term scores are +1 for significantly above, 0 for not significantly different, or -1 for significantly below the baseline, except for clutch fullness < 25%, in which the signs are reversed because a score significantly below the baseline of 10% is considered a positive indicator of stock health. Short-term scores are +0.25 for significantly increasing trends, 0 for no trend, or -0.25 for significantly decreasing trends.  The total score is the sum of long- and short-term scores for each year. Stock status is defined by the total score: < -4.25 = Poor, -4.25 to -1.75 = Below Ave, -1.5 to 1.5 = Moderate, 1.75 to 4.25 = Above Ave, and > 4.25 = Healthy."}
 
 # create lists of required files from all year folders
 # first create vector of paths
@@ -308,7 +308,7 @@ ghl_harv1 <- ghl_harv %>% mutate(Year = as.character(Year)) %>%
   mutate(across(where(is.double), ~ round(.x, 0))) %>%
   filter(Year > 1995) #ar added to make 1996 onward our table years
 
-pandoc.table(ghl_harv1, keep.line.breaks = TRUE, big.mark = ',', digits = c(1,1,1,1,1,2,1,1,1,1,2,2), missing = "-", split.tables = Inf, caption = "Comparison of 2024 model output of legal biomass and mature biomass, and the recommended Guideline Harvest Level (GHL) to the harvest of RKC in the Juneau Area from 1996–2024. Estimated personal use (PU) harvest is calculated using the number of crabs reported for each permit and the average legal weight in the survey each year (since 1996). Total harvest includes both commercial and PU harvest (lb). Recommended harvest rate is % of mature biomass before 2022 and % of legal biomass from 2022 on\\label{tab:ghl-harv}.")
+pandoc.table(ghl_harv1, keep.line.breaks = TRUE, big.mark = ',', digits = c(1,1,1,1,1,2,1,1,1,1,2,2), missing = "-", split.tables = Inf, caption = "Comparison of 2025 model output of legal biomass and mature biomass, and the recommended Guideline Harvest Level (GHL) to the harvest of RKC in the Juneau Area from 1996–2025. Estimated personal use (PU) harvest is calculated using the number of crabs reported for each permit and the average legal weight in the survey each year (since 1996). Total harvest includes both commercial and PU harvest (lb). Recommended harvest rate is % of mature biomass before 2022 and % of legal biomass from 2022 on\\label{tab:ghl-harv}.")
 
 ```
 
@@ -334,7 +334,7 @@ header.row <- harv.rate.lb %>%
 names(harv.rate.lb) <- header.row
 harv.rate.lb.tab <- harv.rate.lb %>% slice(-1, -5)
 
-pandoc.table(harv.rate.lb.tab, big.mark = ',', digits = 1, missing = "-", caption = "Estimated biomass and allocation of RKC in the Juneau area under a range of harvest rate strategies for 2024. All Guideline Harvest Levels (GHLs) are in lb and are applied to legal biomass (lb). \\label{tab:harv-rate}")
+pandoc.table(harv.rate.lb.tab, big.mark = ',', digits = 1, missing = "-", caption = "Estimated biomass and allocation of RKC in the Juneau area under a range of harvest rate strategies for 2025. All Guideline Harvest Levels (GHLs) are in lb and are applied to legal biomass (lb). \\label{tab:harv-rate}")
 
 ```
 
@@ -358,7 +358,7 @@ header.row.n <- harv.rate.n %>%
 names(harv.rate.n) <- header.row.n
 harv.rate.n.tab <- harv.rate.n %>% slice(-1, -5)
 
-pandoc.table(harv.rate.n.tab, big.mark = ',', digits = 1, missing = "-", caption = "Estimated numbers and allocation of RKC in the Juneau area under a range of harvest rate strategies for 2024.  Guideline Harvest Levels (GHLs) are in approximate numbers of legal crab.  Conversion from biomass (lb) to numbers is done by dividing the biomass by the average legal weight from the Juneau area survey (2024 average survey legal length converted to weight = 7.41 lb per crab, mature weight = 6.37 lb per crab). GHL allocation is calculated by applying the average legal weight to the above GHL of legal biomass. \\label{tab:harv-rate-num}")
+pandoc.table(harv.rate.n.tab, big.mark = ',', digits = 1, missing = "-", caption = "Estimated numbers and allocation of RKC in the Juneau area under a range of harvest rate strategies for 2025.  Guideline Harvest Levels (GHLs) are in approximate numbers of legal crab.  Conversion from biomass (lb) to numbers is done by dividing the biomass by the average legal weight from the Juneau area survey (2025 average survey legal length converted to weight = 7.41 lb per crab, mature weight = 6.43 lb per crab). GHL allocation is calculated by applying the average legal weight to the above GHL of legal biomass. \\label{tab:harv-rate-num}")
 
 ```
 
@@ -408,7 +408,7 @@ knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/jnu_rkc_f
 knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/jnu_csa_', cur_yr,'.png'), dpi = 125)
 ```
 
-```{r panel2, fig.cap = "Survey CPUE for male size/sex classes of red king crab along with biomass and harvest estimates for the Juneau Area from 1995–2024 using the 2024 model output.  The horizontal reference lines indicate long-term averages, defined as the average CPUEs from 1995–2007. There is no mark-recapture adjustment for the Juneau area. ", out.height="100%", out.width="100%"}
+```{r panel2, fig.cap = "Survey CPUE for male size/sex classes of red king crab along with biomass and harvest estimates for the Juneau Area from 1995–2025 using the 2025 model output.  The horizontal reference lines indicate long-term averages, defined as the average CPUEs from 1995–2007. There is no mark-recapture adjustment for the Juneau area. ", out.height="100%", out.width="100%"}
 
 knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/Juneau_', cur_yr, '_2.png'), dpi = 125)
 ```
@@ -432,22 +432,6 @@ knitr::include_graphics(paste0(here::here(), '/figures/rkc/Juneau_memo_equil_rat
 knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/jnu_figA1_', cur_yr, '.png'), dpi = 125)
 ```
 
-
-
-\newpage
-
-# Appendix B. Model exploration.
-
-In 2025, we explored moving the Excel CSA model (the one used for this document) into R (the RTMB model). The goal of the RTMB model was to replicate the Excel model in the R framework. More details of this new model can be found in the bridging analysis (summary emailed to the SE Crab Team in late June 2025; publication forthcoming). The model comparison results are depicted below for both standardized CPUE and biomass (Figures B1, B2). When the new RTMB model was run for this year's dataset, there was enough discrepancy in results compared to the former model to warrant further discussion. The difference in biomass results between the models seems to be largely driven by different parameter estimates of the catchability (q). We still have ambitions to switch the analysis over to the RTMB likelihood model, but more exploratory analysis is warranted.
-
-```{r CPUE, fig.cap = "Figure B1. Juneau RKC CPUE: RTMB likelihood (light blue, with 95% confidence intervals) vs Excel residual sum of squares (dark green) results. The observed CPUE is depicted by the black points, with CV error bars based on the historic weighting system." }
-knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/CSA_JNU_CPUE.png'), dpi = 125)
-```
-
-
-```{r Biomass, fig.cap = "Figure B2. Juneau RKC mature, legal, and pre-recruit biomass comparison between RTMB likelihood and Excel residual sum of squares methodology. The RTMB likelihood estimates have 95% confidence intervals.}
-knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/CSA_JNU_9_Biomass.png'), dpi = 125)
-```
 
 \newpage
 
@@ -499,4 +483,19 @@ cp <- read.csv(paste0(here::here(), "/results/rkc/Juneau/", cur_yr, "/cpue_wt_si
 
 pandoc.table(cp, split.tables = Inf, caption = "Standardized catch per unit effort (CPUE) from the Juneau area red king crab survey. Estimates are displayed $\\pm$ standard error. \\label{tab:stan-cpue}")
 
+```
+
+\newpage
+
+# Appendix B. Model exploration. {-}
+
+In 2025, we explored moving the Excel CSA model (the one used for this document) into R (the RTMB model). The goal of the RTMB model was to replicate the Excel model in the R framework. More details of this new model can be found in the bridging analysis (summary emailed to the SE Crab Team in late June 2025; publication forthcoming). The model comparison results are depicted below for both standardized CPUE and biomass (Figures B1, B2). When the new RTMB model was run for this year's dataset, there was enough discrepancy in results compared to the former model to warrant further discussion. The difference in biomass results between the models seems to be largely driven by different parameter estimates of the catchability (q). We still have ambitions to switch the analysis over to the RTMB likelihood model, but more exploratory analysis is warranted.
+
+```{r CPUE, fig.cap = "Figure B1. Juneau RKC CPUE: RTMB likelihood (light blue, with 95% confidence intervals) vs Excel residual sum of squares (dark green) results. The observed CPUE is depicted by the black points, with CV error bars based on the historic weighting system.",out.height="100%", out.width="100%"}
+knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/CSA_JNU_CPUE.png'), dpi = 125)
+```
+
+
+```{r Biomass, fig.cap = "Figure B2. Juneau RKC mature, legal, and pre-recruit biomass comparison between RTMB likelihood and Excel residual sum of squares methodology. The RTMB likelihood estimates have 95% confidence intervals.", out.height="100%", out.width="100%"}
+knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/CSA_JNU_9_Biomass.png'), dpi = 125)
 ```

@@ -109,7 +109,7 @@ jnu_rkc_fig1_edited <- hindcast %>%
   
   #ggtitle(paste0("Juneau ", cur_yr," model")) + 
   ylab("Biomass (lb)")+ xlab("Year") +
-  scale_x_continuous(breaks = seq(min(1976), max(max(hindcast$year)), by = 2)) +
+  scale_x_continuous(breaks = seq(min(1975), max(max(hindcast$year)), by = 2)) +
   #scale_x_continuous(breaks = seq(min(1975), max(max(hindcast$year) + 1), by = 2)) + #I dont like this so I did it differently (line immediately above) - AGR
   #theme(plot.title = element_text(hjust =0.5)) +
   #scale_x_continuous(breaks = seq(min(1975),max(cur_yr), by = 5)) +
