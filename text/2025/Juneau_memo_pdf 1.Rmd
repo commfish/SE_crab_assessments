@@ -86,7 +86,7 @@ cpue %>%
 
 - Estimated legal (up `r change_forecast$leg_change[2]`%) and mature (up `r change_forecast$mat_change[2]`%) biomass both increased compared to `r pr_yr` predicted values. Legal and mature biomass both remain above the long-term average (using baseline years).
 
-- All male CPUE classes increased from `r pr_yr` (`r round(cpue_short$change[1], 1)` % for prerecruits, `r round(cpue_short$change[3], 1)` % for recruits, and `r round(cpue_short$change[5], 1)` for postrecruits), and are above their respective long-term averages.
+- All male CPUE classes increased from `r pr_yr` (`r round(cpue_short$change[1], 1)` % for prerecruits, `r round(cpue_short$change[3], 1)` % for recruits, and `r round(cpue_short$change[5], 1)` % for postrecruits), and are above their respective long-term averages.
 
 - Juvenile male CPUE is `r round(cpue2$Juvenile_wt,1)`, above the long-term average and slightly lower than the previous year. This should be monitored for further declining trends.
 
