@@ -92,6 +92,8 @@ cpue %>%
 
 - Due to the recent year increases in prerecruit and recruit CPUE, and steady post-recruit CPUE, a harvest rate of 10% for the 2025/2026 season is recommended.
 
+- The Excel CSA model (the old model) was used to calculate these results. The RTMB likelihood model results are depicted and discussed in Appendix B.
+
 
 # STOCK ASSESSMENT {-}
 The following is a summary of the biomass estimates and stock status of red king crab (RKC) for the Juneau Area (Section 11-A) for the `r cur_yr`/`r fut_yr` season. Stock assessment methods for `r cur_yr` are identical to those used since 2012; however, in 2017 adjustments to historic (1993–2004) catch-per-unit-effort (CPUE) calculations were performed so that all CPUEs are now calculated using a stratified, weighted mean.  This corrected the long-term baseline (1995–2007) values used to determine stock health (Figure \@ref(fig:jnumodel), Table \@ref(tab:stock-status)), which in turn more accurately depicted the stock health status over time; this was specifically relevant for juvenile males and females. 
@@ -116,7 +118,7 @@ Under-reporting of harvest in the personal use harvest reporting (29%, 9%, 19%, 
 
 The harvest rate of 10% that was applied in 2017 was enacted with the goal of allowing for population growth, since it was substantially lower than the 17% equilibrium harvest rate. Following the observed decrease in the estimated mature biomass, the harvest rate in 2018 was set at 8%, once again with the goal of allowing for overall population growth. However, because the mature biomass decreased following both openings, a further reduction in harvest pressure to 7% was enacted in 2019. 
 
-The harvest rate (7%) set in the  years 2020, 2021, and 2022 produced a relatively stable biomass estimate for legal and mature crab, with small (less than 8% decrease or increase) fluctuation in both legal biomass estimates depending on which model they were compared to, but the CPUEs of most mature male recruit classes showed an increase. The harvest rate in 2023 (10%) was associated with a decrease in CPUE for all male crab classes, although it is difficult to know to what extent the CPUE decreases were influenced by the harvest rate versus other factors such as environmental variation. After the 2024 harvest rate of 8%, all mature male crab CPUE's increased. Again, it is difficult to know if this increase is due to a lowered harvest rate or environmental factors. Setting a harvest rate of 9%, higher than the as the 2024-2025 season but lower than the 2023 season, would likely allow for some stability in mature male biomass for the following season, which would be effective if the goal is to maintain the population at the current level. A harvest rate of less than 9% may allow for more growth in the coming year. Harvest rates exceeding this could result in further population declines, with the probability of decrease and magnitude of the decline increasing proportional to the harvest rate. This population has only shown substantial improvements from 2013 to 2017, and from 2020 to 2023, and 2024 to 2025, even though harvest has been severely reduced since 2008. To encourage sustainability and population growth, a **9% or less harvest rate is recommended** for the `r cur_yr`/`r fut_yr` personal use season. GHL allocation tables for multiple harvest rate strategies were constructed (Tables \@ref(tab:harv-rate) and \@ref(tab:harv-rate-num)). Although harvest rates of 20%, 17%, 15%, 12%, 10%, 8%, and 7% are shown, the data suggest that implementing the higher end of this range would not serve the goal of sustaining average baseline population levels.
+The harvest rate (7%) set in the  years 2020, 2021, and 2022 produced a relatively stable biomass estimate for legal and mature crab, with small (less than 8% decrease or increase) fluctuation in both legal biomass estimates depending on which model they were compared to, but the CPUEs of most mature male recruit classes showed an increase. The harvest rate in 2023 (10%) was associated with a decrease in CPUE for all male crab classes, although it is difficult to know to what extent the CPUE decreases were influenced by the harvest rate versus other factors such as environmental variation. After the 2024 harvest rate of 8%, all mature male crab CPUE's increased. Again, it is difficult to determine if this increase is due to a lowered harvest rate or environmental factors. Setting a harvest rate of 10%, higher than the as the 2024-2025 season and noting that the biomass estimates are at a record high, would likely allow for some stability in mature male biomass for the following season, which would be effective if the goal is to maintain the population at the current level. A harvest rate of less than 10% may allow for more growth in the coming year. Harvest rates exceeding this could result in further population declines, with the probability of decrease and magnitude of the decline increasing proportional to the harvest rate. This population has only shown substantial improvements from 2013 to 2017, and from 2020 to 2023, and 2024 to 2025, even though harvest has been severely reduced since 2008. To encourage sustainability and population growth, a **10% or less harvest rate is recommended** for the `r cur_yr`/`r fut_yr` personal use season. GHL allocation tables for multiple harvest rate strategies were constructed (Tables \@ref(tab:harv-rate) and \@ref(tab:harv-rate-num)). Although harvest rates of 20%, 17%, 15%, 12%, 10%, 8%, and 7% are shown, the data suggest that implementing the higher end of this range would not serve the goal of sustaining average baseline population levels.
 
 
 \newpage
@@ -430,6 +432,20 @@ knitr::include_graphics(paste0(here::here(), '/figures/rkc/Juneau_memo_equil_rat
 knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/jnu_figA1_', cur_yr, '.png'), dpi = 125)
 ```
 
+
+\newpage
+
+# Appendix B. Model exploration.
+
+In 2025, we explored moving the Excel CSA model (the one used for this document) into R (the RTMB model). The goal of the RTMB model was to replicate the Excel model in the R framework. More details of this new model can be found in the bridging analysis (summary emailed to the SE Crab Team in late June 2025; publication forthcoming). The model comparison results are depicted below for both standardized CPUE and biomass (Figures B1, B2). When the new RTMB model was run for this year's dataset, there was enough discrepancy in results compared to the former model to warrant further discussion.
+
+```{r}
+
+```
+
+```{r}
+
+```
 
 \newpage
 
