@@ -670,11 +670,11 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       geom_point(aes(color = type, shape = type), size =3) +
       geom_line(aes(color = type, group = type, linetype = type))+
       scale_colour_manual(name = "", values = c("grey1", "grey1", "grey55"),
-                          labels = c("Harvest", "Adjusted legal", "Adjusted mature"))+
+                          labels = c("Harvest", "Legal biomass", "Mature biomass"))+
       scale_shape_manual(name = "", values = c(1, 18, 32),
-                         labels = c("Harvest", "Adjusted legal", "Adjusted mature"))+
+                         labels = c("Harvest", "Legal biomass", "Mature biomass"))+
       scale_linetype_manual(name = "", values = c("blank", "solid", "solid"),
-                            labels = c("Harvest", "Adjusted legal", "Adjusted mature")) +
+                            labels = c("Harvest", "Legal biomass", "Mature biomass")) +
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
