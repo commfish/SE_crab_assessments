@@ -70,10 +70,10 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1, Year == cur_yr) 
 
 # Calculate soak time - RKC soak time should be 18-24 hrs
 dat_soak <- dat1 %>%
-  mutate(time_set = as.POSIXct(Time.Set,format="%Y-%m-%d %H:%M:%S",tz=Sys.timezone())) %>%
-  mutate(time_hauled = as.POSIXct(Time.Hauled,format="%Y-%m-%d %H:%M:%S",tz=Sys.timezone())) %>%
-  mutate(soak_time = time_hauled - time_set) %>%
-  filter(soak_time > 24 | soak_time < 18)
+  mutate(time_set = as.POSIXct(Time.Set,format="%m/%d/%Y %H:%M",tz=Sys.timezone())) %>%
+  mutate(time_hauled = as.POSIXct(Time.Hauled,format="%m/%d/%Y %H:%M",tz=Sys.timezone())) %>%
+  mutate(soak_time = as.numeric(difftime(time_hauled, time_set, units = "hours")))%>%
+  filter(soak_time > 24 | soak_time < 18 | is.na(soak_time))
 
 ## juvenile molt ?-------------
 head(dat1)
