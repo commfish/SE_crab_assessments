@@ -421,8 +421,9 @@ knitr::include_graphics(paste0(here::here(), '/figures/rkc/Juneau_memo_equil_rat
 ```
 
 
-\newpage
 
+
+\clearpage
 
 # Appendix A. Historic record of annual model forecast {-}
 
