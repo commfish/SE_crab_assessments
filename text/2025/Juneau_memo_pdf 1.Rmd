@@ -442,7 +442,7 @@ ghl_harv_hist <- read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, "
   slice(-1) %>%
   select(-Recommended) 
 
-colnames(ghl_harv_hist) <- c("Year", "Legal biomass (lb)", "Mature biomass (lb)", "Rec. GHL (lb)", "Comm. fishery status", "Est. PU harvest (lb)", "Est. comm. harvest (lb)", "Est. total harvest (lb)", "Est. mature harvest rate", "Est. legal harvest rate")
+colnames(ghl_harv_hist) <- c("Year", "Legal biomass (lb)", "Mature biomass (lb)", "Rec. PU GHL (lb)", "Comm. fishery status", "Est. PU harvest (lb)", "Est. comm. harvest (lb)", "Est. total harvest (lb)", "Est. mature harvest rate", "Est. legal harvest rate")
 
 ghl_harv_hist1 <- ghl_harv_hist %>% mutate(Year = as.character(Year)) %>%
   mutate(`Comm. fishery status` = case_when(
@@ -457,7 +457,7 @@ ghl_harv_hist1 <- ghl_harv_hist %>% mutate(Year = as.character(Year)) %>%
   filter(Year > 1995)
   
 
-pandoc.table(ghl_harv_hist1, keep.line.breaks = TRUE, big.mark = ',', digits = 1, missing = "-", split.tables = Inf, caption = "Comparison of annual forecast legal biomass and mature biomass, and the recommended Guideline Harvest Level (GHL) to the harvest of RKC in the Juneau Area from 1996–2023. Annual forecast for the biomass estimates is the point estimate generated in the year and uses survey data only up to that year in the model, i.e. 2012 estimates here are those generated from the model output in 2012. Estimated personal use (PU) harvest is calculated using the number of crabs reported for each permit and the average legal weight in the survey each year (since 1996). Total harvest includes both commercial and PU harvest (lb). \\label{tab:ghl-harv-hist}")
+pandoc.table(ghl_harv_hist1, keep.line.breaks = TRUE, big.mark = ',', digits = 1, missing = "-", split.tables = Inf, caption = "Comparison of annual forecast legal biomass and mature biomass and the recommended Personal Use Guideline Harvest Level (PU GHL) to the harvest of RKC in the Juneau Area from 1996–2024. Annual forecast for the biomass estimates is the point estimate generated in the year and uses survey data only up to that year in the model, i.e. 2012 estimates here are those generated from the model output in 2012. Estimated personal use (PU) harvest is calculated using the number of crabs reported for each permit and the average legal weight in the survey each year (since 1996). Total harvest includes both commercial and PU harvest (lb). \\label{tab:ghl-harv-hist}")
 
 ```
 
@@ -489,7 +489,7 @@ pandoc.table(cp, split.tables = Inf, caption = "Standardized catch per unit effo
 
 In 2025, we explored moving the Excel CSA model (the one used for this document) into R (the RTMB model). The goal of the RTMB model was to replicate the Excel model in the R framework. More details of this new model can be found in the bridging analysis (summary emailed to the SE Crab Team in late June 2025; publication forthcoming). The model comparison results are depicted below for both standardized CPUE and biomass (Figures B1, B2). When the new RTMB model was run for this year's dataset, there was enough discrepancy in results compared to the former model to warrant further discussion. The difference in biomass results between the models seems to be largely driven by different parameter estimates of the catchability (q). We still have ambitions to switch the analysis over to the RTMB likelihood model, but more exploratory analysis is warranted.
 
-```{r CPUE, fig.cap = "Figure B1. Juneau RKC CPUE: RTMB likelihood (light blue, with 95% confidence intervals) vs Excel residual sum of squares (dark green) results. The observed CPUE is depicted by the black points, with CV error bars based on the historic weighting system.",out.height="100%", out.width="100%"}
+```{r CPUE, fig.cap = "Figure B1. Juneau RKC CPUE: RTMB likelihood (light blue, with 95% confidence intervals) vs Excel residual sum of squares (dark green) results. The observed CPUE (black points) is shown, with CV error bars based on the historic weighting system.",out.height="100%", out.width="100%"}
 knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/CSA_JNU_CPUE.png'), dpi = 125)
 ```
 
