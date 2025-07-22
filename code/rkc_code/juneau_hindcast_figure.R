@@ -91,8 +91,10 @@ ggsave(filename = "jnu_rkc_fig1_2.png", path = paste0(here::here(), '/figures/rk
 jnu_rkc_fig1_edited <- hindcast %>% 
   #hindcast_updated %>% # use this when know decision for current year
   mutate(status = case_when(
+    status == "" ~ "TBD",
     status == "open" ~ "Open",
     status == "closed" ~ "Closed",
+    #level the status factor so I have an intentional order
     TRUE ~ status
   )) %>%
   dplyr::rename(Legal = legal_curyr, Mature = mature_curyr, `Fishery Status` = status) %>% 
@@ -102,7 +104,8 @@ jnu_rkc_fig1_edited <- hindcast %>%
   geom_line(aes(color = type, group = type, linetype = type))+
   geom_point(aes(color = type, shape = `Fishery Status`), size =3) +
   scale_colour_manual(name = "", values = c("black", "grey60"))+
-  scale_shape_manual(values = c(0, 16, 2, 8))+
+  #scale_shape_manual(values = c(0, 16, 2, 8))+
+  scale_shape_manual(values = c(16, 2, 8, 0))+
   scale_linetype_manual(name = "", values = c("solid", "dashed")) +
   scale_y_continuous(labels = comma, limits = c(0,750000),
                      breaks= seq(min(0), max(750000), by = 100000)) +

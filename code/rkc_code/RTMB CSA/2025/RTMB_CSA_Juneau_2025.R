@@ -665,7 +665,7 @@ p1_g <- ggplot(results_df_relevant, aes(x = year)) +
   scale_linetype_manual(values = c("Excel" = "dashed", "RTMB" = "solid")) +
   scale_shape_manual(values = c("Observed" = 16, "RTMB Predicted" = 1)) +
   labs(
-    title = "JNU Pre-recruit CPUE – Excel (dashed), RTMB (solid) with CI",
+    title = "JNU Prerecruit CPUE – Excel (dashed), RTMB (solid) with CI",
     subtitle = "Observed CPUE as black points with CV error bars",
     x = "Year", y = "CPUE",
     linetype = "Model Type",
@@ -737,7 +737,7 @@ p3_g <- ggplot(results_df_relevant, aes(x = year)) +
   scale_linetype_manual(values = c("Excel" = "dashed", "RTMB" = "solid")) +
   scale_shape_manual(values = c("Observed" = 16, "RTMB Predicted" = 1)) +
   labs(
-    title = "JNU Post-recruit CPUE",
+    title = "JNU Postrecruit CPUE",
    # subtitle = "Observed CPUE as black points with CV error bars",
     x = "Year", y = "CPUE",
     linetype = "Model Type",
@@ -754,7 +754,7 @@ p3_g <- ggplot(results_df_relevant, aes(x = year)) +
 ##################################################
 #graph CSA excel biomass vs. RTMB biomass estimates
 #mature biomass
-color_levels_2 <- c("Mature RTMB", "Mature Excel", "Legal RTMB", "Legal Excel", "Pre-recruit RTMB", "Pre-recruit Excel")
+color_levels_2 <- c("Mature RTMB", "Mature Excel", "Legal RTMB", "Legal Excel", "Prerecruit RTMB", "Prerecruit Excel")
 
 p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
   geom_ribbon(aes(ymin=mature_biomass_lower, ymax=mature_biomass_upper), alpha = 0.3, fill = "#56B4E9") + #uncertainty
@@ -777,8 +777,8 @@ p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
       "Mature Excel" = "darkblue",
       "Legal RTMB" = "#009E73",
       "Legal Excel" = "darkgreen",
-      "Pre-recruit RTMB" = "#CC79A7",
-      "Pre-recruit Excel" = "#542788"
+      "Prerecruit RTMB" = "#CC79A7",
+      "Prerecruit Excel" = "#542788"
     )) +
   theme(  legend.position = c(0.15, 0.8),    # x=95% right, y=95% top inside plot area
           # legend.justification = c("right", "top"),  # anchor legend box by its top-right corner

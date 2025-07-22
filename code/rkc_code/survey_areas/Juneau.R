@@ -2,7 +2,7 @@
 # recent date updated: 7-14-2020/ 6-8-2021
 # ADF&G updated for JUNEAU area
 ##AR update: 7/10/24 - for 23-24 rkc stock assessment
-#AGR 7/15/25 - 24-25 stock assessment
+#AGR 7/22/25 - 24-25 stock assessment
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
