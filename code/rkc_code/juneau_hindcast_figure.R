@@ -132,12 +132,19 @@ ggsave(filename = "jnu_rkc_fig1_edited.png", path = paste0(here::here(), '/figur
 jnu_rkc_annual_fore <- hindcast %>% 
   select(-legal_curyr, -mature_curyr) %>% 
   gather(type, pounds, legal_forecast:mature_forecast, factor_key = TRUE) %>% 
+  mutate(status = case_when(
+    status == "" ~ "TBD",
+    status == "open" ~ "Open",
+    status == "closed" ~ "Closed",
+    #level the status factor so I have an intentional order
+    TRUE ~ status
+  )) %>%
   ggplot(aes(year, pounds, group = type)) +
   geom_point(aes(color = type, shape = status), size =3) +
   geom_line(aes(color = type, group = type, linetype = type))+
   scale_colour_manual(name = "", values = c("black", "grey44"))+
   #scale_shape_manual(name = "Fishery Status", values = c(0, 8, 2, 4))+
-  scale_shape_manual(name = "Fishery Status", values = c(0, 8, 2, 4))+  
+  scale_shape_manual(name = "Fishery Status", values = c(16, 2, 8, 0))+  
   scale_linetype_manual(name = "", values = c("solid", "dashed")) +
   scale_y_continuous(labels = comma, limits = c(0,750000),
                      breaks= seq(min(0), max(750000), by = 100000)) +
@@ -154,7 +161,7 @@ jnu_rkc_annual_fore <- hindcast %>%
             hjust = -0.55, vjust = 1.5, nudge_y = 0.05, size = 3.5) +
   guides(shape = guide_legend(ncol = 2), group = guide_legend((ncol =2)))
 
-ggsave(filename = "jnu_rkc_annual_fore.png", path = paste0(here::here(), '/figures/rkc/', cur_yr, '/juneau_figA1_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+ggsave(filename = "jnu_rkc_annual_fore.png", path = paste0(here::here(), '/figures/rkc/', cur_yr), dpi = 800, width = 7.5, height = 5.5)
 
 
 #  select(year, legal_2023)figure of 2023 model with forecast in each year ----- #ar- this one is not working. It also does not seem importabt?

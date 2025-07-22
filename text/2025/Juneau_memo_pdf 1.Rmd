@@ -427,7 +427,7 @@ knitr::include_graphics(paste0(here::here(), '/figures/rkc/Juneau_memo_equil_rat
 
 ```{r afig1, fig.cap = "Annual forecasts of Juneau Area biomass estimates for legal (black points) and mature (gray points) red king crab as annual point estimates (forecasts) from the 3-stage catch-survey analysis model. Black and grey (dashed) reference lines represent mean estimates during baseline years (1995–2007). Fishery status is reported in symbol type; closed status is when both commercial and personal use (PU) fisheries are closed and PU only status indicates that only a PU fishery occurred (commercial fishery was closed in that year).", out.height="100%", out.width="100%"}
 
-knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/jnu_figA1_', cur_yr, '.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(), '/figures/rkc/', cur_yr,'/jnu_rkc_annual_fore.png'), dpi = 125)
 ```
 
 
