@@ -104,8 +104,8 @@ jnu_rkc_fig1_edited <- hindcast %>%
   geom_line(aes(color = type, group = type, linetype = type))+
   geom_point(aes(color = type, shape = `Fishery Status`), size =3) +
   scale_colour_manual(name = "", values = c("black", "grey60"))+
-  #scale_shape_manual(values = c(0, 16, 2, 8))+
-  scale_shape_manual(values = c(16, 2, 8, 0))+
+  scale_shape_manual(values = c(0, 16, 2, 8))+
+  #scale_shape_manual(values = c(16, 2, 8, 0))+
   scale_linetype_manual(name = "", values = c("solid", "dashed")) +
   scale_y_continuous(labels = comma, limits = c(0,750000),
                      breaks= seq(min(0), max(750000), by = 100000)) +
@@ -144,7 +144,7 @@ jnu_rkc_annual_fore <- hindcast %>%
   geom_line(aes(color = type, group = type, linetype = type))+
   scale_colour_manual(name = "", values = c("black", "grey44"))+
   #scale_shape_manual(name = "Fishery Status", values = c(0, 8, 2, 4))+
-  scale_shape_manual(name = "Fishery Status", values = c(16, 2, 8, 0))+  
+  scale_shape_manual(name = "Fishery Status", values = c(0, 16, 2, 8))+  
   scale_linetype_manual(name = "", values = c("solid", "dashed")) +
   scale_y_continuous(labels = comma, limits = c(0,750000),
                      breaks= seq(min(0), max(750000), by = 100000)) +
