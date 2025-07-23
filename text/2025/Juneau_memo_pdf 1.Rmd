@@ -90,7 +90,7 @@ cpue %>%
 
 - Juvenile male CPUE is `r round(cpue2$Juvenile_wt,1)`, above the long-term average and slightly lower than the previous year. This is the third consecutive year of declining juvenile male CPUE.
 
-- Due to the recent year increases in prerecruit and recruit CPUE, and steady postrecruit CPUE, a harvest rate of 10% for the 2025/2026 season is recommended.
+- Due to the recent year increases in prerecruit and recruit CPUE, and steady postrecruit CPUE, a maximum harvest rate of 10% for the 2025/2026 season is recommended.
 
 - The Excel CSA model (the old model) was used to calculate these results. The RTMB likelihood model (the new model) results are discussed in Appendix B.
 
