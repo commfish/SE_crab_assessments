@@ -1,6 +1,6 @@
 # K.Palof  katie.palof@alaska.gov
 # ADF&G 8-1-16 updated for Excursion Inlet  / 
-# updated 8-3-17/7-30-18/7-24-19/ 8-28-20/ 8-18-21/ 7-24-22/ 8-20-24 AGR
+# updated 8-3-17/7-30-18/7-24-19/ 8-28-20/ 8-18-21/ 7-24-22/ 8-20-24 AGR/ 7-30-25 AGR
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
 
@@ -12,11 +12,11 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2024
+cur_yr <- 2025
 pr_yr <- cur_yr -1
 survey.location <- 'Excursion'
-cur_yr2 <- 24
-pr_yr2 <- 23
+cur_yr2 <- 25
+pr_yr2 <- 24
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
@@ -53,6 +53,8 @@ dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
 # before moving forward.
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1)
+
+unique(dat1$Length.Millimeters) #check out any weridly small lengths. NA's are ok
 
 # Calculate soak time - RKC soak time should be 18-24 hrs. This should produce no rows.
 dat_soak <- dat1 %>%
@@ -125,7 +127,6 @@ dat5 %>%
 
 #### survey mid date -----  
 
-#AGR here. Sigh, time hauled missing from 28 pots
 # list of unique dates (day only, excluding time)
 dates <- unique(round_date(ymd_hms(dat$Time.Hauled), unit="day"))
 
@@ -140,6 +141,10 @@ sur.midpoint <- int_midpoint(date.int)
 
 # convert to Julian day
 sur.midpoint.jul <- yday(sur.midpoint)
+
+#save the survey midpoint in results
+write.csv(data.frame(sur.midpoint, sur.midpoint.jul), 
+          paste0('./results/rkc/', survey.location, '/', cur_yr, '/survey_midpoint_', cur_yr, '.csv'))
 
 ##### Historic file ---------------------------------------
 # need to add current years pot summary to the historic pot summary file.  
