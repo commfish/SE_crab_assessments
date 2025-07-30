@@ -333,8 +333,8 @@ panel_figure_NC_PRES_title('Excursion', cur_yr, 'Excursion', 3, 0, "Males", "Fem
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Excursion Inlet ", cur_yr, "_(adj HR).xls"), sheet = "Estimates 3S_exper", range = "A8:E55") %>% #fun how the estimates tab is named a different thing in each area
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Excursion Inlet ", cur_yr, "_(adj HR).xls"), sheet = "Estimates 3S_exper", range = "Q8:S55")) %>% #think I'll have to remove row 2 (line 9 in excel)
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Excursion Inlet ", cur_yr, "_(adj HR).xls"), sheet = "Estimates 3S_exper", range = "A8:E55") %>% #fun how the estimates tab is named a different thing in each area
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Excursion Inlet ", cur_yr, "_(adj HR).xls"), sheet = "Estimates 3S_exper", range = "Q8:S55")) %>% #think I'll have to remove row 2 (line 9 in excel)
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   slice(-1) %>% #added to Peril specifically to remove a row that I do not want, removes 1978 where I do not have data; also works for lynn sisters
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
