@@ -1,5 +1,5 @@
 # K.Palof 
-# ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19/ 8-23-21/ 7-20-22 / 7-26-2023
+# ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19/ 8-23-21/ 7-20-22 / 7-26-2023 / 8-20-24 AGR
 # code to process data from Ocean AK to use in crab CSA models.  
 #  OceanAK report found under Shared Folders/Commercial Fisheries/Region 1/Invertebrates/User Reports/kjpalof/se rkc areas
 
@@ -7,11 +7,11 @@
 source('./code/functions.R')  #functions here for summarizing data and figures 
 
 ## setup global ---------------
-cur_yr <- 2023 # this needs to be updated annually with current survey year 
+cur_yr <- 2024 # this needs to be updated annually with current survey year 
 pr_yr <- cur_yr -1
 survey.location <- 'LynnSisters'
-cur_yr2 <- 23
-pr_yr2 <- 22
+cur_yr2 <- 24
+pr_yr2 <- 23
 
 # lines below create folders if they don't already exist for current year
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr)) 
@@ -262,6 +262,7 @@ egg_percent(largef_all, 'LynnSisters', cur_yr)
 total_health('LynnSisters', cur_yr)
 # works as long as all files are saved in folder with area name
 
+#AGR here
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -314,14 +315,59 @@ panel_figure('LynnSisters', cur_yr, 'LynnSisters', 3, 0) # female panel
 # base.location is the location name in the baseline file, can be different
 
 ### NON CONF panel --------------
-panel_figure_NC('LynnSisters', 2020, 'LynnSisters', 1, 0) # panel with all 3 figures
+panel_figure_NC('LynnSisters', 2024, 'LynnSisters', 1, 0) # panel with all 3 figures #AGR changed to 2024 from 2020
 panel_figure_NC('LynnSisters', cur_yr, 'LynnSisters', 2, 0)
 
 ### presentation figure -----
 panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 2, 0, 'Lynn Sisters')
 panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 3, 0, 'Lynn Sisters')
 
+### presentation figures with different titles -----
+panel_figure_NC_PRES_title('LynnSisters', cur_yr, 'LynnSisters', 2, 0, "Males", "Females and juveniles")
+panel_figure_NC_PRES_title('LynnSisters', cur_yr, 'LynnSisters', 3, 0, "Males", "Females and juveniles")
 
+#AGR need to add Caitlin's fig, copy-paste from elsewhere.
+
+#adding the CSA graph
+##caitlins's code to make obs vs expected graph
+##I should make this a function eventually
+# create model fit plot ---
+
+# note: each year, add one row to the import ranges (e.g., if in 2023 ranges are A8:F53 and R8:T53, then in 2024 ranges are A8:F54 and R8:T54)
+
+library(readxl)
+
+cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Lynn Canal ", cur_yr, "-adj HR.xls"), sheet = "Estimate 3 Stage", range = "A7:F54") %>% #fun how the estimates tab is named a different thing in each area
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Lynn Canal ", cur_yr, "-adj HR.xls"), sheet = "Estimate 3 Stage", range = "R7:T54")) %>% #think I'll have to remove row 2 (line 9 in excel)
+  select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
+  slice(-1) %>% #added to Peril specifically to remove a row that I do not want, removes 1978 where I do not have data; also works for lynn sisters
+  dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
+  mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
+  pivot_longer(cols = c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), values_to = "survey_index") %>%
+  mutate(type = case_when(
+    grepl("Obs", name) ~ "Observed",
+    grepl("Est", name) ~ "Estimated"
+  )) %>%
+  mutate(stage = case_when(
+    name == "Obs_prerecruits" ~ "Pre-recruits",
+    name == "Obs_recruits" ~ "Recruits",
+    name == "Obs_postrecruits" ~ "Post-recruits",
+    name == "Est_prerecruits" ~ "Pre-recruits",
+    name == "Est_recruits" ~ "Recruits",
+    name == "Est_postrecruits" ~ "Post-recruits"
+  )) %>%
+  mutate(stage = factor(stage, levels = c("Pre-recruits", "Recruits", "Post-recruits")))
+
+cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)) +
+  geom_point(data = subset(cpue_fit, type == "Observed")) +
+  geom_line(data = subset(cpue_fit, type == "Estimated"), color = "blue") + 
+  #facet_grid(. ~ stage)
+  facet_wrap(vars(stage)) + #ncol=1 to make it long form
+  theme_bw() +
+  ylab("CPUE")
+
+ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
+                         'Lynnsisters_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
 
 
 

@@ -1,6 +1,6 @@
 # K.Palof 
 # katie.palof@alaska.gov
-# ADF&G 8-3-16 updated for Seymour Canal  / updated 8-8-17/8-9-18 / 9-4-19/8-23-21 / 7-26-22
+# ADF&G 8-3-16 updated for Seymour Canal  / updated 8-8-17/8-9-18 / 9-4-19/8-23-21 / 7-26-22 / 7-25-24 AGR
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
 
@@ -11,10 +11,10 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2023
+cur_yr <- 2024
 pr_yr <- cur_yr -1
-cur_yr2 <- 23
-pr_yr2 <- 22
+cur_yr2 <- 24
+pr_yr2 <- 23
 survey.location <- 'Seymour'
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
@@ -55,6 +55,13 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> temp
 # write out csv of rows with missing recruit status, if they exist
 #write_csv(temp, paste0('./data/rkc/', survey.location, '/SC_missing_recruit_status' , cur_yr, '.csv'))
 
+#let's look at some graphs-AGR - exploratory
+library(ggplot2)
+ggplot(dat1) + aes(x=Length.Millimeters, y=Recruit.Status) + geom_boxplot() #I am looking for outliers/ data entry errors
+#View(dat1 %>% filter(Recruit.Status=="Juvenile", Length.Millimeters<100))
+#View(dat1 %>% filter(Recruit.Status=="Small Females", Length.Millimeters<100))
+#View(dat1 %>% filter(Recruit.Status=="Large Females", Length.Millimeters>100))
+
 # Calculate soak time - RKC soak time should be 18-24 hrs. This should produce no rows.
 dat_soak <- dat1 %>%
   mutate(time_set = as.POSIXct(Time.Set,format="%Y-%m-%d %H:%M:%S",tz=Sys.timezone())) %>%
@@ -94,7 +101,7 @@ dat4 %>%
   mutate(inverse_n = 1 / npots, weighting = inverse_n * Area) ->dat5
 dat5 %>%
   rename(Missing = Var.6, Large.Females = `Large Females`) %>% 
-  mutate(Small.Females = 0) -> dat5 #Small.Females = `Small Females`) -> dat5
+  mutate(Small.Females = `Small Females`) -> dat5 #mutate(Small.Females = 0) -> dat5 
 ## ** issue no small females for 2018 or 2019 need to add this column 
 # this is neccessary so that current years file (dat5) matches the historic file names
 
@@ -305,30 +312,78 @@ panel_figure_NC('Seymour', cur_yr, 'Seymour Canal', 2, 1)
 panel_figure_NC_PRES('Seymour', cur_yr, 'Seymour Canal', 2, 1, "Seymour Canal")
 panel_figure_NC_PRES('Seymour', cur_yr, 'Seymour Canal', 3, 1, "Seymour Canal")
 
+### presentation figures with different titles -----
+panel_figure_NC_PRES_title('Seymour', cur_yr, 'Seymour Canal', 2, 1, "Males", "Females and juveniles")
+panel_figure_NC_PRES_title('Seymour', cur_yr, 'Seymour Canal', 3, 1, "Males", "Females and juveniles")
+
+
 ### female file all years -----
 # create females file for all years
 # raw_data has OceanAK output until 2016. 
 
-levels(raw_data$Pot.Condition)
-raw_data %>%
-  filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> raw_dat1
-raw_dat1 %>%
-  filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> all_LgF_dat1
-all_LgF_dat1[is.na(all_LgF_dat1$Egg.Percent),]
-all_LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_all
+#levels(raw_data$Pot.Condition) #raw_data does not exist, does it need to? AGR
+#raw_data %>%
+#  filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> raw_dat1
+#raw_dat1 %>%
+ # filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> all_LgF_dat1
+#all_LgF_dat1[is.na(all_LgF_dat1$Egg.Percent),]
+#all_LgF_dat1 %>% 
+ # select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
+#         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
+ #        Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_all
 
-LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
+#LgF_dat1 %>% 
+ # select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
+  #       Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
+   #      Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
 
-largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
-write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
-                              'largef_all.csv')))
+#largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
+#write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
+                          #    'largef_all.csv')))
 
+
+#caitlins's code to make obs vs expected graph
+##I should make this a function eventually
+##looks like we use indiviudal year CSA outputs rat- wait no C says to do it the otehr way, with the curryr etsimates
+#caitlin made figure 2- added 7/18/24
+
+# create model fit plot ---
+
+# note: each year, add one row to the import ranges (e.g., if in 2023 ranges are A8:F53 and R8:T53, then in 2024 ranges are A8:F54 and R8:T54)
+
+library(readxl)
+
+cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "A8:E54") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "Q8:S54")) %>%
+  select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
+  dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% #uh, might have to adjust this based on Seymour's naming
+  mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
+  pivot_longer(cols = c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), values_to = "survey_index") %>%
+  mutate(type = case_when(
+    grepl("Obs", name) ~ "Observed",
+    grepl("Est", name) ~ "Estimated"
+  )) %>%
+  mutate(stage = case_when(
+    name == "Obs_prerecruits" ~ "Pre-recruits",
+    name == "Obs_recruits" ~ "Recruits",
+    name == "Obs_postrecruits" ~ "Post-recruits",
+    name == "Est_prerecruits" ~ "Pre-recruits",
+    name == "Est_recruits" ~ "Recruits",
+    name == "Est_postrecruits" ~ "Post-recruits"
+  )) %>%
+  mutate(stage = factor(stage, levels = c("Pre-recruits", "Recruits", "Post-recruits")))
+
+cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)) +
+  geom_point(data = subset(cpue_fit, type == "Observed")) +
+  geom_line(data = subset(cpue_fit, type == "Estimated"), color = "blue") + 
+  #facet_grid(. ~ stage)
+  facet_wrap(vars(stage)) + #ncol=1 to make it long form
+  theme_bw() +
+  ylab("CPUE")
+
+ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
+                         'Seymour_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
+#yay! it works!
 
 
 

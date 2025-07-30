@@ -1,5 +1,5 @@
 # K.Palof 
-# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18/ 9-4-19/8-23-21 / 7-26-22
+# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18/ 9-4-19/8-23-21 / 7-26-22 /7-25-24 AGR
 # R script contains code to process data from Ocean AK to use in crab CSA models, 
 #      code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -8,14 +8,24 @@
 # Read me:
 #     update code with date updated (top), change global year, and pull new survey data (see below)
 
+#agr added 2025...
+#library(reshape2)
+#library(radiant.data)
+
+#to do for jan:
+# Draw a black box around the entire plot
+##grid.rect(gp = gpar(col = "black", fill = NA, lwd = 2))
+
+#pybus bay insteaed of pybus, biomass graph (y axis scale) now looks weird - p4 in panel_graph in functions.R
+
 ## load -------------------------
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2023 # update annually 
+cur_yr <- 2024 # update annually 
 pr_yr <- cur_yr -1
-cur_yr2 <- 23
-pr_yr2 <- 22
+cur_yr2 <- 24
+pr_yr2 <- 23
 survey.location <- 'Pybus'
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
@@ -83,6 +93,16 @@ dat3 %>%
 tab %>%
   group_by(Year, Location, Density.Strata.Code) %>%
   summarise(npots  = length(Pot.No)) -> pots_per_strata
+
+#AGR- adding some graphs (exploratory analysis)
+library(ggplot2)
+ggplot(dat1) + aes(x=Length.Millimeters) + geom_histogram() + facet_wrap(~Recruit.Status)
+ggplot(dat1) + aes(x=Length.Millimeters, y=Recruit.Status) + geom_violin()
+ggplot(dat1) + aes(x=Length.Millimeters, y=Recruit.Status) + geom_boxplot()
+
+#there is a weird small female
+#View(dat1%>% filter(Recruit.Status=="Small Females"))
+##ok that one small female looks fine
 
 
 ##### Weighted CPUE current year -----------------------------------
@@ -222,7 +242,7 @@ write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/
                               'largef_all.csv')))
 
 ##### % poor (<10 %) clutch -----------------------------------
-poor_clutch(largef_all, 'Pybus', cur_yr)
+poor_clutch(largef_all, 'Pybus', cur_yr) #AGR something fishy might be going on here. Mean =sd for this area and for gambier, but juenau looks fine
 # output is saved as poorclutch_current.csv - which has all pots for current year
 #     and poorclutch_17.csv which has the percentage and SD of poor clutches for current year 
 
@@ -307,29 +327,74 @@ panel_figure('Pybus', cur_yr, 'Pybus', 3, 0) # female panel
 panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 2, 2, 'Pybus Bay')
 panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 3, 0, 'Pybus Bay') #female panel
 
-### female file all years -----
+### presentation figures with different titles -----
+panel_figure_NC_PRES_title('Pybus', cur_yr, 'Pybus', 2, 0, "Males", "Females and juveniles")
+panel_figure_NC_PRES_title('Pybus', cur_yr, 'Pybus', 3, 0, "Males", "Females and juveniles")
+
+### female file all years ----- AGR- this bloc isnt working and it annoying and I turned it off for now
 # create females file for all years
 # raw_data has OceanAK output until 2016. 
 
-levels(raw_data$Pot.Condition)
-raw_data %>%
-  filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> raw_dat1
-raw_dat1 %>%
-  filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> all_LgF_dat1
-all_LgF_dat1[is.na(all_LgF_dat1$Egg.Percent),]
-all_LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_all
+#levels(raw_data$Pot.Condition) #this df does not exist here. It has not been read in. Hopefully this is not important, but I'm sure I will find out -AGR
+#raw_data %>%
+ # filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> raw_dat1
+#raw_dat1 %>%
+ # filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> all_LgF_dat1
+#all_LgF_dat1[is.na(all_LgF_dat1$Egg.Percent),]
+#all_LgF_dat1 %>% 
+ # select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
+  #       Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
+   #      Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_all
 
-LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
+#LgF_dat1 %>% 
+ # select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
+  #       Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
+   #      Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
 
-largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
-write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
-                              'largef_all.csv')))
+#largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
+#write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
+#                              'largef_all.csv')))
+
+
+##caitlins's code to make obs vs expected graph
+##I should make this a function eventually
+# create model fit plot ---
+
+# note: each year, add one row to the import ranges (e.g., if in 2023 ranges are A8:F53 and R8:T53, then in 2024 ranges are A8:F54 and R8:T54)
+
+library(readxl)
+
+cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "A8:E55") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "Q8:S55")) %>%
+  select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
+  dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
+  mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
+  pivot_longer(cols = c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), values_to = "survey_index") %>%
+  mutate(type = case_when(
+    grepl("Obs", name) ~ "Observed",
+    grepl("Est", name) ~ "Estimated"
+  )) %>%
+  mutate(stage = case_when(
+    name == "Obs_prerecruits" ~ "Pre-recruits",
+    name == "Obs_recruits" ~ "Recruits",
+    name == "Obs_postrecruits" ~ "Post-recruits",
+    name == "Est_prerecruits" ~ "Pre-recruits",
+    name == "Est_recruits" ~ "Recruits",
+    name == "Est_postrecruits" ~ "Post-recruits"
+  )) %>%
+  mutate(stage = factor(stage, levels = c("Pre-recruits", "Recruits", "Post-recruits")))
+
+cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)) +
+  geom_point(data = subset(cpue_fit, type == "Observed")) +
+  geom_line(data = subset(cpue_fit, type == "Estimated"), color = "blue") + 
+  #facet_grid(. ~ stage)
+  facet_wrap(vars(stage)) + #ncol=1 to make it long form
+  theme_bw() +
+  ylab("CPUE")
+
+ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
+                         'Pybus_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
+#yay! it works!
 
 
 

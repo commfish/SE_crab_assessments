@@ -1,5 +1,5 @@
 # K.Palof   katie.palof@alaska.gov
-# ADF&G 8-4-16 updated for Peril Strait(Deadman's Reach)  / updated 8-2-18/ 7-30-19/ 8-23-21/ 7-26-22
+# ADF&G 8-4-16 updated for Peril Strait(Deadman's Reach)  / updated 8-2-18/ 7-30-19/ 8-23-21/ 7-26-22/ 8-13-24
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -11,22 +11,23 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2023 # udpate annually
+cur_yr <- 2024 # update annually
 pr_yr <- cur_yr -1
+prpr_yr <- cur_yr-2
 survey.location <- 'Peril'   # area is Peril but in data files it's Deadman Reach
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
 
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKCsurveyCSA_PS_21_22.csv'))# file name will change annually
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKC_survey_CSA_Peril_22_24.csv'))# file name will change annually #Peril is special becase every 2 years
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file; Deadmans Reach
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Peril_strata_area.csv')) # same every year
 
-histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/PS_perpot_all_', pr_yr, '.csv'))
+histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', prpr_yr, '/PS_perpot_all_', prpr_yr, '.csv')) #2 years ago AGR
 ## !!!!  this file will be 'EI_perpot_all_pr_yr' and just get updated with current years data.
-females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv'))
+females <- read.csv(paste0('./results/rkc/', survey.location,'/', prpr_yr, '/largef_all.csv')) #last year that was surveyed was 2 years ago for peril - AGR
 
 
 baseline <- read.csv("./data/rkc/longterm_means.csv") # same every year
@@ -67,6 +68,12 @@ dat1 %>%
 dat3 <- dcast(dat2, Year + Location + Trip.No + Pot.No +Density.Strata.Code ~ Recruit.Status, sum, drop=TRUE)
 
 head(dat3)# check to make sure things worked.
+
+#AGR- 2024 speicifc code #NOTE will have to DELETE in future years
+##dat 3 needs a pre_recruit column and it does not have one. So I'm adding a pre-recruit column of 0's
+#Pre_Recruit <- rep(0, length(dat3$Post_Recruit))
+#dat3 <- cbind(dat3, Pre_Recruit)
+  
 
 # Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has it's own area file or area per
 #     strata.  This is used to calculating the weighting for weighted CPUE.
@@ -124,6 +131,26 @@ unique(dat$Time.Hauled)
 # need to seperate time hauled to just have data hauled look for mid-date 
 dat %>% filter(Year == cur_yr)  # 7-15
 ### ***fix *** this needs to be calculated better
+
+#survey mid date AGR 2024- added from Gambier
+library(lubridate)
+# list of unique dates (day only, excluding time)
+#dates <- unique(lubridate::round_date(lubridate::mdy_hm(dat$Time.Hauled), unit="day"))
+#unique(dat$Time.Hauled)#fix specific error AGR
+dat$Time.Hauled[210] <- "2022-07-23 00:00:00" #why does this not have a time? Well it does now. AGR
+dates <- unique(lubridate::round_date(lubridate::ymd_hms(dat$Time.Hauled), unit="day")) #AGR fix
+
+# only survey dates from the current year
+dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
+
+# interval of minimum and maximum survey dates
+date.int <- interval(min(dates.cur, na.rm=TRUE), max(dates.cur, na.rm=TRUE))
+
+# survey midpoint; see functions script for the int_midpoint function
+sur.midpoint <- int_midpoint(date.int)
+
+# convert to Julian day
+sur.midpoint.jul <- yday(sur.midpoint)
 
 ##### Historic file ---------------------------------------
 # need to add current years pot summary to the historic pot summary file.  
@@ -250,6 +277,7 @@ egg_percent(largef_all, 'Peril', cur_yr)
 total_health('Peril', cur_yr)
 # works as long as all files are saved in folder with area name
 
+#AGR 2024 here
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -282,10 +310,10 @@ CPUE_ALL_YEARS %>%
             MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
             SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt_all
 CPUE_wt_all  
-CPUE_wt_all %>% filter(Year >= 1993) -> CPUE_wt_from93
+CPUE_wt_all %>% filter(Year >= 1995) -> CPUE_wt_from93 #AGR changed from 93 to 95 since we care about te average from 95 now- 8/14/24
 
 write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
-                                 cur_yr, '/cpue_wt_since_93.csv'), row.names = FALSE)
+                                 cur_yr, '/cpue_wt_since_95.csv'), row.names = FALSE)
 
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
                               cur_yr, '/cpue_wt_all_yrs.csv'), row.names = FALSE)
@@ -301,36 +329,84 @@ panel_figure('Peril', cur_yr, 'Deadman Reach', 3, 0) # female panel
 # base.location is the location name in the baseline file, can be different
 
 ### NON CONF panel --------------
-panel_figure_NC('Peril', 2019, 'Deadman Reach', 1, 0) # panel with all 3 figures
+panel_figure_NC('Peril', cur_yr, 'Deadman Reach', 1, 0) # panel with all 3 figures #um why would we want the 2019 year? changing to 2024 - AGR 8/14/24
 panel_figure_NC('Peril', cur_yr, 'Deadman Reach', 2, 0)
 
 ### presentation figure -----
 panel_figure_NC_PRES('Peril', cur_yr, 'Deadman Reach', 2, 0, 'Peril Strait')
 panel_figure_NC_PRES('Peril', cur_yr, 'Deadman Reach', 3, 0, 'Peril Strait')
 
+### presentation figures with different titles -----
+panel_figure_NC_PRES_title('Peril', cur_yr, 'Deadman Reach', 2, 0, "Males", "Females and juveniles")
+panel_figure_NC_PRES_title('Peril', cur_yr, 'Deadman Reach', 3, 0, "Males", "Females and juveniles")
+
 ### female file all years -----
 # create females file for all years
 # raw_data has OceanAK output until 2016. 
+#OLD CODE BELOW so I hashtagged it AGR - not sure if I need any of this but re-visit if I do...8/14/24
 
-levels(raw_data$Pot.Condition)
-raw_data %>%
-  filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> raw_dat1
-raw_dat1 %>%
-  filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> all_LgF_dat1
-all_LgF_dat1[is.na(all_LgF_dat1$Egg.Percent),]
-all_LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_all
+#levels(raw_data$Pot.Condition)
+#raw_data %>%
+  #filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> raw_dat1
+#raw_dat1 %>%
+ # filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> all_LgF_dat1
+#all_LgF_dat1[is.na(all_LgF_dat1$Egg.Percent),]
+#all_LgF_dat1 %>% 
+ # select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
+  #       Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
+   #      Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_all
 
-LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
+#LgF_dat1 %>% 
+ # select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
+  #       Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
+   #      Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
 
-largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
-write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
-                              'largef_all.csv')))
+#largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
+#write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
+                             # 'largef_all.csv')))
+
+#adding the CSA graph
+##caitlins's code to make obs vs expected graph
+##I should make this a function eventually
+# create model fit plot ---
+
+# note: each year, add one row to the import ranges (e.g., if in 2023 ranges are A8:F53 and R8:T53, then in 2024 ranges are A8:F54 and R8:T54)
+
+library(readxl)
+
+cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Peril Straits ", cur_yr, " (adj HR)_3.xls"), sheet = "Estimates 3S_experi", range = "A8:E55") %>% #fun how the estimates tab is named a different thing in each area
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Peril Straits ", cur_yr, " (adj HR)_3.xls"), sheet = "Estimates 3S_experi", range = "Q8:S55")) %>% #think I'll have to remove row 2 (line 9 in excel)
+  select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
+  slice(-1) %>% #added to Peril specifically to remove a row that I do not want, removes 1978 where I do not have data
+  dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
+  mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
+  pivot_longer(cols = c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), values_to = "survey_index") %>%
+  mutate(type = case_when(
+    grepl("Obs", name) ~ "Observed",
+    grepl("Est", name) ~ "Estimated"
+  )) %>%
+  mutate(stage = case_when(
+    name == "Obs_prerecruits" ~ "Pre-recruits",
+    name == "Obs_recruits" ~ "Recruits",
+    name == "Obs_postrecruits" ~ "Post-recruits",
+    name == "Est_prerecruits" ~ "Pre-recruits",
+    name == "Est_recruits" ~ "Recruits",
+    name == "Est_postrecruits" ~ "Post-recruits"
+  )) %>%
+  mutate(stage = factor(stage, levels = c("Pre-recruits", "Recruits", "Post-recruits")))
+
+cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)) +
+  geom_point(data = subset(cpue_fit, type == "Observed")) +
+  geom_line(data = subset(cpue_fit, type == "Estimated"), color = "blue") + 
+  #facet_grid(. ~ stage)
+  facet_wrap(vars(stage)) + #ncol=1 to make it long form
+  theme_bw() +
+  ylab("CPUE")
+
+ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
+                         'Peril_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
+
+
 
 
 

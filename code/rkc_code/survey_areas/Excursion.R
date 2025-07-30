@@ -1,6 +1,6 @@
 # K.Palof  katie.palof@alaska.gov
 # ADF&G 8-1-16 updated for Excursion Inlet  / 
-# updated 8-3-17/7-30-18/7-24-19/ 8-28-20/ 8-18-21/ 7-24-22
+# updated 8-3-17/7-30-18/7-24-19/ 8-28-20/ 8-18-21/ 7-24-22/ 8-20-24 AGR
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
 
@@ -12,11 +12,11 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2023
+cur_yr <- 2024
 pr_yr <- cur_yr -1
 survey.location <- 'Excursion'
-cur_yr2 <- 23
-pr_yr2 <- 22
+cur_yr2 <- 24
+pr_yr2 <- 23
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
@@ -125,6 +125,7 @@ dat5 %>%
 
 #### survey mid date -----  
 
+#AGR here. Sigh, time hauled missing from 28 pots
 # list of unique dates (day only, excluding time)
 dates <- unique(round_date(ymd_hms(dat$Time.Hauled), unit="day"))
 
@@ -254,7 +255,6 @@ egg_percent(largef_all, 'Excursion', cur_yr)
 total_health('Excursion', cur_yr)
 # works as long as all files are saved in folder with area name
 
-
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -312,3 +312,51 @@ panel_figure_NC('Excursion',  cur_yr, 'Excursion', 2, 0)
 ### presentation figure -----
 panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 2, 0, 'Excursion Inlet')
 panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 3, 0, 'Excursion Inlet')
+
+### presentation figures with different titles -----
+panel_figure_NC_PRES_title('Excursion', cur_yr, 'Excursion', 2, 0, "Males", "Females and juveniles")
+panel_figure_NC_PRES_title('Excursion', cur_yr, 'Excursion', 3, 0, "Males", "Females and juveniles")
+
+
+#add caitlin's obs/expected figure
+#adding the CSA graph
+##caitlins's code to make obs vs expected graph
+##I should make this a function eventually
+# create model fit plot ---
+
+# note: each year, add one row to the import ranges (e.g., if in 2023 ranges are A8:F53 and R8:T53, then in 2024 ranges are A8:F54 and R8:T54)
+
+library(readxl)
+
+cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Excursion Inlet ", cur_yr, "_(adj HR).xls"), sheet = "Estimates 3S_exper", range = "A8:E55") %>% #fun how the estimates tab is named a different thing in each area
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Excursion Inlet ", cur_yr, "_(adj HR).xls"), sheet = "Estimates 3S_exper", range = "Q8:S55")) %>% #think I'll have to remove row 2 (line 9 in excel)
+  select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
+  slice(-1) %>% #added to Peril specifically to remove a row that I do not want, removes 1978 where I do not have data; also works for lynn sisters
+  dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
+  mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
+  pivot_longer(cols = c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), values_to = "survey_index") %>%
+  mutate(type = case_when(
+    grepl("Obs", name) ~ "Observed",
+    grepl("Est", name) ~ "Estimated"
+  )) %>%
+  mutate(stage = case_when(
+    name == "Obs_prerecruits" ~ "Pre-recruits",
+    name == "Obs_recruits" ~ "Recruits",
+    name == "Obs_postrecruits" ~ "Post-recruits",
+    name == "Est_prerecruits" ~ "Pre-recruits",
+    name == "Est_recruits" ~ "Recruits",
+    name == "Est_postrecruits" ~ "Post-recruits"
+  )) %>%
+  mutate(stage = factor(stage, levels = c("Pre-recruits", "Recruits", "Post-recruits")))
+
+cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)) +
+  geom_point(data = subset(cpue_fit, type == "Observed")) +
+  geom_line(data = subset(cpue_fit, type == "Estimated"), color = "blue") + 
+  #facet_grid(. ~ stage)
+  facet_wrap(vars(stage)) + #ncol=1 to make it long form
+  theme_bw() +
+  ylab("CPUE")
+
+ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
+                         'Excursion_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
+

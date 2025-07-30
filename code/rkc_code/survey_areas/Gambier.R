@@ -1,5 +1,5 @@
 #K.Palof 
-# ADF&G 8-12-16 updated for Gambier Bay  / updated 8-8-17/8-10-18 / 9-4-19/8-23-21 / 7-26-22 / 8-22-23
+# ADF&G 8-12-16 updated for Gambier Bay  / updated 8-8-17/8-10-18 / 9-4-19/8-23-21 / 7-26-22 / 8-22-23 / 7-24-24
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -12,10 +12,10 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2023 # update annually
+cur_yr <- 2024 # update annually
 pr_yr <- cur_yr -1
-cur_yr2 <- 23
-pr_yr2 <- 22
+cur_yr2 <- 24
+pr_yr2 <- 23
 survey.location <- 'Gambier'
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
@@ -38,6 +38,7 @@ biomass <- read.csv("./data/rkc/biomass.csv") # ** update ** from CSA model
 #   file for all locations. Has biomass estimates from CSA,
 #   must be updated after CSA model is run for current year USING current year's model
 #             NOT historic forecast!
+#AGR- but I cant run the CSA until I get the CPUE's from here...
 
 ##### Initial review of new data ---------------------------------
 
@@ -132,7 +133,8 @@ dat5 %>%
 #### survey mid date -----  
 
 # list of unique dates (day only, excluding time)
-dates <- unique(lubridate::round_date(lubridate::mdy_hm(dat$Time.Hauled), unit="day"))
+#dates <- unique(lubridate::round_date(lubridate::mdy_hm(dat$Time.Hauled), unit="day"))
+dates <- unique(lubridate::round_date(lubridate::ymd_hms(dat$Time.Hauled), unit="day")) #AGR fix
 
 # only survey dates from the current year
 dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
@@ -209,6 +211,10 @@ glimpse(dat1) # raw data for both 2016 and 2017
 weights(dat1, 2.921, 6.695, "Gambier", cur_yr)
 # output saved as maleweights.csv
 
+#AGR added exploratory graphs, looking for potential outliers (data entry errors)
+hist(dat1$Length.Millimeters)
+ggplot(dat1) + aes(x=Length.Millimeters, y=Recruit.Status) + geom_boxplot()
+
 ##### Females - large or mature females --------------------------
 # large or mature females
 dat1 %>%
@@ -230,20 +236,22 @@ LgF_dat1 %>%
 # Currently (2019) just load the largef_all.csv file and add current year
 head(females)
 
-# want to add 0's for egg percent if egg development code is 3 or 4
-#LgF_dat1_all %>% 
-#  mutate(Egg.Percent = ifelse((Egg.Development.Code == 3 & 
-#                                 Egg.Condition.Code == 4 |Egg.Condition.Code == 5), 
-#                              0, Egg.Percent)) -> LgF_dat1_all
+
 
 largef_all <- rbind(females, LgF_dat1_curyr) # raw female data for all years.
 write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
                               'largef_all.csv')))
 
+# want to add 0's for egg percent if egg development code is 3 or 4 #AGR- makes sense. I activated this bloc below (it had hashtags). Ok I deleted this again because the output in gambier.RMD was werid
+#largef_all %>% 
+ # mutate(Egg.Percent = ifelse((Egg.Development.Code == 3 & 
+  #                               Egg.Condition.Code == 4 |Egg.Condition.Code == 5), 
+   #                           0, Egg.Percent)) -> largef_all
+
 
 ##### % poor (<10 %) clutch -----------------------------------
 
-poor_clutch(largef_all, 'Gambier', cur_yr)
+poor_clutch(largef_all, 'Gambier', cur_yr) #this might have an issue-AGR
 # output is saved as poorclutch_current.csv - which has all pots current year
 #     and poorclutch_17.csv which has the percentage and SD of poor clutches for current year 
 
@@ -265,7 +273,7 @@ poorclutch_all <- read.csv(paste0('./results/rkc/', survey.location, '/', cur_yr
 
 #function for short term trends and output saving.
 poor_clutch_short(poorclutch_all, 'Gambier', cur_yr)
-# output saved as short_female.csv
+# output saved as short_female.csv #AGR - I dont understnad this graph output
 
 ##### egg percentage overall -----------------------------------
 egg_percent(largef_all, 'Gambier', cur_yr)
@@ -274,14 +282,20 @@ egg_percent(largef_all, 'Gambier', cur_yr)
 ### total stock health table -----------------------
 total_health('Gambier', cur_yr)
 # works as long as all files are saved in folder with area name
+##AGR-  I think that worked
 
+#AGR here, 7/24/24
+
+#well, I'm troubleshooting because mean=SD for the poor clutches for the last 3 years and I dont think that is right.
+##juneau.R uses: poor_clutch() function. Can I use that here? Does it care about <10% instead of <25%
 
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
+##well, poor clutch looks bad vecause mean =sd for the last several years. I cant figure out why right now AGR
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ### !!! 
 # Run CSA model - either excel or here --
 # Put Biomass estimates for this area in 'data/biomass.csv'. this contains this years estimates.
-
+##ALL OF  THE YEARS BIOMASS ESTIMATES FROM THE LAST YEAR- COPY PASTE THE WHOLE TIME SERIES!!
 
 ### raw sample size -----------
 head(dat5)
@@ -328,31 +342,74 @@ panel_figure('Gambier', cur_yr, 'Gambier', 3, 0) # female panel
 panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 2, 0, 'Gambier Bay')
 panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 3, 0, 'Gambier Bay')
 
+### presentation figures with different titles -----
+panel_figure_NC_PRES_title('Gambier', cur_yr, 'Gambier', 2, 0, "Males", "Females and juveniles")
+panel_figure_NC_PRES_title('Gambier', cur_yr, 'Gambier', 3, 0, "Males", "Females and juveniles")
+
+
 ### female file all years -----
 # create females file for all years
 # raw_data has OceanAK output until 2016. 
 
-levels(raw_data$Pot.Condition)
-raw_data %>%
-  filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> raw_dat1
-raw_dat1 %>%
-  filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> all_LgF_dat1
-all_LgF_dat1[is.na(all_LgF_dat1$Egg.Percent),]
-all_LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_all
+#levels(raw_data$Pot.Condition) #ok this is not working AGR. Is that a problem? Cause it might not be. The prob could be that the data was never read in.
+#raw_data %>%
+ # filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> raw_dat1
+#raw_dat1 %>%
+ # filter(Sex.Code == 2, Recruit.Status == 'Large Females') -> all_LgF_dat1
+#all_LgF_dat1[is.na(all_LgF_dat1$Egg.Percent),]
+#all_LgF_dat1 %>% 
+ # select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
+  #       Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
+   #      Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_all
 
-LgF_dat1 %>% 
-  select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
-         Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
-         Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
+#LgF_dat1 %>% 
+ # select(Year, Project.Code, Trip.No, Location, Pot.No, Number.Of.Specimens, 
+  #       Recruit.Status, Sex.Code, Length.Millimeters, Egg.Percent, 
+   #      Egg.Development.Code, Egg.Condition.Code)-> LgF_dat1_last2
 
-largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
-write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
-                              'largef_all.csv')))
+#largef_all <- rbind(LgF_dat1_all, LgF_dat1_last2) # raw female data for all years.
+#write.csv(largef_all, (paste0('./results/rkc/', survey.location, '/', cur_yr, '/', 
+ #                             'largef_all.csv')))
 
+##caitlins's code to make obs vs expected graph
+##I should make this a function eventually
+# create model fit plot ---
 
+# note: each year, add one row to the import ranges (e.g., if in 2023 ranges are A8:F53 and R8:T53, then in 2024 ranges are A8:F54 and R8:T54)
+
+library(readxl)
+
+cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "A8:E55") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "Q8:S55")) %>%
+  select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
+  dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
+  mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
+  pivot_longer(cols = c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), values_to = "survey_index") %>%
+  mutate(type = case_when(
+    grepl("Obs", name) ~ "Observed",
+    grepl("Est", name) ~ "Estimated"
+  )) %>%
+  mutate(stage = case_when(
+    name == "Obs_prerecruits" ~ "Pre-recruits",
+    name == "Obs_recruits" ~ "Recruits",
+    name == "Obs_postrecruits" ~ "Post-recruits",
+    name == "Est_prerecruits" ~ "Pre-recruits",
+    name == "Est_recruits" ~ "Recruits",
+    name == "Est_postrecruits" ~ "Post-recruits"
+  )) %>%
+  mutate(stage = factor(stage, levels = c("Pre-recruits", "Recruits", "Post-recruits")))
+
+cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)) +
+  geom_point(data = subset(cpue_fit, type == "Observed")) +
+  geom_line(data = subset(cpue_fit, type == "Estimated"), color = "blue") + 
+  #facet_grid(. ~ stage)
+  facet_wrap(vars(stage)) + #ncol=1 to make it long form
+  theme_bw() +
+  ylab("CPUE")
+
+ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
+                         'Gambier_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
+#yay! it works!
 
 
 
