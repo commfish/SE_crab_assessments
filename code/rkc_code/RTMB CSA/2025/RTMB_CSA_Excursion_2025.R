@@ -67,7 +67,7 @@ this_year_crab_weights <- read.csv("results/rkc/Excursion/2025/maleweights.csv")
 df$Catch..Number.[46] <- 0 #this needs to be automated.. both for the row number updated (curyr-1) and the PU number( from the PU R code output)
 df$Catch.Mid.Date[46] <- NA #dates are a pain. Automate later
 
-#AGR HERE
+
 #get rid of some non-relevant stuff
 df <- df %>% select(Survey.Year, Catch.Season, Pre.recruit, Recruit, Post.recruit, Catch..Number., Catch.Mid.Date, Survey.Mid.Date, Mature.Weight, Legal.Weight, Prerecruit.Weight, Weight,
                     Estimated.Recruits, Estimated.Postrecruits) #select only the columns I need
@@ -84,7 +84,7 @@ new_line <- data.frame(
   #legal = , #I actually dont think I use this column
   Catch..Number. = NA, #no info for the last year
   Catch.Mid.Date = NA, #no info in most recent year (the fishing hasnt started yet!)
-  Survey.Mid.Date = "11-Jul-25", #dates are a pain. Automate when I have some more time
+  Survey.Mid.Date = "19-Jul-25", #dates are a pain. Automate when I have some more time **FIX**
   Mature.Weight = this_year_crab_weights$mature_lbs ,
   Legal.Weight = this_year_crab_weights$legal_lbs,
   Prerecruit.Weight = this_year_crab_weights$prer_lbs,
@@ -101,9 +101,9 @@ new_line <- data.frame(
  
 )
 
-df<- rbind(df,new_line) #names do not match previous names
+df<- rbind(df,new_line) 
 
-#agr new ends here
+
 #put data into individual stored places for RTMB
 YEARS <- df$Survey.Year
 WEIGHTS <- df$Weight #weighing. MAy need to add one for the new year
@@ -116,8 +116,6 @@ CV <- sqrt(exp(1/(2*WEIGHTS))-1)
 CATCH <- as.numeric(gsub(",", "", df$Catch..Number.)) #get rid of commas, ideally before...
 #replace NA in catch with 0
 CATCH[is.na(CATCH)] <- 0 #replace NA with 0
-
-##there was some thing in the juneau csa excel readme about how calculating PU is not straightforward. So... check that plz
 
 CATCH_MIDDATE <-as.Date(df$Catch.Mid.Date,format = "%d-%b-%y") #data wrangle catch middate into usable format
 REF_DATE <- CATCH_MIDDATE[1]
@@ -204,8 +202,6 @@ array_all_stages <- array_all_stages[!is.na(array_all_stages[,2,1]), , ] #remove
 #PARAMS
 ###########
 T12 <- 32.55515817/100 #starting value for the 2025 analysis Excursion Inlet (automate later!!) #Q2 in excel
-#q <- 104.187334848418/1000000 #catchability as a rate (est as not/100? IDK (see csa excel for what they do...)) #THIS IS ALLOWED TO CHANGE
-#q <- 105.557381539957/1000000 #from 2023 to 2024 analysis (last year)
 q <- 321.1311767/1000000 #starting point for 2025 analysis from excursion inlet (Q3 in excel - excusrion 2024 excel CSA)
 S <- 0.32 #fixed
 
@@ -213,7 +209,7 @@ S <- 0.32 #fixed
 #SETUP
 #######################
 data <- list(
-  YEARS = YEARS, #all years inclduing missing cpue data years
+  YEARS = YEARS, #all years including missing cpue data years
   #lambdas = WEIGHTS, AGR off 6/12/25- now this is in the cpue data (and I still need to convert to CV...)
   CATCH = CATCH,
   #log_survey_data = log(array_all_stages), #log makes it not go negative? try it
@@ -228,7 +224,7 @@ data <- list(
 )
 
 pars <- list(
-  ln_mean_rec = log(1.7), #could also try 1. 1.7 was close to juneau mean. 1 and 1.7 give the same answer
+  ln_mean_rec = log(1.1), #1.09 is the excursion inlet prerec mean . 1.7 was near the juneau prerecruit mean
   ln_Eps_R = log(rep(1, length(df$Survey.Year))), #very small value if additive. close to 1 if multiplicative. 
   ln_q = log(q), # catchability 
   ln_T12 = log(T12), # preR to R survival rate and molt rate, both
@@ -259,171 +255,11 @@ map$ln_mean_rec <- factor(NA) #fix mean recruitment - not dealing with this righ
 #map$ln_T12 <- factor(NA)
 
 ############################3
-#SOMETHNG LIKE THIS:
-#the function
-basic_pop_model <- function(pars) {
-  
-  # get parameters and data
-  RTMB::getAll(pars, data) #or can write out as in the RTMB vonbert example
-  
-  # Model Set Up (Containers) -----------------------------------------------
-  n_stages = 3 # number of stages for a 3 stage model
-  n_yrs = length(YEARS) # number of years #this should be correct, I put years (includign the NAs) in the data
-  
-  # Population Stuff
-  #CPUE_AS = array(data = 0, dim = c(n_yrs + 1, n_stages)) # Numbers at stage, adds one for this year
-  SSB = array(0, dim = c(n_yrs, n_stages)) # Pre-rec, legal, and mature biomasses
-  
-  # Survey Stuff
-  PredSrvCPUE = array(data = 0, dim = c(n_yrs, n_stages)) # Predicted CPUE at stage PREREC, REC, POSTREC #THE MATRIX MODEL
-  PredSrvIdx = array(0, dim = c(n_yrs, n_stages)) # predicted biomass calculated from the predicted survey CPUE and waa
-  
-  #LINK SURVEY DATA TO MATRIX PREDICTIONS TO LIKELIHOOD. 
-  
-  # Likelihoods - box
-  #SrvIdx_nLL = array(0, dim = c(n_yrs, n_stages)) # Survey Index Likelihoods - this replaces the sum of squares - one likelihood for each year and each stage - summed by row and then summed by year
-  SrvIdx_nLL = rep(0,3) #AGR changed to this 6/12/25
-  
-  #identify a vector where there are no NA's in the data- for the likelihood loop
-  #no_NAs <- data.frame(CPUE_rec) %>% #not a df. Need to do this for just a numeric item in a list
-  #  rownames_to_column() %>%
-  #  filter(!is.na(CPUE_rec)) %>% #will tell us where NA's are in the data
-  #  select(rowname)
-# no_NAs <- as.integer(no_NAs$rowname) #not srue if I still need this
-  
-  
-  # Penalties #I don't need penalties?? do I?
-  #Rec_nLL = rep(0, n_yrs) # Recruitment penalty - AR- why is this a penalty?? **FLAG**
-  #Init_Rec_nLL = rep(0, n_ages - 2) # Initial Recruitment penalty #and why is there an initial?? ***FLAG**
-  jnLL = 0 # Joint negative log likelihood #this I need
-  
-  # Do some parameter transformations here 
-  mean_rec = exp(ln_mean_rec) # mean recruitment
-  q = exp(ln_q) # survey catchability
-  T12 = exp(ln_T12)
-  sigma_survey = exp(ln_sigma_survey) # survey index error
-  init_rec_cpue = exp(ln_init_rec_cpue) # initial recruit CPUE
-  init_postrec_cpue = exp(ln_init_postrec_cpue) # initial postrecruit CPUE
-  Eps_R = exp(ln_Eps_R) # recruitment deviates
-  #survey_data = exp(log_survey_data) #delete later perhaps
-  WEIGHTS = 1.0/(2* sqrt(log(1.0+survey_data[,3,]^2))^2)   #turn CV into weights - I made it so years formerly weighted 0 are now weighted 0.1- agr 25
-  survey_data <- abind(survey_data, WEIGHTS, along=2) ## add weights to the 3d array
+#the function will be called basic_pop_model. I'll put it in a different R script and source it here.
 
-  
-  # Initialize Population ---------------------------------------------------
-
-  #pop initialization
-  PredSrvCPUE[1,] <- c( 
-    #Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec + mean_rec, #Tyler said pick additive or multiplicative, having both is weird
-    Pre_CPUE_prerec_calc <- Eps_R[1] * mean_rec,
-    #Pre_CPUE_prerec_calc <- Eps_R[1] + mean_rec,
-    Pred_CPUE_rec_calc = init_rec_cpue,
-    Pred_CPUE_postrec_calc = init_postrec_cpue 
-  )
-  
-  #Pop projection
-  
-  #softplus <- function(x) log1p(exp(x)) #hmm. This subjectively raises my postrecruit starting values and I'm not sure how I feel about that
-  #softplus <- function(x) log(0.5 + exp(x)) #ugh. seems subjective.
-  
-  for (t in 2:n_yrs){
-  #predSrvCPUE[t,] <- c(
-    #years = YEARS,
-    PredSrvCPUE[t,1] = Eps_R[t] * mean_rec
-    PredSrvCPUE[t,2] = T12*PredSrvCPUE[t-1, 1] #using my rtmb calcs instead of the read-in data
-    #PredSrvCPUE[t,3] = softplus((PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S))) #cant be neg
-    PredSrvCPUE[t,3] = max((PredSrvCPUE[t-1, 2] + PredSrvCPUE[t-1, 3]) * exp(-S * SURVEY_TAU[t]) - (q*CATCH[t-1]*exp(CATCH_SURVEY_TAU[t]*-S)), 0.0001)
-} #ok cool, got the pop (CPUE) projection in there.
-  
-  #########
-  ##POPULATION CALC IN LOGSPACE
-  #PredSrvCPUE[1,] <- c( 
-  #  Pre_CPUE_prerec_calc <- ln_Eps_R[1] + ln_mean_rec, #logspace; Eps_R[t] * mean_rec in regular space
-  #  Pred_CPUE_rec_calc = ln_init_rec_cpue,
-  #  Pred_CPUE_postrec_calc = ln_init_postrec_cpue 
-  #)
-  
-  #for (t in 2:n_yrs){
-  #  PredSrvCPUE[t,1] = ln_Eps_R[t] + ln_mean_rec #logspace equation of:  Eps_R[t] * mean_rec
-  #  PredSrvCPUE[t,2] = ln_T12 + PredSrvCPUE[t-1, 1] #logspace equation of: T12*PredSrvCPUE[t-1, 1]
-  #  x= log(exp(PredSrvCPUE[t-1, 2]) + exp(PredSrvCPUE[t-1, 3])) + (-S * SURVEY_TAU[t])
-  #  y= ln_q + log(CATCH[t-1]) - S * CATCH_SURVEY_TAU[t]
-  #  PredSrvCPUE[t, 3] <- x + log(1 - exp(y - x)) #check is correct
-    #NOPredSrvCPUE[t,3] = log(exp(PredSrvCPUE[t-1, 2]) + exp(PredSrvCPUE[t-1, 3])) + (-S * SURVEY_TAU[t]) + log(1-exp(ln_q) + log(CATCH[t-1]) - S * CATCH_SURVEY_TAU[t]) #using my rtmb calcs instead of the read-in data
-
-  #} 
-  
-  #####
-  
-  
-  #calc the biomass per year for prerecruit, recruit, and postrecruit legal and mature
-  PredSrvIdx[,1] <- (PredSrvCPUE[,1]/q) * wt_prerec #prerecruit biomass = prerecruit cpue/catchability * the weight 
-  PredSrvIdx[,2] <- ((PredSrvCPUE[,2]+PredSrvCPUE[,3])/q) * wt_legal #legal biomasss = recruit cpue + postrecruit cpue, divided by catchability, times the legal weight
-  PredSrvIdx[,3] <- PredSrvIdx[,1]+PredSrvIdx[,2] #mature biomass =  legal biomass + prerecruit biomasss
-  
-  # Likelihoods -------------------------------------------------------------
-
-  ## Survey Index ------------------------------------------------------------
-  #crap- I think below is estimating CV for the output?? how to stop?
-  ##add weights in as a separate thing?
-  ##survey data should NOT change...
-  
-#lambdas <- survey_data[,3,1] #the to, from CV conversion should be here (see tyler solution code and emails)
-#holder <- array(0, dim = c(44, 4, 3))
-pred <- numeric(nrow(survey_data[,,1])) #could be better assigned
-  #for(y in 1:n_yrs) { #make a vector that skips the missing years TODO
-  #for(y in no_NAs) { #this one skips missing years #oops, needs to be the years??- FLAG**
-     for(h in 1:n_stages) {
-       for(y in 1:nrow(survey_data[,,h])){
-         y_row <- which(YEARS == survey_data[y,1,h])#[y, 1]) #index the nrow of the model matrix that year y of survey data corresponds to
-         pred[y] <- PredSrvCPUE[y_row, h] # vector of predictions for stage h in only years that we have data. FLAG Negatives. NEgatives not ok? No negative CPUE... Log?
-       }
-    SrvIdx_nLL[h] = -sum(dnorm(survey_data[,2,h], pred, sigma_survey, TRUE) * survey_data[,4,h] ) #the likelihood. Pred is going negative. this bad? FLAG** #survey_data[,4,h] is weights
-    #AGR 25 crap- is it estimating CV here? We dont want that
-    # add predictions to the data for the report however you want to
-    #holder[,,h] <- cbind(survey_data[,,h], pred) #I dont get why I have this. FLAG. MY data is spit out elsewhere.
-     } #end of st(stage) loop
-  
-
-  
-  ## Recruitment ------------------------------------------------------------- PERHAPS ADD THIS LATER
-  #Init_Rec_nLL = -sum(dnorm(ln_InitDevs, -sigma_R^2/2, sigma_R, TRUE)) #I am unsure if these stay for the crab CSA.. this will be the next addition if not now, at least
-  #Rec_nLL = -sum(dnorm(Eps_R, -sigma_R^2/2, sigma_R, TRUE)) #use if ranefs
-  #for(y in 1:n_yrs) {
-   #   Rec_nLL[y] = -dnorm(Eps_R, -sigma_R^2/2, sigma_R, TRUE) #* lambdas[y] #try adding weights here  #that ran poorly
-  #}
-  
-  # Get joint likelihood
-  jnLL = sum(SrvIdx_nLL)
-  #jnLL = sum(SrvIdx_nLL) + sum(Rec_nLL) #we're keeping it simple for the crab CSA
-
-  
- 
-  # Report Section
-  #I'll want CV's for graphing
-  #CVs <- survey_data[,3,1]
-  
-  #RTMB::ADREPORT(SSB)# Mature and Legal biomasses, and error
-  RTMB::REPORT(sigma_survey) #I want my error. Will have to add in other error sources later??
-  #RTMB::ADREPORT(PredSrvIdx) #survey biomass by stage
-  RTMB::REPORT(PredSrvIdx) #REPORT or ADREPORT?? *FLAG* #the pred biomass
-  #RTMB::ADREPORT(PredSrvCPUE) #predicted survey CPUE by stage
-  RTMB::REPORT(PredSrvCPUE) #REPORT or ADREPORT?? *FLAG* #the pred cpue
-  RTMB::REPORT(jnLL)
-  RTMB::REPORT(q)
-  RTMB::REPORT(T12)
-  #RTMB::REPORT(holder) # a better name for this one perhaps. #does not convert to df because only 44 entries.
-  #RTMB::ADREPORT(mean_rec)
-  RTMB::REPORT(Eps_R) #annual recruitment
-  RTMB::REPORT(survey_data)
-
-  return(jnLL) #do I need this too?
-}
-#END POP MODEL
-
+source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize.R") #creates the model.
 
 # Run Model ---------------------------------------------------------------
-
 
 pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map) 
 #pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map, random=c("Eps_R")) #if random effects. We decided no for this model.
@@ -438,14 +274,14 @@ pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map)
 
 #TORUBLESHOOT
 # Check initial parameter values
-#print(pop_mod$par)
+print(pop_mod$par)
 
 # Evaluate the objective function and gradient at initial parameter values
-#initial_fn <- pop_mod$fn(pop_mod$par)
-#initial_gr <- pop_mod$gr(pop_mod$par)
+initial_fn <- pop_mod$fn(pop_mod$par)
+initial_gr <- pop_mod$gr(pop_mod$par)
 
-#print(initial_fn) #if NA's there is problem
-#print(initial_gr) #if NA's, problem
+print(initial_fn) #if NA's there is problem *FLAG!! There are problems here for excursion inlet 2025. I'll have to get into it unfortunately
+print(initial_gr) #if NA's, problem
 
 # Ensure no NA/NaN values in the function and gradient evaluations
 #if (any(is.na(initial_fn)) || any(is.nan(initial_fn))) {
@@ -461,7 +297,7 @@ pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map=map)
 
 pop_mod$par #object and starting params
 pop_mod$fn()
-pop_mod$gr()
+pop_mod$gr() #SOMETHING WENT BAD. AGR HERE
 
 
 #OPTION 1 for model run - nlminb
