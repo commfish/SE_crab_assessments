@@ -133,9 +133,12 @@ for (i in 2:length(SURVEY_MIDDATE)){
   }
 }
 
+#temp quick fix!!
+CATCH_MIDDATE[34] <- CATCH_MIDDATE[33]
+
 #TAU's
 CATCH_SURVEY_TAU <- rep(0, length(CATCH_MIDDATE)) #create a vector of zeros
-CATCH_SURVEY_TAU[1] <- 0 #first year as 0
+CATCH_SURVEY_TAU[1] <- 0.5815 #first year as 0 #wait why is this?? **FLAG** I gave it a starting value from EI
 for (i in 2:length(CATCH_MIDDATE)){
   if(CATCH [i-1] ==0){
     CATCH_SURVEY_TAU[i] <- 1 #if the catch is 0, the CATCH_SURVEY_TAU = 1 for the next year
@@ -145,11 +148,18 @@ for (i in 2:length(CATCH_MIDDATE)){
   }
 }
 
+#TROUBLESHOOT TEMP - oh I see it. Year 2012 is missing a catch mid-year date. I can put in a temp one for now and dig that up later
+##need to fish out the commfish data... FLAG. for now I'll give it 2011
+
+
+
 SURVEY_TAU <- rep(0, length(SURVEY_MIDDATE)) #create a vector of zeros
 SURVEY_TAU[1] <- 0 #first year as 0
   for (i in 2:length(SURVEY_MIDDATE)){
   SURVEY_TAU[i] <- (abs(SURVEY_MIDDATE[i]-SURVEY_MIDDATE[i-1]))/365 #same formula as excel to get the tao adjustor
-}
+  }
+
+
 #survey info
 ##survey CPUE (from summary table) #vectors over all the years
 CPUE_prerec <- df$Pre.recruit 
@@ -342,13 +352,13 @@ pop_mod$env$last.par.best
 #space to compare 2025 excel to RTMB model AGR HERE 2025
 #this could all be automated better...
 #df_juneau_24_compare <- read.csv("CSA_excel/JNU_test.csv")
-df_juneau_25_compare <- read.csv("CSA_excel/Juneau 2025 CPUE correction.csv")
+df_25_compare <- read.csv("CSA_excel/Excursion Inlet 2025 Excel results comparison.csv")
 #get rid of commas in the numbers for prerecuit biomass, legal biomass, and mature biomass
-df_juneau_25_compare$Mature.Biomass <- as.numeric(gsub(",", "", df_juneau_25_compare$Mature.Biomass))
-df_juneau_25_compare$Legal.Biomass <- as.numeric(gsub(",", "", df_juneau_25_compare$Legal.Biomass))
-df_juneau_25_compare$Prerecruit.Biomass <- as.numeric(gsub(",", "", df_juneau_25_compare$Prerecruit.Biomass))
+df_25_compare$Mature.Biomass <- as.numeric(gsub(",", "", df_25_compare$Mature.Biomass))
+df_25_compare$Legal.Biomass <- as.numeric(gsub(",", "", df_25_compare$Legal.Biomass))
+df_25_compare$Prerecruit.Biomass <- as.numeric(gsub(",", "", df_25_compare$Prerecruit.Biomass))
 
-Temp<- df_juneau_25_compare%>%
+Temp<- df_25_compare%>%
   filter(!is.na(Recruit)) #get rid of any years with missing survey data
 Year <- c(min(Temp$Survey.Year):max(Temp$Survey.Year)) #get the years from the data
 
@@ -390,8 +400,8 @@ results_df_relevant <- result_df %>%
         #mutate
 
 
-#I should add CV to the raw data (juenau 2024 compare)
-df_juneau_25_compare <- df_juneau_25_compare %>% 
+#I should add CV to the raw data
+df_25_compare <- df_25_compare %>% 
   mutate(year = Survey.Year) %>% #added a matching year column
   left_join(cv_df) %>% #joined cv
   mutate(
@@ -426,10 +436,10 @@ p1 <- ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) +
   geom_line(aes(color =factor("RTMB", levels=color_levels)), linewidth=1) + #the model-predicted cpue
   geom_point(aes(color=factor("RTMB", levels=color_levels)))+
   #add the CSA excel model CPUE
-  geom_line(data=df_juneau_25_compare ,aes(y=Estimated.Prerecruits, x=Survey.Year, color=factor("Excel", levels=color_levels),)) + #this is the observed survey CPUE values
-  geom_point(data=df_juneau_25_compare, aes(y=Pre.recruit, x=Survey.Year, color=factor("Observed", levels=color_levels))) + #this is the observed survey CPUE values
-  geom_errorbar(data=df_juneau_25_compare, aes(ymin=cv_lower_prerec, ymax=cv_upper_prerec, x=Survey.Year, y=NULL))+
-  labs(title="JNU Pre-recruit CPUE", x="Year", y="CPUE", subtitle = "observed CPUE as black points with CV error bars") +
+  geom_line(data=df_25_compare ,aes(y=Estimated.Prerecruits, x=Survey.Year, color=factor("Excel", levels=color_levels),)) + #this is the observed survey CPUE values
+  geom_point(data=df_25_compare, aes(y=Pre.recruit, x=Survey.Year, color=factor("Observed", levels=color_levels))) + #this is the observed survey CPUE values
+  geom_errorbar(data=df_25_compare, aes(ymin=cv_lower_prerec, ymax=cv_upper_prerec, x=Survey.Year, y=NULL))+
+  labs(title="EI Pre-recruit CPUE", x="Year", y="CPUE", subtitle = "observed CPUE as black points with CV error bars") +
   scale_color_manual(
     name=NULL,
     values = c(
@@ -443,18 +453,17 @@ p1 <- ggplot(results_df_relevant) + aes(x=year, y=prerecuit_cpue) +
          # legend.background = element_rect(fill = alpha("white", 0.7), color = "gray80"),  # semi-transparent background for readability
           legend.box.background = element_rect(color = "gray80")
          )
-#there we go.pre-rec is being estimated now.
 
-#anyway, recruits CPUE
+#recruits CPUE
 p2 <- ggplot(results_df_relevant) + aes(x=year, y=recruit_cpue) + 
   geom_ribbon(aes(ymin=recruit_cpue_lower, ymax=recruit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(color="lightblue")+
-  geom_point(data=df_juneau_25_compare ,aes(y=Recruit, x=Survey.Year)) + #this is the observed survey CPUE values
-  geom_errorbar(data=df_juneau_25_compare, aes(ymin=cv_lower_rec, ymax=cv_upper_rec, x=Survey.Year, y=NULL))+
+  geom_point(data=df_25_compare ,aes(y=Recruit, x=Survey.Year)) + #this is the observed survey CPUE values
+  geom_errorbar(data=df_25_compare, aes(ymin=cv_lower_rec, ymax=cv_upper_rec, x=Survey.Year, y=NULL))+
   #add the CSA excel model CPUE
-  geom_line(data=df_juneau_25_compare ,aes(y=Estimated.Recruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="JNU Recruit CPUE", x="Year", y="CPUE") +
+  geom_line(data=df_25_compare ,aes(y=Estimated.Recruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
+  labs(title="EI Recruit CPUE", x="Year", y="CPUE") +
   theme_minimal()
 
 #and postrecruit CPUE
@@ -462,11 +471,11 @@ p3 <- ggplot(results_df_relevant) + aes(x=year, y=postrecuit_cpue) +
   geom_ribbon(aes(ymin=postrecuit_cpue_lower, ymax=postrecuit_cpue_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
   geom_line(color ="lightblue", linewidth=1) + #the model-predicted cpue
   geom_point(color="lightblue")+
-  geom_point(data=df_juneau_25_compare ,aes(y=Post.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
-  geom_errorbar(data=df_juneau_25_compare, aes(ymin=cv_lower_postrec, ymax=cv_upper_postrec, x=Survey.Year, y=NULL))+
+  geom_point(data=df_25_compare ,aes(y=Post.recruit, x=Survey.Year)) + #this is the observed survey CPUE values
+  geom_errorbar(data=df_25_compare, aes(ymin=cv_lower_postrec, ymax=cv_upper_postrec, x=Survey.Year, y=NULL))+
   #add the CSA excel model CPUE
-  geom_line(data=df_juneau_25_compare ,aes(y=Estimated.Postrecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
-  labs(title="JNU Post-recruit CPUE", x="Year", y="CPUE") +
+  geom_line(data=df_25_compare ,aes(y=Estimated.Postrecruits, x=Survey.Year), color = "darkgreen") + #this is the observed survey CPUE values
+  labs(title="EI Post-recruit CPUE", x="Year", y="CPUE") +
   theme_minimal()
 
 library(patchwork)
@@ -474,120 +483,8 @@ library(patchwork)
 
 cur_yr <- 2025 #the current year
 #save plot to figures file
-ggsave(paste0("figures/rkc/",cur_yr,"/CSA_JNU_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
+ggsave(paste0("figures/rkc/",cur_yr,"/CSA_EI_CPUE.png"), plot = p123, width = 8, height = 10, dpi = 300)
 
-#C doesn't like dashed lines version
-
-
-#greyscale version - meh, not bothering
-p1_g <- ggplot(results_df_relevant, aes(x = year)) + 
-  # RTMB model CPUE with uncertainty
-  geom_ribbon(aes(ymin = prerecuit_cpue_lower, ymax = prerecuit_cpue_upper), 
-              fill = "grey80", alpha = 0.4) +
-  geom_line(aes(y = prerecuit_cpue, linetype = "RTMB"), color = "grey30", linewidth = 1) +
-  geom_point(aes(y = prerecuit_cpue, shape = "RTMB"), color = "grey30") +
-  
-  # Observed CPUE and CV error bars
-  geom_point(data = df_juneau_25_compare, 
-             aes(x = Survey.Year, y = Pre.recruit, shape = "Observed"), 
-             color = "black") +
-  geom_errorbar(data = df_juneau_25_compare, 
-                aes(x = Survey.Year, ymin = cv_lower_prerec, ymax = cv_upper_prerec, y=NULL), 
-                color = "black") +
-  
-  # Excel-predicted CPUE
-  geom_line(data = df_juneau_25_compare, 
-            aes(x = Survey.Year, y = Estimated.Prerecruits, linetype = "Excel"), 
-            color = "grey10", linewidth = 1) +
-  
-  # Legends and labels
-  scale_linetype_manual(values = c("Excel" = "dashed", "RTMB" = "solid")) +
-  scale_shape_manual(values = c("Observed" = 16, "RTMB Predicted" = 1)) +
-  labs(
-    title = "JNU Prerecruit CPUE – Excel (dashed), RTMB (solid) with CI",
-    subtitle = "Observed CPUE as black points with CV error bars",
-    x = "Year", y = "CPUE",
-    linetype = "Model Type",
-    shape = "Data Source"
-  ) +
-  theme_minimal()
-
-
-#recruits
-p2_g <- ggplot(results_df_relevant, aes(x = year)) + 
-  # RTMB model CPUE with uncertainty
-  geom_ribbon(aes(ymin = recruit_cpue_lower, ymax = recruit_cpue_upper), 
-              fill = "grey80", alpha = 0.4) +
-  geom_line(aes(y = recruit_cpue, linetype = "RTMB"), color = "grey30", linewidth = 1) +
-  geom_point(aes(y = recruit_cpue, shape = "RTMB"), color = "grey30") +
-  
-  # Observed CPUE and CV error bars
-  geom_point(data = df_juneau_24_compare, 
-             aes(x = Survey.Year, y = Recruit, shape = "Observed"), 
-             color = "black") +
-  geom_errorbar(data = df_juneau_24_compare, 
-                aes(x = Survey.Year, ymin = cv_lower_rec, ymax = cv_upper_rec, y=NULL), 
-                color = "black") +
-  
-  # Excel-predicted CPUE
-  geom_line(data = df_juneau_24_compare, 
-            aes(x = Survey.Year, y = Estimated.Recruits, linetype = "Excel"), 
-            color = "grey10", linewidth = 1) +
-  
-  # Legends and labels
-  scale_linetype_manual(values = c("Excel" = "dashed", "RTMB" = "solid")) +
-  scale_shape_manual(values = c("Observed" = 16, "RTMB Predicted" = 1)) +
-  labs(
-    title = "JNU Recruit CPUE",
-   # subtitle = "Observed CPUE as black points with CV error bars",
-    x = "Year", y = "CPUE",
-    linetype = "Model Type",
-    shape = "Data Source"
-  ) +
-  theme_minimal()+
-  theme(  legend.position = c(0.95, 0.95),    # x=95% right, y=95% top inside plot area
-          # legend.justification = c("right", "top"),  # anchor legend box by its top-right corner
-          # legend.background = element_rect(fill = alpha("white", 0.7), color = "gray80"),  # semi-transparent background for readability
-          legend.box.background = element_rect(color = "gray80")
-  )
-
-#postrecruit greyscale
-p3_g <- ggplot(results_df_relevant, aes(x = year)) + 
-  # RTMB model CPUE with uncertainty
-  geom_ribbon(aes(ymin = postrecuit_cpue_lower, ymax = postrecuit_cpue_upper), 
-              fill = "grey80", alpha = 0.4) +
-  geom_line(aes(y = postrecuit_cpue, linetype = "RTMB"), color = "grey30", linewidth = 1) +
-  geom_point(aes(y = postrecuit_cpue, shape = "RTMB"), color = "grey30") +
-  
-  # Observed CPUE and CV error bars
-  geom_point(data = df_juneau_24_compare, 
-             aes(x = Survey.Year, y = Post.recruit, shape = "Observed"), 
-             color = "black") +
-  geom_errorbar(data = df_juneau_24_compare, 
-                aes(x = Survey.Year, ymin = cv_lower_postrec, ymax = cv_upper_postrec, y=NULL), 
-                color = "black") +
-  
-  # Excel-predicted CPUE
-  geom_line(data = df_juneau_24_compare, 
-            aes(x = Survey.Year, y = Estimated.Postrecruits, linetype = "Excel"), 
-            color = "grey10", linewidth = 1) +
-  
-  # Legends and labels
-  scale_linetype_manual(values = c("Excel" = "dashed", "RTMB" = "solid")) +
-  scale_shape_manual(values = c("Observed" = 16, "RTMB Predicted" = 1)) +
-  labs(
-    title = "JNU Postrecruit CPUE",
-   # subtitle = "Observed CPUE as black points with CV error bars",
-    x = "Year", y = "CPUE",
-    linetype = "Model Type",
-    shape = "Data Source"
-  ) +
-  theme_minimal()
-
-#save save
-(p123_g <- p1_g/p2_g/p3_g + plot_layout(guides = "collect")) #combine the plots and collect the legends)
-
-#ggsave(paste0(cur_yr,"/figures/CSA_JNU_9_CPUE_grey.png"), plot = p123_g, width = 8, height = 10, dpi = 300)
 
 
 ##################################################
@@ -598,15 +495,15 @@ color_levels_2 <- c("Mature RTMB", "Mature Excel", "Legal RTMB", "Legal Excel", 
 p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
   geom_ribbon(aes(ymin=mature_biomass_lower, ymax=mature_biomass_upper), alpha = 0.3, fill = "#56B4E9") + #uncertainty
   geom_line(aes(color =factor("Mature RTMB", levels=color_levels_2)), size=1) + #the model-predicted RTMB biomasss
-  geom_line(data=df_juneau_25_compare ,aes(y=Mature.Biomass, x=Survey.Year, color=factor("Mature Excel", levels=color_levels_2))) + #this is excel model mature biomass
+  geom_line(data=df_25_compare ,aes(y=Mature.Biomass, x=Survey.Year, color=factor("Mature Excel", levels=color_levels_2))) + #this is excel model mature biomass
   #add legal biomass
   geom_ribbon(aes(ymin=legal_biomass_lower, ymax=legal_biomass_upper), alpha = 0.2, fill = "#009E73") + #uncertainty
   geom_line(aes(y=legal_biomass,color =factor("Legal RTMB", levels=color_levels_2)), size=1) + #the RTMB model-predicted biomasss
-  geom_line(data=df_juneau_25_compare ,aes(y=Legal.Biomass, x=Survey.Year, color=factor("Legal Excel", levels=color_levels_2))) + #this is the excel moodel
+  geom_line(data=df_25_compare ,aes(y=Legal.Biomass, x=Survey.Year, color=factor("Legal Excel", levels=color_levels_2))) + #this is the excel moodel
   #add prerecruit biomass
   geom_ribbon(aes(ymin=prerecruit_biomass_lower, ymax=prerecruit_biomass_upper), alpha = 0.2, fill = "#CC79A7") + #uncertainty
-  geom_line(aes(y=prerecruit_biomass,color =factor("Pre-recruit RTMB", levels=color_levels_2)), size=1) + #the RTMB model-predicted biomass
-  geom_line(data=df_juneau_25_compare ,aes(y=Prerecruit.Biomass, x=Survey.Year, color=factor("Pre-recruit Excel", levels = color_levels_2))) + #this is the excel-predicted biomass
+  geom_line(aes(y=prerecruit_biomass,color =factor("Prerecruit RTMB", levels=color_levels_2)), size=1) + #the RTMB model-predicted biomass
+  geom_line(data=df_25_compare ,aes(y=Prerecruit.Biomass, x=Survey.Year, color=factor("Prerecruit Excel", levels = color_levels_2))) + #this is the excel-predicted biomass
   labs(title="JNU Mature, Legal, and Pre-recruit Biomass", x="Year", y="Biomass") +
   theme_minimal() +
   scale_color_manual(
@@ -627,43 +524,7 @@ p4<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) +
 
 p4
 #ggsave to current year figures folder
-ggsave(paste0("figures/rkc/",cur_yr,"/CSA_JNU_9_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
-
-#I asked AI to make one that is colorblind friedly. Let's see how it did.
-p5 <- ggplot(results_df_relevant, aes(x = year)) + 
-  # Prerecruit biomass
-  geom_ribbon(aes(ymin = prerecruit_biomass_lower, ymax = prerecruit_biomass_upper), 
-              fill = "grey80", alpha = 0.5) +
-  geom_line(aes(y = prerecruit_biomass, linetype = "RTMB"), color = "grey20", size = 1) +
-  geom_line(data = df_juneau_24_compare, 
-            aes(x = Survey.Year, y = Prerecruit.Biomass, linetype = "Excel"), 
-            color = "grey20", size = 1) +
-  
-  # Legal biomass
-  geom_ribbon(aes(ymin = legal_biomass_lower, ymax = legal_biomass_upper), 
-              fill = "grey65", alpha = 0.5) +
-  geom_line(aes(y = legal_biomass, linetype = "RTMB"), color = "grey10", size = 1) +
-  geom_line(data = df_juneau_24_compare, 
-            aes(x = Survey.Year, y = Legal.Biomass, linetype = "Excel"), 
-            color = "grey10", size = 1) +
-  
-  # Mature biomass
-  geom_ribbon(aes(ymin = mature_biomass_lower, ymax = mature_biomass_upper), 
-              fill = "grey50", alpha = 0.5) +
-  geom_line(aes(y = mature_biomass, linetype = "RTMB"), color = "black", size = 1) +
-  geom_line(data = df_juneau_24_compare, 
-            aes(x = Survey.Year, y = Mature.Biomass, linetype = "Excel"), 
-            color = "black", size = 1) +
-  
-  scale_linetype_manual(values = c("RTMB" = "solid", "Excel" = "dashed")) +
-  labs(title = "JNU Mature, Legal, and Pre-recruit Biomass– Excel (dashed), RTMB (solid) with CI",
-       x = "Year", y = "Biomass",
-       linetype = "Model") +
-  theme_minimal()
-
-#ggsave(paste0(cur_yr,"/figures/CSA_JNU_9_Biomass_greyscale.png"), plot = p5, width = 8, height = 5, dpi = 300)
-
-#C did not like the dashed lines, going back to color.
+ggsave(paste0("figures/rkc/",cur_yr,"/CSA_EI_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
 
 
 #make the df in long format#######
@@ -671,32 +532,32 @@ p5 <- ggplot(results_df_relevant, aes(x = year)) +
 
 #end df long wrangle here#######
 
-
-p6<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
-  geom_ribbon(aes(ymin=mature_biomass_lower, ymax=mature_biomass_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
-  geom_line(color ="lightblue", size=1) + #the model-predicted RTMB biomasss
-  geom_line(data=df_juneau_24_compare ,aes(y=Mature.Biomass, x=Survey.Year), color="blue") + #this is excel model mature biomass
+#what's this plot??
+#p6<-ggplot(results_df_relevant) + aes(x=year, y=mature_biomass) + 
+#  geom_ribbon(aes(ymin=mature_biomass_lower, ymax=mature_biomass_upper), alpha = 0.3, fill = "lightblue") + #uncertainty
+#  geom_line(color ="lightblue", size=1) + #the model-predicted RTMB biomasss
+#  geom_line(data=df_juneau_24_compare ,aes(y=Mature.Biomass, x=Survey.Year), color="blue") + #this is excel model mature biomass
   #add legal biomass
-  geom_ribbon(aes(ymin=legal_biomass_lower, ymax=legal_biomass_upper), alpha = 0.2, fill = "lightgreen") + #uncertainty
-  geom_line(aes(y=legal_biomass),color ="lightgreen", size=1) + #the RTMB model-predicted biomasss
-  geom_line(data=df_juneau_24_compare ,aes(y=Legal.Biomass, x=Survey.Year), color="darkgreen") + #this is the excel moodel
+#  geom_ribbon(aes(ymin=legal_biomass_lower, ymax=legal_biomass_upper), alpha = 0.2, fill = "lightgreen") + #uncertainty
+#  geom_line(aes(y=legal_biomass),color ="lightgreen", size=1) + #the RTMB model-predicted biomasss
+#  geom_line(data=df_juneau_24_compare ,aes(y=Legal.Biomass, x=Survey.Year), color="darkgreen") + #this is the excel moodel
   #add prerecruit biomass
-  geom_ribbon(aes(ymin=prerecruit_biomass_lower, ymax=prerecruit_biomass_upper), alpha = 0.2, fill = "lightpink") + #uncertainty
-  geom_line(aes(y=prerecruit_biomass),color ="lightpink", size=1) + #the RTMB model-predicted biomass
-  geom_line(data=df_juneau_24_compare ,aes(y=Prerecruit.Biomass, x=Survey.Year), color="pink") + #this is the excel-predicted biomass
-  labs(title="JNU Biomass - Excel dark lines, RTMB light lines with CI", x="Year", y="Biomass") +
-  scale_color_manual(name = "Biomass Type",
-                     values = c("Mature" = "lightblue", "Legal" = "lightgreen", "Prerecruit" = "lightpink")) +
-  scale_linetype_manual(name = "Model",
-                        values = c("RTMB" = "solid", "Excel" = "dashed")) +
-  labs(title = "JNU Biomass – Excel (dashed) vs RTMB (solid) with 95% CI",
-       x = "Year", y = "Biomass") +
-  theme_minimal() #not colorblind friendly
+#  geom_ribbon(aes(ymin=prerecruit_biomass_lower, ymax=prerecruit_biomass_upper), alpha = 0.2, fill = "lightpink") + #uncertainty
+#  geom_line(aes(y=prerecruit_biomass),color ="lightpink", size=1) + #the RTMB model-predicted biomass
+ # geom_line(data=df_juneau_24_compare ,aes(y=Prerecruit.Biomass, x=Survey.Year), color="pink") + #this is the excel-predicted biomass
+#  labs(title="JNU Biomass - Excel dark lines, RTMB light lines with CI", x="Year", y="Biomass") +
+ # scale_color_manual(name = "Biomass Type",
+#                     values = c("Mature" = "lightblue", "Legal" = "lightgreen", "Prerecruit" = "lightpink")) +
+#  scale_linetype_manual(name = "Model",
+ #                       values = c("RTMB" = "solid", "Excel" = "dashed")) +
+#  labs(title = "JNU Biomass – Excel (dashed) vs RTMB (solid) with 95% CI",
+ #      x = "Year", y = "Biomass") +
+#  theme_minimal() #not colorblind friendly
 
-p6
+#p6
 
 
-
+#EVERYTHING BELOW HERE IS IN DEVELOPMENT. iN THEORY I'LL PRODUCE WHATEVER RESULTS AND OUTPUT TABLES I NEED BELOW.
 ######################################################################
 #agr here 25, more or less. Next I'll do the annoying tables and ... export the results (biomass) into a csv that I can do the rest of the analysis with.
 #also Qc this analysis and send figs to C
