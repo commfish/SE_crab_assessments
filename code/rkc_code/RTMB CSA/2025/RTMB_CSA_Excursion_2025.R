@@ -106,7 +106,8 @@ df<- rbind(df,new_line)
 
 #put data into individual stored places for RTMB
 YEARS <- df$Survey.Year
-WEIGHTS <- df$Weight #weighing. MAy need to add one for the new year
+WEIGHTS <- df$Weight  #weighing. MAy need to add one for the new year
+
 WEIGHTS[is.na(WEIGHTS)] <- 0.1#0.0001 #teh weights are 0 but lets not let the CV be inf. AGR
 
 #make the weights CV 6/16/25
