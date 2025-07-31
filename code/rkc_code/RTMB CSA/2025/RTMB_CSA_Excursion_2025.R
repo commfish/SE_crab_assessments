@@ -1,6 +1,8 @@
-###Juneau RTMB CSA Generalized###
+###Excursion inlet RTMB CSA Generalized###
 ##Alex Reich
 ##7/31/25
+
+#WARNING: MAKE SURE PRERECRUITS ARENT OVERFITTING PLEASE!!
 
 ##############################################################################
 #TO DO
@@ -526,6 +528,15 @@ p4
 #ggsave to current year figures folder
 ggsave(paste0("figures/rkc/",cur_yr,"/CSA_EI_Biomass.png"), plot = p4, width = 8, height = 5, dpi = 300)
 
+
+#I want to see the p4 graph with a wider y axis
+p5 <- p4 + ylim(-70000, 500000)
+p5
+ggsave(paste0("figures/rkc/",cur_yr,"/CSA_EI_Biomass2.png"), plot = p5, width = 8, height = 5, dpi = 300)
+
+p7 <- p4 +ylim(-70000, 1000000)
+p7
+ggsave(paste0("figures/rkc/",cur_yr,"/CSA_EI_Biomass3.png"), plot = p7, width = 8, height = 5, dpi = 300)
 
 #make the df in long format#######
 # Combine datasets with source label for plotting
