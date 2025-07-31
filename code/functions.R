@@ -629,8 +629,11 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   
   
   if(scale == 1){
-    p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1600000),
-                  breaks= seq(min(0), max(1600000), by = 150000), oob = rescale_none)
+    p4 = p4 + scale_y_continuous(labels = comma,
+                                 #limits = c(0,1600000),
+                                 limits = c(0,max(biomass_graph$pounds, 
+                                                  na.rm = TRUE) + 25000),
+                                 breaks = seq(0, max(biomass_graph$pounds, na.rm = TRUE) + 250000, by = 500000))#agr add 25
   }
   }
   
@@ -652,7 +655,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                           na.rm = TRUE) + 25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds, 
-                                                     na.rm = TRUE)+25000), by = 50000)) +
+                                                     na.rm = TRUE)+25000), by = 500000)) +
       theme(legend.position = c(0.5,0.85), #moving that legend slightly up for seymour.
             axis.text = element_text(size = 12), 
             axis.title=element_text(size=14,face="bold")) + 
