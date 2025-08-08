@@ -18,6 +18,8 @@
 
 #pybus bay insteaed of pybus, biomass graph (y axis scale) now looks weird - p4 in panel_graph in functions.R
 
+#AGR FLAG- need to update functions with stuff from the S drive (panel_figure and panel_figure_NC - more work needed on the latter)
+
 ## load -------------------------
 source('./code/functions.R')
 
@@ -321,7 +323,7 @@ panel_figure('Pybus', cur_yr, 'Pybus', 3, 0) # female panel
 # base.location is the location name in the baseline file, can be different
 
 ### presentation figure -----
-panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 2, 2, 'Pybus Bay')
+panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 2, 2, 'Pybus Bay') #AGR flag here- this function needs work
 panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 3, 0, 'Pybus Bay') #female panel
 
 ### presentation figures with different titles -----
@@ -361,8 +363,8 @@ panel_figure_NC_PRES_title('Pybus', cur_yr, 'Pybus', 3, 0, "Males", "Females and
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "A8:E55") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "Q8:S55")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "A8:E56") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "Q8:S56")) %>%
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
