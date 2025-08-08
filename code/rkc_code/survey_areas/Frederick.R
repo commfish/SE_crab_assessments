@@ -26,7 +26,7 @@ dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dat <- read.csv(paste0('./data/rkc/', survey.location, '/RKC_survey_CSA_', survey.location, '_', pr_yr2, '_', cur_yr2, '.csv'))
                   # this is input from OceanAK - set up as red crab survey data for CSA
                   # Year = 2018,2019, project code 007, Location - Port Frederick, species - red king crab
-area <- read.csv(paste0('./data/rkc/', survey.location, '/Frederick_strata_area.csv')) #need to get strata area
+area <- read.csv(paste0('./data/rkc/', survey.location, '/PortFrederick_strata_area.csv')) #need to get strata area
                   #this file is the same every year.  Unless the survey methods change
 histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/EI_perpot_all_yrs.csv')) #update for fred
  ## !!!!  this file will be 'EI_perpot_all_yrs' and just get updated with current years data.

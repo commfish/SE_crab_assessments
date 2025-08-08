@@ -1,5 +1,5 @@
-# K.Palof 
-# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18/ 9-4-19/8-23-21 / 7-26-22 /7-25-24 AGR
+# K.Palof - now run and edited by A. Reich 
+# ADF&G 8-3-16 updated for Pybus Bay  / updated 8-8-17/8-10-18/ 9-4-19/8-23-21 / 7-26-22 /7-25-24 AGR/ 8-8-25 AGR
 # R script contains code to process data from Ocean AK to use in crab CSA models, 
 #      code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -22,10 +22,10 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2024 # update annually 
+cur_yr <- 2025 # update annually 
 pr_yr <- cur_yr -1
-cur_yr2 <- 24
-pr_yr2 <- 23
+cur_yr2 <- 25
+pr_yr2 <- 24
 survey.location <- 'Pybus'
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
@@ -100,10 +100,6 @@ ggplot(dat1) + aes(x=Length.Millimeters) + geom_histogram() + facet_wrap(~Recrui
 ggplot(dat1) + aes(x=Length.Millimeters, y=Recruit.Status) + geom_violin()
 ggplot(dat1) + aes(x=Length.Millimeters, y=Recruit.Status) + geom_boxplot()
 
-#there is a weird small female
-#View(dat1%>% filter(Recruit.Status=="Small Females"))
-##ok that one small female looks fine
-
 
 ##### Weighted CPUE current year -----------------------------------
 # the weighting is the product of the area for each strata and the inverse (1/n) of the number of pots per strata per year
@@ -161,6 +157,7 @@ sur.midpoint <- int_midpoint(date.int)
 # convert to Julian day
 sur.midpoint.jul <- yday(sur.midpoint)
 
+#agr- add a date saver csv please
 
 ##### Historic file ---------------------------------------
 # need to add current years pot summary to the historic pot summary file.  
