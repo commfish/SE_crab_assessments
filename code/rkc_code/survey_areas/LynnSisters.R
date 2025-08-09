@@ -308,6 +308,7 @@ write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/',
 ### *** add biomass into biomass.csv file before running figure code ***
 
 #panel_figure('LynnSisters', 2018, 'LynnSisters')
+#AGR FLAG 2025 - these figs need adjusting - both conf and nonconf. The conf ones are fixed on the S drive. The nonconf ones need updating
 panel_figure('LynnSisters', cur_yr, 'LynnSisters', 1, 0) # panel with all 3 figures
 panel_figure('LynnSisters', cur_yr, 'LynnSisters', 2, 0) # male panel
 panel_figure('LynnSisters', cur_yr, 'LynnSisters', 3, 0) # female panel
@@ -338,8 +339,8 @@ panel_figure_NC_PRES_title('LynnSisters', cur_yr, 'LynnSisters', 3, 0, "Males", 
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Lynn Canal ", cur_yr, "-adj HR.xls"), sheet = "Estimate 3 Stage", range = "A7:F54") %>% #fun how the estimates tab is named a different thing in each area
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Lynn Canal ", cur_yr, "-adj HR.xls"), sheet = "Estimate 3 Stage", range = "R7:T54")) %>% #think I'll have to remove row 2 (line 9 in excel)
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR.xls"), sheet = "Estimate 3 Stage", range = "A7:F54") %>% #fun how the estimates tab is named a different thing in each area
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR.xls"), sheet = "Estimate 3 Stage", range = "R7:T54")) %>% #think I'll have to remove row 2 (line 9 in excel)
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   slice(-1) %>% #added to Peril specifically to remove a row that I do not want, removes 1978 where I do not have data; also works for lynn sisters
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
