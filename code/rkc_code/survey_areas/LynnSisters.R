@@ -1,5 +1,5 @@
-# K.Palof 
-# ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19/ 8-23-21/ 7-20-22 / 7-26-2023 / 8-20-24 AGR
+# K.Palof - now A. Reich
+# ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19/ 8-23-21/ 7-20-22 / 7-26-2023 / 8-20-24 AGR/ 8-8-25 AGR
 # code to process data from Ocean AK to use in crab CSA models.  
 #  OceanAK report found under Shared Folders/Commercial Fisheries/Region 1/Invertebrates/User Reports/kjpalof/se rkc areas
 
@@ -7,11 +7,11 @@
 source('./code/functions.R')  #functions here for summarizing data and figures 
 
 ## setup global ---------------
-cur_yr <- 2024 # this needs to be updated annually with current survey year 
+cur_yr <- 2025 # this needs to be updated annually with current survey year 
 pr_yr <- cur_yr -1
 survey.location <- 'LynnSisters'
-cur_yr2 <- 24
-pr_yr2 <- 23
+cur_yr2 <- 25
+pr_yr2 <- 24
 
 # lines below create folders if they don't already exist for current year
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr)) 
@@ -41,6 +41,7 @@ biomass <- read.csv("./data/rkc/biomass.csv")
 ## survey data QAC -------
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
+sapply(dat, unique)
 
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
