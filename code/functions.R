@@ -695,7 +695,9 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   }
   
   if(survey.location == "LynnSisters"){
-    p4 <- p4 + theme(legend.position = c(0.65,0.85))
+    p4 <- p4 + theme(legend.position = c(0.65,0.85)) +
+      scale_y_continuous(labels = comma, limits = c(0,100000),
+                         breaks= seq(min(0), max(100000), by = 25000), oob = rescale_none)
   }
   
   if(survey.location == "Gambier"){
@@ -929,7 +931,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     )+
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -971,7 +973,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     #scale_y_continuous(limits = c(0,(max(round(femjuv_graph$mean, 0) +1))), oob = rescale_none) + #agr 2025 off
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -1020,7 +1022,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     ylab("Percentage") + 
     xlab(NULL) +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
     theme(legend.position = c(0.2,0.5), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) 
@@ -1062,7 +1064,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
       #scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
       #                                                    na.rm = TRUE) + 25000),
       #                  breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -1106,7 +1108,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
       scale_y_continuous(labels = comma, 
                          limits = c(0,max(biomass_graph$pounds, 
                                           na.rm = TRUE) + 25000),
@@ -1144,7 +1146,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1996),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
       scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                           na.rm = TRUE) + 25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -1158,7 +1160,9 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   }
   
   if(survey.location == "LynnSisters"){
-    p4 <- p4 + theme(legend.position = c(0.65,0.85))
+    p4 <- p4 + theme(legend.position = c(0.65,0.85)) +
+      scale_y_continuous(labels = comma, limits = c(0,100000),
+                         breaks= seq(min(0), max(100000), by = 25000), oob = rescale_none)
   }
   
   if(survey.location == "Gambier"){

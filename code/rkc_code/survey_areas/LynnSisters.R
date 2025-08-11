@@ -320,21 +320,9 @@ panel_figure('LynnSisters', cur_yr, 'LynnSisters', 3, 0) # female panel
 panel_figure_NC('LynnSisters', 2024, 'LynnSisters', 1, 0) # panel with all 3 figures #AGR changed to 2024 from 2020
 panel_figure_NC('LynnSisters', cur_yr, 'LynnSisters', 2, 0)
 
-### presentation figure -----
-panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 2, 0, 'Lynn Sisters')
-panel_figure_NC_PRES('LynnSisters', cur_yr, 'LynnSisters', 3, 0, 'Lynn Sisters')
 
-### presentation figures with different titles -----
-panel_figure_NC_PRES_title('LynnSisters', cur_yr, 'LynnSisters', 2, 0, "Males", "Females and juveniles")
-panel_figure_NC_PRES_title('LynnSisters', cur_yr, 'LynnSisters', 3, 0, "Males", "Females and juveniles")
 
-#AGR need to add Caitlin's fig, copy-paste from elsewhere.
-
-#adding the CSA graph
-##caitlins's code to make obs vs expected graph
-##I should make this a function eventually
-# create model fit plot ---
-
+# Model fit fig. It's ok.
 # note: each year, add one row to the import ranges (e.g., if in 2023 ranges are A8:F53 and R8:T53, then in 2024 ranges are A8:F54 and R8:T54)
 
 library(readxl)
