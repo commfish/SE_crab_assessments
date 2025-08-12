@@ -3,7 +3,13 @@
 #convresion code from EI
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
+###well it will, eventually.
 
+#After re-introducing Port Frederick to the Survey areas after 11 years, there's no existing R file for this analysus
+##also all historical data are in jmp files deep in the Douglas shared drives. I don't yet know how to open jmp files. But I do know how to make graphs
+
+#so, this year's port frederick will focus on reading in the data and getting the male CPUE graphs. Port Frederick will not be biomass-estimated or included in the analysis this yera
+##a model is only as good as the data you put into it, and this is missing the past 11 years of data.
 
 # Read me:
 #     update code with date updated (top), change global year, and pull new survey data (see below)
@@ -28,13 +34,20 @@ dat <- read.csv(paste0('./data/rkc/', survey.location, '/RKC_survey_CSA_', surve
                   # Year = 2018,2019, project code 007, Location - Port Frederick, species - red king crab
 area <- read.csv(paste0('./data/rkc/', survey.location, '/PortFrederick_strata_area.csv')) #need to get strata area
                   #this file is the same every year.  Unless the survey methods change
-histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/EI_perpot_all_yrs.csv')) #update for fred
- ## !!!!  this file will be 'EI_perpot_all_yrs' and just get updated with current years data.
-females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv'))
+#histdat <- read.csv(paste0('./results/rkc/', survey.location, '/', pr_yr, '/PortFrederick_perpot_all_yrs.csv')) #update for fred
+ ## !!!!  YEAH I'm gonna have to dig for this one, for port frederick
+#females <- read.csv(paste0('./results/rkc/', survey.location,'/', pr_yr, '/largef_all.csv')) #need to find this data - Port Frederick
 
-baseline <- read.csv("./data/rkc/longterm_means.csv")
+#baseline <- read.csv("./data/rkc/longterm_means.csv") #lol we don't have a longterm mean for PT Fred.
+# so how are longterm means calced? gonna have to do that here. 1995-2007 says the RIR
+hist_CPUE <- read.csv(paste0('results/rkc/Frederick/', pr_yr, '/cpue_wt_since_95.csv'))
+hist_CPUE %>% filter(Year < 2008) %>% 
+  summarize(Pre_Recruit = mean(Prerecruit),
+            Recruit = mean(Recruit),
+            Postrecruit = mean(Postrecruit)) -> baseline_fred
+
 # update this file after running CSA - 
-biomass <- read.csv("./data/rkc/biomass.csv") 
+#biomass <- read.csv("./data/rkc/biomass.csv") Port Frederick not included in the biomass csv right now 
 #   file for all locations. Has biomass estimates from CSA,
 #   must be updated after CSA model is run for current year USING current year's model
 #             NOT historic forecast!

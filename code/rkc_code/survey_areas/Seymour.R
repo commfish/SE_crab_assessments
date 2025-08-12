@@ -96,12 +96,14 @@ tab %>%
 # need to combine data sets to accomplish this.
 tab %>%
   right_join(pots_per_strata) -> dat4
+#write.csv(dat4, paste0('./results/rkc/', survey.location, '/', cur_yr, '/dat4.csv'))
 
 dat4 %>%
   mutate(inverse_n = 1 / npots, weighting = inverse_n * Area) ->dat5
 dat5 %>%
   rename(Missing = Var.6, Large.Females = `Large Females`) %>% 
   mutate(Small.Females = `Small Females`) -> dat5 #mutate(Small.Females = 0) -> dat5 
+write.csv(dat5, paste0('./results/rkc/', survey.location, '/', cur_yr, '/dat5.csv'))
 ## ** issue no small females for 2018 or 2019 need to add this column 
 # this is neccessary so that current years file (dat5) matches the historic file names
 
@@ -120,6 +122,8 @@ CPUE_wt
 # global survey.location and year
 write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/SC_CPUE_',cur_yr, '.csv'), 
           row.names = FALSE)
+#write.csv(CPUE_wt, paste0('./results/rkc/', survey.location, '/', cur_yr, '/CPUE_wt.csv'), 
+ #         row.names = FALSE)
 
 #### survey mid date -----
 
