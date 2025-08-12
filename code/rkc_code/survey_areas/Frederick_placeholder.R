@@ -366,6 +366,9 @@ p1 <- ggplot(hist_CPUE_long, aes(Year, CPUE, group = recruit.class, fill = recru
         axis.title=element_text(size=14,face="bold"), 
         plot.title = element_text(size = 24)) #+
 
+ggsave(paste0('./figures/rkc/',cur_yr, '/', survey.location, '_', cur_yr, 'Fred_male_placeholder.png'), p1,  
+       dpi = 800, width = 8, height = 4.75)
+
 
 ### NON CONF panel --------------
 #panel_figure_NC('Excursion', cur_yr, 'Excursion', 1, 0) # panel with all 3 figures
