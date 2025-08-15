@@ -424,7 +424,7 @@ write.csv(biomass_rate, paste0('./results/rkc/Region1/', cur_yr, '/regional_', c
 
 # Table 2 to 4 - bioamss, adj, Equ.er.adj -----------
 survey.locations <- c("Pybus", "Excursion", "Gambier", "Juneau", 
-                      "LynnSisters", "Peril", "Seymour")
+                      "LynnSisters", "Peril", "Seymour") #um what about no peril this year, how do we cope? What did C do in 2023? AGR flag 25
 # Table 2 -- #TK AGR - error here, total PU is wrong. Also, use legal to estimate GHL, also. Maybe make this a new table- table 2.5
 biomass_rate %>% 
   #mutate(Equilibrium.HR = ifelse(Location == "Juneau", hr_cur_yr, equ.er.adj)) %>% 
