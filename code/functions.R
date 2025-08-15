@@ -695,13 +695,27 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   }
   
   if(survey.location == "LynnSisters"){
-    p4 <- p4 + theme(legend.position = c(0.65,0.85)) +
+    p4 <- p4 + theme(legend.position = c(0.65,0.85))+
       scale_y_continuous(labels = comma, limits = c(0,100000),
                          breaks= seq(min(0), max(100000), by = 25000), oob = rescale_none)
   }
   
   if(survey.location == "Gambier"){
-    p4 <- p4 + theme(legend.position = c(0.5,0.9))
+    p4 <- p4 + theme(legend.position = c(0.5,0.85))+
+      scale_y_continuous(labels = comma, limits = c(0,400000),
+                         breaks= seq(min(0), max(400000), by = 100000), oob = rescale_none)
+  }
+  
+  if(survey.location == "Excursion"){
+    p4 <- p4 +
+      scale_y_continuous(labels = comma, limits = c(0,400000),
+                         breaks= seq(min(0), max(400000), by = 100000), oob = rescale_none)
+  }
+  
+  if(survey.location == "Peril"){
+    p4 <- p4 +
+      scale_y_continuous(labels = comma, limits = c(0,300000),
+                         breaks= seq(min(0), max(300000), by = 100000), oob = rescale_none)
   }
   
   ### FINAL plot -------------
@@ -1160,13 +1174,27 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   }
   
   if(survey.location == "LynnSisters"){
-    p4 <- p4 + theme(legend.position = c(0.65,0.85)) +
+    p4 <- p4 + theme(legend.position = c(0.65,0.85))+
       scale_y_continuous(labels = comma, limits = c(0,100000),
                          breaks= seq(min(0), max(100000), by = 25000), oob = rescale_none)
   }
   
   if(survey.location == "Gambier"){
-    p4 <- p4 + theme(legend.position = c(0.5,0.9))
+    p4 <- p4 + theme(legend.position = c(0.5,0.85))+
+      scale_y_continuous(labels = comma, limits = c(0,400000),
+                         breaks= seq(min(0), max(400000), by = 100000), oob = rescale_none)
+  }
+  
+  if(survey.location == "Excursion"){
+    p4 <- p4 +
+      scale_y_continuous(labels = comma, limits = c(0,400000),
+                         breaks= seq(min(0), max(400000), by = 100000), oob = rescale_none)
+  }
+  
+  if(survey.location == "Peril"){
+    p4 <- p4 +
+      scale_y_continuous(labels = comma, limits = c(0,300000),
+                         breaks= seq(min(0), max(300000), by = 100000), oob = rescale_none)
   }
   
   

@@ -1,5 +1,5 @@
 #K.Palof 
-# ADF&G 8-12-16 updated for Gambier Bay  / updated 8-8-17/8-10-18 / 9-4-19/8-23-21 / 7-26-22 / 8-22-23 / 7-24-24
+# ADF&G 8-12-16 updated for Gambier Bay  / updated 8-8-17/8-10-18 / 9-4-19/8-23-21 / 7-26-22 / 8-22-23 / 7-24-24 / 8-15-25 AGR
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
