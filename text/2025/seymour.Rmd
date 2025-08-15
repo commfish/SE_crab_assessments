@@ -1,7 +1,7 @@
 ---
 title: "Seymour Canal area survey results"
-author: "Caitlin Stern"
-date: "August 22, 2023"
+author: "Alex Reich"
+date: "August 2025"
 output: html_document
 ---
 
@@ -9,7 +9,7 @@ output: html_document
 library(knitr)
 library(tidyverse)
 #dat <- read.csv("../data/rkc/Juneau/jnu_16_17_oceanAK_out_RAW.csv")
-cur_yr = 2024
+cur_yr = 2025
 survey.location = 'Seymour'
 cur_yr
 ```

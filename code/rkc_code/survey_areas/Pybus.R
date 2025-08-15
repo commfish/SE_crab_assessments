@@ -319,16 +319,7 @@ panel_figure('Pybus', cur_yr, 'Pybus', 1, 0) # panel with all 3 figures
 panel_figure('Pybus', cur_yr, 'Pybus', 2, 0) # male panel
 panel_figure('Pybus', cur_yr, 'Pybus', 3, 0) # female panel
 
-# panel_figure <- function(survey.location, cur_yr, base.location)
-# base.location is the location name in the baseline file, can be different
-
-### presentation figure -----
-panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 2, 2, 'Pybus Bay') #AGR flag here- this function needs work
-panel_figure_NC_PRES('Pybus', cur_yr, 'Pybus', 3, 0, 'Pybus Bay') #female panel
-
-### presentation figures with different titles -----
-panel_figure_NC_PRES_title('Pybus', cur_yr, 'Pybus', 2, 0, "Males", "Females and juveniles")
-panel_figure_NC_PRES_title('Pybus', cur_yr, 'Pybus', 3, 0, "Males", "Females and juveniles")
+panel_figure_NC('Pybus', cur_yr, 'Pybus', 2, 0) #conf male
 
 ### female file all years ----- AGR- this bloc isnt working and it annoying and I turned it off for now
 # create females file for all years

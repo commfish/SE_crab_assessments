@@ -314,13 +314,6 @@ panel_figure('Excursion', cur_yr, 'Excursion', 3, 0) # female panel
 panel_figure_NC('Excursion', cur_yr, 'Excursion', 1, 0) # panel with all 3 figures
 panel_figure_NC('Excursion',  cur_yr, 'Excursion', 2, 0)
 
-### presentation figure -----
-panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 2, 0, 'Excursion Inlet')
-panel_figure_NC_PRES('Excursion', cur_yr, 'Excursion', 3, 0, 'Excursion Inlet')
-
-### presentation figures with different titles -----
-panel_figure_NC_PRES_title('Excursion', cur_yr, 'Excursion', 2, 0, "Males", "Females and juveniles")
-panel_figure_NC_PRES_title('Excursion', cur_yr, 'Excursion', 3, 0, "Males", "Females and juveniles")
 
 
 #add caitlin's obs/expected figure

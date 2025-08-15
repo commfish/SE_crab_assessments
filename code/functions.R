@@ -467,10 +467,10 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     #                   oob = rescale_none) +
     #ylim(0,(max(males_graph$mean) + max(males_graph$se))) + 
     #ggtitle(survey.location) + #25- AGR- turning title off to appease Jan
-    annotate("text", label = survey.location, 
-             x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
-             size = 6, fontface = "bold"    
-             )+
+   # annotate("text", label = survey.location, 
+    #         x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
+     #        size = 6, fontface = "bold"    
+      #       )+
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
@@ -491,14 +491,24 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     #scale_linetype_manual(name = "", values = c("solid", "dotdash", "longdash"), #agradded
      #                     labels = c("Postrecruit", "Prerecruit", "Recruit")) 
   
-  if(survey.location == "LynnSisters"){ #agr just added this chunk to adjust the Lynn sisters legend
-    p1 = p1 + #ggtitle("Lynn Sisters") +
-      theme(legend.position = c(0.35,0.8)) }
-    
   if(survey.location == "Gambier"){ #agr just added this chunk to adjust the Gambier legend 9/3/24
       p1 = p1 + #ggtitle("Gambier") +
         theme(legend.position = c(0.35,0.8))
   }
+  if(survey.location == "LynnSisters"){ #agr just added this chunk to adjust the Lynn sisters legend
+    p1 = p1 +# ggtitle("Lynn Sisters") +
+      theme(legend.position = c(0.35,0.8)) +
+      annotate("text", label = "Lynn Sisters", 
+               x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning #AGR ADD THIS to active github functions
+               size = 6, fontface = "bold")
+  }
+  
+  
+  if(survey.location != "LynnSisters"){
+    p1 = p1 + annotate("text", label = survey.location, 
+                       x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning #AGR ADD THIS
+                       size = 6, fontface = "bold"    
+    )}
 
   ### F1b females/juvenile plot ---------------
   p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
@@ -512,7 +522,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"),
                       labels = c("Juvenile female", "Juvenile male", "Mature female")) +
     #ylim(0,25) + 
-    scale_y_continuous(limits = c(0,(max(round(femjuv_graph$mean, 0) +1))), oob = rescale_none) +
+    scale_y_continuous(limits = c(0,(max(round((femjuv_graph$mean + femjuv_graph$se), 0) +1))), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
@@ -529,14 +539,30 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"))
   
-  if(option == 3){
-    p2 = p2 + #ggtitle(paste0('Female/juvenile CPUE & egg health for ', survey.location)) +
-      annotate("text", label = survey.location, 
-               x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
-               size = 6, fontface = "bold"    
-      )+
-      theme(plot.title = element_text(size = 24))
+ # if(option == 3){
+ #   p2 = p2 + #ggtitle(paste0('Female/juvenile CPUE & egg health for ', survey.location)) +
+  #    annotate("text", label = survey.location, 
+   #            x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
+    #           size = 6, fontface = "bold"    
+  #    )+
+   #   theme(plot.title = element_text(size = 24))
+  #}
+
+  if(survey.location == "LynnSisters"){ #agr just added this chunk to adjust the Lynn sisters legend
+    p2 = p2 +# ggtitle("Lynn Sisters") +
+      theme(legend.position = c(0.7,0.8)) +
+      annotate("text", label = "Lynn Sisters", 
+               x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning #AGR ADD THIS to active github functions
+               size = 6, fontface = "bold")
   }
+  
+  
+  if(survey.location != "LynnSisters"){
+    p2 = p2 + annotate("text", label = survey.location, 
+                       x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning #AGR ADD THIS
+                       size = 6, fontface = "bold"    
+    )}
+  
   
  # if(survey.location == "LynnSisters"){
 #    p2 = p2 + #ggtitle("Female/juvenile CPUE & egg health for Lynn Sisters") +
@@ -652,20 +678,20 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
       scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
-      scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
-                                                          na.rm = TRUE) + 25000),
-                         breaks= seq(min(0), max(max(biomass_graph$pounds, 
-                                                     na.rm = TRUE)+25000), by = 500000)) +
+      scale_y_continuous(labels = comma, 
+                         limits = c(0,max(biomass_graph$pounds, 
+                                          na.rm = TRUE) + 25000),
+                         breaks = seq(0, max(biomass_graph$pounds, na.rm = TRUE) + 250000, by = 1000000))+
       theme(legend.position = c(0.5,0.85), #moving that legend slightly up for seymour.
             axis.text = element_text(size = 12), 
             axis.title=element_text(size=14,face="bold")) + 
       geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey1")+
       geom_hline(data = baseline_means, aes(yintercept = mature_adj_mean), 
                  color = "grey55", linetype = "dashed")
-    if(scale == 1){
-      p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1600000),
-                                   breaks= seq(min(0), max(1600000), by = 150000), oob = rescale_none)
-    }
+   # if(scale == 1){
+  #    p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1600000),
+   #                                breaks= seq(min(0), max(1600000), by = 150000), oob = rescale_none)
+  #  }
   }
   
   if(survey.location == "Juneau"){
@@ -1126,7 +1152,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       scale_y_continuous(labels = comma, 
                          limits = c(0,max(biomass_graph$pounds, 
                                           na.rm = TRUE) + 25000),
-                         breaks = seq(0, max(biomass_graph$pounds, na.rm = TRUE) + 250000, by = 500000))+ #agr added 25
+                         breaks = seq(0, max(biomass_graph$pounds, na.rm = TRUE) + 250000, by = 1000000))+ #agr added 25
       #breaks= seq(min(0), max(max(biomass_graph$pounds, 
       #                           na.rm = TRUE)+25000), by = 50000)) +
       theme(legend.position = c(0.5,0.85), #moving that legend slightly up for seymour.

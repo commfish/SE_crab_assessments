@@ -312,14 +312,6 @@ panel_figure('Seymour', cur_yr, 'Seymour Canal', 3, 1) # female panel
 panel_figure_NC('Seymour', cur_yr, 'Seymour Canal', 1, 1)
 panel_figure_NC('Seymour', cur_yr, 'Seymour Canal', 2, 1)
 
-### presentation figure -----
-panel_figure_NC_PRES('Seymour', cur_yr, 'Seymour Canal', 2, 1, "Seymour Canal")
-panel_figure_NC_PRES('Seymour', cur_yr, 'Seymour Canal', 3, 1, "Seymour Canal")
-
-### presentation figures with different titles -----
-panel_figure_NC_PRES_title('Seymour', cur_yr, 'Seymour Canal', 2, 1, "Males", "Females and juveniles")
-panel_figure_NC_PRES_title('Seymour', cur_yr, 'Seymour Canal', 3, 1, "Males", "Females and juveniles")
-
 
 ### female file all years -----
 # create females file for all years
@@ -357,8 +349,8 @@ panel_figure_NC_PRES_title('Seymour', cur_yr, 'Seymour Canal', 3, 1, "Males", "F
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "A8:E54") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "Q8:S54")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "A8:E54") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "Q8:S54")) %>%
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% #uh, might have to adjust this based on Seymour's naming
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR

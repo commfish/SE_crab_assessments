@@ -333,13 +333,10 @@ panel_figure('Gambier', cur_yr, 'Gambier', 3, 0) # female panel
 # panel_figure <- function(survey.location, cur_yr, base.location)
 # base.location is the location name in the baseline file, can be different
 
-### presentation figure -----
-panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 2, 0, 'Gambier Bay')
-panel_figure_NC_PRES('Gambier', cur_yr, 'Gambier', 3, 0, 'Gambier Bay')
+### non conf fig
+panel_figure_NC('Gambier', cur_yr, 'Gambier', 2, 0)
 
-### presentation figures with different titles -----
-panel_figure_NC_PRES_title('Gambier', cur_yr, 'Gambier', 2, 0, "Males", "Females and juveniles")
-panel_figure_NC_PRES_title('Gambier', cur_yr, 'Gambier', 3, 0, "Males", "Females and juveniles")
+
 
 
 ### female file all years -----
@@ -374,8 +371,8 @@ panel_figure_NC_PRES_title('Gambier', cur_yr, 'Gambier', 3, 0, "Males", "Females
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "A8:E55") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "Q8:S55")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "A8:E55") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "Q8:S55")) %>%
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
