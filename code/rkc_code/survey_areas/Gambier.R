@@ -12,10 +12,10 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2024 # update annually
+cur_yr <- 2025 # update annually
 pr_yr <- cur_yr -1
-cur_yr2 <- 24
-pr_yr2 <- 23
+cur_yr2 <- 25
+pr_yr2 <- 24
 survey.location <- 'Gambier'
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
@@ -282,12 +282,7 @@ egg_percent(largef_all, 'Gambier', cur_yr)
 ### total stock health table -----------------------
 total_health('Gambier', cur_yr)
 # works as long as all files are saved in folder with area name
-##AGR-  I think that worked
 
-#AGR here, 7/24/24
-
-#well, I'm troubleshooting because mean=SD for the poor clutches for the last 3 years and I dont think that is right.
-##juneau.R uses: poor_clutch() function. Can I use that here? Does it care about <10% instead of <25%
 
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 ##well, poor clutch looks bad vecause mean =sd for the last several years. I cant figure out why right now AGR
