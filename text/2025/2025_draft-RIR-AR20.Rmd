@@ -722,7 +722,7 @@ df2 <- df %>%
     recruit.class == "effective_no_pots" ~ "Effective no. of pots"
   ))
 
-names(df2) <- c(" ", "Peril Strait", "Excursion Inlet", "Gambier Bay", "Juneau", "Lynn Sisters",
+names(df2) <- c(" ", "Excursion Inlet", "Gambier Bay", "Juneau", "Lynn Sisters", #add "Peril Strait" before Excursion in Peril survey years
               "Pybus Bay", "Seymour Canal")
 #knitr::kable((df), booktabs = T, caption = "Table 2")
 ft <- flextable(df2)
@@ -740,7 +740,7 @@ write_csv(tbl7_d, paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/SE_RKC_
 
 
 tbl7_e <- tbl7_d %>%
- dplyr::select(-c("Mature HR", "Total GHL (mature lb)", "PU harvest (mature lb)", "2024 Commercial GHL (mature lb)"))
+ dplyr::select(-c("Mature HR", "Total GHL (mature lb)", "PU harvest (mature lb)", "2025 Commercial GHL (mature lb)")) #updated the year to 2025
 
 
 ft <- flextable(tbl7_e) %>% 
@@ -785,11 +785,12 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture1.jpg'), dpi = 
 ```{r regionalbio, fig.cap = "Total biomass estimates (expanded regional estimates) of mature (gray points and line) and legal (black points and line) red king crab in Southeast Alaska. Estimates based on Catch-Survey Analysis (CSA) methodologies adjusted using mark-recapture study results (Table 1) then further expanded to include non-survey areas. Reference lines represent long-term (1995–2007) average of legal and mature biomass estimates.  Squares represent years without commercial harvest."}
 #refernce lines SHOULD be 1995-2007- check this please AGR
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr,'_edited.png'), dpi = 125)
+#AGR 25- will need a long term median - add that to figures2tables2. TODO
 ```
 
 ```{r distcur, fig.cap = "Current year's red king crab survey areas in Southeast Alaska. In 2015, Port Frederick and Holkham Bay were removed as survey areas but are shown here for reference. Peril Strait was not surveyed in 2023 and is now on a biennial survey schedule."}
 #FIGURE 3. it IS TOO BIG. HOW TO MAKE SMALLER?
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture2_new.jpg'), dpi=125) #was dpi = 125
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture2.2.png'), dpi=125) #was dpi = 125
 ```
 
 ```{r pybus2, fig.cap = "Pybus Bay CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
@@ -833,6 +834,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_c
 
 ```{r peril2, fig.cap = "Peril Strait CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. Peril Strait was not surveyed in 2023 because it has moved to a biennial survey schedule."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', cur_yr,'_2.png'), dpi = 125)
+#I'll need to add a graph here - run Peril for 2025 to get the grapg - it will be mising 2025 data but that's fine.
 ```
 
 ```{r peril3, fig.cap = "Peril Strait CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007). Peril Strait was not surveyed in 2023 because it has moved to a biennial survey schedule."}
@@ -840,8 +842,8 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', 
 ```
 
 ```{r peril4, fig.cap = "The Peril Strait current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_cpue_model_fit.png'), dpi = 125)
-#AGR added
+#knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_cpue_model_fit.png'), dpi = 125)
+#AGR added; turned off in 2025
 ```
 
 ```{r juneau2, fig.cap = "Juneau area CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
@@ -892,19 +894,22 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion
 
 ```{r longterm, tab.cap = paste("Comparisons of", cur_yr, "survey CPUE values to long-term averages by size/sex class and survey area. 1 = significantly above long-term average; 0 = not significantly different from long-term average; -1 = significantly below long-term average."), results = "asis"}
 
-#2023 VERSION SAYS TABLE A1 BUT 2024 VERSION SAYS TABLE 9. WHY. NO. MAKE IT GO BACK.
+#Table A1 (put that in manually)
+#turn off peril in non-peril years
+cur_yr<-2025
 
 files_lt <- c(paste0(here::here(), "/results/rkc/Pybus/", cur_yr, "/longterm.csv"), 
                     paste0(here::here(), "/results/rkc/Gambier/", cur_yr, "/longterm.csv"), 
                     paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/longterm.csv"), 
                     paste0(here::here(), "/results/rkc/Juneau/", cur_yr, "/longterm.csv"), 
                     paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/longterm.csv"),
-                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/longterm.csv"),
-                    paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/longterm.csv"))
+                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/longterm.csv")#,
+                    #paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/longterm.csv")
+              )
 
 lt_list <- files_lt %>%
   map(read.csv) 
-names(lt_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion", "Peril")
+names(lt_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion")# ,"Peril") #add peril in peril-survey years
 #type_change <- c("type", "change")
 
 #lt_list2 <- lapply(lt_list, "[", , type_change)
@@ -953,12 +958,12 @@ files_st <- c(paste0(here::here(), "/results/rkc/Pybus/", cur_yr, "/shortterm.cs
                     paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/shortterm.csv"), 
                     paste0(here::here(), "/results/rkc/Juneau/", cur_yr, "/shortterm.csv"), 
                     paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/shortterm.csv"),
-                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/shortterm.csv"),
-                    paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/shortterm.csv"))
+                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/shortterm.csv"))#,
+                   # paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/shortterm.csv")) #turn off peril in non-peril years
 
 st_list <- files_st %>%
   map(read.csv) 
-names(st_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion", "Peril")
+names(st_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion")#, "Peril") #turn of peril in non-peril years
 
 st_all <- do.call(rbind, Map(cbind.data.frame, Location = names(st_list), st_list))
 row.names(st_all) <- NULL
