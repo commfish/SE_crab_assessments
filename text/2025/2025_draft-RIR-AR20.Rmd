@@ -266,7 +266,7 @@ files_sh <- c(paste0(here::here(), "/results/rkc/Pybus/", cur_yr, "/stock_health
 
 sh_list <- files_sh %>%
   map(read.csv) 
-names(sh_list) <- c("Pybus", "Gambier", "Seymour", "Peril", "Juneau", "LynnSisters", "Excursion") #AGR added "Peril", pattern matchign for the win. turn off "peril" on odd years?
+names(sh_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion") #add "Peril" in peril-surveyed years please.
 
 sh_all <- do.call(rbind, Map(cbind.data.frame, Location = names(sh_list), sh_list))
 row.names(sh_all) <- NULL
@@ -274,8 +274,8 @@ row.names(sh_all) <- NULL
 pybus_stockhealth <- sh_all %>% filter(location == "Pybus") %>% pull(health_status)
 gambier_stockhealth <- sh_all %>% filter(location == "Gambier") %>% pull(health_status)
 seymour_stockhealth <- sh_all %>% filter(location == "Seymour") %>% pull(health_status)
-peril_stockhealth <- sh_all %>% filter(location == "Peril") %>% pull(health_status) # use this in years with a Peril survey
-#peril_stockhealth <-  "unsurveyed" # use this in years without a Peril survey
+#peril_stockhealth <- sh_all %>% filter(location == "Peril") %>% pull(health_status) # use this in years with a Peril survey
+peril_stockhealth <-  "unsurveyed" # use this in years without a Peril survey
 juneau_stockhealth <- sh_all %>% filter(location == "Juneau") %>% pull(health_status)
 lynnsisters_stockhealth <- sh_all %>% filter(location == "LynnSisters") %>% pull(health_status)
 excursion_stockhealth <- sh_all %>% filter(location == "Excursion") %>% pull(health_status)
@@ -286,10 +286,11 @@ excursion_stockhealth <- sh_all %>% filter(location == "Excursion") %>% pull(hea
 # pounds and numbers of crab targeted in the Juneau summer personal use fishery
 
 # input the Juneau mature harvest rate (decided upon in the Juneau assessment meeting in July)
-juneau_hr <- 0.08 #updated AGR, OBSOLETE?
+juneau_hr <- 0.10 #updated AGR #CRAP, is this # wrong? since the legal rate is 0.10, the mature rate will be lower
+##this # might not be used tho, so pay attention. FLAG!!
 
 # input the Juneau legal harvest rate
-juneau_hr_legal <- 0.08 #updated AGR
+juneau_hr_legal <- 0.10 #updated AGR
 
 # summer PU proportion of the GHL (= 0.5; winter PU is 0.1 and commercial is 0.4)
 sum.pu.prop <- 0.5 #AGR ok this seems like it will stay the same
@@ -299,13 +300,13 @@ leg.wt <- read.csv(paste0(here::here(),'/results/rkc/Juneau/', cur_yr, '/malewei
   filter(Year == cur_yr) %>%
   pull(legal_lbs)
 
-# legal male lbs for Juneau total PU #TK This is wrong
+# legal male lbs for Juneau total PU #TK This is wrong #WHAT? FLAG 2025
 lbs.leg.pu.total <- tbl7_d_alt %>%
   filter(`Survey area` == "Juneau") %>%
   mutate(pu.harvest = `PU harvest (legal lb)`) %>%
   pull(pu.harvest)
 
-# legal male lbs for Juneau summer PU #TK this is wrong
+# legal male lbs for Juneau summer PU #TK this is wrong #FLAG!! 2025
 lbs.leg.pu <- tbl7_d_alt %>%
   filter(`Survey area` == "Juneau") %>%
   mutate(pu.harvest = sum.pu.prop*`PU harvest (legal lb)`) %>%
@@ -343,12 +344,12 @@ files_regch <- c(paste0(here::here(), "/results/rkc/Region1/2019/change_in_model
                     paste0(here::here(), "/results/rkc/Region1/2021/change_in_modeled_regional_biomass_2021.csv"), 
                     paste0(here::here(), "/results/rkc/Region1/2022/change_in_modeled_regional_biomass_2022.csv"), 
                     paste0(here::here(), "/results/rkc/Region1/2023/change_in_modeled_regional_biomass_2023.csv"),
-                 paste0(here::here(), #AGR added TK
-"/results/rkc/Region1/2024/change_in_modeled_regional_biomass_2024.csv")) #AGR added TK- in the spirit of copy paste and pattern matching
+                    paste0(here::here(), "/results/rkc/Region1/2024/change_in_modeled_regional_biomass_2024.csv"),
+                    paste0(here::here(), "/results/rkc/Region1/2025/change_in_modeled_regional_biomass_2025.csv")) #AGR added TK- in the spirit of copy paste and pattern matching
 
 regch_list <- files_regch %>%
   map(read.csv) 
-names(regch_list) <- c("2019", "2020", "2021", "2022", "2023", "2024") #AGR added 2024 tk
+names(regch_list) <- c("2019", "2020", "2021", "2022", "2023", "2024", "2025") #AGR added 2024, and a year later 2025 - I probs will drop the earlier years off the table
 type_change <- c("type", "change")
 regch_list2 <- lapply(regch_list, "[", , type_change)
 regch_all <- do.call(rbind, Map(cbind.data.frame, name = names(regch_list2), regch_list2))
@@ -371,7 +372,7 @@ avg_change_mature_sign <- ifelse(avg_change_mature > 0, "increased", "declined")
 # legal and mature biomass estimated by 2023 model compared to 2022 model estimates
 
 
-gambier_lmb <- read_excel(paste0(here::here(), "/CSA excel/Gambier Bay 2024_adj HR_USE_updatedPU.xls"), sheet = "summary_use") #AGR changed 2023 to 2024. oh ok it's under development
+gambier_lmb <- read_excel(paste0(here::here(), "/CSA excel/Gambier Bay 2025_adj HR_USE_updatedPU.xls"), sheet = "summary_use") #AGR changed 2023 to 2024. oh ok it's under development. changed 2024 to 2025
 
 
 
