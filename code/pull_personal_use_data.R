@@ -134,8 +134,21 @@ effort_tab12 <- tbl(con, "CRAB_EFFORT") %>%
   filter(PERMIT_ID %in% permit_sel12) %>%
   select(PERMIT_ID, EFFORT_ID, CATCH_DATE, LOCATION_CODE, CODED_LOCATION, DISTRICT, PERMITTEE_PROVIDED_LOCATION) %>%
   as.data.frame()
+effort_tab13 <- tbl(con, "CRAB_EFFORT") %>%
+  filter(PERMIT_ID %in% permit_sel13) %>%
+  select(PERMIT_ID, EFFORT_ID, CATCH_DATE, LOCATION_CODE, CODED_LOCATION, DISTRICT, PERMITTEE_PROVIDED_LOCATION) %>%
+  as.data.frame()
+effort_tab14 <- tbl(con, "CRAB_EFFORT") %>%
+  filter(PERMIT_ID %in% permit_sel14) %>%
+  select(PERMIT_ID, EFFORT_ID, CATCH_DATE, LOCATION_CODE, CODED_LOCATION, DISTRICT, PERMITTEE_PROVIDED_LOCATION) %>%
+  as.data.frame()
+effort_tab15 <- tbl(con, "CRAB_EFFORT") %>%
+  filter(PERMIT_ID %in% permit_sel15) %>%
+  select(PERMIT_ID, EFFORT_ID, CATCH_DATE, LOCATION_CODE, CODED_LOCATION, DISTRICT, PERMITTEE_PROVIDED_LOCATION) %>%
+  as.data.frame() #have to extend this every year, in accordance with how many permit_sel lists I had to make. AGR 25
 
-effort_tab <- rbind(effort_tab01, effort_tab02, effort_tab03, effort_tab04, effort_tab05, effort_tab06, effort_tab07, effort_tab08, effort_tab09, effort_tab10, effort_tab11, effort_tab12)
+#extend below every year please as needed AGR 25
+effort_tab <- rbind(effort_tab01, effort_tab02, effort_tab03, effort_tab04, effort_tab05, effort_tab06, effort_tab07, effort_tab08, effort_tab09, effort_tab10, effort_tab11, effort_tab12, effort_tab13, effort_tab14, effort_tab15)
 
 # vector of effort IDs to use in filtering catch table
 effort_sel <- effort_tab %>%
@@ -151,7 +164,10 @@ effort_sel01 <- effort_sel[1:1000]
 effort_sel02 <- effort_sel[1001:2000]
 effort_sel03 <- effort_sel[2001:3000]
 effort_sel04 <- effort_sel[3001:4000]
-effort_sel05 <- effort_sel[4001:length(effort_sel)]
+effort_sel05 <- effort_sel[4001:5000]
+effort_sel06 <- effort_sel[5001:6000] 
+effort_sel07 <- effort_sel[6001:7000]
+effort_sel08 <- effort_sel[7001:length(effort_sel)] #AGR extended to here 25
 
 # filter catch table to include only catch from the relevant trips
 catch_tab1 <- tbl(con, "CRAB_CATCH") %>%
@@ -179,7 +195,22 @@ catch_tab5 <- tbl(con, "CRAB_CATCH") %>%
   select(EFFORT_ID, CATCH_ID, SPECIES_CODE, SPECIES, NUMBER_OF_CRAB) %>%
   as.data.frame()
 
-catch_tab <- rbind(catch_tab1, catch_tab2, catch_tab3, catch_tab4, catch_tab5)
+catch_tab6 <- tbl(con, "CRAB_CATCH") %>%
+  filter(EFFORT_ID %in% effort_sel06) %>%
+  select(EFFORT_ID, CATCH_ID, SPECIES_CODE, SPECIES, NUMBER_OF_CRAB) %>%
+  as.data.frame()
+
+catch_tab7 <- tbl(con, "CRAB_CATCH") %>%
+  filter(EFFORT_ID %in% effort_sel07) %>%
+  select(EFFORT_ID, CATCH_ID, SPECIES_CODE, SPECIES, NUMBER_OF_CRAB) %>%
+  as.data.frame()
+
+catch_tab8 <- tbl(con, "CRAB_CATCH") %>%
+  filter(EFFORT_ID %in% effort_sel08) %>%
+  select(EFFORT_ID, CATCH_ID, SPECIES_CODE, SPECIES, NUMBER_OF_CRAB) %>% #agr extended to here in 2025
+  as.data.frame()
+
+catch_tab <- rbind(catch_tab1, catch_tab2, catch_tab3, catch_tab4, catch_tab5, catch_tab6, catch_tab7, catch_tab8) #AGR lengthened in 2025
 
 # join catch and effort information, such that each effort ID has information about how many crab were caught
 effort_catch <- merge(effort_tab, catch_tab, by="EFFORT_ID", all=T) %>%
@@ -209,7 +240,7 @@ effort_catch_ar <- effort_catch %>%
     .default = "Other"
   ))
 
-# calculate catch mid-date for use in CSA model
+# calculate catch mid-date for use in CSA model #AGR... update for 2025? nah, I left the below alone. Need to source functions.R I think
 
 # Lynn Sisters in 2022
 LSdates1_22 <- effort_catch_ar %>%
@@ -255,7 +286,7 @@ pu_harvest_reg <- effort_catch_ar %>%
   filter(crab_year > 2017)
 
 # export regional PU info
-write.csv(pu_harvest_reg, paste0('./data/harvest/', cur_yr, '_regional_PU_harvest.csv'), row.names = FALSE) 
+write.csv(pu_harvest_reg, paste0('./data/harvest/', cur_yr, '_regional_PU_harvest.csv'), row.names = FALSE) #this works in 2025 and I am SO GRATEFUL- AGR
 
 # *******************************************************************************************************************
 # information about number of permits fished
