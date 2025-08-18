@@ -372,7 +372,7 @@ avg_change_mature_sign <- ifelse(avg_change_mature > 0, "increased", "declined")
 # legal and mature biomass estimated by 2023 model compared to 2022 model estimates
 
 
-gambier_lmb <- read_excel(paste0(here::here(), "/CSA excel/Gambier Bay 2025_adj HR_USE_updatedPU.xls"), sheet = "summary_use") #AGR changed 2023 to 2024. oh ok it's under development. changed 2024 to 2025
+gambier_lmb <- read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay 2025_adj HR_USE_updatedPU.xls"), sheet = "summary_use") #AGR changed 2023 to 2024. oh ok it's under development. changed 2024 to 2025. 
 
 
 
@@ -628,12 +628,12 @@ set_table_properties(ft, layout = "autofit")
 
 ```{r health5year, tab.cap = paste("Total stock health designations and associated scores for", cur_yr-4, "to", cur_yr, "by survey area."), results = "asis"}
 
-#AGR- NOTE, THIS ONE NEEDS MANUAL UPDATING, EVERY YEAR!
+#AGR- NOTE, THIS ONE NEEDS MANUAL UPDATING, EVERY YEAR! Damn it-2025
 # pull the current year's health scores for the table. Can use previous years' health scores written out as strings below.
 pybus_healthscore <- sh_all %>% filter(location == "Pybus") %>% pull(score)
 gambier_healthscore <- sh_all %>% filter(location == "Gambier") %>% pull(score)
 seymour_healthscore <- sh_all %>% filter(location == "Seymour") %>% pull(score)
-peril_healthscore <- sh_all %>% filter(location == "Peril") %>% pull(score) #ARG un-hashtagged. Will need to turn off peril every other year
+#peril_healthscore <- sh_all %>% filter(location == "Peril") %>% pull(score) #ARG un-hashtagged. Will need to turn off peril every other year
 juneau_healthscore <- sh_all %>% filter(location == "Juneau") %>% pull(score)
 lynnsisters_healthscore <- sh_all %>% filter(location == "LynnSisters") %>% pull(score)
 excursion_healthscore <- sh_all %>% filter(location == "Excursion") %>% pull(score)
@@ -641,23 +641,24 @@ excursion_healthscore <- sh_all %>% filter(location == "Excursion") %>% pull(sco
 
 sur.area <- c("Pybus Bay", "Gambier Bay", "Seymour Canal", "Peril Strait", "Juneau Area", "Lynn Sisters", "Excursion Inlet")
 #y2019 <- c("Below Average (-3.75)", "Poor (-6.00)", "Poor (-5.00)", "Poor (-6.25)", "Below Average (-3.50)", "Moderate (0.50)", "Below Average (-2.75)")
-y2020 <- c("Below Average (-2.50)", "Poor (-6.25)", "Below Average (-3.50)", "Below Average (-4.25)", "Moderate (-0.50)", "Moderate (1.50)", "Poor (-4.75)")
+#y2020 <- c("Below Average (-2.50)", "Poor (-6.25)", "Below Average (-3.50)", "Below Average (-4.25)", "Moderate (-0.50)", "Moderate (1.50)", "Poor (-4.75)")
 y2021 <- c("Below Average (-4.00)", "Below Average (-2.75)", "Poor (-5.00)", "Below Average (-2.25)", "Above Average (3.50)", "Moderate (1.25)", "Poor (-5.00)")
 y2022 <- c("Below Average (-2.50)", "Moderate (0.75)", "Below Average (-4.00)", "Below Average (-2.75)", "Healthy (5.00)", "Moderate (1.00)", "Poor (-6.00)")
-y2023 <- c("Poor (-5.75)", "Moderate (1.25)", "Below Average (-3.00)", "Unsurveyed", "Healthy (7.75)", "Above Average (3.25)", "Poor (-5.75)") #agr manually entered
-y2024 <- c(paste0(str_to_title(pybus_stockhealth), " (", pybus_healthscore, ")"), 
+y2023 <- c("Poor (-5.75)", "Moderate (1.25)", "Below Average (-3.00)", "Unsurveyed", "Healthy (7.75)", "Above Average (3.25)", "Poor (-5.75)")
+y2024 <- c("Poor (-5.25)", "Below Average (-2.75)", "Moderate (-0.5)", "Poor (-7)", "Healthy (4.5)", "Below Average (-2.5)", "Poor (-5.5)")
+#agr manually entered
+y2025 <- c(paste0(str_to_title(pybus_stockhealth), " (", pybus_healthscore, ")"), 
            c(paste0(str_to_title(gambier_stockhealth), " (", gambier_healthscore, ")")), 
            c(paste0(str_to_title(seymour_stockhealth), " (", seymour_healthscore, ")")), 
-           c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")")),
-           #str_to_title(peril_stockhealth), # change this to c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")"))                                                  # in years with a Peril survey 
-           #in years without a peril survey: str_to_title(peril_stockhealth),
+           #c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")")), #years with peril survey
+           c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")")), #years without peril survey
            c(paste0(str_to_title(juneau_stockhealth), " (", juneau_healthscore, ")")), 
            c(paste0(str_to_title(lynnsisters_stockhealth), " (", lynnsisters_healthscore, ")")),
            c(paste0(str_to_title(excursion_stockhealth), " (", excursion_healthscore, ")")))
 
-tbl4 <- as.data.frame(cbind(sur.area, y2020, y2021, y2022, y2023, y2024))
+tbl4 <- as.data.frame(cbind(sur.area, y2021, y2022, y2023, y2024, y2025))
 
-names(tbl4) <- c("Survey area", "2020", "2021", "2022", "2023", "2024")
+names(tbl4) <- c("Survey area", "2021", "2022", "2023", "2024", "2025")
 
 ft <- flextable(tbl4) %>%
   fontsize(size = 7, part = "all")
