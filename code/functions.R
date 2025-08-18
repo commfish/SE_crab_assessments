@@ -509,6 +509,11 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
                        x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning #AGR ADD THIS
                        size = 6, fontface = "bold"    
     )}
+  
+  
+  #if(survey.location != "Peril"){ #AGR finagling in 2025 with the peril graph
+   # p1 = p1 + scale_x_continuous(limits = c(1994, 2026)   
+  #  )}
 
   ### F1b females/juvenile plot ---------------
   p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 

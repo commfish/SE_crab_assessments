@@ -1,5 +1,5 @@
 # K.Palof   katie.palof@alaska.gov
-# ADF&G 8-4-16 updated for Peril Strait(Deadman's Reach)  / updated 8-2-18/ 7-30-19/ 8-23-21/ 7-26-22/ 8-13-24
+# ADF&G 8-4-16 updated for Peril Strait(Deadman's Reach)  / updated 8-2-18/ 7-30-19/ 8-23-21/ 7-26-22/ 8-13-24/ 8-18-25 AGR
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -11,7 +11,7 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2024 # update annually
+cur_yr <- 2024 # update annually .. Well, I'm just gonna update the graphs and where it is saved.
 pr_yr <- cur_yr -1
 prpr_yr <- cur_yr-2
 survey.location <- 'Peril'   # area is Peril but in data files it's Deadman Reach
@@ -310,9 +310,9 @@ CPUE_ALL_YEARS %>%
             MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))),
             SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females)))))) -> CPUE_wt_all
 CPUE_wt_all  
-CPUE_wt_all %>% filter(Year >= 1995) -> CPUE_wt_from93 #AGR changed from 93 to 95 since we care about te average from 95 now- 8/14/24
+CPUE_wt_all %>% filter(Year >= 1995) -> CPUE_wt_from95 #AGR changed from 93 to 95 since we care about te average from 95 now- 8/14/24
 
-write.csv(CPUE_wt_from93, paste0('results/rkc/', survey.location, '/', 
+write.csv(CPUE_wt_from95, paste0('results/rkc/', survey.location, '/', 
                                  cur_yr, '/cpue_wt_since_95.csv'), row.names = FALSE)
 
 write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/', 
@@ -320,6 +320,11 @@ write.csv(CPUE_wt_all, paste0('results/rkc/', survey.location, '/',
 
 #panel_figure('Peril', 2019, 'Deadman Reach')
 ### important to make sure biomass.csv is updated
+#as.data.frame(Year = 2025, Pre_Recruit_wt = NA, PreR_SE = NA, Recruit_wt = NA, Rec_SE = NA, Post_Recruit_wt = NA, PR_SE = NA,
+ #          Juvenile_wt = NA, Juv_SE = NA, MatF_wt = NA, MatF_SE = NA, SmallF_wt = NA, SmallF_SE = NA
+ #          )
+
+#rbind(CPUE_wt_from95,) #I'll have to fix the axes later/. 2025 FLAG!!
 
 panel_figure('Peril', cur_yr, 'Deadman Reach', 1, 0) # panel with all 3 figures
 panel_figure('Peril', cur_yr, 'Deadman Reach', 2, 0) # male panel
@@ -332,13 +337,7 @@ panel_figure('Peril', cur_yr, 'Deadman Reach', 3, 0) # female panel
 panel_figure_NC('Peril', cur_yr, 'Deadman Reach', 1, 0) # panel with all 3 figures #um why would we want the 2019 year? changing to 2024 - AGR 8/14/24
 panel_figure_NC('Peril', cur_yr, 'Deadman Reach', 2, 0)
 
-### presentation figure -----
-panel_figure_NC_PRES('Peril', cur_yr, 'Deadman Reach', 2, 0, 'Peril Strait')
-panel_figure_NC_PRES('Peril', cur_yr, 'Deadman Reach', 3, 0, 'Peril Strait')
 
-### presentation figures with different titles -----
-panel_figure_NC_PRES_title('Peril', cur_yr, 'Deadman Reach', 2, 0, "Males", "Females and juveniles")
-panel_figure_NC_PRES_title('Peril', cur_yr, 'Deadman Reach', 3, 0, "Males", "Females and juveniles")
 
 ### female file all years -----
 # create females file for all years
