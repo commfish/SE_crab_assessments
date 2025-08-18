@@ -79,7 +79,10 @@ permit_sel08 <- permit_sel[7001:8000]
 permit_sel09 <- permit_sel[8001:9000]
 permit_sel10 <- permit_sel[9001:10000]
 permit_sel11 <- permit_sel[10001:11000]
-permit_sel12 <- permit_sel[11001:length(permit_sel)]
+permit_sel12 <- permit_sel[11001:12000]
+permit_sel13 <- permit_sel[12001:13000]       
+permit_sel14 <- permit_sel[13001:14000]
+permit_sel15 <- permit_sel[14001:length(permit_sel)] #will have to extend this manually each yr- AGR
 
 
 # filter effort table to include only effort from the relevant trips

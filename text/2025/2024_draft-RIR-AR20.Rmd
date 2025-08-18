@@ -1,6 +1,6 @@
 ---
-title: "2024 Southeast Alaska red king crab stock assessment CONFIDENTIAL RIR draft "
-author: "Alex Reich (alex.reich@alaska.gov) and Caitlin Stern"
+title: "2025 Southeast Alaska red king crab stock assessment CONFIDENTIAL RIR draft "
+author: "Alex Reich (alex.reich@alaska.gov)"
 date: "`r format(Sys.time(), '%B %Y')`"
 output:
   bookdown::word_document2:
@@ -26,7 +26,7 @@ library(readxl)
 library(officer)
 library(officedown)
 source(paste0(here::here(),'/code/functions.R'))
-cur_yr = 2024 # updated annually
+cur_yr = 2025 # updated annually
 pr_yr = cur_yr-1
 fut_yr = cur_yr+1
 opts_chunk$set(fig.width = 12, fig.height = 7, echo = FALSE, warning = FALSE, message = FALSE,  dpi=300)
@@ -137,7 +137,7 @@ pybus_hr <- 0
 gambier_hr <- 0
 seymour_hr <- 0
 peril_hr <- 0
-juneau_hr <- 0.08 #updated 2024
+juneau_hr <- 0.10 #updated 2025 UPDATE EACH YEAR!!
 lynnsisters_hr <- 0
 excursion_hr <- 0
 bkc_hr_display <- 0
@@ -146,11 +146,12 @@ total_hr <- NA
 
 # input legal harvest rates. These are determined from stock health & the previous year's results.
 # the Juneau harvest rate should be the one decided upon in the Juneau assessment meeting in July.
+#AGR 2025- FLAG - take a look and update manually...
 pybus_hr_leg <- 0 #agr updated to legal stock harvest rates 2024
 gambier_hr_leg <- 0.04
 seymour_hr_leg <- 0.1 #debated 0.05 but went with 0.10
 peril_hr_leg <- 0
-juneau_hr_leg <- 0.08 #2024 number
+juneau_hr_leg <- 0.10 #2025 number UPDATE EACH YEAR
 lynnsisters_hr_leg <- 0.09
 excursion_hr_leg <- 0
 bkc_hr_display_leg <- 0
