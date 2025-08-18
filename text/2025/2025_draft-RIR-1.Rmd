@@ -389,7 +389,7 @@ FYI: *information is not completed yet; this is a draft of the RIR for both rese
 
 # `r cur_yr` QUICK SUMMARY {-}
   - Regional legal and mature biomass increased by `r round(reg_bio_change_leg, 0)`% and `r round(reg_bio_change_mat, 0)`% respectively in `r cur_yr`.
-  - The Juneau area (Section 11-A) has `r juneau_stockhealth` stock health, Lynn Sisters has `r lynnsisters_stockhealth` stock health, Gambier Bay has `r gambier_stockhealth` stock health, Seymour Canal has `r seymour_stockhealth` stock health, Excursion Inlet has `r excursion_stockhealth` stock health, and Pybus Bay has `r pybus_stockhealth` stock health. Stock health considers all aspects of the population (mature males, juveniles, and females).
+  - The Juneau area (Section 11-A) has `r juneau_stockhealth` stock health, Lynn Sisters, Gambier Bay, and Seymour Canal have `r lynnsisters_stockhealth` stock health, and Excursion Inlet and Pybus Bay have `r excursion_stockhealth` stock health. Stock health considers all aspects of the population (mature males, juveniles, and females).
   - The Juneau area, Gambier Bay, and Seymour Canal are the only areas with an increase in both legal and mature biomass from `r pr_yr`; Lynn Sisters showed an increase in legal but not mature biomass.
   - Both the Juneau area and Lynn Sisters had a notable drop in survey CPUE for all male size classes.
   - Neither of the harvest rate options (low risk HR or max appropriate HR) reach a harvestable surplus above the 200,000 lb threshold (Tables \@ref(tab:maxHR) and \@ref(tab:riskadHR)).
