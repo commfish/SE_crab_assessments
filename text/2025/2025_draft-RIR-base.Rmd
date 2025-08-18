@@ -17,6 +17,11 @@ output:
 ```{r}
 #to do before 2025
 ##tables 1 and 2 here need the actual seleted values for the juneau area. Please go to figures2tables2.R and add in a section to put in the mgmt selected rates for the juneau areas. Also save the equilibrium and max rise Juneau outputs to put in the captions of tables 1 and 2.
+
+#add port frederick CPUE figure placeholder (in appendix perhaps??)
+#add Appendix B- RIR work
+#find Jan error in 2024
+#update text
 ```
 
 
@@ -633,7 +638,7 @@ set_table_properties(ft, layout = "autofit")
 pybus_healthscore <- sh_all %>% filter(location == "Pybus") %>% pull(score)
 gambier_healthscore <- sh_all %>% filter(location == "Gambier") %>% pull(score)
 seymour_healthscore <- sh_all %>% filter(location == "Seymour") %>% pull(score)
-#peril_healthscore <- sh_all %>% filter(location == "Peril") %>% pull(score) #ARG un-hashtagged. Will need to turn off peril every other year
+peril_healthscore <- sh_all %>% filter(location == "Peril") %>% pull(score) #ARG un-hashtagged. Will need to turn off peril every other year
 juneau_healthscore <- sh_all %>% filter(location == "Juneau") %>% pull(score)
 lynnsisters_healthscore <- sh_all %>% filter(location == "LynnSisters") %>% pull(score)
 excursion_healthscore <- sh_all %>% filter(location == "Excursion") %>% pull(score)
@@ -651,7 +656,7 @@ y2025 <- c(paste0(str_to_title(pybus_stockhealth), " (", pybus_healthscore, ")")
            c(paste0(str_to_title(gambier_stockhealth), " (", gambier_healthscore, ")")), 
            c(paste0(str_to_title(seymour_stockhealth), " (", seymour_healthscore, ")")), 
            #c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")")), #years with peril survey
-           c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")")), #years without peril survey
+           c(paste0(str_to_title(peril_stockhealth))), #years without peril survey
            c(paste0(str_to_title(juneau_stockhealth), " (", juneau_healthscore, ")")), 
            c(paste0(str_to_title(lynnsisters_stockhealth), " (", lynnsisters_healthscore, ")")),
            c(paste0(str_to_title(excursion_stockhealth), " (", excursion_healthscore, ")")))
@@ -855,7 +860,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_',
 ```
 
 ```{r juneau4, fig.cap = "The Juneau area current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/cpue_model_fit.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_cpue_model_fit.png'), dpi = 125)
 #AGR added
 ```
 
