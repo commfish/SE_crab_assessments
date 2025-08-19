@@ -228,6 +228,11 @@ expansion <- 0.528
 regional.b %>% 
   mutate(expanded_legal = adj_legal/expansion, 
          expanded_mature = adj_mature/expansion) -> regional.b.expand
+#AGR add 2025. Add TBD in there.WILL NEED TO CHANGE WHEN WE DECIDE TO OPEN OR CLOSE THE FISHERY
+temp <- length(regional.b.expand$Year)
+regional.b.expand[temp, 6] <- "TBD"
+
+
 write.csv(regional.b.expand, paste0('./results/rkc/Region1/', cur_yr, '/regional_biomass_', cur_yr, '.csv'), 
           row.names = FALSE)
 
@@ -266,7 +271,7 @@ regional.b.expand %>%
 
 ggsave(fig2_expand_mr_regional_biomass, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
-# version of the figure with edits requested by regional staff
+# version of the figure with edits requested by regional staff AGR 25 updated
 reg_baseline_MR$pounds_expanded <- reg_baseline_MR$pounds/expansion
 
 fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>% 
@@ -277,7 +282,7 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>%
     TRUE ~ status
   )) %>%
   gather(type, pounds, expanded_legal:expanded_mature, factor_key = TRUE) %>%
-  mutate(status = replace(status, which(status == "TBD"), "Closed")) %>% # can replace the TBD with open or closed
+  #mutate(status = replace(status, which(status == "TBD"), "Closed")) %>% # can replace the TBD with open or closed - EDIT AFTER DECISION!!!
   dplyr::rename(`Fishery Status` = status) %>%
   ggplot(aes(Year, pounds, group = type)) +
   geom_line(aes(colour = type, group = type, linetype = type))+
@@ -290,7 +295,7 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>%
   scale_colour_manual(name = "", values = c("black", "grey60"))+
   #scale_shape_manual(name = "Fishery Status", values = c(25, 21, 8))+
   #scale_shape_manual(values = c(25, 21, 8))+
-  scale_shape_manual(values = c(0, 16, 2, 8))+
+  scale_shape_manual(values = c(16, 0, 2))+
   #scale_linetype_manual(name = "", values = c("solid", "dashed", "solid", "dashed"), 
                         #guide = FALSE) +
   scale_linetype_manual(name = "", values = c("solid", "dashed")) +
@@ -317,7 +322,7 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>%
 
 
 
-fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>% 
+fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>% #EYES HERE! THIS ONE! 25
   select(Year, expanded_legal, expanded_mature, status) %>%
   mutate(status = case_when(
     status == "open" ~ "Open",
@@ -326,13 +331,13 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>%
   )) %>%
   dplyr::rename("Legal" = expanded_legal, "Mature" = expanded_mature) %>%
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>%
-  mutate(status = replace(status, which(status == "TBD"), "Closed")) %>% # can replace the TBD with open or closed
+  #mutate(status = replace(status, which(status == "TBD"), "Closed")) %>% # can replace the TBD with open or closed #TUrN ON AFTER WE DECIDE!!!
   dplyr::rename(`Fishery Status` = status) %>%
   ggplot(aes(Year, pounds, group = type)) +
   geom_line(aes(color = type, group = type, linetype = type))+
   geom_point(aes(color = type, shape = `Fishery Status`), size =3) +
   scale_colour_manual(name = "", values = c("black", "grey60"))+
-  scale_shape_manual(values = c(0, 16, 2, 8))+
+  scale_shape_manual(values = c(0, 16, 8))+
   scale_linetype_manual(name = "", values = c("solid", "dashed")) +
   scale_y_continuous(labels = comma, limits = c(0,(max(regional.b.expand$expanded_mature,
                                                        na.rm = TRUE) + 100000)),
@@ -340,13 +345,13 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>%
                                  by = 1000000)) +
   #ggtitle(paste0("Juneau ", cur_yr," model")) + 
   ylab("Biomass (lb)")+ xlab("Year") +
-  scale_x_continuous(breaks = seq(min(1976),max(max(regional.b.expand$Year)+1), by = 2)) + #even years
-  #scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) + #odd years
+  #scale_x_continuous(breaks = seq(min(1976),max(max(regional.b.expand$Year)+1), by = 2)) + #even years
+  scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) + #odd years
   #theme(plot.title = element_text(hjust =0.5)) +
   #scale_x_continuous(breaks = seq(min(1975),max(cur_yr), by = 5)) +
   geom_hline(yintercept =  reg_baseline_MR$pounds_expanded[1], color = "grey1")+
   geom_hline(yintercept = reg_baseline_MR$pounds_expanded[2], color = "grey60", linetype = "dashed") +
-  theme(legend.position = c(0.9,0.793), legend.title = element_text(size = 11), 
+  theme(legend.position = c(0.9,0.75), legend.title = element_text(size = 11), 
         legend.text = element_text(size = 11), axis.text = element_text(size = 14), 
         axis.title = element_text(size = 14, face = "bold"), axis.text.x = element_text(angle = 90)) +
   #geom_text(data = baseline_mean_curyr, aes(x = start_yr, y = baseline, label = label), 
