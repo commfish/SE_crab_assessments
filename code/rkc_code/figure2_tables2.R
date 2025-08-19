@@ -112,7 +112,12 @@ reg_baseline[3:4, ] ->  reg_baseline_MR
 # Figure 2 TBD regional biomass CSA biomass---------
 # should have 2018 model with longterm baselines (1995-2007) and closure status. 
 #   also show 2018 forecast as distinct from model output
-regional.b %>% 
+regional.b.2 <- regional.b
+temp1 <- length(regional.b$Year)
+regional.b.2[temp1, 6] <- "TBD"
+
+#this graph is being difficult, I think I'll need it llater AGR 25 tk
+regional.b.2 %>% 
   select(Year, legal, mature, status) %>% 
   gather(type, pounds, legal:mature, factor_key = TRUE) %>% 
   ggplot(aes(Year, pounds, group = type)) +
@@ -121,7 +126,7 @@ regional.b %>%
   geom_hline(data = reg_baseline_CSA, aes(yintercept = pounds, linetype = type, colour = type)) +
   scale_colour_manual(name = "", values = c("black", "black", "grey60", "grey60"), 
                       guide = FALSE)+
-  scale_shape_manual(name = "Fishery Status", values = c(25, 21, 8))+
+  scale_shape_manual(name = "Fishery Status", values = c(0, 1, 8))+
   scale_linetype_manual(name = "", values = c("solid", "solid", "dashed", "dashed"), 
                         guide = FALSE) +
   scale_fill_manual(name = "", values = c("black", "gray75"), 
