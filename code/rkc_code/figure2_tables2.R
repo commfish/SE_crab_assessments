@@ -365,6 +365,35 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>% #EYES HERE! THIS
 
 ggsave(fig2_expand_mr_regional_biomass_edited, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
 
+#AGR 2025- the fig2_expand_mr_regional_biomass_edited - with medians!
+##what do we care about??
+###the long-term median
+####long term mean is 1995-2007??
+####how we define the long term median
+###50% of the logn term median
+#fig2_expand_mr_regional_biomass_edited +geom_hline()
+
+med_calc_95 <- regional.b.expand %>% filter(Year > 1994 & Year < 2008)
+median_95 <- median(med_calc_95$expanded_legal)
+half_med_95 <- median_95/2
+med_calc_all <- regional.b.expand %>% filter(Year < cur_yr)
+median_all <- median(med_calc_all$expanded_legal)
+half_med_all <- median_all/2
+
+med1 <- fig2_expand_mr_regional_biomass_edited +
+  geom_hline(yintercept=median_95, color="orange", linetype = "dotdash", size=1) +
+  geom_hline(yintercept=half_med_95, color="orange", linetype = "dotted", size=1)+
+  labs(title = "Median 1995-2007")
+
+med2 <- fig2_expand_mr_regional_biomass_edited +
+  geom_hline(yintercept=median_all, color="purple", linetype = "dotdash", size=1) +
+  geom_hline(yintercept=half_med_all, color="purple", linetype = "dotted", size=1) +
+  labs(title = "Median 1977-2024")
+
+ggsave(med1, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1995_2007_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
+ggsave(med2, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1977_2024_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
+
+
 # clean up tables --------
 # equlibrium exploitation rate -----
 exploit_rate %>%  # exploitation rats for other areas as weighted means from surveyed areas
