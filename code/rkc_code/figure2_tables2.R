@@ -393,6 +393,47 @@ med2 <- fig2_expand_mr_regional_biomass_edited +
 ggsave(med1, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1995_2007_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
 ggsave(med2, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1977_2024_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
 
+##a cleaner median graph AGR 25
+fig_median_simple <- regional.b.expand %>% 
+  select(Year, expanded_legal, status) %>%
+  mutate(status = case_when(
+    status == "open" ~ "Open",
+    status == "closed" ~ "Closed",
+    TRUE ~ status
+  )) %>%
+  dplyr::rename("Legal" = expanded_legal) %>%
+  #gather(type, pounds, Legal:Mature, factor_key = TRUE) %>%
+  #mutate(status = replace(status, which(status == "TBD"), "Closed")) %>% # can replace the TBD with open or closed #TUrN ON AFTER WE DECIDE!!!
+  dplyr::rename(`Fishery Status` = status) %>%
+  ggplot(aes(Year, Legal)) +
+  geom_line()+
+  geom_point(aes(shape = `Fishery Status`), size =3) +
+  #scale_colour_manual(name = "", values = c("black", "grey60"))+
+  scale_shape_manual(values = c(0, 16, 8))+
+  #scale_linetype_manual(name = "", values = c("solid", "dashed")) +
+  scale_y_continuous(labels = comma, limits = c(0,(max(regional.b.expand$expanded_mature,
+                                                       na.rm = TRUE) + 100000)),
+                     breaks= seq(min(0), max(max(regional.b.expand$expanded_mature, na.rm = TRUE) +100000), 
+                                 by = 1000000)) +
+  #ggtitle(paste0("Juneau ", cur_yr," model")) + 
+  ylab("Legal biomass (lb)")+ xlab("Year") +
+  #scale_x_continuous(breaks = seq(min(1976),max(max(regional.b.expand$Year)+1), by = 2)) + #even years
+  scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) + #odd years
+  #theme(plot.title = element_text(hjust =0.5)) +
+  #scale_x_continuous(breaks = seq(min(1975),max(cur_yr), by = 5)) +
+  #geom_hline(yintercept =  reg_baseline_MR$pounds_expanded[1], color = "grey1")+
+  #geom_hline(yintercept = reg_baseline_MR$pounds_expanded[2], color = "grey60", linetype = "dashed") +
+  theme(legend.position = c(0.9,0.75), legend.title = element_text(size = 11), 
+        legend.text = element_text(size = 11), axis.text = element_text(size = 14), 
+        axis.title = element_text(size = 14, face = "bold"), axis.text.x = element_text(angle = 90)) +
+  #geom_text(data = baseline_mean_curyr, aes(x = start_yr, y = baseline, label = label), 
+  #hjust = -0.45, vjust = 1.5, nudge_y = 0.05, size = 4) +
+  guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol = 1)))+
+  geom_hline(yintercept=median_95, color="orange", linetype = "dotdash", size=1) +
+  geom_hline(yintercept=half_med_95, color="orange", linetype = "dotted", size=1)
+
+ggsave(fig_median_simple, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1995_2007_median_simple', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
+
 
 # clean up tables --------
 # equlibrium exploitation rate -----
