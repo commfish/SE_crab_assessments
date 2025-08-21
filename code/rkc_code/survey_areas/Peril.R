@@ -371,8 +371,9 @@ panel_figure_NC('Peril', cur_yr, 'Deadman Reach', 2, 0)
 
 # note: each year, add one row to the import ranges (e.g., if in 2023 ranges are A8:F53 and R8:T53, then in 2024 ranges are A8:F54 and R8:T54)
 
-library(readxl)
+#library(readxl)
 
+if (cur_yr %% 2 == 0) {#if current year is even
 cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Peril Straits ", cur_yr, " (adj HR)_3.xls"), sheet = "Estimates 3S_experi", range = "A8:E55") %>% #fun how the estimates tab is named a different thing in each area
   cbind(read_excel(paste0(here::here(), "/CSA excel/Peril Straits ", cur_yr, " (adj HR)_3.xls"), sheet = "Estimates 3S_experi", range = "Q8:S55")) %>% #think I'll have to remove row 2 (line 9 in excel)
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
@@ -404,8 +405,7 @@ cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)
 
 ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
                          'Peril_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
-
-
+}
 
 
 

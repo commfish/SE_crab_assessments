@@ -490,6 +490,8 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
           plot.title = element_text(size = 24)) #+
     #scale_linetype_manual(name = "", values = c("solid", "dotdash", "longdash"), #agradded
      #                     labels = c("Postrecruit", "Prerecruit", "Recruit")) 
+
+  
   
   if(survey.location == "Gambier"){ #agr just added this chunk to adjust the Gambier legend 9/3/24
       p1 = p1 + #ggtitle("Gambier") +
@@ -510,6 +512,10 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
                        size = 6, fontface = "bold"    
     )}
   
+  if(survey.location == "Peril"){ #specific 2025 adjustment to make the graph not wack
+    p1 = p1 + 
+      scale_x_continuous(breaks = seq(min(1995), max(2025), by =2), limits= c(1995, 2025.6)) #specific 2025 fix
+  }
   
   #if(survey.location != "Peril"){ #AGR finagling in 2025 with the peril graph
    # p1 = p1 + scale_x_continuous(limits = c(1994, 2026)   
@@ -605,6 +611,10 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   }
   if(option ==3){
     p3 = p3 + xlab("Year")
+  }
+  
+  if(survey.location == "Peril"){
+    p3 = p3 + scale_x_continuous(breaks = seq(min(1995),max(2025), by =2)) #specific peril 2025 fix, will need to turn off in even years
   }
   
   
@@ -746,7 +756,8 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   if(survey.location == "Peril"){
     p4 <- p4 +
       scale_y_continuous(labels = comma, limits = c(0,300000),
-                         breaks= seq(min(0), max(300000), by = 100000), oob = rescale_none)
+                         breaks= seq(min(0), max(300000), by = 100000), oob = rescale_none)+
+      scale_x_continuous(breaks = seq(min(1995), max(2025.6), by=2)) #specific 2025 peril fix
   }
   
   ### FINAL plot -------------
@@ -994,6 +1005,11 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   #scale_linetype_manual(name = "", values = c("solid", "dotdash", "longdash"), #agradded
   #                     labels = c("Postrecruit", "Prerecruit", "Recruit")) 
   
+  if(survey.location == "Peril"){ #specific 2025 adjustment to make the graph not wack
+    p1 = p1 + 
+      scale_x_continuous(breaks = seq(min(1995), max(2025), by =2, limits= c(1995, 2025.6)))
+  }
+  
   if(survey.location == "LynnSisters"){ #agr just added this chunk to adjust the Lynn sisters legend
     p1 = p1 +# ggtitle("Lynn Sisters") +
       theme(legend.position = c(0.35,0.8)) }
@@ -1225,7 +1241,8 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   if(survey.location == "Peril"){
     p4 <- p4 +
       scale_y_continuous(labels = comma, limits = c(0,300000),
-                         breaks= seq(min(0), max(300000), by = 100000), oob = rescale_none)
+                         breaks= seq(min(0), max(300000), by = 100000), oob = rescale_none)+
+      scale_x_continuous(breaks = seq(min(1995), max(2025), by=2))
   }
   
   
