@@ -149,6 +149,7 @@ regional.b.2 %>%
 
 ggsave(fig2_regional_biomass, filename = paste0('./figures/rkc/', cur_yr, '/CSAregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
 
+#CSA but expanded
 
 # Figure 2 TBD regional biomass M/R adjusted biomass---------
 # should have 2018 model with longterm baselines (1995-2007) and closure status. #agr we use 1995-2007 as the baseline now 2024 TK
