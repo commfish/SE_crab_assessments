@@ -18,19 +18,25 @@ output_path <- paste0('results/tanner/', cur_yr) # output and results
 dir.create(output_path) 
 
 # data -----
-cur_yr <- 2022
+cur_yr <- 2023
+n_yr <- cur_yr + 1
 #survey_biomass <- read.csv("./data/TCS/survey_areas_biomass.csv") #add to each year
 # above file had point estimates from each year and was kept historically in SigmaPlot. Now this is tracked in 
 # an appendix table in the stock health document. 
-biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))          
+biomass <- read.csv(paste0('./data/tanner/tanner_', n_yr, '_biomassmodel.csv'))          
 harvest_old <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_85_18.csv")
 #harvest <- read.csv(paste0('./data/harvest/Tanner_Detailed Fish Tickets_ALL_years_', cur_yr, '.csv'))
-harvest <- read.csv("./data/harvest/tanner_harvest.csv") # harvest harvest since 2017
-# add current years catch to this file or repull all years
-std_cpue <- read.csv(paste0("C:/Users/kjpalof/Documents/R projects/tanner-crab/results/std_commericial_cpue", cur_yr, ".csv"))
-#calculated in a separate project "tanner-crab" - need to calc this first so go to "tanner-crab"
+harvest <- read.csv("./data/harvest/tanner_harvest.csv") # harvest harvest since 2017; add current year's harvest to this file or 
+# repull all years
+std_cpue <- read.csv(paste0("./results/tanner/harvest/", cur_yr, "/std_commercial_cpue", cur_yr, ".csv")) # calculated in tanner_harvest.R
 hist_biomass <- read.csv(paste0("./data/tanner/tanner_annual_pt_estimate_historic_", cur_yr-1, ".csv"))
-# !! where is this updated???? !! updated manually
+hist_biomass_update <- read.csv(paste0("./data/tanner/tanner_annual_pt_estimate_historic_", cur_yr, ".csv"))
+# this is updated in the cur_yr_tanner_draft.Rmd file
+
+# repeat previous year's estimates for Peril Strait, due to lack of survey in 2023
+biomass_ps_2023 <- biomass %>% filter(Year == 2022 & Area == "Peril Strait") %>% mutate(Year = 2023)
+biomass_ps <- rbind(biomass, biomass_ps_2023)
+biomass <- biomass_ps
 
 # data prep for Figure 1 ---------------
 biomass %>% 
@@ -68,9 +74,9 @@ Year <- c(1997:2000)
 adj_L <- c(data_adjust1$adj.97L[1], data_adjust1$adj.98L[1], data_adjust1$adj.99L[1], data_adjust1$adj.99L[1])
 adj_M <- c(data_adjust1$adj.97M[1], data_adjust1$adj.98M[1], data_adjust1$adj.99M[1], data_adjust1$adj.99M[1])
 
-adjust <- data.frame(Year, adj_L, adj_M) 
+adjust <- data.frame(Year, adj_L, adj_M)
 
-# add adjustments to the totals in years neccesary
+# add adjustments to the totals in years neccessary
 year_totals %>% 
   left_join(adjust) %>% 
   mutate(Legal = ifelse(!is.na(adj_L), Total_L*(1+adj_L), Total_L), 
@@ -104,7 +110,7 @@ adj_M <- c(data_adjust2$adj.97M[1], data_adjust2$adj.98M[1], data_adjust2$adj.99
 
 adjust2 <- data.frame(Year, adj_L, adj_M) 
 
-# add adjustments to the totals in years neccesary
+# add adjustments to the totals in years necessary
 year_totals %>% 
   left_join(adjust2) %>% 
   mutate(Legal = ifelse(!is.na(adj_L), Total_L*(1+adj_L), Total_L), 
@@ -112,7 +118,7 @@ year_totals %>%
   select(Year, Legal, Mature) -> cur_yr_biomass2
 
 # Figure 1 ------------
-# Now is calculated base on the current years model output.
+# Now is calculated based on the current years model output.
 # use average contribution in early years with all years data 
 cur_yr_biomass %>% 
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
@@ -138,10 +144,42 @@ cur_yr_biomass %>%
 
   ggsave(paste0('./figures/tanner/',  cur_yr,'/', cur_yr,'_figure1_curyr_data.png'), dpi = 800,
          width = 8, height = 5.75)
+  
+# fig 1 with changes made according to regional staff requests
+  
+fig1_reg <- cur_yr_biomass %>% 
+    gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
+    ggplot(aes(Year, y = pounds/1000000, group = type)) +
+    geom_line(aes(color = type, linetype = type))+
+    geom_point(aes(fill = type, shape = type), size =3) +
+    scale_fill_manual(name = "", values = c("black", "gray100")) + 
+    scale_colour_manual(name = "", values = c("gray1", "grey48"))+
+    scale_shape_manual(name = "", values = c(21, 21))+
+    scale_linetype_manual(name = "", values = c("solid", "dashed")) +
+    ylab("Biomass (1,000,000 lb)") + 
+    xlab("Survey Year") +
+    theme(plot.title = element_text(hjust =0.5)) + 
+    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_y_continuous(limits = c(0,max(cur_yr_biomass$Mature/1000000, 
+                                        na.rm = TRUE) + 1.5), 
+                       breaks= seq(min(0), max(max(cur_yr_biomass$Mature/1000000, 
+                                                   na.rm = TRUE)+ 1.5), by = 1.0)) +
+    theme(legend.position = c(0.65,0.80), 
+          legend.text=element_text(size = 12),
+          axis.text = element_text(size = 12),
+          axis.text.x = element_text(angle = 90, vjust = 0.5),
+          axis.title=element_text(size=14,face="bold"))
+  
+ggsave(paste0(here::here(), '/figures/tanner/',  cur_yr,'/', cur_yr,'_figure1_curyr_data_edited.png'), dpi = 800,
+         width = 8, height = 5.75)
+  
+
 
 # Figure A1 for appendix --------------
 # make sure you update this csv with current year values - or pull from above 
 tail(hist_biomass) 
+  
+tail(hist_biomass_update)
   
 # these are projected biomass for each end year - old data/years here are NOT updated.
 # add current year to this.
@@ -149,7 +187,8 @@ cur_yr_biomass %>%
   filter(Year == cur_yr) -> temp1
 hist_biomass %>% 
   rbind(temp1) -> hist_biomass2
-# add code to pull in current year from above here and then re-save from the following year
+# added code to pull in current year from above here and then re-save from the following year
+
  hist_biomass2 %>% 
     gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
     ggplot(aes(Year, y = pounds/1000000, group = type)) +
@@ -229,6 +268,7 @@ breaks = seq(min(1991),max(cur_yr), by =2)
 b_labels = paste0(breaks-1, "/", substr(breaks, 3, 4))
 
 substr(breaks, 3, 4)
+
 # Figure 2a ----
 ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
   geom_bar(stat = "identity", 
@@ -266,7 +306,7 @@ ggplot(figure2s, aes(x = Year, y = avg.cpue)) +
   theme(legend.position = c(0.65,0.80), 
         axis.text = element_text(size = 12),
         axis.text.x = element_text(angle = 45, vjust = 0.5),
-        axis.title=element_text(size=14,face="bold")) -> fig2b#+
+        axis.title=element_text(size=14,face="bold")) -> fig2b #+
   #geom_hline(yintercept = mean(figure2$avg.cpue, na.rm = TRUE)) 
 
 
@@ -274,6 +314,48 @@ plot_grid(fig2a, fig2b, ncol = 1, align = 'v')
 ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 800,
        width = 8, height = 9.0)
 
+# fig 2 for RIR, changes made according to regional staff requests
+fig2a_reg <- ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
+  geom_bar(stat = "identity", 
+           fill = "grey75", colour = "black") +
+  #ggtitle("Commercial Tanner crab harvest") +
+  ylab("Harvest (1,000,000 lb)") + 
+  xlab(NULL) +
+  theme(plot.title = element_text(hjust =0.5)) + 
+  scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2)) +
+  scale_y_continuous(limits = c(0,max(figure2$pounds/1000000, 
+                                      na.rm = TRUE) + 0.5), 
+                     breaks= seq(min(0), max(max(figure2$pounds/1000000, 
+                                                 na.rm = TRUE)+ 0.5), by = 1.0)) +
+  theme(axis.text.x = element_blank(),
+        legend.position = c(0.65,0.80), 
+        axis.text = element_text(size = 12),
+        #axis.text.x = element_text(angle = 45, vjust = 0.5),
+        axis.title=element_text(size=14,face="bold"))
+
+fig2b_reg <- ggplot(figure2s, aes(x = Year, y = avg.cpue)) +
+  geom_line(aes(x = Year, y = avg.cpue)) +
+  geom_point(aes(x = Year, y = avg.cpue), size =3) +
+  geom_ribbon(aes(ymin = avg.cpue - 2*se, ymax = avg.cpue + 2*se), 
+              alpha = 0.2) +
+  #geom_errorbar(aes(x = Year, ymin = avg.cpue - 2*se, ymax = avg.cpue + 2*se), #now displayed as confidence intervals
+  #            width = 0.2, na.rm = TRUE) +
+  expand_limits(y = 0) +
+  ylab("Fishery CPUE (crab per pot)") + 
+  xlab("Season") +
+  scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2), 
+                     labels = b_labels) +
+  scale_y_continuous(labels = comma, limits = c(0, 40), 
+                     breaks= seq(min(0), max(40), by = 10)) +
+  theme(legend.position = c(0.65,0.80), 
+        legend.text=element_text(size = 12),
+        axis.text = element_text(size = 12),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        axis.title=element_text(size=14,face="bold"))
+
+plot_grid(fig2a_reg, fig2b_reg, ncol = 1, align = 'v')
+ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_figure2_edited.png'), dpi = 800,
+       width = 8, height = 9.0)
 
 # Biomass vs. harvest annual ------
 # biomass is just regional and does not include non-surveyed areas. 
@@ -322,12 +404,13 @@ ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_su
 annual_harvest_all %>% 
   mutate(Survey_year = Year -1) %>% 
   select(Survey_year, pounds, numbers, permits) -> annual_harvest_all_lag
+
 cur_yr_biomass %>% 
   mutate(Regional_Legal = Legal/.66, Regional_Mature = Mature/0.66, Survey_year = Year) %>% 
   left_join(annual_harvest_all_lag) %>% 
   mutate(hrate = pounds/Regional_Mature*100) -> biomass_harvest2
 
-biomass_harvest2 %>% 
+reg_harvest_comm_catch <- biomass_harvest2 %>% 
   select(Survey_year, Regional_Mature, Regional_Legal, harvest = pounds) %>% 
   #gather(type, pounds, Regional_Mature:Regional_Legal, factor_key = TRUE) %>% 
   ggplot() +
@@ -352,9 +435,13 @@ biomass_harvest2 %>%
                                       na.rm = TRUE) + .5), 
                      breaks= seq(min(0), max(max(biomass_harvest2$Regional_Mature/1000000, 
                                                  na.rm = TRUE)+ .5), by = 1.0)) +
-  scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+  scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2))
+  
+reg_harvest_comm_catch
+
   ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_comm_catch_yr.png'), dpi = 800,
          width = 8.5, height = 6.0)
+  
 # Old with point estimates Figure 1 ------------
 ##?????
 survey_biomass %>% 

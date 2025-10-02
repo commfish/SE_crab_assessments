@@ -1,7 +1,7 @@
 #K.Palof 
 # ADF&G 9-21-18 updated and reworked similar to RKC code
-# 10-19-2021/ 10-19-2022
-# updated Oct 2023 by Caitlin Stern
+# 10-19-2021/ 10-19-2022 
+# updated Oct 2023 by Caitlin Stern; Sept 2024 by Alex Reich
 # Areas: RKCS areas for Tanner crab - EXCLUDES north juneau and stephens passage (see readme.md for reason)
 # includes: Excursion, Seymour Canal, Pybus Bay, Gambier Bay, Peril Strait, and Lynn Sisters
 # code to process data from Ocean AK to use in crab CSA models.  
@@ -10,8 +10,9 @@
 source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with multiple areas at once.
 
 ## setup global ---------------
-cur_yr <- 2023
+cur_yr <- 2024
 pr_yr <- cur_yr - 1
+n_yr <- cur_yr + 1
 fig_path <- paste0('figures/tanner/tanner_rkc/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
 output_path <- paste0('results/tanner/tanner_rkc/', cur_yr) # output and results
@@ -28,7 +29,7 @@ dat.b <- read.csv(paste0("./data/tanner/tanner_rkc/red crab survey for Tanner cr
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 biomass <- read.csv(paste0("./data/tanner/tanner_", cur_yr, "_biomassmodel.csv")) #!! create a file for the current year
 # by copying last years to start, then have to add each area from CSA models. !!outside R!!
-# this file should be updated with current year model output.
+# this file should be updated with current year model output. #TK is this a riddle - AGR
 
 # survey data QAC -------
 head(dat.a)
@@ -74,8 +75,8 @@ dat %>%
 
 dat1 %>%
   filter(Recruit.Status == "", Width.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
-# before moving forward.
-dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> test1
+# before moving forward.- AGR TK this totally produces rows. Crap. Why?
+dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> test1 #AGR oh looks like C fixed it
 # 2018 excursion pot 2 and 42
 # 2019 gambier bay pot 39
 write.csv(test1, paste0("./results/tanner/tanner_rkc/data_issues", cur_yr, ".csv"))
@@ -105,7 +106,7 @@ dat1 %>%
   filter(experimental == 0) -> dat1a
   # remove seymour canal swan cove pots, these are only pot #'s greater than 54 in 2015.
 
-  # need to confirm that rkcs area tagging pots in 2019 - seymour and excusion are NOT included
+  # need to confirm that rkcs area tagging pots in 2019 - seymour and excusion are NOT included #AGR TK- what?
 dat1a %>% 
   filter(Year == 2022) %>% 
   group_by(Location) %>% 
@@ -219,6 +220,10 @@ long_term2 <- long_term[[1]] %>%
   #bind_rows(long_term[[6]]) # use this for years with a Peril survey
 write.csv(long_term2, paste0('./results/tanner/tanner_rkc/', cur_yr, '/long_term.csv'))
 
+# calculate % difference from baseline
+long_term3 <- long_term2 %>%
+  mutate(diff_mean = round(((mean - lt.mean) / lt.mean)*100, 0))
+
 ##### Weights from length - weight relationship--------------------
 weight_L(Tdat1, cur_yr) # function found in tanner_rkc_functions.R
 
@@ -310,16 +315,29 @@ poor_clutch_short(poorclutch1, cur_yr)
 ggplot(poorclutch1, aes(Year, var1))+geom_point() +facet_wrap(~AREA)
 ###
 
+female_shortterm <- read.csv(paste0("./results/tanner/tanner_rkc/", cur_yr, "/female_shortterm.csv"))
+
 ## stock health -------
 total_health("tanner_rkc", cur_yr)
 
+stock_health_curyr <- read.csv(paste0("./results/tanner/tanner_rkc/", cur_yr, "/stock_health.csv"))
+stock_health_pryr <- read.csv(paste0("./results/tanner/tanner_rkc/", pr_yr, "/stock_health.csv"))
 
-## STOP here and run R markdown with summary of rkc areas ----
+# create summary matrix for report ----
+
+row.name.col <- c("", "", "Large/mature females", "percent clutch fullness < 25%", "- vs. long-term average", "- short-term trend", "- CPUE vs. long-term average", "- CPUE short-term trend", "Prerecruit males", "- CPUE vs. long-term average", "- CPUE short-term trend", "Recruit males", "- CPUE vs. long-term average", "- CPUE short-term trend", "Postrecruit males", "- CPUE vs. long-term average", "- CPUE short-term trend", paste(pr_yr, "Total score"), paste(pr_yr, "Stock status"), paste(pr_yr, "Mature harvest rate"), paste(cur_yr, "Total score"), paste(cur_yr, "Stock status"), paste(cur_yr, "Mature harvest rate"))
+
+sc.sum1 <- c("Seymour Canal", "% of baseline", "", "", subset(long_term3$diff_mean, long_term3$AREA == "SC" & long_term3$recruit.status == "large.female"), "", "", subset(long_term3$diff_mean, long_term3$AREA == "SC" & long_term3$recruit.status == "pre.recruit"), "", "", subset(long_term3$diff_mean, long_term3$AREA == "SC" & long_term3$recruit.status == "recruit"), "", "", subset(long_term3$diff_mean, long_term3$AREA == "SC" & long_term3$recruit.status == "post.recruit"), "", subset(stock_health_pryr$score, stock_health_pryr$AREA == "SC"), str_to_title(subset(stock_health_pryr$health_status, stock_health_pryr$AREA == "SC")), percent(subset(stock_health_pryr$harvest_per, stock_health_pryr$AREA == "SC")), subset(stock_health_curyr$score, stock_health_curyr$AREA == "SC"), str_to_title(subset(stock_health_curyr$health_status, stock_health_curyr$AREA == "SC")), percent(subset(stock_health_curyr$harvest_per, stock_health_curyr$AREA == "SC")))
+sc.sum2 <- c("", "Score", "", "", subset(long_term3$significant, long_term3$AREA == "SC" & long_term3$recruit.status == "large.female"))
+
+sum.mat <- as.data.frame(cbind(row.name.col, sc.sum1)) #TK AGR there is a warning message here, is there supposed to be?
+
+## STOP here and run R markdown with summary of rkc areas ----  
 # SE_crab_assessments/text/tanner/tanner_rkc_survey_summary.Rmd
 
 # READ ME: 
-# put cpue from this markdown into CSA excel files or R input files.
-# need harvest for each survey area from 'tanner_harvest.R' file created: 
+# put cpue from this markdown into CSA excel files or R input files. #TK AGR here
+# need harvest for each survey area from 'tanner_harvest.R' file created:  #AGR done!! 24
 # 'tanner_comm_catch'cur_yr'.csv' (catch in numbers) & 'tanner_catch_mid_date'cur_yr'.csv' (mid-catch date)
 # Run CSA - put resulting biomass 'cur_yr' values into 
 # 'tanner_cur_yr_biomassmodel.csv'
@@ -348,13 +366,15 @@ panel_figure("LS", cur_yr, "Lynn Sisters", 2, "include", 0.55, 0.8)
 panel_figure("LS", cur_yr, "Lynn Sisters", 3, "include", 0.55, 0.8)
 
 
-# non-confidential areas 2018 ------------
+# non-confidential areas ------------
+panel_figure("EI", cur_yr, "Excursion Inlet", 2, "exclude", 0.55, 0.8)
+panel_figure("SC", cur_yr, "Seymour Canal", 2, "exclude", 0.55, 0.8)
 panel_figure("GB", cur_yr, "Gambier Bay", 2, "exclude", 0.55, 0.8)
 panel_figure("LS", cur_yr, "Lynn Sisters", 2, "exclude", 0.55, 0.8)
 panel_figure("PS", cur_yr, "Peril Strait", 2, "exclude", 0.35, 0.8)
 panel_figure("PB", cur_yr, "Pybus Bay", 2, "exclude", 0.35, 0.8)
 
-# presentation figures ------------
+# presentation figures ------------ #AGR TK ARE THESE OBSOLETE??
 panel_figure_pres("EI", 2018, "Excursion Inlet", 2, "include")
 panel_figure_pres("EI", 2018, "Excursion Inlet", 3, "include")
 

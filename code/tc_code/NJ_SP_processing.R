@@ -12,11 +12,17 @@
 # Data:
 #     Current year's data from OceanAK pull - 'Juneau_red crab survey for Tanner crab CSA'
 # **FIX** make sure the correct pull from OceanAK is referred here.
+# update Oct 2023: data are now pulled using the pull_data_for_csa.R script
 
 # Load -------------
 # source('./code/tanner_functions.R')
+source('./code/tanner_rkc_functions.R')
+
+cur_yr <- 2024
+pr_yr <- cur_yr -1
+
 source('./code/tc_code/sp_nj_figures.R')
-cur_yr <- 2022
+
 fig_path <- paste0('figures/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
 output_path <- paste0('results/tanner/nj_stp/', cur_yr) # output and results
@@ -25,31 +31,34 @@ dir.create(output_path)
 
 # Data ---------------
 # change input file and input folder for each
-dat <- read.csv(paste0('./data/tanner/nj_stp/Juneau_red crab survey for Tanner crab CSA_', cur_yr,'.csv'))
+dat <- read.csv(paste0('./data/tanner/nj_stp/Juneau_red_crab_survey_for_Tanner_crab_CSA_', cur_yr,'.csv'))
 # all current year pots from Juneau and Barlow Cove - OceanAK
-
 
 ## data processing -------------------
 head(dat)
 glimpse(dat) # confirm that data was read in correctly.
 
-### prep pots to give to Kellii----------
+### prep pots to give to Zane ----------
 dat %>% select(Year, Location.Code, Location, Pot.No, Depth.Fathoms, Latitude.Decimal.Degrees, 
                Longitude.Decimal.Degrees) %>% 
   group_by(Year, Location, Pot.No) %>% 
   summarise(Depth.Fathoms = mean(Depth.Fathoms), Latitude.Decimal.Degrees = mean(Latitude.Decimal.Degrees), 
             Longitude.Decimal.Degrees = mean(Longitude.Decimal.Degrees)) -> juneau_pot_info
 write.csv(juneau_pot_info, paste0('./data/tanner/nj_stp/juneau_pot_info_', cur_yr,'.csv'))
-## this is the file that needs to be used in GIS to assign pots to either NJ or SP
-## see notes in w
+## this is the file that needs to be used in GIS to assign pots to either NJ or SP. Send this to Zane.
+## see notes in word document - AGR TK- crap what word document??
 
 
 ## rest of data -------------
 area <- read.csv("./data/tanner/nj_stp/stp_strata_area.csv")  #density strata for tanner stratification in Stephen's Passage area
+
+# after Zane has used GIS to put the Juneau area pots into density strata, save the .xlsx file he sent as juneau_cur_yr_results.
+# then import that file here.
 seperate <- read.csv(paste0('./data/tanner/nj_stp/juneau_', cur_yr,'_results.csv')) #**FIX** update annually
-#     from Kellii using GIS, puts Juneau area pots into density strata
+
 # run lines above "prep for GIS" then follow onenote instructinos for GIS. Then move this resulting file above
-# to this folder here for the seperation.
+# to this folder here for the separation. #AGR HERE!!!! - ok idk what the onenote instructons are or wherethey are... at all. 
+
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 
 SP_hist <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr-1, '/SP_rawdata_all.csv'))
@@ -75,29 +84,31 @@ dat1 %>%
 # also need to check soak time and to make sure all crab that were measured have a recruit status
 #come back later and add a soak time column - tanner soak time should be between 16-20??? double check this
 
-##### seperate NJ and Juneau (also known as SP) ---------------------
+##### separate NJ and Juneau (also known as SP) ---------------------
 head(seperate)
+unique(dat1$Location)
+
 dat1 %>%
   mutate(area = ifelse(Location == "Barlow Cove", "NJ", 
-                       ifelse(Location == "Juneau" & Pot.No %in% seperate$Pot_No, "Juneau", "NJ"))) ->dat1
-# seperating the areas since North Juneau does not have density strata - since it's a red crab area
+                       ifelse(Location == "Juneau" & Pot.No %in% seperate$Pot_No, "Juneau", "NJ"))) -> dat2
+# separating the areas since North Juneau does not have density strata - since it's a red crab area
 # and Juneau does since it's based on the Tanner Stephens Passage strata.
-dat1 %>% 
-  filter(area == "NJ") ->dat.NJ
-dat1 %>% 
+dat2 %>% 
+  filter(area == "NJ") -> dat.NJ
+dat2 %>% 
   filter(area == "Juneau") -> dat.SP
 
 #### North Juneau ----------------------
 ###  need to keep barlow (location code 12, 1) and juneau (location code 13, 23) seperate
 ##### Historic file ---------------------------------------
 ### these files are read in above
-#     need to add current years CPUE to the historic CPUE file.  For simplicity reasons this will be inputed for each of the bays.  This will avoid
+#     need to add current year's CPUE to the historic CPUE file.  For simplicity reasons this will be inputed for each of the bays.  This will avoid
 #       any issues with recalculating the crab per pot due to edits in data.
 #       read in historic by pot file and make sure variable names match
 glimpse(NJ_hist) # make sure the column names here match those in dat.NJ
-dat.NJ %>% select(- Latitude.Decimal.Degrees, -Longitude.Decimal.Degrees) -> dat.NJ
-NJ_hist %>% select ( -X ) -> NJ_hist
-data.NJ.all <- rbind(NJ_hist, dat.NJ)
+dat.NJ %>% select(- Latitude.Decimal.Degrees, -Longitude.Decimal.Degrees) -> dat.NJ2
+NJ_hist %>% select ( -X ) -> NJ_hist2
+data.NJ.all <- rbind(NJ_hist2, dat.NJ2)
 write.csv(data.NJ.all, paste0('./results/tanner/nj_stp/', cur_yr,'/NJ_rawdata_all.csv'))
 
 ### data manipulations ----------------------
@@ -123,18 +134,19 @@ data.NJ.all %>%
 #Now summarize by pot - only one area - NJ
 Tdat1 %>%
   group_by(Year, area, sub_area, Pot.No, mod_recruit) %>% # use area here instead of location due to multiple location names for one survey area
-  summarise(crab = sum(Number.Of.Specimens)) -> dat2
+  summarise(crab = sum(Number.Of.Specimens)) -> Tdat2
 
-dat3 <- dcast(dat2, Year + area + sub_area + Pot.No ~ mod_recruit, sum, drop=TRUE)
-head(dat3)# check to make sure things worked.
+Tdat3 <- dcast(Tdat2, Year + area + sub_area + Pot.No ~ mod_recruit, sum, drop=TRUE)
+head(Tdat3)# check to make sure things worked.
 #write.csv(dat3, './results/nj_stp/dat3.csv')
 
 # No weighting by strata here for RKCS data due to it being designed for RKC.
 
 ##### CPUE historic -----------------------------------
-#This version is ready to calculate CPUE for each recruit class
-#Calculates a  mean CPUE and SE for each recruit class # not weighted due to lack of tanner specific strata on red crab survey
-dat3 %>%
+# This version is ready to calculate CPUE for each recruit class
+# Calculates a  mean CPUE and SE for each recruit class 
+# not weighted due to lack of tanner specific strata on red crab survey
+Tdat3 %>%
   group_by(Year) %>%
   summarise(Pre_Recruit_u = mean(Pre_Recruit), PreR_SE = (sd(Pre_Recruit)/(sqrt(sum(!is.na(Pre_Recruit))))), 
             Recruit_u = mean(Recruit), Rec_SE = (sd(Recruit)/(sqrt(sum(!is.na(Recruit))))), 
@@ -159,9 +171,9 @@ NJ_cpue_historic %>%
 
 # can I use red crab function here?  **FIX**
 #source('./code/functions.R')
-head(dat3)
+head(Tdat3)
 
-dat3 %>%
+Tdat3 %>%
   filter(Year >= cur_yr-3) -> dat3a # confirm that is only contains the last 4 years.  
 
 dat3_long <- gather(dat3a, mod_recruit, crab, Juvenile:Small.Females, factor_key = TRUE) # need the long version for this.
@@ -185,7 +197,7 @@ dat3_long %>% # doesn't work with dat2 data because there are no 0's for missing
   select(mod_recruit, r.squared, p.value)-> short_term_out2
 
 short_term_slope %>%
-  right_join(short_term_out2)->short_term_results # estimate here is slope from regression
+  right_join(short_term_out2)-> short_term_results # estimate here is slope from regression
 #Now need to add column for significance and score
 short_term_results %>%
   mutate(significant = ifelse(p.value < 0.05 & slope > 0, 1,
@@ -195,13 +207,13 @@ short_term_results %>%
 write.csv(short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_shortterm.csv'))
 
 dat3_long %>%
-  filter(mod_recruit %in% recruit_used) ->st_dat3_long
-ggplot(st_dat3_long, aes(Year, crab, color = mod_recruit))+geom_point() 
+  filter(mod_recruit %in% recruit_used) -> st_dat3_long
+ggplot(st_dat3_long, aes(Year, crab, color = mod_recruit)) + geom_point() 
 
 ##### Long term trends ---------------------
 #compare current year CPUE distribution to the long term mean
-dat3 %>%
-  filter(Year == cur_yr) ->dat3_current
+Tdat3 %>%
+  filter(Year == cur_yr) -> dat3_current
 #make sure you have a file with only current years data
 baseline %>% 
   filter(AREA == 'NJ') -> baseline_NJ
@@ -215,16 +227,20 @@ t.test(dat3_current$Post_Recruit, mu = baseline_NJ$Post_Recruit)
 
 # **FIX** need to summarize these to save the results - see function for red crab
 # currently these have to be copied into Excel sheet - 'Tanner Matrix 2020(21).xlsx'
+# fixed Oct 2023: use function long_ttest_nj()
 
-##### Weights from length - weight relatinship--------------------
+long_ttest_nj("NJ", cur_yr, baseline, Tdat3)
+
+
+##### Weights from length - weight relationship--------------------
 # Linear model is changed for each area
 # North Juneau linear model: exp(3.16*log(length in mm)-8.84)*2.2/1000
 glimpse(Tdat1) # raw data for all years
 Tdat1 %>%
   mutate(weight_lb = (exp((3.16*log(Width.Millimeters)) - 8.84 ))*(2.2/1000))-> datWL
 
-Mature = c("Pre_Recruit", "Recruit", "Post_Recruit")
-Legal =c("Recruit", "Post_Recruit")
+Mature <- c("Pre_Recruit", "Recruit", "Post_Recruit")
+Legal <- c("Recruit", "Post_Recruit")
 
 datWL %>% 
   group_by(Year) %>% 
@@ -238,10 +254,29 @@ datWL %>%
 
 write.csv(male_weights, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_weights.csv'))
 
-##### survey mid-date --------------------
-Tdat1 %>%
+#### NJ survey mid date -----  
+
+Tdat1_dates <- Tdat1 %>%
   filter(Year == cur_yr) %>%
   distinct(Time.Hauled)
+
+# list of unique dates (day only, excluding time)
+dates <- unique(round_date(ymd_hms(Tdat1_dates$Time.Hauled), unit="day"))
+
+# only survey dates from the current year
+dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
+
+# interval of minimum and maximum survey dates
+date.int <- interval(min(dates.cur, na.rm=TRUE), max(dates.cur, na.rm=TRUE))
+
+# survey midpoint; see functions script for the int_midpoint function
+NJ.sur.midpoint <- int_midpoint(date.int)
+
+# convert to Julian day
+NJ.sur.midpoint.jul <- yday(NJ.sur.midpoint) #agr edited from just sur.midpoint
+
+midpoints.df <- setNames(data.frame(t(c("NJ", as.character(NJ.sur.midpoint)))), c("area", "survey.midpoint.date"))
+
 
 ##### Females - large or mature females --------------------------
 # large or mature females
@@ -252,6 +287,7 @@ Tdat1 %>%
 # this is egg_condition_code == 4
 LgF_Tdat1 %>%
   filter(Egg.Development.Code == 4)
+
 ##### % poor (<10 %) clutch -----------------------------------
 # This selects those rows that do not have an egg percentage.
 # if these rows have a egg. development code and egg condition code then the egg percentage should be there
@@ -264,7 +300,7 @@ LgF_Tdat1 %>%
   filter(is.na(Egg.Percent))
 
 LgF_Tdat1 %>%
-  mutate(Less25 = ifelse(Egg.Percent < 25, "y", "n"))-> LgF_Tdat1 # where 1 is yes and 2 is no
+  mutate(Less25 = ifelse(Egg.Percent < 25, "y", "n")) -> LgF_Tdat1 # where 1 is yes and 2 is no
 
 LgF_Tdat1 %>%
   filter(!is.na(Less25)) %>% 
@@ -275,28 +311,38 @@ poorclutch1 <- dcast(poorclutch, Year + sub_area + Pot.No ~ Less25, sum, drop=TR
 
 poorclutch1 %>%
   mutate(var1 = y / (y+n)) -> poorclutch1
+
 poorclutch1 %>%
   group_by(Year)%>%
   summarise(Pclutch = mean(var1)*100 , 
             Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
+
 write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_low_clutch_cur.csv'), 
           row.names = FALSE)
+
 NJ_lowc_historic %>% 
   filter(Year < 2009) %>% 
   bind_rows(percent_low_clutch) %>% 
   write.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_low_clutch.csv'), row.names = FALSE)
 
 
-##### Long term females -------------------------
+##### NJ Long term females -------------------------
 glimpse(poorclutch1)
+
 #compare current year's CPUE distribution to the long term mean
+#make sure you have a file with only current year's data #AGR TK uhhh. this is more that just the current year's data.
+
 poorclutch1 %>%
-  filter(Year == cur_yr) ->poorclutch1_current
-#make sure you have a file with only current year's data
+  filter(Year == cur_yr) -> poorclutch1_current
+
 #calculate the t.test
 t.test(poorclutch1_current$var1, mu = 0.10) # manually move to Excel sheet
 
-##### Short term females ------------------------
+# update Oct 2023: use function to create csv with this info rather than manually moving to Excel sheet
+poor_clutch_long_njstp(poorclutch1_current, "NJ")
+
+
+##### NJ Short term females ------------------------
 
 #look at trend for the last 4 years.  Need a file with last four years in it 
 head(poorclutch1) # should have the last 4 years from OceanAK
@@ -326,9 +372,11 @@ F_short_term_results %>%
   mutate(significant = ifelse(p.value < 0.05 & estimate > 0, 1,
                               ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
   mutate(score = 0.25*significant) -> F_short_term_results #estimate is slope from regression
+
 # final results with score - save here
 write.csv(F_short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_Fem_shortterm.csv'))
-ggplot(poorclutch1, aes(Year, var1))+geom_point() 
+
+ggplot(poorclutch1, aes(Year, var1)) + geom_point() 
 
 ##### egg percentage overall -----------------------------------
 LgF_Tdat1 %>%
@@ -339,9 +387,11 @@ LgF_Tdat1 %>%
 clutch_by_pot %>%
   group_by(Year)%>%
   summarise(mean = mean(egg_mean), 
-            egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) ->percent_clutch
+            egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) -> percent_clutch
+
 write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/NJ_percent_clutch_cur.csv'), 
           row.names = FALSE)
+
 NJ_clutch_historic %>% 
   filter(Year < 2009) %>% 
   bind_rows(percent_clutch) %>% 
@@ -366,9 +416,10 @@ dat.SP %>%
 
 ##### Historic file ---------------------------------------
 
-#need to add current years CPUE to the historic CPUE file.  For simplicity reasons this will be inputed for each of the bays.  This will avoid
-# any issues with recalculating the crab per pot due to edits in data.
+# Need to add current years CPUE to the historic CPUE file.  For simplicity reasons this will be inputed for each of the bays.  
+# This will avoid any issues with recalculating the crab per pot due to edits in data.
 # read in historic by pot file and make sure variable names match
+
 glimpse(SP_hist) # make sure the column names here match those in dat.NJ
 
 dat.SP %>% 
@@ -409,7 +460,7 @@ Tdat1 %>%
 
 dat3 <- dcast(dat2, Year + area + Pot.No + Tanner.Density.Strata.Code ~ mod_recruit, sum, drop=TRUE)
 # write.csv(dat3, paste0('./results/nj_stp/', cur_yr, '/SP_dat3.csv'))
-# Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has it's own area file or area per
+# Join area input file with dat3 - which is the data summarized by pot.  Each sampling area has its own area file or area per
 #     strata.  This is used to calculating the weighting for weighted CPUE.
 dat3 %>%
   right_join(area) -> tab
@@ -427,7 +478,7 @@ tab %>%
   right_join(pots_per_strata) -> dat4
 
 dat4 %>%
-  mutate(inverse_n = 1 / npots, weighting = inverse_n * Area_km) ->dat5
+  mutate(inverse_n = 1 / npots, weighting = inverse_n * Area_km) -> dat5
 
 #check to make sure there aren't crab without a assigned recruit class. 
 dat5 %>%
@@ -491,20 +542,23 @@ short_term_results %>%
 write.csv(short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_shortterm.csv'))
 
 dat3_long %>%
-  filter(mod_recruit %in% recruit_used) ->st_dat3_long
+  filter(mod_recruit %in% recruit_used) -> st_dat3_long
+
 ggplot(st_dat3_long, aes(Year, crab))+geom_point() +facet_wrap (~ mod_recruit)
 
 ##### Long term trends ---------------------
 #compare current year CPUE distribution to the long term mean
+
+# make sure you have a file with only current year's data
 dat5 %>%
-  filter(Year == cur_yr) ->dat5_current
-#make sure you have a file with only 2016 data
+  filter(Year == cur_yr) -> dat5_current
+
 # long term baseline values are different for each area, I guess make a file for each area?
-#
+
 # the y = has to be changed for each area but once they are set they are the same from year to year
 # THIS NEEDS TO BE A WEIGHTED MEAN - see processingCODE.R
 dat5_current %>%
-  filter(area == "Juneau") ->long_term_current
+  filter(area == "Juneau") -> long_term_current
 wtd.t.test(long_term_current$Large.Females, y = 5.32, 
            weight = long_term_current$weighting, samedata=FALSE)
 wtd.t.test(long_term_current$Pre_Recruit, y = 4.24, 
@@ -513,16 +567,20 @@ wtd.t.test(long_term_current$Recruit, y = 4.64,
            weight = long_term_current$weighting, samedata=FALSE)
 wtd.t.test(long_term_current$Post_Recruit, y = 2.64, weight = long_term_current$weighting, samedata=FALSE)
 
+# update Oct 2023: now can use function long_ttest_sp() to create a csv file containing these results
+long_ttest_sp(data5_current, "SP", cur_yr)
 
-##### Weights from length - weight relatinship--------------------
+
+
+##### Weights from length - weight relationship--------------------
 # Linear model is changed for each area
 # stephens passage linear model: exp(3.38*log(length in mm)-9.99)*2.2/1000
 glimpse(Tdat1) # raw data for all years
 Tdat1 %>%
   mutate(weight_lb = (exp((3.38*log(Width.Millimeters)) - 9.99 ))*(2.2/1000))-> datWL
 
-Mature = c("Pre_Recruit", "Recruit", "Post_Recruit")
-Legal =c("Recruit", "Post_Recruit")
+Mature <- c("Pre_Recruit", "Recruit", "Post_Recruit")
+Legal <- c("Recruit", "Post_Recruit")
 
 
 datWL %>% 
@@ -538,10 +596,30 @@ datWL %>%
 
 write.csv(male_weights, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_weights.csv'))
 
-##### survey mid-date --------------------
-Tdat1 %>%
+#### SP survey mid date -----  
+
+Tdat1_dates <- Tdat1 %>%
   filter(Year == cur_yr) %>%
   distinct(Time.Hauled)
+
+# list of unique dates (day only, excluding time)
+dates <- unique(round_date(ymd_hms(Tdat1_dates$Time.Hauled), unit="day"))
+
+# only survey dates from the current year
+dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
+
+# interval of minimum and maximum survey dates
+date.int <- interval(min(dates.cur, na.rm=TRUE), max(dates.cur, na.rm=TRUE))
+
+# survey midpoint; see functions script for the int_midpoint function
+SP.sur.midpoint <- int_midpoint(date.int)
+
+# convert to Julian day
+SP.sur.midpoint.jul <- yday(sur.midpoint)
+
+midpoints.df2 <- setNames(data.frame(t(c("SP", as.character(SP.sur.midpoint)))), c("area", "survey.midpoint.date"))
+midpoints.df3 <- rbind(midpoints.df, midpoints.df2)
+write_csv(midpoints.df3, paste0('results/tanner/nj_stp/', cur_yr, '/NP_SP_survey_middates.csv'))
 
 ##### Females - large or mature females --------------------------
 # large or mature females
@@ -552,6 +630,7 @@ Tdat1 %>%
 # this is egg_condition_code == 4
 LgF_Tdat1 %>%
   filter(Egg.Development.Code == 4)
+
 ##### % poor (<10 %) clutch -----------------------------------
 # This selects those rows that do not have an egg percentage.
 # if these rows have a egg. development code and egg condition code then the egg percentage should be there
@@ -574,21 +653,27 @@ poorclutch1 <- dcast(poorclutch, Year + area + Pot.No ~ Less25, sum, drop=TRUE)
 
 poorclutch1 %>%
   mutate(var1 = y / (y+n)) -> poorclutch1
+
 poorclutch1 %>%
   group_by(area, Year)%>%
   summarise(Pclutch = mean(var1)*100 , 
             Pclutch.se = ((sd(var1))/sqrt(sum(!is.na(var1))))*100) -> percent_low_clutch
+
 write.csv(percent_low_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percent_low_clutch.csv'))
 
-##### Long term females -------------------------
+##### SP Long term females -------------------------
 glimpse(poorclutch1)
 #compare 2016 CPUE distribution to the long term mean
 poorclutch1 %>%
-  filter(Year == cur_yr) ->poorclutch1_current
+  filter(Year == cur_yr) -> poorclutch1_current
 #make sure you have a file with only 2016 data
 #calculate the t.test
 t.test(poorclutch1_current$var1, mu = 0.10)
-##### Short term females ------------------------
+
+# update Oct 2023: use function to create csv with this info rather than manually moving to Excel sheet
+poor_clutch_long_njstp(poorclutch1_current, "SP")
+
+##### SP Short term females ------------------------
 
 #look at trend for the last 4 years.  Need a file with last four years in it 
 head(poorclutch1) # should have the last 4 years from OceanAK
@@ -616,8 +701,10 @@ F_short_term_results %>%
   mutate(significant = ifelse(p.value < 0.05 & estimate > 0, 1,
                               ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
   mutate(score = 0.25*significant) -> F_short_term_results #estimate is slope from regression
+
 # final results with score - save here
 write.csv(F_short_term_results, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_Fem_shortterm.csv'))
+
 ggplot(poorclutch1, aes(Year, var1))+geom_point() 
 
 ##### egg percentage overall -----------------------------------
@@ -628,20 +715,31 @@ LgF_Tdat1 %>%
 
 clutch_by_pot %>%
   group_by(Location, Year)%>%
-  summarise(mean = mean(egg_mean), egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) ->percent_clutch
+  summarise(mean = mean(egg_mean), egg.se = (sd(egg_mean)/sqrt(sum(!is.na(egg_mean))))) -> percent_clutch
+
 write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percent_clutch.csv'))
 
+##### total stock health for both NJ and SP -----------------------------------
+total_health_njsp(cur_yr)
 
-## !!!!!!!!!!!!! update biomass.csv file before running figure creation 
+## !!!!!!!!!!!!! update biomass.csv file before running figure creation #AGR TK here - need tp run CSA for NJ and SP
 # this needs to be updated from CSA runs for 2021 for SP and NJ
 
-# panel figure SP ---------------
+# confidential panel figure SP ---------------
 #survey.location = "Juneau"
 #area = "Stephens Passage"
 #abrv = "SP"
 
-panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 2)
-panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 3)
+panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 2, "include")
+panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 3, "include")
+
+# nonconfidential panel figure SP ---------------
+#survey.location = "Juneau"
+#area = "Stephens Passage"
+#abrv = "SP"
+
+panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 2, "exclude")
+panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 3, "exclude")
 
 # presentation figures----------------
 # old function - needs to be updated.
@@ -649,15 +747,24 @@ panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 3)
 #panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 3)
 
 
-# panel figure NJ ----
+# confidential panel figure NJ ----
 # issues is that prior to 2009 don't have good idea of what raw data is used.  Take CPUE/SE and 
 #     female info from Sigma Plot file.
 #survey.location = "North Juneau"
 #area = "North Juneau"
 #abrv = "NJ"
-panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 2)
-panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 3)
+panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 2, "include")
+panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 3, "include")
 
-# presentation figures----------------
+# nonconfidential panel figure NJ ---------------
+#survey.location = "North Juneau"
+#area = "North Juneau"
+#abrv = "NJ"
+
+panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 2, "exclude")
+panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 3, "exclude")
+
+
+# presentation figures---------------- #AGR tk not sure I need these below...
 panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 2)
 panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 3)

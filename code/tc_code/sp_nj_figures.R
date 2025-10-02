@@ -1,12 +1,14 @@
 # K.Palof 11-28-18
-# Functions to create figures for Stephens Passage (Juneau) and North Juneau.  Need seperate functions due 
+# Functions to create figures for Stephens Passage (Juneau) and North Juneau.  Need separate functions due 
 # how data is compiled.
 
 #####Load -------------
 source('./code/tanner_functions.R')
 
+n_yr <- cur_yr + 1
+
 ## CONF panel figure ---------------
-panel_figure_J <- function(survey.location, cur_yr, area, abrv, option){
+panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
   # survey.location here are codes: Juneau, North Juneau
   # area is used in biomass /harvest file:  Icy Strait, Glacier Bay, 
   # Holkham Bay, Thomas Bay, Stephens Passage, North Juneau, Lynn Sisters, Pybus Bay, 
@@ -16,6 +18,8 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option){
   # option refers to output from this function. 
   # Option 1 - all 4 on one file, Option 2 - just p1, p4 (males), 
   # Option 3 - p2,p3 (females)
+  # confidential - whether to include confidential data, if "include" then include all data, 
+  #               if "exclude" then remove confidential data (i.e. Non-conf graphs)
   CPUE_wt_graph <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr,
                                    '/', abrv, '_CPUE_ALL.csv'))
   poorclutch_summary <- read.csv(paste0('./results/tanner/nj_stp/', cur_yr, '/', abrv, '_percent_low_clutch.csv'))
@@ -24,7 +28,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option){
   # file with year and mean percent poor clutch and se poor clutch 
   baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
   baseline_rkc <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
-  biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))
+  biomass <- read.csv(paste0('./data/tanner/tanner_', n_yr, '_biomassmodel.csv'))
   harvest <- read.csv(paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
   # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
@@ -105,7 +109,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option){
   ## poor clutch --------
   poorclutch_summary %>% # this data is coming in as a percentage not a ratio
     #filter(Location == survey.location) %>% 
-    select(Year, Pclutch, Pclutch.se) ->poorclutch_summary_a
+    select(Year, Pclutch, Pclutch.se) -> poorclutch_summary_a
   ## mean egg percent -------
   egg_mean_all %>% 
     #filter(Location == survey.location) %>% 
@@ -128,9 +132,14 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option){
   
   ## biomass manipulations -----------------
   # file for all locations.  Has preR, legal, and mature biomass from CSAs
+  if(conf == "exclude"){
+    harvest %>% 
+      filter(confidential == "n") -> harvest
+  }
+  
   harvest %>% 
     filter(Year >= 1997) %>%
-    select(Year, Area = survey.area, pounds) ->harvest_a
+    select(Year, Area = survey.area, pounds) -> harvest_a
   
   biomass %>% 
     merge(harvest_a, by = c("Year", "Area"), all = TRUE) %>% 
@@ -275,9 +284,17 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option){
                 panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
                 ifelse(option == 3, 
                        panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
-                option, '.png'), panel,  
-         dpi = 800, width = 8, height = 9.5)
+  
+  
+  if(conf == "exclude"){  
+    ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
+                  option, '_nonconf.png'), panel,  
+           dpi = 800, width = 8, height = 9.5)}
+  if(conf == "include"){
+    ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
+                  option, 'confidential.png'), panel,  
+           dpi = 800, width = 8, height = 9.5)}
+  
 }
 
 ## CONF NJ panel figure ---------------
@@ -517,7 +534,7 @@ panel_figure_jnu_pres <- function(survey.location, cur_yr, area, abrv, option){
   # Option 3 - p2,p3 (females)
   CPUE_wt_graph <- read.csv(paste0('./results/nj_stp/', cur_yr,
                                    '/', abrv, '_CPUE_ALL.csv'))
-  poorclutch_summary <- read.csv(paste0('./results/nj_stp/', cur_yr, '/', abrv, '_precent_low_clutch.csv'))
+  poorclutch_summary <- read.csv(paste0('./results/nj_stp/', cur_yr, '/', abrv, '_percent_low_clutch.csv'))
   egg_mean_all <- read.csv(paste0('./results/nj_stp/', cur_yr,
                                   '/', abrv, '_percent_clutch.csv'))
   # file with year and mean percent poor clutch and se poor clutch 
