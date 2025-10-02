@@ -1,4 +1,4 @@
-# K.Palof 10-16-18 updated / 10-16-19 / 11-9-2020 / 11-3-2021/ 10-19-22
+# K.Palof 10-16-18 updated / 10-16-19 / 11-9-2020 / 11-3-2021/ 10-19-22/ AGR 10-2-24
 # Code to review logbook data for Tanner crab fishery.
 # needed to separate out catch for Lynn Sisters and North Juneau, previously done in .JMP and Excel
 
@@ -11,11 +11,11 @@ library(tidyverse)
 library(readxl)
 
 ## global ------
-cur_yr <- 2024 # update annually
+cur_yr <- 2025 # update annually
 
 #####Load Data -------------------------------------
 
-logb <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr, '.csv')) # all data 
+logb <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr, '.csv')) # all data- pull from OceanAK- in agreich/SE Tanner Crab- just this year 
 logb_all <- read.csv(paste0('./results/tanner/harvest/', cur_yr-1, '/logbook_11510_all.csv')) # bring in previous yrs percentages
 # This is the master file with the percentage of catch in each year that is attributed to NJ or LS - it is added to and saved at the end 
 #    of this file for the following year
@@ -68,6 +68,10 @@ percent_assigned_cur <- log11510 %>%
   mutate(percent = crabs/total_no, YEAR = Year) %>% ## edits due to pulling data from OceanAK and having column name changes
   select(survey.area, YEAR, crabs, pots, total_no, percent) %>%
   filter(is.na(survey.area) == FALSE) # delete this after dealing with NAs
+
+#create a "2025" folder in the results/tanner/harvest folder
+output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
+dir.create(output_path)
 
 write.csv(percent_assigned_cur, paste0('./results/tanner/harvest/', cur_yr,'/logbook_11510_', cur_yr,'.csv'))
 

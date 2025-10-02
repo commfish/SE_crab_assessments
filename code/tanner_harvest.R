@@ -21,15 +21,15 @@ windowsFonts(Times=windowsFont("TT Times New Roman"))
 theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
             theme(panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank()))
-cur_yr = 2024
+cur_yr = 2025
 pr_yr = cur_yr-1
 output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
-dir.create(output_path) 
+#dir.create(output_path) 
 
 # Data ---------------------------------------------------
 # change input file to most recent year's catch from OceanAK for each
 #harvest <- read.csv("./data/harvest/tanner_harvest_2024.csv") # TK need to download from oceanak (ugh) and update yera every yera
-harvest <- read.csv("./data/harvest/2024 Detailed Fish Tickets_Tanner(1).csv")  #got from Tessa's OceakAK search, adding  Batch Year and Sum of Animals to the query.
+harvest <- read.csv("./data/harvest/2025 Detailed Fish Tickets_Tanner.csv")  #got from Tessa's OceakAK search, adding  Batch Year and Sum of Animals to the query.
 glimpse(harvest)
 
 #harvest_all <- read.csv("./data/Tanner_Detailed Fish Tickets_98_18.csv")
@@ -46,14 +46,14 @@ logb11510 <- read.csv(paste0('./results/tanner/harvest/', cur_yr,'/logbook_11510
 
 # these are for calculating std cpue
 #logbook <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr,'.csv')) %>% filter(Year > 2019)
-logbook <- read.csv(paste0('./data/harvest/tanner_logbook_2020_', cur_yr,'.csv'))
-logbook_all <- read_excel(path = "./data/harvest/All_logbook_tanner.xlsx", sheet = "AlexData") # from ALEX not in OCEAN AK
-# only goes to 2019
+logbook <- read.csv(paste0('./data/harvest/tanner_logbook_2020_', cur_yr,'.csv')) # get this from Oracle and name for the current year
+logbook_all <- read_excel(path = "./data/harvest/All_logbook_tanner.xlsx", sheet = "AlexData") # from ALEX not in OCEAN AK; the historical data, it's in the folder- AGR
+# only goes to 2019- which is why we have logbook to bind with that
 
 # data clean up --------
 ## need to update this output from OceanAK to be only region 1....**FIX**
 harvest %>% 
-  filter(Batch.Year == cur_yr & Office.Name == 'Petersburg') %>% 
+  filter(Batch.Year == cur_yr & Office.Name == 'Petersburg') %>% #agr- maybe pull castern data- maybe it's fomratted better FLAG**
   dplyr::rename(Year = Batch.Year) -> harvest2
   
 ### current year ----------------------
