@@ -1,6 +1,6 @@
 # K.Palof 10-16-18 updated / 10-16-19 / 11-9-2020 / 11-3-2021/ 10-19-22
 # Code to review logbook data for Tanner crab fishery.
-# needed to seperate out catch for Lynn Sisters and North Juneau, previously done in .JMP and Excel
+# needed to separate out catch for Lynn Sisters and North Juneau, previously done in .JMP and Excel
 
 # logbook data from ALEX (as of 10-16-18) pull only data from district 115 - have to sort here for sub-district 10
 #    since that's all that is needed. Pull for all years and save file in results/tanner 
@@ -11,7 +11,7 @@ library(tidyverse)
 library(readxl)
 
 ## global ------
-cur_yr <- 2023 # update annually
+cur_yr <- 2024 # update annually
 
 #####Load Data -------------------------------------
 

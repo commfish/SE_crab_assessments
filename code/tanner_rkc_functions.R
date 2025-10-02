@@ -10,7 +10,7 @@ library(broom)
 library(kableExtra)
 library(xtable)
 library(flextable)
-
+library(lubridate)
 library(reshape)
 library(stringr)
 library(reshape2)
@@ -37,6 +37,11 @@ windowsFonts(Times=windowsFont("TT Times New Roman"))
 theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
             theme(panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank()))
+
+### calculate midpoint date function ----------------
+int_midpoint <- function(interval) {
+  round_date(int_start(interval) + (int_end(interval) - int_start(interval))/2, unit="day")
+}
 
 ### short term function ----------------
 #input is file with last four years of data summarized by pot
@@ -127,6 +132,89 @@ long_ttest <- function(area, year, baseline, bypot){
 ### function to loop long term function above ------------
 long_loop_17 <- function(x, curyr){
   long_ttest(x, curyr, baseline = baseline, bypot = dat3)
+}
+
+### long-term functions for NJ SP areas -----------------
+
+long_ttest_nj <- function(area, year, baseline, bypot){
+  baseline %>% 
+    filter(AREA == area) -> baseline_values
+  bypot %>% 
+    filter(area == area & Year == year) -> data.use
+  lfem <- t.test(data.use$Large.Females, mu = baseline_values$Large.Female)
+  prer <- t.test(data.use$Pre_Recruit, mu = baseline_values$Pre_Recruit)
+  rec <- t.test(data.use$Recruit, mu = baseline_values$Recruit)
+  postr <- t.test(data.use$Post_Recruit, mu = baseline_values$Post_Recruit)
+  
+  long_term <- matrix(nrow = 4, ncol = 3)
+  rownames(long_term) <- c("large.female", "pre.recruit", "recruit", "post.recruit")
+  colnames(long_term) <- c("mean", "p.value", "lt.mean")
+  
+  long_term[1,1] <-lfem$estimate
+  long_term[1,2] <- lfem$p.value
+  long_term[1,3] <- lfem$null.value
+  long_term[2,1] <-prer$estimate
+  long_term[2,2] <- prer$p.value
+  long_term[2,3] <- prer$null.value
+  long_term[3,1] <-rec$estimate
+  long_term[3,2] <- rec$p.value
+  long_term[3,3] <- rec$null.value
+  long_term[4,1] <-postr$estimate
+  long_term[4,2] <- postr$p.value
+  long_term[4,3] <- postr$null.value
+  
+  long_term_results <- as.data.frame(long_term)
+  
+  long_term_results %>%
+    mutate(significant = ifelse(p.value < 0.05 & mean > lt.mean, 1,
+                                ifelse(p.value <0.05 & mean < lt.mean, -1, 0))) %>% 
+    mutate(recruit.status = c("large.female", "pre.recruit", "recruit", "post.recruit")) %>% 
+    mutate( AREA = area) -> long_term_results #estimate is slope from regression
+  
+  # final results with score - save here
+  write_csv(long_term_results, paste0('results/tanner/nj_stp/', cur_yr, '/', area, '_longterm.csv'))
+}
+
+
+long_ttest_sp <- function(data5_current, area, year){
+  dat5_current %>%
+    filter(area == "Juneau") -> long_term_current
+  
+  lfem <- wtd.t.test(long_term_current$Large.Females, y = 5.32, 
+             weight = long_term_current$weighting, samedata=FALSE)
+  prer <- wtd.t.test(long_term_current$Pre_Recruit, y = 4.24, 
+             weight = long_term_current$weighting, samedata=FALSE)
+  rec <- wtd.t.test(long_term_current$Recruit, y = 4.64, 
+             weight = long_term_current$weighting, samedata=FALSE)
+  postr <- wtd.t.test(long_term_current$Post_Recruit, y = 2.64, weight = long_term_current$weighting, samedata=FALSE)
+  
+  long_term <- matrix(nrow = 4, ncol = 3)
+  rownames(long_term) <- c("large.female", "pre.recruit", "recruit", "post.recruit")
+  colnames(long_term) <- c("mean", "p.value", "lt.mean")
+  
+  long_term[1,1] <-lfem$additional[["Mean"]]
+  long_term[1,2] <- lfem$coefficients[["p.value"]]
+  long_term[1,3] <- lfem$additional[["Alternative"]]
+  long_term[2,1] <-prer$additional[["Mean"]]
+  long_term[2,2] <- prer$coefficients[["p.value"]]
+  long_term[2,3] <- prer$additional[["Alternative"]]
+  long_term[3,1] <-rec$additional[["Mean"]]
+  long_term[3,2] <- rec$coefficients[["p.value"]]
+  long_term[3,3] <- rec$additional[["Alternative"]]
+  long_term[4,1] <-postr$additional[["Mean"]]
+  long_term[4,2] <- postr$coefficients[["p.value"]]
+  long_term[4,3] <- postr$additional[["Alternative"]]
+  
+  long_term_results <- as.data.frame(long_term)
+  
+  long_term_results %>%
+    mutate(significant = ifelse(p.value < 0.05 & mean > lt.mean, 1,
+                                ifelse(p.value <0.05 & mean < lt.mean, -1, 0))) %>% 
+    mutate(recruit.status = c("large.female", "pre.recruit", "recruit", "post.recruit")) %>% 
+    mutate(area = area) -> long_term_results #estimate is slope from regression
+  
+  # final results with score - save here
+  write_csv(long_term_results, paste0('results/tanner/nj_stp/', cur_yr, '/', area, '_longterm.csv'))
 }
 
 ## weight-length function -------------
@@ -234,6 +322,26 @@ poor_clutch_short <- function(females_all, year){
   write_csv(short_term_results, paste0('results/tanner/tanner_rkc/', year, '/female_shortterm.csv'))
 }
 
+### female poor clutch long term for NJ STP -------
+poor_clutch_long_njstp <- function(poorclutch_current, area){
+  poorclutch_current -> data.use
+  lt_female <- t.test(data.use$var1, mu = 0.10)
+  
+  longt_female <- matrix(nrow = 1, ncol = 2)
+  rownames(longt_female) <- c("large.female")
+  colnames(longt_female) <- c("mean", "p.value")
+  
+  longt_female[1,1] <-mean(data.use$var1)
+  longt_female[1,2] <- lt_female$p.value
+  
+  longt_female <- as.data.frame(longt_female)
+  longt_female %>%
+    mutate(significant = ifelse(p.value < 0.05 & mean > 0.10, -1,
+                                ifelse(p.value <0.05 & mean < 0.10, 1, 0))) %>% 
+    mutate(recruit.status = c("large.female")) %>% 
+    mutate(area = area) -> longt_female #estimate is slope from regression
+  write.csv(longt_female, paste0('./results/tanner/nj_stp/', cur_yr, '/', area, '_female_long_term.csv'))
+}
 
 ### total stock health table --------------
 total_health <- function(area, year){
@@ -265,20 +373,105 @@ total_health <- function(area, year){
     summarise(score = lt_sigf + sigf + lf_sigf + sf_sigf) -> sum_all
   
  # summary score add stock health status
-  sum_all %>%
-    mutate(health_status = ifelse(score < -4.25, "poor", 
-                                  ifelse(score > -4.25 & score<= -1.75, 
-                                   "below average", 
-                                   ifelse(score > -1.75 & score <= 1.5, "moderate", 
-                                    ifelse(score > 1.75 & score <= 4.25, "above average", 
-                                     ifelse(score > 4.25, "healthy", "unknown")))))) %>% 
-    mutate (harvest_per = ifelse(health_status == "poor", 0, 
-                                 ifelse(health_status == "below average", 0.05, 
-                                  ifelse(health_status == "moderate", 0.10, 
-                                   ifelse(health_status == "above average", 0.15,
-                                    ifelse(health_status == "healthy", 0.20, "unk")))))) -> stock_health
+  #sum_all %>%
+    #mutate(health_status = ifelse(score < -4.25, "poor", 
+                                  #ifelse(score > -4.25 & score<= -1.75, 
+                                   #"below average", 
+                                   #ifelse(score > -1.75 & score <= 1.5, "moderate", 
+                                    #ifelse(score > 1.75 & score <= 4.25, "above average", 
+                                     #ifelse(score > 4.25, "healthy", "unknown")))))) %>% 
+    #mutate (harvest_per = ifelse(health_status == "poor", 0, 
+                                 #ifelse(health_status == "below average", 0.05, 
+                                  #ifelse(health_status == "moderate", 0.10, 
+                                   #ifelse(health_status == "above average", 0.15,
+                                    #ifelse(health_status == "healthy", 0.20, "unk")))))) -> stock_health
+  stock_health <- sum_all %>%
+    mutate(health_status = case_when(
+      score < -3.25 ~ "poor",
+      score >= -3.25 & score < -1.25 ~ "below average",
+      score >= -1.25 & score <= 1.25 ~ "moderate",
+      score > 1.25 & score <= 3.25 ~ "above average",
+      score > 3.25 ~ "healthy"
+    )) %>%
+    mutate(harvest_per = case_when(
+      health_status == "poor" ~ 0,
+      health_status == "below average" ~ 0.05,
+      health_status == "moderate" ~ 0.10,
+      health_status == "above average" ~ 0.15,
+      health_status == "healthy" ~ 0.20
+    ))
   #select ( - score_f) -> stock_health
   write_csv(stock_health, paste0('results/tanner/', area, '/', year, '/stock_health.csv'))
+}
+
+
+### total stock health table for SP and NJ areas --------------
+total_health_njsp <- function(year){
+  NJ_longterm <- read_csv(paste0('results/tanner/nj_stp/', year, '/NJ_longterm.csv')) %>% mutate(Location = AREA) %>% select(-AREA)
+  NJ_shortterm <- read_csv(paste0('results/tanner/nj_stp/',  year, '/NJ_shortterm.csv')) %>% mutate(Location = c("NJ", "NJ", "NJ", "NJ"))
+  NJ_lt_female <- read_csv(paste0('results/tanner/nj_stp/',  year, '/NJ_female_long_term.csv'))
+  NJ_short_female <- read_csv(paste0('results/tanner/nj_stp/', year, '/NJ_Fem_shortterm.csv')) %>% mutate(Location = "NJ")
+  SP_longterm <- read_csv(paste0('results/tanner/nj_stp/', year, '/SP_longterm.csv')) %>% mutate(Location = area) %>% select(-area)
+  SP_shortterm <- read_csv(paste0('results/tanner/nj_stp/',  year, '/SP_shortterm.csv')) %>% mutate(Location = c("SP", "SP", "SP", "SP"))
+  SP_lt_female <- read_csv(paste0('results/tanner/nj_stp/',  year, '/SP_female_long_term.csv')) 
+  SP_short_female <- read_csv(paste0('results/tanner/nj_stp/', year, '/SP_Fem_shortterm.csv')) %>% mutate(Location = "SP") %>% select(-area)
+  
+  longterm <- rbind(NJ_longterm, SP_longterm)
+  shortterm <- rbind(NJ_shortterm, SP_shortterm)
+  lt_female <- rbind(NJ_lt_female, SP_lt_female)
+  short_female <- rbind(NJ_short_female, SP_short_female)
+  
+  longterm %>% 
+    group_by(Location) %>% 
+    summarise(lt_sigf = sum(significant)) -> t1
+  shortterm %>% 
+    group_by(Location) %>% 
+    summarise(sigf = sum(score)) -> t2
+  lt_female %>% 
+    group_by(area) %>% 
+    summarise(lf_sigf = sum(significant)) %>% 
+    mutate(Location = area) %>% 
+    select(Location,lf_sigf) -> t3
+  short_female %>% 
+    group_by(Location) %>% 
+    summarise(sf_sigf = sum(score)) -> t4
+  
+  t1 %>% 
+    left_join(t2) %>% 
+    left_join(t3) %>% 
+    left_join(t4) %>% 
+    group_by(Location) %>% 
+    summarise(score = lt_sigf + sigf + lf_sigf + sf_sigf) -> sum_all
+  
+  # summary score add stock health status
+  #stock_health <- sum_all %>%
+  #mutate(health_status = ifelse(score < -4.25, "poor", 
+  #ifelse(score > -4.25 & score<= -1.75, 
+  #"below average", 
+  #ifelse(score > -1.75 & score <= 1.5, "moderate", 
+  #ifelse(score > 1.75 & score <= 4.25, "above average", 
+  #ifelse(score > 4.25, "healthy", "unknown")))))) %>% 
+  #mutate (harvest_per = ifelse(health_status == "poor", 0, 
+  #ifelse(health_status == "below average", 0.05, 
+  #ifelse(health_status == "moderate", 0.10, 
+  #ifelse(health_status == "above average", 0.15,
+  #ifelse(health_status == "healthy", 0.20, "unk"))))))
+  stock_health <- sum_all %>%
+    mutate(health_status = case_when(
+      score < -3.25 ~ "poor",
+      score >= -3.25 & score < -1.25 ~ "below average",
+      score >= -1.25 & score <= 1.25 ~ "moderate",
+      score > 1.25 & score <= 3.25 ~ "above average",
+      score > 3.25 ~ "healthy"
+    )) %>%
+    mutate(harvest_per = case_when(
+      health_status == "poor" ~ 0,
+      health_status == "below average" ~ 0.05,
+      health_status == "moderate" ~ 0.10,
+      health_status == "above average" ~ 0.15,
+      health_status == "healthy" ~ 0.20
+    ))
+  write_csv(stock_health, paste0('results/tanner/nj_stp/', year, '/NJSP_stock_health.csv'))
 }
 
 
@@ -301,7 +494,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                                   '/RKCS_percent_clutch.csv'))
   # file with year and mean percent poor clutch and se poor clutch 
   baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
-  biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))
+  biomass <- read.csv(paste0('./data/tanner/tanner_', n_yr, '_biomassmodel.csv'))
   harvest <- read.csv(paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
                                     # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
@@ -553,8 +746,8 @@ panel_figure_pres <- function(survey.location, cur_yr, area, option, conf){
                                   '/RKCS_percent_clutch.csv'))
   # file with year and mean percent poor clutch and se poor clutch 
   baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
-  biomass <- read.csv("./data/tanner/tanner_rkc/tanner_2018_biomassmodel.csv") 
-  harvest <- read.csv("./results/tanner/tanner_rkc/tanner_comm_catch_97_2018_confid.csv") # needs to be updated with
+  biomass <- read.csv("./data/tanner/tanner_rkc/tanner_", n_yr, "_biomassmodel.csv") 
+  harvest <- read.csv("./results/tanner/tanner_rkc/tanner_comm_catch_97_", cur_yr, "_confid.csv") # needs to be updated with
   # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   

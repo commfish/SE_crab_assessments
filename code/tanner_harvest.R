@@ -8,14 +8,28 @@
 
 # Load ---------------------------
 library(tidyverse)
-cur_yr = 2022
+library(readxl)
+library(extrafont)
+library(grid)
+library(gridExtra)
+library(lubridate)
+
+#font_import()
+loadfonts(device="win")
+windowsFonts(Times=windowsFont("TT Times New Roman"))
+
+theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
+            theme(panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank()))
+cur_yr = 2024
 pr_yr = cur_yr-1
 output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
 dir.create(output_path) 
 
 # Data ---------------------------------------------------
 # change input file to most recent year's catch from OceanAK for each
-harvest <- read.csv("./data/harvest/tanner_harvest.csv")
+#harvest <- read.csv("./data/harvest/tanner_harvest_2024.csv") # TK need to download from oceanak (ugh) and update yera every yera
+harvest <- read.csv("./data/harvest/2024 Detailed Fish Tickets_Tanner(1).csv")  #got from Tessa's OceakAK search, adding  Batch Year and Sum of Animals to the query.
 glimpse(harvest)
 
 #harvest_all <- read.csv("./data/Tanner_Detailed Fish Tickets_98_18.csv")
@@ -23,6 +37,18 @@ harvest_all <- read.csv(paste0('./results/tanner/harvest/', pr_yr, '/comm_catch_
 #harvest_all <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_97_18.csv")
 logb11510 <- read.csv(paste0('./results/tanner/harvest/', cur_yr,'/logbook_11510_all.csv')) # from tanner_logbook.R calculations
 
+#aside test AGR TK- DELETE THIS BLOC
+#test <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr,'.csv'))
+#test2 <- test %>% filter(Year>2019)
+#test3 <- read.csv(paste0('./data/harvest/tanner_logbook_2020_', pr_yr,'.csv'))
+#library(diffr)
+#diffr(test2, test3)
+
+# these are for calculating std cpue
+#logbook <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr,'.csv')) %>% filter(Year > 2019)
+logbook <- read.csv(paste0('./data/harvest/tanner_logbook_2020_', cur_yr,'.csv'))
+logbook_all <- read_excel(path = "./data/harvest/All_logbook_tanner.xlsx", sheet = "AlexData") # from ALEX not in OCEAN AK
+# only goes to 2019
 
 # data clean up --------
 ## need to update this output from OceanAK to be only region 1....**FIX**
@@ -67,6 +93,8 @@ harvest2 %>%
             pounds = sum(Whole.Weight..sum.)) -> harvest2a
 
 write.csv(harvest2a, paste0('./results/tanner/harvest/', cur_yr,'/comm_catch_by_statarea', cur_yr,'.csv'))
+
+#View(harvest2 %>% filter(survey.area =="Stephens Passage"))
 #dat %>%
 #  filter(Stat.Area == 11510, Season == 'Sep2015 - Aug16') %>%
 #  select(Season, CFEC, Stat.Area, )
@@ -76,7 +104,7 @@ harvest2 %>%
 #  filter(Date.of.Landing != '2018-07-13 00:00:00') %>% 
   group_by(Year, survey.area)%>%
   summarise(permits = length(unique(CFEC)), numbers = sum(Number.Of.Animals), 
-            pounds = sum(Whole.Weight..sum.)) -> comm.catch.sum
+            pounds = sum(Whole.Weight..sum.)) -> comm.catch.sum #TK AGR there is an NA here, revisit pease
 
 # lynn sister and north juneau need to be manually split up in area 115-10
 write.csv(comm.catch.sum, paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch', cur_yr,'.csv'))
@@ -90,6 +118,7 @@ harvest2 %>%
 mid.catch %>% 
   group_by(survey.area, Year) %>% 
   summarise(total = sum(numbers)) -> step1
+
 mid.catch %>% 
   left_join(step1) %>% 
   mutate(ratio_catch = numbers/total) -> mid.catch2
@@ -104,7 +133,7 @@ comm.catch.sum %>%
 write.csv(annual_catch, paste0('./results/tanner/harvest/', cur_yr, '/tanner_annual_catch_', cur_yr,'.csv'))
 
 
-### all years ----------------------
+### all years ---------------------- #TK AGR  IDK what is going on heree
  
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
@@ -144,7 +173,7 @@ harvest2 %>%
 harvest_all %>% 
   #mutate(year_caught = Year, Year = Year - 1) %>% # check here and make sure end year is cur_yr above -2, i.e. cur_yr = 2020, end year is 2018
   #select(-X) %>% 
-  bind_rows(harvest2_cur) -> harvest_all_update
+  bind_rows(harvest2_cur) -> harvest_all_update 
 
 # Combine current year ---------
 
@@ -157,16 +186,61 @@ logb11510 %>%
   mutate(year_caught = Year) %>% # this has 'Year' as "year caught" NOT fishery year - fix this above.
   select(-Year) -> logb_merge
 
-stat_11510 <- harvest_all_update %>% 
+#stat_11510 <- harvest_all_update %>% #AGR deactivted chunk
 #harvest_all %>%  # placeholder for updates made in season after initial calcs are done
+ # filter(Stat.Area == 11510) %>% 
+#  left_join(logb_merge) %>% # this has 'Year' as "year caught" NOT fishery year - fix this above.
+ # mutate(no_NJ = numbers*percentNJ,
+  #       no_LS = numbers*(1-percentNJ), 
+   #      lb_NJ = pounds*percentNJ,
+    #     lb_LS = pounds*(1-percentNJ)) %>% 
+ # select(Year, Stat.Area, vessels, people, permits, processor, no_NJ, no_LS, lb_NJ, lb_LS) %>% 
+#  gather("label", "value", 7:10) %>% 
+ # mutate(survey.area = case_when(grepl("NJ", label, ignore.case = TRUE) ~ "North Juneau",
+   #                              grepl("LS", label, ignore.case = TRUE) ~ "Lynn Sisters"), 
+    #     units = case_when(grepl("no", label, ignore.case = TRUE) ~ "numbers", 
+     #                      grepl("lb", label, ignore.case = TRUE) ~ "pounds")) %>% 
+#  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, units, value) %>% 
+ # spread(units, value) %>% 
+#  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds, Year) %>% 
+ # mutate(year_caught = Year + 1) #this does not work - AGR TK
+
+# alternative version since the above one wasn't working - Caitlin's comment #AGR TK here - I have an error here
+#stat_11510 <- harvest_all_update %>% #AGR TK 
+  #harvest_all %>%  # placeholder for updates made in season after initial calcs are done #AGR TK activated
+#  filter(Stat.Area == 11510) %>% 
+ # left_join(logb_merge, by= "year_caught") %>% # this has 'Year' as "year caught" NOT fishery year - fix this above.
+#  mutate(no_NJ = case_when(survey.area %in% c("North Juneau", "Other") ~ numbers*percentNJ, .default = NA)) %>% 
+#  mutate(no_LS = case_when(survey.area %in% c("Lynn Sisters", "Other") ~ numbers*(1 - percentNJ), .default = NA)) %>% 
+# mutate(lb_NJ = case_when(survey.area %in% c("North Juneau", "Other") ~ pounds*percentNJ, .default = NA)) %>% 
+ # mutate(lb_LS = case_when(survey.area %in% c("Lynn Sisters", "Other") ~ pounds*(1 - percentNJ), .default = NA)) %>% 
+#  select(Year, Stat.Area, vessels, people, permits, processor, no_NJ, no_LS, lb_NJ, lb_LS) %>% 
+ # gather("label", "value", 7:10) %>% 
+#  filter(is.na(value) == FALSE) %>%
+ # mutate(survey.area = case_when(grepl("NJ", label, ignore.case = TRUE) ~ "North Juneau",
+  #                               grepl("LS", label, ignore.case = TRUE) ~ "Lynn Sisters"), 
+   #      units = case_when(grepl("no", label, ignore.case = TRUE) ~ "numbers", 
+    #                       grepl("lb", label, ignore.case = TRUE) ~ "pounds")) %>% 
+#  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, units, value) %>% 
+ # spread(units, value) %>% 
+#  select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds, Year) %>% 
+ # mutate(year_caught = Year + 1) 
+
+
+#AGR tK error above - this one also does not work
+
+###START CAITLIN ADD OCT 24
+stat_11510 <- harvest2_cur %>% 
+  #harvest_all %>%  # placeholder for updates made in season after initial calcs are done
   filter(Stat.Area == 11510) %>% 
   left_join(logb_merge) %>% # this has 'Year' as "year caught" NOT fishery year - fix this above.
-  mutate(no_NJ = numbers*percentNJ,
-         no_LS = numbers*(1-percentNJ), 
-         lb_NJ = pounds*percentNJ,
-         lb_LS = pounds*(1-percentNJ)) %>% 
+  mutate(no_NJ = case_when(survey.area %in% c("North Juneau", "Other") ~ numbers*percentNJ, .default = NA)) %>% 
+  mutate(no_LS = case_when(survey.area %in% c("Lynn Sisters", "Other") ~ numbers*(1 - percentNJ), .default = NA)) %>% 
+  mutate(lb_NJ = case_when(survey.area %in% c("North Juneau", "Other") ~ pounds*percentNJ, .default = NA)) %>% 
+  mutate(lb_LS = case_when(survey.area %in% c("Lynn Sisters", "Other") ~ pounds*(1 - percentNJ), .default = NA)) %>% 
   select(Year, Stat.Area, vessels, people, permits, processor, no_NJ, no_LS, lb_NJ, lb_LS) %>% 
   gather("label", "value", 7:10) %>% 
+  filter(is.na(value) == FALSE) %>%
   mutate(survey.area = case_when(grepl("NJ", label, ignore.case = TRUE) ~ "North Juneau",
                                  grepl("LS", label, ignore.case = TRUE) ~ "Lynn Sisters"), 
          units = case_when(grepl("no", label, ignore.case = TRUE) ~ "numbers", 
@@ -174,15 +248,46 @@ stat_11510 <- harvest_all_update %>%
   select(Year, Stat.Area, survey.area, vessels, people, permits, processor, units, value) %>% 
   spread(units, value) %>% 
   select(Year, Stat.Area, survey.area, vessels, people, permits, processor, numbers, pounds, Year) %>% 
-  mutate(year_caught = Year + 1) 
+  mutate(year_caught = Year + 1)
 
+harvest_all_update2 <- harvest_all_update %>%
+  #harvest_all %>%  
+  filter(!(Stat.Area == 11510 & year_caught == cur_yr)) %>% 
+  bind_rows(stat_11510)
+
+#END CAITLIN ADD OCT 24
+
+#AGR ADD Oct 16 2024
+##mid date catch for lynn sistsers. Lynn sisters is two stat areas, ask caitlin to explain it to me later
+mid.catch.ls <- harvest2 %>% filter(Stat.Area %in% c(11510, 11215)) %>% arrange(Date.Fishing.Began) %>%
+  
+  group_by(Date.Fishing.Began) %>%
+  
+  summarise(numbers = sum(Number.Of.Animals),
+            survey.area = max(survey.area),
+            Year= max(Year))
+
+mid.catch.ls %>% 
+  
+  group_by(survey.area, Year) %>% 
+  
+  summarise(total = sum(numbers)) -> step1.ls
+
+mid.catch.ls %>% 
+  
+  left_join(step1.ls) %>% 
+  
+  mutate(ratio_catch = numbers/total) -> mid.catch2.ls
+
+write.csv(mid.catch2.ls, paste0('./results/tanner/harvest/', cur_yr, '/lynnsisters_middate', cur_yr,'.csv'))
+##end AGR add
 
 ### Deal with 11510 -----------
 # - take it out manipulate it above and add it back in
-harvest_all_update %>%
+#harvest_all_update %>%
 #harvest_all %>%  
-  filter(Stat.Area != 11510) %>% 
-  bind_rows(stat_11510) -> harvest_all_update2
+ # filter(Stat.Area != 11510) %>% 
+#  bind_rows(stat_11510) -> harvest_all_update2
 
 # !! this has update catch distribution between LS and NJ for stat area 11510
 write.csv(harvest_all_update2, #pretty sure this should be the data frame with the new 11510
@@ -231,4 +336,68 @@ comm.catch.sum_all %>%
 
 comm.catch.sum_all %>% 
   mutate(confidential = ifelse(permits < 3 | vessels < 3 | people < 3, "y", "n")) -> comm.catch.sum_all_C
+
 write.csv(comm.catch.sum_all_C, paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'_confid.csv'))
+
+
+## std cpue -------------
+
+## data manipulation -------
+
+## current year ---------
+
+logbook1a <- logbook %>% 
+  rename_at(1, ~"Year") %>%
+  filter(Year >= 2020) %>% 
+  select(Year, effort.date = Entry.Date, District, 
+         Sub.district, ADFG_NO = ADFG.Number, pots = Number.of.Pots.Lifted, 
+         numbers = Target.Species.Retained) %>% 
+  mutate(effort.date = as.Date(ymd_hms(effort.date))) %>% 
+  as.data.frame()
+
+logbook1 <- logbook1a %>% 
+  mutate(day = strftime(effort.date, format = "%j"))
+
+# std cpue current year -------
+logbook1 %>% 
+  filter(pots > 0) %>% 
+  arrange(day) %>% 
+  group_by(Year) %>% 
+  arrange(day) %>% 
+  mutate(cum.pots = cumsum(pots), cpue = numbers/pots) %>% 
+  filter(cum.pots <= 12521) %>% 
+  summarise(avg.cpue = mean(cpue), 
+            se = sd(cpue)/sqrt(length(cpue)))
+
+
+## all years -------------
+# add current years data 
+#logbook_all %>% 
+#  bind_rows(logbook) -> logbook_all
+
+# need to convert effort date to day of year
+logbook_all %>% select(Year = YEAR, effort.date = EFFORT_DATE, District = DISTRICT, 
+                       Sub.district = SUB_DISTRICT, ADFG_NO, pots = NUMBER_POTS_LIFTED, 
+                       numbers = TARGET_SPECIES_RETAINED) %>% 
+  as.data.frame() -> logbook_all1 
+
+logbook_all1 %>% 
+  mutate(day = strftime(effort.date, format = "%j")) -> logbook_all1
+
+## add years since 2019 since that's all I have in all logbook data...need to **fix** this. #TK AGR has this been fixed?? Watch out for rbinding repeating years into the final df...
+logbook_all1 %>% 
+  bind_rows(logbook1) -> logbook_all_cur
+### std cpue -----------------
+## determine cumulative pots ordered by day
+cpue_by_year <- logbook_all_cur %>% 
+  filter(pots >0) %>% 
+  arrange(day) %>% 
+  group_by(Year) %>% 
+  arrange(day) %>% 
+  mutate(cum.pots = cumsum(pots), cpue = numbers/pots) %>% 
+  filter(cum.pots <= 12521) %>% 
+  summarise(avg.cpue = mean(cpue, na.rm = TRUE), 
+            se = sd(cpue, na.rm = TRUE)/sqrt(length(cpue))) %>% 
+  as.data.frame()
+
+write_csv(cpue_by_year, paste0('./results/tanner/harvest/', cur_yr, '/std_commercial_cpue' , cur_yr, '.csv'))

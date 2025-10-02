@@ -1,4 +1,5 @@
 #K.Palof 10-20-17
+# C. Stern 2023_11_01
 
 # Functions for processing Tanner crab data from the Tanner crab survey.  
 #   There are four areas, all in one input file. 
@@ -27,14 +28,37 @@ library(purrr)
 library(TMB)
 library(radiant.data)
 
+#font_import()
 loadfonts(device="win")
 windowsFonts(Times=windowsFont("TT Times New Roman"))
+windowsFonts()
+
+loadfonts(quiet = T)
+fonts()
+set_null_device("png")
+
 
 #theme_set(theme_sleek())
 theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
             theme(panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank()))
 
+
+
+### TCS middate function ----------------
+# calculates the survey middate for each Tanner crab survey area
+tcs_survey_middate <- function(area, Tdat1_dates) {
+  dat.use <- filter(Tdat1_dates, Location == area)
+  # list of unique dates (day only, excluding time)
+  dates <- unique(round_date(ymd_hms(dat.use$Time.Hauled), unit="day"))
+  # only survey dates from the current year
+  dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
+  # interval of minimum and maximum survey dates
+  date.int <- interval(min(dates.cur, na.rm=TRUE), max(dates.cur, na.rm=TRUE))
+  # survey midpoint; see functions script for the int_midpoint function
+  sur.midpoint <- round_date(int_start(date.int) + (int_end(date.int) - int_start(date.int))/2, unit="day")
+  setNames(data.frame(t(c(area, as.character(sur.midpoint)))), c("Location", "survey.midpoint.date"))
+}
 
 ### short term function ----------------
 #input is file with last four years of data summarized by pot
@@ -220,19 +244,33 @@ total_health <- function(survey, year){
     summarise(score = lt_sigf + sigf + lf_sigf + sf_sigf) -> sum_all
   
   # summary score add stock health status
-  sum_all %>%
-    mutate(health_status = ifelse(score < -4.25, "poor", 
-                                  ifelse(score > -4.25 & score<= -1.75, 
-                                         "below average", 
-                                         ifelse(score > -1.75 & score <= 1.5, "moderate", 
-                                                ifelse(score > 1.75 & score <= 4.25, "above average", 
-                                                       ifelse(score > 4.25, "healthy", "unknown")))))) %>% 
-    mutate (harvest_per = ifelse(health_status == "poor", 0, 
-                                 ifelse(health_status == "below average", 0.05, 
-                                        ifelse(health_status == "moderate", 0.10, 
-                                               ifelse(health_status == "above average", 0.15,
-                                                      ifelse(health_status == "healthy", 0.20, "unk")))))) -> stock_health
-  #select ( - score_f) -> stock_health
+  #stock_health <- sum_all %>%
+    #mutate(health_status = ifelse(score < -4.25, "poor", 
+                                  #ifelse(score > -4.25 & score<= -1.75, 
+                                         #"below average", 
+                                         #ifelse(score > -1.75 & score <= 1.5, "moderate", 
+                                                #ifelse(score > 1.75 & score <= 4.25, "above average", 
+                                                       #ifelse(score > 4.25, "healthy", "unknown")))))) %>% 
+    #mutate (harvest_per = ifelse(health_status == "poor", 0, 
+                                 #ifelse(health_status == "below average", 0.05, 
+                                        #ifelse(health_status == "moderate", 0.10, 
+                                               #ifelse(health_status == "above average", 0.15,
+                                                      #ifelse(health_status == "healthy", 0.20, "unk"))))))
+  stock_health <- sum_all %>%
+    mutate(health_status = case_when(
+      score < -3.25 ~ "poor",
+      score >= -3.25 & score < -1.25 ~ "below average",
+      score >= -1.25 & score <= 1.25 ~ "moderate",
+      score > 1.25 & score <= 3.25 ~ "above average",
+      score > 3.25 ~ "healthy"
+    )) %>%
+    mutate(harvest_per = case_when(
+      health_status == "poor" ~ 0,
+      health_status == "below average" ~ 0.05,
+      health_status == "moderate" ~ 0.10,
+      health_status == "above average" ~ 0.15,
+      health_status == "healthy" ~ 0.20
+    ))
   write_csv(stock_health, paste0('results/tanner/', survey, '/', year, '/stock_health.csv'))
 }
 
@@ -256,7 +294,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                                   '/all_years_percent_clutch.csv'))
   # file with year and mean percent poor clutch and se poor clutch 
   baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
-  biomass <- read.csv(paste0('./data/tanner/tanner_', cur_yr, '_biomassmodel.csv'))
+  biomass <- read.csv(paste0('./data/tanner/tanner_', n_yr, '_biomassmodel.csv'))
   harvest <- read.csv(paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
   # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
@@ -509,8 +547,8 @@ panel_figure_pres <- function(survey.location, cur_yr, area, option, conf){
                                   '/all_years_percent_clutch.csv'))
   # file with year and mean percent poor clutch and se poor clutch 
   baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
-  biomass <- read.csv("./data/rkc_tanner/tanner_2018_biomassmodel.csv") 
-  harvest <- read.csv("./results/tanner/tanner_comm_catch_97_2018_confid.csv") # needs to be updated with
+  biomass <- read.csv("./data/rkc_tanner/tanner_', n_yr, '_biomassmodel.csv") 
+  harvest <- read.csv("./results/tanner/harvest/", cur_yr, "tanner_comm_catch_97_", cur_yr, "_confid.csv") # needs to be updated with
   # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
   
