@@ -28,8 +28,8 @@ output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
 
 # Data ---------------------------------------------------
 # change input file to most recent year's catch from OceanAK for each
-#harvest <- read.csv("./data/harvest/tanner_harvest_2024.csv") # TK need to download from oceanak (ugh) and update yera every yera
-harvest <- read.csv("./data/harvest/2025 Detailed Fish Tickets_Tanner.csv")  #got from Tessa's OceakAK search, adding  Batch Year and Sum of Animals to the query.
+harvest <- read.csv(paste0('./data/harvest/tanner_harvest_',cur_yr,'.csv')) # From oceanAK- in agreich folder now - tanner_harvest_se- UPDATE EVERY YEAR
+#harvest <- read.csv("./data/harvest/2025 Detailed Fish Tickets_Tanner.csv")  #got from Tessa's OceakAK search, adding  Batch Year and Sum of Animals to the query.
 glimpse(harvest)
 
 #harvest_all <- read.csv("./data/Tanner_Detailed Fish Tickets_98_18.csv")
@@ -53,7 +53,7 @@ logbook_all <- read_excel(path = "./data/harvest/All_logbook_tanner.xlsx", sheet
 # data clean up --------
 ## need to update this output from OceanAK to be only region 1....**FIX**
 harvest %>% 
-  filter(Batch.Year == cur_yr & Office.Name == 'Petersburg') %>% #agr- maybe pull castern data- maybe it's fomratted better FLAG**
+  filter(Batch.Year == cur_yr & Office.Name == 'Petersburg') %>% 
   dplyr::rename(Year = Batch.Year) -> harvest2
   
 ### current year ----------------------
