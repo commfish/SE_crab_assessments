@@ -59,7 +59,7 @@ password <- read_file("./code/crab_survey_password.txt")
 con <- DBI::dbConnect(odbc::odbc(), #2025 update
                       Driver = "Oracle in OraClient19Home1",
                       DBQ = "soaocip-ovpnc-scan.exa.sjcprod.oraclevcn.com:1521/dfgr1p.exa.sjcprod.oraclevcn.com",
-                      UID = "i_cat_pu_reporter",
+                      UID = "i_sur_crab_reporter", #"i_cat_pu_reporter", #that one is for PU
                       PWD = password)
 
 # list of tables
@@ -436,7 +436,7 @@ write.csv(data_for_csa, paste0('./data/tanner/tanner_rkc/red crab survey for Tan
 # Egg Development Code, Egg Condition Code, Pot Comment
 
 # find trip ID for current year (use PROJECT_CODE = 007 which should correspond to PROJECT = "Red King Crab Survey")
-trip_year <- tbl(con, "TRIP") %>%
+trip_year <-  tbl(con, "TRIP") %>%
   filter(PROJECT_CODE == "007" & YEAR == cur_yr) %>%
   # fields needed from trip table: TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO
   select(TRIP_ID, YEAR, PROJECT_CODE, TRIP_NO) %>%
