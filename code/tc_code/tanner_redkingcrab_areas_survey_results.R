@@ -1,7 +1,7 @@
 #K.Palof 
 # ADF&G 9-21-18 updated and reworked similar to RKC code
 # 10-19-2021/ 10-19-2022 
-# updated Oct 2023 by Caitlin Stern; Sept 2024 by Alex Reich
+# updated Oct 2023 by Caitlin Stern; Sept 2024 by Alex Reich; Oct 2025 AGR
 # Areas: RKCS areas for Tanner crab - EXCLUDES north juneau and stephens passage (see readme.md for reason)
 # includes: Excursion, Seymour Canal, Pybus Bay, Gambier Bay, Peril Strait, and Lynn Sisters
 # code to process data from Ocean AK to use in crab CSA models.  
@@ -10,7 +10,7 @@
 source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with multiple areas at once.
 
 ## setup global ---------------
-cur_yr <- 2024
+cur_yr <- 2025
 pr_yr <- cur_yr - 1
 n_yr <- cur_yr + 1
 fig_path <- paste0('figures/tanner/tanner_rkc/', cur_yr) # folder to hold all figs for a given year
@@ -29,7 +29,7 @@ dat.b <- read.csv(paste0("./data/tanner/tanner_rkc/red crab survey for Tanner cr
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 biomass <- read.csv(paste0("./data/tanner/tanner_", cur_yr, "_biomassmodel.csv")) #!! create a file for the current year
 # by copying last years to start, then have to add each area from CSA models. !!outside R!!
-# this file should be updated with current year model output. #TK is this a riddle - AGR
+# this file should be updated with current year model output. 
 
 # survey data QAC -------
 head(dat.a)
@@ -108,7 +108,7 @@ dat1 %>%
 
   # need to confirm that rkcs area tagging pots in 2019 - seymour and excusion are NOT included #AGR TK- what?
 dat1a %>% 
-  filter(Year == 2022) %>% 
+  filter(Year == 2025) %>% 
   group_by(Location) %>% 
   summarise(n = max(Pot.No)) # confirm 2019 pot removed.  **FIX** this for future
 

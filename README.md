@@ -67,7 +67,11 @@ then...
 
 3\. And then get the data to run tanner\_harvest.R. Run tanner\_harvest.R. The fishery is in the spring so it is completed by March-ish
 
-* &nbsp;	this looks to be from OceanAK. I have it in my folder- agreich/SE Tanner crab/2025 Detailed Fish Tickets\_Tanner. Update the year (fishing season) and export as a csv.
+*  	this looks to be from OceanAK. I have it in my folder- agreich/SE Tanner crab/2025 Detailed Fish Tickets\_Tanner. Update the year (fishing season) and export as a csv.
+
+
+
+NOTE: For steps 4 and 6, there is a QC aspect for the survey data. Pay attention to the wrangling and QC before the CPUE standardization. The data has already been QC'ed before entry, but field team handles a TON of crab and thus things slip through the cracks sometimes. So if you find data entry errors in step 4 and 6, ask the relevant contact (Zane, currently) for corrections, re-download and save the relevant data from OceanAK if necessary. Small things can be corrected by hand, but best data practices and all that.
 
 
 
@@ -90,7 +94,7 @@ then...
 
 * this is for the Tanner survey areas of Holkham, Thomas, Glacier Bay, and Icy Strait
 * Download this data from pull\_data\_for\_csa.R on OceanAK if you have not already
-* &nbsp;	- I tend to run the red king crab areas before the Tanner survey ends, because I can get a head start on the analysis that way
+*  	- I tend to run the red king crab areas before the Tanner survey ends, because I can get a head start on the analysis that way
 * \*FOR 2025 - Adjust GBay to delete the pots that are now outisde the survey area\*
 * Stop at the STOP point, run the summary rmd, run CSA's, and manually update the biomass file.
 
@@ -208,6 +212,4 @@ see readme.md in /code/tc\_code/ for more details.
 
 
 How to run the Tanner Assessment
-
-
 
