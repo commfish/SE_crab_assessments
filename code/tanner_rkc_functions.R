@@ -481,9 +481,10 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   # survey.location here are codes: EI, PS, PB, GB, SC, LS
   #TEST
   #survey.location <- "EI"
-  #cur_yr <- 2024
+  #cur_yr <- 2025
   #area <- "Excursion Inlet"
-  #option = "include"
+  #option = 2
+  #conf = "include"
   #l1 = 0.55
   #l2 = 0.88
   
@@ -599,14 +600,24 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     geom_point(aes(color = recruit.class, shape = recruit.class, 
                    fill = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
-    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
-    scale_shape_manual(name = "", values = c(15, 16, 17))+ #fixed 11/18/24
+    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"),
+                        labels= c("Postrecruit", "Prerecruit", "Recruit"))+ #agr 25 added legend labels to this and the two below
+    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"),
+                      labels =c("Postrecruit", "Prerecruit", "Recruit")) +
+    scale_shape_manual(name = "", values = c(15, 16, 17),
+                       labels=c("Postrecruit", "Prerecruit", "Recruit")
+                       )+ #fixed 11/18/24
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
     #                   oob = rescale_none) +
-    ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
+    #ggtitle(area) + #no title agr 25
+    annotate("text", label = area, 
+             x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
+             size = 6, fontface = "bold"    
+    )+ #instead adding the labels inside the plot agr 25
+    
+    ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -628,12 +639,15 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
     geom_point(aes(color = recruit.class, shape = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c( "#56B4E9"))+
-    scale_shape_manual(name = "", values = c(15))+
-    scale_fill_manual(name = "", values = c("#56B4E9")) +
+    scale_colour_manual(name = "", values = c( "#56B4E9"),
+                        labels =c("Mature female"))+
+    scale_shape_manual(name = "", values = c(15),
+                       labels =c("Mature female"))+
+    scale_fill_manual(name = "", values = c("#56B4E9"),
+                      labels =c("Mature female")) +
     #ylim(0,25) + 
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
-    ylab("Mature female CPUE (number/pot)")+ xlab(NULL)+
+    ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
@@ -644,13 +658,17 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     theme(legend.position = c(0.3,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) +
-    expand_limits(y = 0)
+    expand_limits(y = 0)+
+    annotate("text", label = area, 
+             x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
+             size = 6, fontface = "bold"    
+    ) #agr add-  annotation of area to me graph
   
-  if(option == 3){
-    p2 = p2 + ggtitle(paste0(area, ' - Females')) +
-      theme(plot.title = element_text(size = 24))
-  }
-  
+  #if(option == 3){
+   # p2 = p2 + ggtitle(paste0(area, ' - Females')) + #AGR 25 off- gonna have a label inside the plot instead
+    #  theme(plot.title = element_text(size = 24))
+  #}
+   
   
   #### F1c Female eggs graph -----------
   p3 <- ggplot(female_egg_graph, aes(Year, mean, group = female.egg, fill = female.egg)) + 
@@ -725,12 +743,22 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   
   #p1 + scale_shape_manual(name = "", values = c(15, 16, 17)) #fixed 11/18/24
   
-  ifelse(option == 1 , 
-         panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
-         ifelse(option == 2, 
-                panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
-                ifelse(option == 3, 
-                       panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
+  #ifelse(option == 1 , 
+   #      panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
+    #     ifelse(option == 2, 
+     #           panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
+      #          ifelse(option == 3, 
+       #                panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
+  
+  if (option == 1) {
+    panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v')
+  } else if (option == 2) {
+    panel <- plot_grid(p1, p4, ncol = 1, align = 'v')
+  } else if (option == 3) {
+    panel <- plot_grid(p2, p3, ncol = 1, align = 'v')
+  } else {
+    panel <- 0
+  }
   
 if(conf == "exclude"){  
   ggsave(paste0('./figures/tanner/tanner_rkc/',cur_yr,'/', survey.location, '_', cur_yr, '_', 
