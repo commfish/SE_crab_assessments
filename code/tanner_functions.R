@@ -390,14 +390,22 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     geom_point(aes(color = recruit.class, shape = recruit.class, 
                    fill = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
-    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
-    scale_shape_manual(name = "", values = c(15, 16, 17))+
+    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"),
+                        labels= c("Postrecruit", "Prerecruit", "Recruit"))+
+    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"),
+                      labels= c("Postrecruit", "Prerecruit", "Recruit")) +
+    scale_shape_manual(name = "", values = c(15, 16, 17),
+                       labels= c("Postrecruit", "Prerecruit", "Recruit"))+
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
     #                   oob = rescale_none) +
-    ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
+    #ggtitle(area) + nope- agr 25
+    ylab("CPUE (number/pot)")+ xlab(NULL)+ 
+    annotate("text", label = area, 
+             x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
+             size = 6, fontface = "bold"    
+    )+ #instead of title agr 25
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1996),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1995),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -424,14 +432,17 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
     geom_point(aes(color = recruit.class, shape = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c( "#56B4E9"))+
-    scale_shape_manual(name = "", values = c(15))+
-    scale_fill_manual(name = "", values = c("#56B4E9")) +
+    scale_colour_manual(name = "", values = c( "#56B4E9"),
+                        labels =c("Mature female"))+
+    scale_shape_manual(name = "", values = c(15),
+                       labels =c("Mature female"))+
+    scale_fill_manual(name = "", values = c("#56B4E9"),
+                      labels =c("Mature female")) +
     #ylim(0,25) + 
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
-    ylab("Mature female CPUE (number/pot)")+ xlab(NULL)+
+    ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1996),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)#change to 1997 insetead of 1996 in odd years
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1995),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)#change to 1997 insetead of 1996 in odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -440,12 +451,16 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     theme(legend.position = c(0.15,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) +
-    expand_limits(y = 0)
+    expand_limits(y = 0)+
+    annotate("text", label = area, 
+             x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
+             size = 6, fontface = "bold"    
+    )
   
-  if(option == 3){
-    p2 = p2 + ggtitle(paste0(survey.location, ' - Females')) +
-      theme(plot.title = element_text(size = 24))
-  }
+ # if(option == 3){
+  #  p2 = p2 + ggtitle(paste0(survey.location, ' - Females')) +
+   #   theme(plot.title = element_text(size = 24))
+  #}
   
   
   #### F1c Female eggs graph -----------
@@ -459,7 +474,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     scale_fill_manual(name = "", values = c("black", "gray45")) +
     ylab("Percentage") + 
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1996),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1995),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     
@@ -476,7 +491,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     p3 = p3 + theme(axis.text.x = element_blank())
   }
   if(option ==3){
-    p3 = p3 + xlab("Survey Year")
+    p3 = p3 + xlab("Year")
   }
   if(survey.location == "Icy Strait"){ #agr just added this chunk to adjust legend
     p3 = p3 +
@@ -484,24 +499,27 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   }
   
   ### biomass harvest graph --------------
-  p4 <- ggplot(biomass_graph, aes(Year, y = pounds/100000, group = type))+ 
+  p4 <- ggplot(biomass_graph, aes(Year, y = pounds, group = type))+ 
     geom_point(aes(color = type, shape = type), size =3) +
     geom_line(aes(color = type, group = type, linetype = type))+
-    scale_colour_manual(name = "", values = c("grey1", "grey1", "grey48", "grey62"))+
-    scale_shape_manual(name = "", values = c(1, 18, 32, 18))+
-    scale_linetype_manual(name = "", values = c("blank", "solid", "solid", "dashed")) +
-    ylab("Pounds (100,000 lbs)") + 
-    xlab("Survey Year") +
+    scale_colour_manual(name = "", values = c("grey1", "grey1", "grey48"),
+                        labels= c("Harvest", "Legal", "Mature"))+
+    scale_shape_manual(name = "", values = c(1, 18, 32),
+                       labels= c("Harvest", "Legal", "Mature"))+
+    scale_linetype_manual(name = "", values = c("blank", "solid", "solid"),
+                          labels= c("Harvest", "Legal", "Mature")) +
+    ylab("Biomass (lb)") + 
+    xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1996),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994) #added: limits = c(1997, cur_yr), to try to troubleshoot different plots lining up bad error,
-    scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds/100000, 
-                                                        na.rm = TRUE) + 0.25000),
-                       breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
-                                                  na.rm = TRUE)+0.25000), by = 1.0)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1995),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994) #added: limits = c(1997, cur_yr), to try to troubleshoot different plots lining up bad error,
+    scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
+                                                        na.rm = TRUE) + 25000),
+                       breaks= seq(min(0), max(max(biomass_graph$pounds, 
+                                                  na.rm = TRUE)+25000), by = 100000)) +
     theme(legend.position = c(l1, l2), #c(0.55,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) + 
-    geom_hline(data = baseline_means, aes(yintercept = legal_mean/100000), color = "grey1", 
+    geom_hline(data = baseline_means, aes(yintercept = legal_mean), color = "grey1", 
                linetype = "dashed")
   #geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey62", linetype = "dashed")
   #if(scale == 1){
@@ -518,12 +536,25 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   #       dpi = 800, width = 8, height = 9.5)
   #dev.off()
   
-  ifelse(option == 1 , 
-         panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
-         ifelse(option == 2, 
-                panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
-                ifelse(option == 3, 
-                       panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
+ # ifelse(option == 1 , 
+  #       panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
+   #      ifelse(option == 2, 
+    #            panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
+     #           ifelse(option == 3, 
+      #                 panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
+  
+  if (option == 1) {
+    panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v')
+  } else if (option == 2) {
+    #panel <- plot_grid(p1, p4, ncol = 1, align = 'v')
+    panel <- p1/p4 #agr update-cowplot
+  } else if (option == 3) {
+    #panel <- plot_grid(p2, p3, ncol = 1, align = 'v')
+    panel <- p2/p3
+  } else {
+    panel <- 0
+  }
+  
   
   if(conf == "exclude"){  
     ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 

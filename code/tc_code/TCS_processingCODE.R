@@ -32,7 +32,7 @@ baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
 # need this data for biomass and CPUE trend figures
 hist_dat <- read.csv(paste0('./results/tanner/tanner_tcs/',cur_yr-1, '/',cur_yr-1,'_CPUE_historic.csv'))
 # Older data needs to be imported 1997 to 2013 has post-strata assignments. 
-#   DO NOT take from OceanAK since it won't have survey strata designations in OceanAK
+#   DO NOT take from OceanAK since it won't have survey strata designations in OceanAK- oh, so this data is somewhere- AGR 25. Track it down post-survey please
 
 ## survey data QAC -------
 head(dat)
@@ -402,7 +402,7 @@ panel_figure("Glacier Bay", cur_yr, "Glacier Bay", 2, "exclude", 0.55, 0.8)
 #panel_figure_pres("Holkham Bay", cur_yr, "Holkham Bay", 2, "exclude")
 #panel_figure_pres("Holkham Bay", cur_yr, "Holkham Bay", 3, "exclude")
 
-panel_figure_pres("Thomas Bay", cur_yr, "Thomas Bay", 2, "exclude")
-panel_figure_pres("Thomas Bay", cur_yr, "Thomas Bay", 3, "exclude")
+#panel_figure_pres("Thomas Bay", cur_yr, "Thomas Bay", 2, "exclude")
+#panel_figure_pres("Thomas Bay", cur_yr, "Thomas Bay", 3, "exclude")
 
 

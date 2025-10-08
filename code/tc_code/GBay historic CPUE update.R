@@ -7,10 +7,13 @@
 ## as a result, I re- ran the CPUE for 2013-2025
 ## BUT I still need to update the historical files(1999-2013) for GBAY.
 ## THIS IS THAT UPDATE - October 2025
-
+library(tidyverse)
 
 #I manipulated the read-in code to get the data before 2013. Here it is
 old_data <- read.csv("data/tanner/tanner_tcs/tanner crab survey for CSA_OLD.csv")
+
+area <- read.csv("./data/tanner/tanner_tcs/TCSstrata_area.csv") 
+baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
 
 #initial review of old data
 # remove pots with Pot condition code that's not "normal" or 1 
@@ -47,7 +50,7 @@ Tdat1 <- dat1 %>%
 Tdat1 %>% 
   filter(mod_recruit == "Missing") #some issues in 2010 in Holkham but I've bothered Zane enough this week- FLAG for later
 
-
+old_data <- Tdat1
 
 #just interested in gbay
 Gbay_old_data <- old_data %>% filter(Location == "Glacier Bay")
@@ -61,11 +64,13 @@ Old_pots_gone <- Gbay_old_data %>%
     GB_pots_outside,
     by = c("Location", "Year", "Pot.No")
   )
+#flag. DAMMIT. unique(Old_pots_gone %>% filter(is.na(Density.Strata.Code))%>% select(Year)) - many years are missing strata assigments. 
+##Another data request for Zane, it will have to wait until post-survey.
 
 #now I need to re-run the CPUE standardization for these old years:
 ##and the format being the same, code from TCS_processing should work
-dat2 <- Gbay_old_data %>%
-  group_by(Year, Location, Pot.No, Density.Strata.Code, mod_recruit) %>% 
+dat2 <- Old_pots_gone %>%
+  group_by(Year, Pot.No, Location, Density.Strata.Code, mod_recruit) %>% 
   summarise(crab = sum(Number.Of.Specimens)) %>% 
   filter(!is.na(mod_recruit))
 
@@ -104,3 +109,5 @@ CPUE_wt_all <- dat5 %>%
             Juvenile_wt = weighted.mean(Juvenile, weighting), Juv_SE = (weighted.sd(Juvenile, weighting)/(sqrt(sum(!is.na(Juvenile))))), 
             SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females))))),
             MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))))
+
+write.csv(CPUE_wt_all, "results/tanner/tanner_tcs/2025/GBAY_fixed_historic_CPUE_99_12.csv")
