@@ -720,7 +720,8 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #1993, 1994 depending on even or odd yr- arg
-    scale_y_continuous(limits = c(0,max(biomass_graph$pounds, 
+    scale_y_continuous(labels = scales::comma, #agr added to put comma 25
+      limits = c(0,max(biomass_graph$pounds, 
                                                         na.rm = TRUE) + 25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds, 
                                                    na.rm = TRUE) + 25000), by = 50000)) + #agr change per graph (with an if statement) as relevant 25
