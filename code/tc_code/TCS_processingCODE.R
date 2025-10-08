@@ -124,6 +124,10 @@ unique(Tdat1_noGB %>% filter(Year == 2021, Location == "Glacier Bay") %>% select
 #looks like it successfully removed the pots I don't want
 Tdat1 <- Tdat1_noGB
 
+#great! but that was just a fix for years 2013-current year. I'll need to do this for historic years (1999-2012) separately I beleive
+View(hist_dat) #that;s the summary. Hmm. I'll likely choose to write a different R folder to update hist_dat- will need to pull the pots from OceanAK
+
+
 ################
 
 
