@@ -615,7 +615,7 @@ date.int <- interval(min(dates.cur, na.rm=TRUE), max(dates.cur, na.rm=TRUE))
 SP.sur.midpoint <- int_midpoint(date.int)
 
 # convert to Julian day
-SP.sur.midpoint.jul <- yday(sur.midpoint)
+SP.sur.midpoint.jul <- yday(SP.sur.midpoint)
 
 midpoints.df2 <- setNames(data.frame(t(c("SP", as.character(SP.sur.midpoint)))), c("area", "survey.midpoint.date"))
 midpoints.df3 <- rbind(midpoints.df, midpoints.df2)
@@ -766,5 +766,5 @@ panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 3, "exclude")
 
 
 # presentation figures---------------- #AGR tk not sure I need these below...
-panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 2)
-panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 3)
+#panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 2)
+#panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 3)

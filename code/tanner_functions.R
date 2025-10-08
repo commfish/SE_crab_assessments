@@ -397,7 +397,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     #                   oob = rescale_none) +
     ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1996),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -414,6 +414,11 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
           axis.title=element_text(size=14,face="bold"), 
           plot.title = element_text(size = 24))
   
+  if(survey.location == "Glacier Bay"){ #agr just added this chunk to adjust the legend
+    p1 = p1 +
+      theme(legend.position = c(0.1,0.85))
+  }
+  
   
   ### F1b females/juvenile plot ---------------
   p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
@@ -426,7 +431,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("Mature female CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1996),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)#change to 1997 insetead of 1996 in odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -454,7 +459,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     scale_fill_manual(name = "", values = c("black", "gray45")) +
     ylab("Percentage") + 
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1996),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     
@@ -473,6 +478,10 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   if(option ==3){
     p3 = p3 + xlab("Survey Year")
   }
+  if(survey.location == "Icy Strait"){ #agr just added this chunk to adjust legend
+    p3 = p3 +
+      theme(legend.position = c(0.2,0.4))
+  }
   
   ### biomass harvest graph --------------
   p4 <- ggplot(biomass_graph, aes(Year, y = pounds/100000, group = type))+ 
@@ -484,7 +493,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     ylab("Pounds (100,000 lbs)") + 
     xlab("Survey Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1996),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994) #added: limits = c(1997, cur_yr), to try to troubleshoot different plots lining up bad error,
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds/100000, 
                                                         na.rm = TRUE) + 0.25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 

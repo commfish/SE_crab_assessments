@@ -28,6 +28,7 @@ library(TeachingDemos)
 library(purrr)
 library(TMB)
 library(radiant.data)
+library(RColorBrewer)
 
 #font_import()
 loadfonts(device="win")
@@ -478,6 +479,14 @@ total_health_njsp <- function(year){
 ## CONF panel figure ---------------
 panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   # survey.location here are codes: EI, PS, PB, GB, SC, LS
+  #TEST
+  #survey.location <- "EI"
+  #cur_yr <- 2024
+  #area <- "Excursion Inlet"
+  #option = "include"
+  #l1 = 0.55
+  #l2 = 0.88
+  
   # area is used in biomass /harvest file:  Icy Strait, Glacier Bay, 
       # Holkham Bay, Thomas Bay, Stephens Passage, North Juneau, Lynn Sisters, Pybus Bay, 
       # Gambier Bay, Excursion Inlet, Peril Strait, Seymour Canal  
@@ -592,12 +601,12 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     geom_line(aes(color = recruit.class, group = recruit.class))+
     scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
     scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
-    scale_shape_manual(name = "", values = c(15, 16, 17))+
+    scale_shape_manual(name = "", values = c(15, 16, 17))+ #fixed 11/18/24
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
     #                   oob = rescale_none) +
     ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -606,7 +615,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                linetype = "dotdash", lwd = 0.75)+
     geom_hline(yintercept = baseline2$Recruit, color = "#56B4E9", 
                linetype = "longdash", lwd = 0.75)+
-    geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
+    geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999",
                lwd = 0.75)+
     scale_y_continuous(labels = comma) +
     theme(legend.position = c(0.3,0.85), 
@@ -626,7 +635,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("Mature female CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -654,7 +663,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     scale_fill_manual(name = "", values = c("black", "gray45")) +
     ylab("Percentage") + 
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     
@@ -674,6 +683,11 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     p3 = p3 + xlab("Survey Year")
   }
   
+  if(survey.location == "GB" | survey.location == "PS"| survey.location=="EI"){ #agr just added this chunk to adjust the Gambier legend 9/3/24
+    p3 = p3 +
+      theme(legend.position = c(0.6,0.4))
+  }
+  
   ### biomass harvest graph --------------
   p4 <- ggplot(biomass_graph, aes(Year, y = pounds/100000, group = type))+ 
     geom_point(aes(color = type, shape = type), size =3) +
@@ -684,7 +698,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     ylab("Pounds (100,000 lbs)") + 
     xlab("Survey Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
                                                         na.rm = TRUE) + 0.25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
@@ -708,6 +722,8 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   #ggsave(paste0('./figures/redcrab/', survey.location, '_', cur_yr, '.png'), panel,  
   #       dpi = 800, width = 8, height = 9.5)
   #dev.off()
+  
+  #p1 + scale_shape_manual(name = "", values = c(15, 16, 17)) #fixed 11/18/24
   
   ifelse(option == 1 , 
          panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
@@ -838,26 +854,32 @@ panel_figure_pres <- function(survey.location, cur_yr, area, option, conf){
   
   # Figure panel -----
   #### F1a mature male plot -----------
-  p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class))+ 
-    geom_point(aes(color = recruit.class, shape = recruit.class), size =3) +
+  p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
+    geom_point(aes(color = recruit.class, shape = recruit.class, 
+                   fill = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c("grey1", "grey62", "grey34"))+
+    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
+    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
     scale_shape_manual(name = "", values = c(15, 16, 17))+
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
     #                   oob = rescale_none) +
     ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-    geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
-                  width =.4) +
-    geom_hline(yintercept = baseline2$Pre_Recruit, color = "grey65")+
-    geom_hline(yintercept = baseline2$Recruit, color = "grey34")+
-    geom_hline(yintercept = baseline2$Post_Recruit, color = "black")+
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+                alpha = 0.2) +
+    #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
+    #              width =.4) +
+    geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", 
+               linetype = "dotdash", lwd = 0.75)+
+    geom_hline(yintercept = baseline2$Recruit, color = "#56B4E9", 
+               linetype = "longdash", lwd = 0.75)+
+    geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
+               lwd = 0.75)+
+    scale_y_continuous(labels = comma) +
     theme(legend.position = c(0.3,0.85), 
-          legend.text = element_text(size = 20),
-          legend.key.size = unit(1.5, 'lines'),
-          axis.text = element_text(size = 16), 
-          axis.title=element_text(size=18,face="bold"), 
+          axis.text = element_text(size = 12), 
+          axis.title=element_text(size=14,face="bold"), 
           plot.title = element_text(size = 24))
   
   

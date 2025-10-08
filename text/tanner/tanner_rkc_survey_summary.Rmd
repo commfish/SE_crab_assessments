@@ -1,14 +1,14 @@
 ---
 title: "Tanner results from RKC survey"
-author: "Caitlin Stern"
-date: "October 2023"
+author: "Alex Reich"
+date: "October 2025"
 output: html_document
 ---
 
 ```{r setup, include = FALSE}
 library(knitr)
 library(tidyverse)
-cur_yr <- 2023
+cur_yr <- 2025
 pr_yr <- cur_yr - 1
 
 ```
