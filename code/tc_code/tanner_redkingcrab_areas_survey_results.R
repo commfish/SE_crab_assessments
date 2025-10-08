@@ -27,7 +27,7 @@ dat.b <- read.csv(paste0("./data/tanner/tanner_rkc/red crab survey for Tanner cr
     # "For pulling Tanner crab data collected on the summer crab survey"
     # all data in this file do not need area, historic or female files here
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
-biomass <- read.csv(paste0("./data/tanner/tanner_", cur_yr, "_biomassmodel.csv")) #!! create a file for the current year
+biomass <- read.csv(paste0("./data/tanner/tanner_", n_yr, "_biomassmodel.csv")) #!! create a file for the current year
 # by copying last years to start, then have to add each area from CSA models. !!outside R!!
 # this file should be updated with current year model output. 
 
@@ -46,7 +46,8 @@ dat.a2 <- dat.a %>%
 
 test2a <- dat.a2 %>% filter(is.na(Time.Hauled)==TRUE | is.na(Time.Set)==TRUE)
 
-dat.b2 <- dat.b %>%
+
+dat.b2 <- dat.b %>% #somethign is broken here that messes up all of the dates for this dataset- AGR- FLAG!!
   mutate(Time.Set = case_when(
     nchar(Time.Set) == 19 ~ Time.Set,
     nchar(Time.Set) == 10 ~ paste(Time.Set, "12:00:00")
@@ -65,6 +66,14 @@ test2b <- dat.b2 %>% filter(is.na(Time.Hauled)==TRUE | is.na(Time.Set)==TRUE)
 # merge 2 data files 
 dat.a2 %>% 
   bind_rows(dat.b2) -> dat
+
+#AGR aside, I nneed survey mid dates and something of the code above is messing with the dates -FLAG for later
+##but in the presetn moment I just need the dates for 2025
+mid_dates_curyr <- dat.b %>% filter(Year == 2025) %>% select(Location, Time.Hauled)
+#"Excursion Inlet"; "Gambier bay"; "Lynn Sisters"; "Pybus Bay"
+mid_dates_curyr_location <- mid_dates_curyr %>% filter(Location == "Seymour Canal") #hmm, can I separate out date from time??
+View(mid_dates_curyr_location)
+
 
 ##### Initial review of new data ---------------------------------
 # remove pots with Pot condition code that's not "normal" or 1 
@@ -227,12 +236,13 @@ long_term3 <- long_term2 %>%
 ##### Weights from length - weight relationship--------------------
 weight_L(Tdat1, cur_yr) # function found in tanner_rkc_functions.R
 
-##### mid-date survey-------------
+##### mid-date survey-------------#BROKEN!!- AGR 25
 glimpse(Tdat1)
 # need just the date of Time.Set and then to get the mid-date
 #Tdat1 %>%
-# mutate(time.set = as.POSIXlt(Time.Set)) -> Tdat1
-Tdat1 %>% filter(Year == cur_yr & AREA == "SC")
+ #mutate(time.set = as.POSIXlt(Time.Set)) -> Tdattest
+EI_middate_survey <- Tdat1 %>% filter(Year == cur_yr & AREA == "EI")
+EI_middate_survey$time.set
 #** FIX ** 
 
 ##### Females - large or mature females --------------------------
@@ -334,10 +344,11 @@ sum.mat <- as.data.frame(cbind(row.name.col, sc.sum1)) #TK AGR there is a warnin
 
 ## STOP here and run R markdown with summary of rkc areas ----  
 # SE_crab_assessments/text/tanner/tanner_rkc_survey_summary.Rmd
+### save output with this year/last year's output with last year
 
 # READ ME: 
-# put cpue from this markdown into CSA excel files or R input files. #TK AGR here
-# need harvest for each survey area from 'tanner_harvest.R' file created:  #AGR done!! 24
+# put cpue from this markdown into CSA excel files or R input files. 
+# need harvest for each survey area from 'tanner_harvest.R' file created:  
 # 'tanner_comm_catch'cur_yr'.csv' (catch in numbers) & 'tanner_catch_mid_date'cur_yr'.csv' (mid-catch date)
 # Run CSA - put resulting biomass 'cur_yr' values into 
 # 'tanner_cur_yr_biomassmodel.csv'
@@ -347,7 +358,7 @@ sum.mat <- as.data.frame(cbind(row.name.col, sc.sum1)) #TK AGR there is a warnin
 # need to run 'tanner_harvest.R' code to produce file with catch for last season prior to figure creation.
 
 ## panel figures -----
-panel_figure("EI", cur_yr, "Excursion Inlet", 2, "include", 0.55, 0.8)
+panel_figure("EI", cur_yr, "Excursion Inlet", 2, "include", 0.55, 0.8) #these crash so that's fun - AGR 25 - troubleshoot tanner_rkc_functions.R
 panel_figure("EI", cur_yr, "Excursion Inlet", 3, "include", 0.55, 0.8)
 
 panel_figure("SC", cur_yr, "Seymour Canal", 2, "include", 0.35, 0.8)
