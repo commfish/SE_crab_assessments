@@ -78,8 +78,9 @@ NOTE: For steps 4 and 6, there is a QC aspect for the survey data. Pay attention
 4\. Run tanner\_redkingcrab\_areas\_survey\_results.R
 
 * make a new biomass file for this year. NAME GOES HERE!!
-* STOP at the stop point and run the R markdown with summary of RKC areas (line~335)
+* STOP at the stop point and run the R markdown with summary of RKC areas (line~335). Follow instructions
 * Run the Excel CSAs- with the std CPUE data from the summary. Copy-paste the biomass output from this into the 2025 tanner biomass file
+* Then continue running the rest of the R file
 
 
 
