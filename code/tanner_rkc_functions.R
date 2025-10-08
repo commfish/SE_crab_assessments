@@ -649,7 +649,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -681,7 +681,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     scale_fill_manual(name = "", values = c("black", "gray45")) +
     ylab("Percentage") + 
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #1993 or 1994 if even or odd yr- agr
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     
@@ -707,24 +707,27 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   }
   
   ### biomass harvest graph --------------
-  p4 <- ggplot(biomass_graph, aes(Year, y = pounds/100000, group = type))+ 
+  p4 <- ggplot(biomass_graph, aes(Year, y = pounds, group = type))+ 
     geom_point(aes(color = type, shape = type), size =3) +
     geom_line(aes(color = type, group = type, linetype = type))+
-    scale_colour_manual(name = "", values = c("grey1", "grey1", "grey48", "grey62"))+
-    scale_shape_manual(name = "", values = c(1, 18, 32, 18))+
-    scale_linetype_manual(name = "", values = c("blank", "solid", "solid", "dashed")) +
-    ylab("Pounds (100,000 lbs)") + 
-    xlab("Survey Year") +
+    scale_colour_manual(name = "", values = c("grey1", "grey1", "grey48"),
+                        labels= c("Harvest", "Legal", "Mature"))+ #adjusted legal, adjusted mature??
+    scale_shape_manual(name = "", values = c(1, 18, 32),
+                       labels= c("Harvest", "Legal", "Mature"))+ 
+    scale_linetype_manual(name = "", values = c("blank", "solid", "solid"),
+                          labels= c("Harvest", "Legal", "Mature")) +
+    ylab("Biomass (lb)") + 
+    xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
-    scale_y_continuous(limits = c(0,max(biomass_graph$pounds/100000, 
-                                                        na.rm = TRUE) + 0.25000),
-                       breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
-                                                   na.rm = TRUE) + 0.25000), by = 0.5)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #1993, 1994 depending on even or odd yr- arg
+    scale_y_continuous(limits = c(0,max(biomass_graph$pounds, 
+                                                        na.rm = TRUE) + 25000),
+                       breaks= seq(min(0), max(max(biomass_graph$pounds, 
+                                                   na.rm = TRUE) + 25000), by = 50000)) + #agr change per graph (with an if statement) as relevant 25
     theme(legend.position = c(l1, l2), #c(0.55,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) + 
-    geom_hline(data = baseline_means, aes(yintercept = legal_mean/100000), color = "grey1", 
+    geom_hline(data = baseline_means, aes(yintercept = legal_mean), color = "grey1", 
                linetype = "dashed")
     #geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey62", linetype = "dashed")
   #if(scale == 1){
