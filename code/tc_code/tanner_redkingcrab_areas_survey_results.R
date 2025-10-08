@@ -385,24 +385,24 @@ panel_figure("LS", cur_yr, "Lynn Sisters", 2, "exclude", 0.55, 0.8)
 panel_figure("PS", cur_yr, "Peril Strait", 2, "exclude", 0.35, 0.8)
 panel_figure("PB", cur_yr, "Pybus Bay", 2, "exclude", 0.35, 0.8)
 
-# presentation figures ------------ #AGR TK ARE THESE OBSOLETE??
-panel_figure_pres("EI", 2018, "Excursion Inlet", 2, "include")
-panel_figure_pres("EI", 2018, "Excursion Inlet", 3, "include")
+# presentation figures ------------ #AGR TK ARE THESE OBSOLETE??- meh, I turned these off - AGR 25
+#panel_figure_pres("EI", 2018, "Excursion Inlet", 2, "include")
+#panel_figure_pres("EI", 2018, "Excursion Inlet", 3, "include")
 
-panel_figure_pres("SC", 2018, "Seymour Canal", 2, "include")
-panel_figure_pres("SC", 2018, "Seymour Canal", 3, "include")
+#panel_figure_pres("SC", 2018, "Seymour Canal", 2, "include")
+#panel_figure_pres("SC", 2018, "Seymour Canal", 3, "include")
 
-panel_figure_pres("PB", 2018, "Pybus Bay", 2, "exclude")
-panel_figure_pres("PB", 2018, "Pybus Bay", 3, "exclude")
+#panel_figure_pres("PB", 2018, "Pybus Bay", 2, "exclude")
+#panel_figure_pres("PB", 2018, "Pybus Bay", 3, "exclude")
 
-panel_figure_pres("GB", 2018, "Gambier Bay", 2, "exclude")
-panel_figure_pres("GB", 2018, "Gambier Bay", 3, "exclude")
+#panel_figure_pres("GB", 2018, "Gambier Bay", 2, "exclude")
+#panel_figure_pres("GB", 2018, "Gambier Bay", 3, "exclude")
 
-panel_figure_pres("PS", 2018, "Peril Strait", 2, "exclude")
-panel_figure_pres("PS", 2018, "Peril Strait", 3, "exclude")
+#panel_figure_pres("PS", 2018, "Peril Strait", 2, "exclude")
+#panel_figure_pres("PS", 2018, "Peril Strait", 3, "exclude")
 
-panel_figure_pres("LS", 2018, "Lynn Sisters", 2, "exclude")
-panel_figure_pres("LS", 2018, "Lynn Sisters", 3, "exclude")
+#panel_figure_pres("LS", 2018, "Lynn Sisters", 2, "exclude")
+#panel_figure_pres("LS", 2018, "Lynn Sisters", 3, "exclude")
 
 
 ####
