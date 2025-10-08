@@ -20,7 +20,7 @@ dir.create(output_path)
 
 # this is input from OceanAK - set up as tanner crab survey for CSA
 # update 2023: this file is now created using the pull_data_for_csa.R script, connecting directly to the database
-## AGR TK 24- I read in after the first survey leg, will need to read in again after the second leg.
+## AGR TK 24- I read in after the first survey leg, will need to read in again after the second leg.- AGR 25 ditto
 dat <- read.csv(paste0('./data/tanner/tanner_tcs/tanner crab survey for CSA_13_', cur_yr2, '.csv'))
 
 area <- read.csv("./data/tanner/tanner_tcs/TCSstrata_area.csv") 
@@ -53,11 +53,11 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> test1
 
 write.csv(test1, paste0("./results/tanner/tanner_tcs/data_issues", cur_yr, ".csv"))
 
-# check pot 15, 2013 Holkham Bay - pull again from OceanAK **FIX**
-#AGR TK - 2 issues in 2013, 2015, will need to pull data and run this code again.- both from Holkham bay
+#agre 25- need to check again after 2nd survey
 
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - tanner soak time should be between 16-20??? double check this
+##dont filter anythign tho -just to look at
 
 ##### Tanner specific manipulations -----------------------------
 ###     Tanner Survey areas ONLY 
@@ -84,8 +84,7 @@ Tdat1 <- dat1 %>%
 # confirm this worked
 Tdat1 %>% 
   filter(mod_recruit == "Missing")
-# same issues with pot 15 in HB, 2013 **FIX**
-#AGR TK - it appears the above issue is solved, I just have my two problem crab from 2013 and 2019
+
 
 #### survey mid date by area -----  
 
@@ -97,8 +96,23 @@ Tdat1_dates <- Tdat1 %>%
 areas <- as.vector(unique(Tdat1$Location))
   
 tcs_middates <- bind_rows(lapply(areas, tcs_survey_middate, Tdat1_dates = Tdat1_dates))
+#will need to re-run after 2nd survey- agr 25
 
 write_csv(tcs_middates, paste0('./results/tanner/tanner_tcs/', cur_yr, '/', cur_yr, '_TCS_middates.csv'))
+
+#####################
+#Glacier bay- remove the irrelevant pots- agr 25 add
+# in 2024, the survey size in glacier bay was reduced
+##so we asked Zane to make a data file with a list of pots from past years that are outside of this area
+##READ CSV
+GB_pots_outside <- read.csv("data/glacier bay 2024 restrat/Glacier Bay pots in old strata.csv")
+
+#I'll use this datafile to remove the irrelevant pots from the Glacier Bay CPUE calculation:
+
+
+
+################
+
 
 ## CPUE calc -----------------
 ##### By Pot ----------------------------------------------------

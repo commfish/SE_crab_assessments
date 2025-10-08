@@ -1,5 +1,5 @@
 #K.Palof 
-# ADF&G 11-15-16 / 10-11-17 / 11-2-18 /10-10-19/ 11-12-20 / 11-7-21 / 11-7-22
+# ADF&G 11-15-16 / 10-11-17 / 11-2-18 /10-10-19/ 11-12-20 / 11-7-21 / 11-7-22/ AGR 10-8-25
 # Areas: tanner crab assessment of red crab areas : North Juneau and Stephens Passage
 #   done seperately because they need to be divided into these two areas based on the pot locations, 
 #   division is done in ArcGIS using shape files for survey strata
@@ -18,7 +18,7 @@
 # source('./code/tanner_functions.R')
 source('./code/tanner_rkc_functions.R')
 
-cur_yr <- 2024
+cur_yr <- 2025
 pr_yr <- cur_yr -1
 
 source('./code/tc_code/sp_nj_figures.R')
@@ -45,8 +45,8 @@ dat %>% select(Year, Location.Code, Location, Pot.No, Depth.Fathoms, Latitude.De
   summarise(Depth.Fathoms = mean(Depth.Fathoms), Latitude.Decimal.Degrees = mean(Latitude.Decimal.Degrees), 
             Longitude.Decimal.Degrees = mean(Longitude.Decimal.Degrees)) -> juneau_pot_info
 write.csv(juneau_pot_info, paste0('./data/tanner/nj_stp/juneau_pot_info_', cur_yr,'.csv'))
-## this is the file that needs to be used in GIS to assign pots to either NJ or SP. Send this to Zane.
-## see notes in word document - AGR TK- crap what word document??
+## this is the file that needs to be used in GIS to assign pots to either NJ or SP. Send this to Zane. #Uhh, what- AGR? 25- is this a current issue or did C fix?
+## see notes in word document - AGR TK (24)- crap what word document??
 
 
 ## rest of data -------------
