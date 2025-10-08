@@ -358,7 +358,7 @@ sum.mat <- as.data.frame(cbind(row.name.col, sc.sum1)) #TK AGR there is a warnin
 # need to run 'tanner_harvest.R' code to produce file with catch for last season prior to figure creation.
 
 ## panel figures -----
-panel_figure("EI", cur_yr, "Excursion Inlet", 2, "include", 0.55, 0.8) #these crash so that's fun - AGR 25 - troubleshoot tanner_rkc_functions.R
+panel_figure("EI", cur_yr, "Excursion Inlet", 2, "include", 0.55, 0.7) #these crash so that's fun - AGR 25 - troubleshoot tanner_rkc_functions.R
 panel_figure("EI", cur_yr, "Excursion Inlet", 3, "include", 0.55, 0.8)
 
 panel_figure("SC", cur_yr, "Seymour Canal", 2, "include", 0.35, 0.8)
@@ -367,7 +367,7 @@ panel_figure("SC", cur_yr, "Seymour Canal", 3, "include", 0.55, 0.8)
 panel_figure("PB", cur_yr, "Pybus Bay", 2, "include", 0.35, 0.8)
 panel_figure("PB", cur_yr, "Pybus Bay", 3, "include", 0.55, 0.8)
 
-panel_figure("GB", cur_yr, "Gambier Bay", 2, "include", 0.55, 0.8)
+panel_figure("GB", cur_yr, "Gambier Bay", 2, "include", 0.50, 0.8)
 panel_figure("GB", cur_yr, "Gambier Bay", 3, "include", 0.55, 0.8)
 
 panel_figure("PS", cur_yr, "Peril Strait", 2, "include", 0.35, 0.8)
@@ -378,9 +378,9 @@ panel_figure("LS", cur_yr, "Lynn Sisters", 3, "include", 0.55, 0.8)
 
 
 # non-confidential areas ------------
-panel_figure("EI", cur_yr, "Excursion Inlet", 2, "exclude", 0.55, 0.8)
+panel_figure("EI", cur_yr, "Excursion Inlet", 2, "exclude", 0.55, 0.7)
 panel_figure("SC", cur_yr, "Seymour Canal", 2, "exclude", 0.55, 0.8)
-panel_figure("GB", cur_yr, "Gambier Bay", 2, "exclude", 0.55, 0.8)
+panel_figure("GB", cur_yr, "Gambier Bay", 2, "exclude", 0.50, 0.8)
 panel_figure("LS", cur_yr, "Lynn Sisters", 2, "exclude", 0.55, 0.8)
 panel_figure("PS", cur_yr, "Peril Strait", 2, "exclude", 0.35, 0.8)
 panel_figure("PB", cur_yr, "Pybus Bay", 2, "exclude", 0.35, 0.8)

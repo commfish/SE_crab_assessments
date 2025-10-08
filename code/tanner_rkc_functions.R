@@ -629,10 +629,15 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999",
                lwd = 0.75)+
     scale_y_continuous(labels = comma) +
-    theme(legend.position = c(0.3,0.85), 
+    theme(legend.position = c(0.44,0.85), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"), 
           plot.title = element_text(size = 24))
+  
+  if(survey.location == "PS"){ #agr adjusting legend
+    p1 = p1 +
+      theme(legend.position = c(0.3,0.85))
+  }
   
   
   ### F1b females/juvenile plot ---------------
@@ -698,7 +703,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     p3 = p3 + theme(axis.text.x = element_blank())
   }
   if(option ==3){
-    p3 = p3 + xlab("Survey Year")
+    p3 = p3 + xlab("Year")
   }
   
   if(survey.location == "GB" | survey.location == "PS"| survey.location=="EI"){ #agr just added this chunk to adjust the Gambier legend 9/3/24
@@ -754,12 +759,23 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
       #          ifelse(option == 3, 
        #                panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
   
+  
+  add_margin <- theme(plot.margin = margin(5.5, 5.5, 5.5, 15, "pt")) #agr added 25 to prevent dumb overlay problem
+  
+  p1 <- p1 + add_margin
+  p2 <- p2 + add_margin
+  p3 <- p3 + add_margin
+  p4 <- p4 + add_margin
+  
+  
   if (option == 1) {
     panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v')
   } else if (option == 2) {
-    panel <- plot_grid(p1, p4, ncol = 1, align = 'v')
+    #panel <- plot_grid(p1, p4, ncol = 1, align = 'v')
+    panel <- p1/p4 #agr update-cowplot
   } else if (option == 3) {
-    panel <- plot_grid(p2, p3, ncol = 1, align = 'v')
+    #panel <- plot_grid(p2, p3, ncol = 1, align = 'v')
+    panel <- p2/p3
   } else {
     panel <- 0
   }
