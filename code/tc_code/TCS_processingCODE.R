@@ -108,8 +108,21 @@ write_csv(tcs_middates, paste0('./results/tanner/tanner_tcs/', cur_yr, '/', cur_
 GB_pots_outside <- read.csv("data/glacier bay 2024 restrat/Glacier Bay pots in old strata.csv")
 
 #I'll use this datafile to remove the irrelevant pots from the Glacier Bay CPUE calculation:
+##my working dataframe is Tdat1
+#View(Tdat1)
+#match: Location(Glacier Bay), Year, Pot.No. removing the overlaps with the GB_pots_outside df will get rid of the glacier bay pots that are now outside the survey area
+#the data wrangle:
+Tdat1_noGB <- Tdat1 %>%
+  anti_join(
+    GB_pots_outside,
+    by = c("Location", "Year", "Pot.No")
+  )
 
-
+#test
+unique(GB_pots_outside %>% filter(Year == 2021) %>% select(Pot.No))
+unique(Tdat1_noGB %>% filter(Year == 2021, Location == "Glacier Bay") %>% select(Pot.No))
+#looks like it successfully removed the pots I don't want
+Tdat1 <- Tdat1_noGB
 
 ################
 
@@ -342,7 +355,7 @@ catch.mid <- read_csv(paste0(here::here(), "/results/tanner/harvest/", cur_yr, "
   write_csv(paste0(here::here(), "/results/tanner/harvest/", cur_yr, "/tanner_mid_catch_date_area", cur_yr, ".csv"))
 
 #AGR TK partially to here. Will need to run all code above once I have full data from the second survey
-##but now I can run Holkham and Thomas CSA's
+##but now I can run GBAY and Icy CSA's
 ### STOP here and run .Rmd file for these results: SE_crab_assessments\text\tanner\tanner_tcs_area.Rmd ------------------------
 
 # After running and checking the .Rmd file, run the CSA model in Excel for each area
