@@ -26,7 +26,7 @@ dat <- read.csv(paste0('./data/tanner/tanner_tcs/tanner crab survey for CSA_13_'
 area <- read.csv("./data/tanner/tanner_tcs/TCSstrata_area.csv") 
 baseline <- read.csv("./data/tanner/tanner_tcs/longterm_means_TC.csv")
 # brought in all data since 2013 - this was after survey was stratified.  
-# biomass <- read.csv() # need to bring this in for figures later. **FIX**
+biomass <- read.csv(paste0('data/tanner/tanner_', n_yr,'_biomassmodel.csv')) # need to bring this in for figures later. **FIX**
 
 ### historic file ---------
 # need this data for biomass and CPUE trend figures
@@ -317,6 +317,8 @@ poor_clutch_short(poorclutch1, cur_yr)
 ggplot(poorclutch1, aes(Year, var1))+geom_point() +facet_wrap(~Location)
 
 ##### egg percentage overall -----------------------------------
+#AGR Flag- anything I need to do with GBay removals here? remove some crab??
+##(I dont think so, I think we're ok here)
 LgF_Tdat1 %>%
   filter(!is.na(Egg.Percent)) %>% 
   group_by(Year, Location, Pot.No) %>%
@@ -336,7 +338,7 @@ historic_low %>%
   filter(Year < 2013) %>% 
   select (-X) %>% 
   bind_rows(percent_low_clutch) %>% 
-  write.csv(paste0('./results/tanner/tanner_tcs/', cur_yr, '/all_years_percent_low_clutch.csv'))
+  write.csv(paste0('./results/tanner/tanner_tcs/', cur_yr, '/all_years_percent_low_clutch.csv')) #flag- might need to GBAY-update this historic data. I saved it but haven't replaced "historic data" with it yet
 
 historic_clutch %>% 
   filter(Year < 2013) %>% 

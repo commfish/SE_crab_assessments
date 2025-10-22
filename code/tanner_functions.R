@@ -424,7 +424,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   
   if(survey.location == "Glacier Bay"){ #agr just added this chunk to adjust the legend
     p1 = p1 +
-      theme(legend.position = c(0.1,0.85))
+      theme(legend.position = c(0.1,0.75))
   }
   
   
