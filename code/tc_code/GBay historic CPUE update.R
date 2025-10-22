@@ -78,6 +78,9 @@ write.csv(strata_fix_key, "data/glacier bay 2024 restrat/Gbay strata key 1999 20
 
 #ok. now bind old_pots_gone and strata_fix to update the strata.
 Old_pots_gone_2 <- left_join(Old_pots_gone, strata_fix_key, by=c("Location", "Year", "Pot.No"))
+Old_pots_gone_2 <- Old_pots_gone_2 %>%
+  select(-Density.Strata.Code)%>%
+  rename(Density.Strata.Code = DENSITY_STRATA_CODE)
 
 #now I need to re-run the CPUE standardization for these old years:
 ##and the format being the same, code from TCS_processing should work
@@ -122,4 +125,40 @@ CPUE_wt_all <- dat5 %>%
             SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females))))),
             MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))))
 
-write.csv(CPUE_wt_all, "results/tanner/tanner_tcs/2025/GBAY_fixed_historic_CPUE_99_13.csv")
+write.csv(CPUE_wt_all, "results/tanner/tanner_tcs/2025/GBAY_fixed_historic_CPUE_99_13.csv") #re-ran the GBAY CPUE's with the old pots removed.
+
+
+#alright, lets update the old male weights too
+#-AGR - MAKE GBAY SPECIFIC PLEASe - FLAG
+##### Weights from length - weight relationship--------------------
+#
+# Linear model is changed for each area
+weight_length <- data.frame(AREA =character(),  slope =numeric(), coeff = numeric())
+
+#Location = unique(dat5$Location) #"Glacier Bay" "Holkham Bay" "Icy Strait"  "Thomas Bay" 
+#slope = c(3.30, 3.34, 3.29, 3.32) # these are from W-L relationships established for each area
+#coeff = c(9.48, 9.73, 9.48, 9.67)
+
+weight_length <- data.frame(Location = unique(dat5$Location), slope = c(3.30),
+                            coeff = c(9.48))
+
+glimpse(Tdat1) # raw data f #I think I can use old_pots_gone_2 here instead of Tdat1
+#flag- do I need to remove the old crab from here?? (and in the 2013 onwards stuff too??)
+Old_pots_gone_2 %>%
+  right_join(weight_length) %>%
+  mutate(weight_lb = (exp((slope*log(Width.Millimeters)) - coeff ))*(2.2/1000))-> datWL
+
+Mature = c("Pre_Recruit", "Recruit", "Post_Recruit")
+Legal =c("Recruit", "Post_Recruit")
+
+male_weights <- datWL %>% 
+  group_by(Location, Year) %>% 
+  filter(Sex.Code == 1) %>% 
+  summarise(mature_lbs = weighted.mean(weight_lb[mod_recruit %in% Mature], 
+                                       Number.Of.Specimens[mod_recruit %in% Mature]), 
+            legal_lbs = weighted.mean(weight_lb[mod_recruit %in% Legal], 
+                                      Number.Of.Specimens[mod_recruit %in% Legal]), 
+            prer_lbs = weighted.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
+                                     Number.Of.Specimens[mod_recruit == "Pre_Recruit"]))
+# final results with score - save here
+write.csv(male_weights, paste0('./results/tanner/tanner_tcs/TCS_weights_1999_2013.csv'))
