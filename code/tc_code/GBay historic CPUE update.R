@@ -75,13 +75,13 @@ strata_fix <- strata_fix %>% rename(Year = YEAR, Location = LOCATION, Pot.No = P
 strata_fix_key <- strata_fix %>% distinct(Year, Location, Pot.No, DENSITY_STRATA_CODE)
 write.csv(strata_fix_key, "data/glacier bay 2024 restrat/Gbay strata key 1999 2013.csv")
 
-#AGR HERE 10/22/25
+
 #ok. now bind old_pots_gone and strata_fix to update the strata.
-left_join(Old_pots_gone, strata_fix, by=c("Location", "Year", "Pot.No"))
+Old_pots_gone_2 <- left_join(Old_pots_gone, strata_fix_key, by=c("Location", "Year", "Pot.No"))
 
 #now I need to re-run the CPUE standardization for these old years:
 ##and the format being the same, code from TCS_processing should work
-dat2 <- Old_pots_gone %>%
+dat2 <- Old_pots_gone_2 %>%
   group_by(Year, Pot.No, Location, Density.Strata.Code, mod_recruit) %>% 
   summarise(crab = sum(Number.Of.Specimens)) %>% 
   filter(!is.na(mod_recruit))
@@ -122,4 +122,4 @@ CPUE_wt_all <- dat5 %>%
             SmallF_wt = weighted.mean(Small.Females, weighting), SmallF_SE = (weighted.sd(Small.Females, weighting)/(sqrt(sum(!is.na(Small.Females))))),
             MatF_wt = weighted.mean(Large.Females, weighting), MatF_SE = (weighted.sd(Large.Females, weighting)/(sqrt(sum(!is.na(Large.Females))))))
 
-write.csv(CPUE_wt_all, "results/tanner/tanner_tcs/2025/GBAY_fixed_historic_CPUE_99_12.csv")
+write.csv(CPUE_wt_all, "results/tanner/tanner_tcs/2025/GBAY_fixed_historic_CPUE_99_13.csv")
