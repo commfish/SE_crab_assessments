@@ -53,7 +53,6 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> test1
 
 write.csv(test1, paste0("./results/tanner/tanner_tcs/data_issues", cur_yr, ".csv"))
 
-#agre 25- need to check again after 2nd survey
 
 # **FIX **  calculate soak time 
 #come back later and add a soak time column - tanner soak time should be between 16-20??? double check this

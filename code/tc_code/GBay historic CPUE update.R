@@ -64,8 +64,20 @@ Old_pots_gone <- Gbay_old_data %>%
     GB_pots_outside,
     by = c("Location", "Year", "Pot.No")
   )
-#flag. DAMMIT. unique(Old_pots_gone %>% filter(is.na(Density.Strata.Code))%>% select(Year)) - many years are missing strata assigments. 
+#flag. DAMMIT. unique(Old_pots_gone %>% filter(is.na(Density.Strata.Code))%>% select(Year)) - many years are missing strata assignments. 
 ##Another data request for Zane, it will have to wait until post-survey.
+
+#fixed. Katie gave me strata areas. These should be added to OceanAK at some point (bug Zane eventually)
+strata_gbay <- read.csv("data/glacier bay 2024 restrat/99 to 13_GLB_TCS_raw bio data_with strata.csv")
+names(strata_gbay)
+strata_fix <- strata_gbay %>% select(YEAR, LOCATION, POT_NO, DENSITY_STRATA_CODE)
+strata_fix <- strata_fix %>% rename(Year = YEAR, Location = LOCATION, Pot.No = POT_NO)
+strata_fix_key <- strata_fix %>% distinct(Year, Location, Pot.No, DENSITY_STRATA_CODE)
+write.csv(strata_fix_key, "data/glacier bay 2024 restrat/Gbay strata key 1999 2013.csv")
+
+#AGR HERE 10/22/25
+#ok. now bind old_pots_gone and strata_fix to update the strata.
+left_join(Old_pots_gone, strata_fix, by=c("Location", "Year", "Pot.No"))
 
 #now I need to re-run the CPUE standardization for these old years:
 ##and the format being the same, code from TCS_processing should work
