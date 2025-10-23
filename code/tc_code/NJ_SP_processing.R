@@ -57,7 +57,7 @@ area <- read.csv("./data/tanner/nj_stp/stp_strata_area.csv")  #density strata fo
 seperate <- read.csv(paste0('./data/tanner/nj_stp/juneau_', cur_yr,'_results.csv')) #**FIX** update annually
 
 # run lines above "prep for GIS" then follow onenote instructinos for GIS. Then move this resulting file above
-# to this folder here for the separation. #AGR HERE!!!! - ok idk what the onenote instructons are or wherethey are... at all. 
+# to this folder here for the separation. #AGR- get this from Zane
 
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 
@@ -225,10 +225,7 @@ t.test(dat3_current$Pre_Recruit, mu = baseline_NJ$Pre_Recruit)
 t.test(dat3_current$Recruit, mu = baseline_NJ$Recruit)
 t.test(dat3_current$Post_Recruit, mu = baseline_NJ$Post_Recruit)
 
-# **FIX** need to summarize these to save the results - see function for red crab
-# currently these have to be copied into Excel sheet - 'Tanner Matrix 2020(21).xlsx'
-# fixed Oct 2023: use function long_ttest_nj()
-
+# summarize results
 long_ttest_nj("NJ", cur_yr, baseline, Tdat3)
 
 
@@ -724,6 +721,9 @@ total_health_njsp(cur_yr)
 
 ## !!!!!!!!!!!!! update biomass.csv file before running figure creation #AGR TK here - need tp run CSA for NJ and SP
 # this needs to be updated from CSA runs for 2021 for SP and NJ
+
+#and load in that biomass file
+
 
 # confidential panel figure SP ---------------
 #survey.location = "Juneau"

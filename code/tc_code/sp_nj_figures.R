@@ -278,13 +278,23 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
   #       dpi = 800, width = 8, height = 9.5)
   #dev.off()
   
-  ifelse(option == 1 , 
-         panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
-         ifelse(option == 2, 
-                panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
-                ifelse(option == 3, 
-                       panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
+ # ifelse(option == 1 , 
+  #       panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
+   #      ifelse(option == 2, 
+    #            panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
+     #           ifelse(option == 3, 
+      #                 panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
   
+  
+  if (option == 1) { #agr added to avoid an error, 2025
+    panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v')
+  } else if (option == 2) {
+    panel <- plot_grid(p1, p4, ncol = 1, align = 'v')
+  } else if (option == 3) {
+    panel <- plot_grid(p2, p3, ncol = 1, align = 'v')
+  } else {
+    panel <- NULL
+  }
   
   if(conf == "exclude"){  
     ggsave(paste0('./figures/tanner/', cur_yr, '/', survey.location, '_', cur_yr, '_', 

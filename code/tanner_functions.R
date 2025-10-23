@@ -427,6 +427,12 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
       theme(legend.position = c(0.1,0.75))
   }
   
+  if(survey.location == "Holkham Bay"|survey.location == "Thomas Bay"){ #agr just added this chunk to adjust the legend
+    p1 = p1 +
+      theme(legend.position = c(0.4,0.85))
+  }
+  
+  
   
   ### F1b females/juvenile plot ---------------
   p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
