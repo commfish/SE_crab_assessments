@@ -159,12 +159,20 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
     geom_point(aes(color = recruit.class, shape = recruit.class, 
                    fill = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"))+
-    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9")) +
-    scale_shape_manual(name = "", values = c(15, 16, 17))+
+    scale_colour_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"),
+                        labels = c("Postrecruit", "Prerecruit", "Recruit"))+
+    scale_fill_manual(name = "", values = c("#999999", "#E69F00", "#56B4E9"),
+                      labels = c("Postrecruit", "Prerecruit", "Recruit")) +
+    scale_shape_manual(name = "", values = c(15, 16, 17),
+                       labels = c("Postrecruit", "Prerecruit", "Recruit"))+
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
     #                   oob = rescale_none) +
-    ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
+    #ggtitle(area) + 
+    ylab("CPUE (number/pot)")+ xlab(NULL)+
+    annotate("text", label = area,  #agr- instaed of title 2025
+             x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
+             size = 6, fontface = "bold"    
+    )+ 
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 to 1994 for the even year (2024)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
@@ -177,7 +185,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
                linetype = "longdash", lwd = 0.75)+
     geom_hline(yintercept = baseline2$Post_Recruit, color = "#999999", 
                lwd = 0.75)+
-    theme(legend.position = c(0.25,0.85), 
+    theme(legend.position = c(0.40,0.85), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold"), 
           plot.title = element_text(size = 24)) +
@@ -188,13 +196,16 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
   p2 <- ggplot(femjuv_graph, aes(Year, mean, group = recruit.class, fill = recruit.class))+ 
     geom_point(aes(color = recruit.class, shape = recruit.class), size =3) +
     geom_line(aes(color = recruit.class, group = recruit.class))+
-    scale_colour_manual(name = "", values = c( "#56B4E9"))+
-    scale_shape_manual(name = "", values = c(15))+
-    scale_fill_manual(name = "", values = c("#56B4E9")) +
+    scale_colour_manual(name = "", values = c( "#56B4E9"),
+                        labels =c("Mature female"))+
+    scale_shape_manual(name = "", values = c(15),
+                       labels =c("Mature female"))+
+    scale_fill_manual(name = "", values = c("#56B4E9"),
+                      labels =c("Mature female")) +
     
     #ylim(0,25) + 
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
-    ylab("Mature female CPUE (number/pot)")+ xlab(NULL)+
+    ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #chagned 1993 to 1994 for the even year (2024)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
@@ -202,16 +213,20 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
     #              width =.4) +
     geom_hline(yintercept = baseline2$Large.Female, color = "#56B4E9")+
-    theme(legend.position = c(0.15,0.9),#was 0.8 
+    theme(legend.position = c(0.40,0.9),#was 0.8 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) +
-    expand_limits(y=0) #+
+    expand_limits(y=0) +
+    annotate("text", label = area, #agr 2025 add
+             x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
+             size = 6, fontface = "bold"    
+    )
     #scale_y_continuous(limits = comma)
   
-  if(option == 3){
-    p2 = p2 + ggtitle(paste0(area, ' - Females')) +
-      theme(plot.title = element_text(size = 24))
-  }
+  #if(option == 3){
+   # p2 = p2 + ggtitle(paste0(area, ' - Females')) +
+    #  theme(plot.title = element_text(size = 24))
+#  }
   
   
   #### F1c Female eggs graph -----------
@@ -240,18 +255,21 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
     p3 = p3 + theme(axis.text.x = element_blank())
   }
   if(option ==3){
-    p3 = p3 + xlab("Survey Year")
+    p3 = p3 + xlab("Year")
   }
   
   ### biomass harvest graph --------------
   p4 <- ggplot(biomass_graph, aes(Year, y = pounds/100000, group = type))+ 
     geom_point(aes(color = type, shape = type), size =3) +
     geom_line(aes(color = type, group = type, linetype = type))+
-    scale_colour_manual(name = "", values = c("grey1", "grey1", "grey48", "grey62"))+
-    scale_shape_manual(name = "", values = c(1, 18, 32, 18))+
-    scale_linetype_manual(name = "", values = c("blank", "solid", "solid", "dashed")) +
-    ylab("Pounds (100,000 lbs)") + 
-    xlab("Survey Year") +
+    scale_colour_manual(name = "", values = c("grey1", "grey1", "grey48"),
+                        labels= c("Harvest", "Legal", "Mature"))+
+    scale_shape_manual(name = "", values = c(1, 18, 32),
+                       labels= c("Harvest", "Legal", "Mature"))+
+    scale_linetype_manual(name = "", values = c("blank", "solid", "solid"),
+                          labels= c("Harvest", "Legal", "Mature")) +
+    ylab("Biomass (lb)") + 
+    xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #changed 1993 to 1994 for even-year numbering
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds/100000, 
