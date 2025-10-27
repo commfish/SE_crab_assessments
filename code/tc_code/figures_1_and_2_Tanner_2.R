@@ -32,11 +32,11 @@ harvest <- read.csv(paste0('./data/harvest/tanner_harvest_', cur_yr,'.csv')) # h
 std_cpue <- read.csv(paste0("./results/tanner/harvest/", cur_yr, "/std_commercial_cpue", cur_yr, ".csv")) # calculated in tanner_harvest.R
 hist_biomass <- read.csv(paste0("./data/tanner/tanner_annual_pt_estimate_historic_", cur_yr-1, ".csv"))
 hist_biomass_update <- read.csv(paste0("./data/tanner/tanner_annual_pt_estimate_historic_", cur_yr, ".csv"))
-# this is updated in the cur_yr_tanner_draft.Rmd file - in the 3rd block
+# this is updated in the cur_yr_tanner_draft.Rmd file - in the 2nd block
 
 # repeat previous year's estimates for Peril Strait, due to lack of survey in 2023 - agr updated for this same thing in 2025
-biomass_ps_2023 <- biomass %>% filter(Year == 2022 & Area == "Peril Strait") %>% mutate(Year = 2023)
-biomass_ps <- rbind(biomass, biomass_ps_2023)
+biomass_ps_2025 <- biomass %>% filter(Year == 2022 & Area == "Peril Strait") %>% mutate(Year = 2025)
+biomass_ps <- rbind(biomass, biomass_ps_2025)
 biomass <- biomass_ps
 
 # data prep for Figure 1 ---------------
@@ -54,7 +54,7 @@ biomass %>%
 adj.97 <- c("Thomas Bay", "Holkham Bay", "Glacier Bay")
 adj.98 <- c("Thomas Bay", "Glacier Bay")
 adj.99 <- ("Thomas Bay")
-## adjustments using all years ---
+## adjustments using all years --- #AGR 25 why do we do adjustments??
 # first survey year until 2018 
  biomass %>% 
   left_join(year_totals) %>% 
@@ -120,8 +120,9 @@ year_totals %>%
 
 # Figure 1 ------------
 # Now is calculated based on the current years model output.
-# use average contribution in early years with all years data 
-cur_yr_biomass %>% 
+# use average contribution in early years with all years data - hmm what- AGR 25
+#AGr flag- look at last year and see what you did to the data
+cur_yr_biomass %>% #AGr flag will have to update this graph -  biomass/100000 NO, I want my real numbers
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
   ggplot(aes(Year, y = pounds/1000000, group = type)) +
   geom_line(aes(color = type, linetype = type))+
@@ -180,13 +181,14 @@ ggsave(paste0(here::here(), '/figures/tanner/',  cur_yr,'/', cur_yr,'_figure1_cu
 # make sure you update this csv with current year values - or pull from above 
 tail(hist_biomass) 
   
-tail(hist_biomass_update)
+tail(hist_biomass_update) 
   
 # these are projected biomass for each end year - old data/years here are NOT updated.
 # add current year to this.
 cur_yr_biomass %>% 
   filter(Year == cur_yr) -> temp1
 hist_biomass %>% 
+  dplyr::rename(Legal = legal, Mature=mature)%>%#agr add for wrangle fix
   rbind(temp1) -> hist_biomass2
 # added code to pull in current year from above here and then re-save from the following year
 
@@ -254,8 +256,8 @@ annual_harvest %>%
 annual_harvest_all %>% 
   select(Year, pounds) %>% 
   filter(Year > 1991) %>% 
-  left_join(std_cpue) -> figure2
-# issues with current pull from OceanAK
+  left_join(std_cpue) -> figure2 #warning, there are some NA's for the early years AGR. this might be ok tho.
+# issues with current pull from OceanAK #I think no issues in 25? AGR
 #annual_harvest_cur %>% 
 #  select(Year, pounds) %>% 
 #  filter(Year > 1991) %>% 
@@ -383,7 +385,7 @@ cur_yr_biomass %>%
 
 ## this version has survey year but this isn't matched with comm harvest year. 
   ## harvest 2021 is really 2020/2021 season
-biomass_harvest %>% 
+biomass_harvest %>% #this graph crashes. AGR 25. Not sure if needed.
     select(Year, Regional_Mature, Regional_Legal, harvest = pounds) %>% 
     #gather(type, pounds, Regional_Mature:Regional_Legal, factor_key = TRUE) %>% 
     ggplot() +
@@ -438,7 +440,7 @@ reg_harvest_comm_catch <- biomass_harvest2 %>%
                                                  na.rm = TRUE)+ .5), by = 1.0)) +
   scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2))
   
-reg_harvest_comm_catch
+reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like the 2024 graph
 
   ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_comm_catch_yr.png'), dpi = 800,
          width = 8.5, height = 6.0)
