@@ -447,7 +447,7 @@ reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like
   
 # Old with point estimates Figure 1 ------------
 ##?????
-survey_biomass %>% 
+survey_biomass %>% #yeah IDK, maybe an obsolete graph- agr 25
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
   ggplot(aes(Year, y = pounds/1000000, group = type)) +
   geom_line(aes(color = type, linetype = type))+
