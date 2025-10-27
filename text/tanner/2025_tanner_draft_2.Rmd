@@ -1,0 +1,985 @@
+---
+title: "Southeast Tanner crab assessment 2025 CONFIDENTIAL draft "
+author: "Alex Reich, alex.reich@alaska.gov"
+date: "`r format(Sys.time(), '%B %Y')`"
+output:
+  bookdown::word_document2:
+    fig_caption: yes
+    includes: null
+    toc: no
+    reference_docx: style_settings.docx
+  #word_document:
+    #reference_docx: style_settings.docx
+    #toc: no
+---
+\pagenumbering{arabic}
+
+```{r global_options, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
+#FLAG- save cur_yr as the current year in the environment before pressing KNIT. Why? Idk. - AGR 25
+library(knitr)
+library(kableExtra)
+library(ftExtra)
+source(paste0(here::here(),'/code/tanner_rkc_functions.R'))
+cur_yr = 2025
+pr_yr = cur_yr-1
+fut_yr = cur_yr + 1
+opts_chunk$set(fig.width = 12, fig.height = 6, echo = FALSE, warning = FALSE, message = FALSE,  dpi=300)
+
+set_flextable_defaults(
+  font.family = "Arial", 
+  font.size = 9,
+  font.color = "black",
+  table.layout = "autofit",
+  text.align = "center"
+  #digits = 1,
+  #theme_fun = "theme_box"
+  )
+#\pagenumbering{gobble}
+```
+
+```{r exesum, echo = FALSE}
+biomass <- read.csv(paste0(here::here(),'/data/tanner/tanner_', fut_yr, '_biomassmodel.csv'))  
+# file for all locations.  Has legal and mature biomass from current year CSA & harvest
+hist_bio <- read.csv(paste0(here::here(),'/data/tanner/tanner_annual_pt_estimate_historic_', pr_yr,'.csv'))
+   # add prior year's estimate to this and rename with prior year's values
+   # values for surveyed area is output in 'results/tanner/'pr_yr'/surveyed_areas_total_'pr_yr'_mode.csv
+#table2 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_2021.csv'))
+# these are created in 'figure2_tables.R'
+#table3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table3_regional_2021.csv'))
+#tableA3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/TableA3_regional_2021.csv'))
+#table4 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table4_regional_2021.csv'))
+###
+# regional biomass ----
+
+# add 2022 estimates to 2023 for Peril Strait, due to lack of survey in 2023
+#did same in 2025, another peril-not surveyed year agr
+biomass_ps_2025 <- biomass %>% filter(Year == 2024 & Area == "Peril Strait") %>% mutate(Year = 2025) #update the cur_yr and pre_yr agr
+biomass_ps <- rbind(biomass, biomass_ps_2025)#update to cur_yr agr
+
+biomass_ps %>% 
+  group_by(Year) %>% 
+  summarise(legal = round(sum(Legal),0), mature = round(sum(Mature),0)) %>% 
+  as.data.frame() -> regional.b
+
+## expansion factor for non-surveyed areas ----
+regional.b %>% 
+  mutate(non_sur_legal = round((legal/0.66) - legal, 0),
+         non_sur_mature = round((mature/0.66) - mature, 0),
+         TOTAL_leg = (legal + non_sur_legal), 
+         TOTAL_mat = (mature + non_sur_mature)) -> regional.b_table
+
+regional.b_table %>% filter(Year == cur_yr) -> b_cur_yr
+b_cur_yr %>% 
+  select(Year, legal, mature) -> add_hist
+
+# historic comparisons ---
+hist_bio2 <- hist_bio %>% 
+ # dplyr::rename(Legal = legal, Mature = mature) %>% #hm I do not think we want to rename, at least not here. AGR 25
+  bind_rows(add_hist) #rename can go after this?
+
+# save a new version of the historical point estimates here:
+write_csv(hist_bio2, paste0(here::here(), '/data/tanner/tanner_annual_pt_estimate_historic_', cur_yr, '.csv'))
+
+change <- hist_bio2 %>% 
+  filter(Year >= pr_yr) %>% 
+  mutate(non_sur_legal = round((legal/0.66) - legal, 0),
+         non_sur_mature = round((mature/0.66) - mature, 0),
+         TOTAL_leg = (legal + non_sur_legal), 
+         TOTAL_mat = (mature + non_sur_mature)) %>% 
+  mutate(Year = case_when(
+    Year == pr_yr ~ "prior",
+    Year == cur_yr ~ "current"
+  )) %>%
+  gather(type, pounds, legal:TOTAL_mat, factor_key = TRUE) %>% 
+  spread(key = Year, value = pounds) %>% 
+  mutate(change = 100*(current - prior)/ prior, diff = current - prior) 
+
+round((change %>% filter(type == 'TOTAL_mat'))$diff/1000000, 2) -> pr_yr_diff
+round((change %>% filter(type == 'TOTAL_mat'))$prior/1000000, 2) -> pr_yr_mat
+round((change %>% filter(type == 'TOTAL_leg'))$diff/1000000, 2) -> pr_yr_diff_L
+round((change %>% filter(type == 'TOTAL_leg'))$change, 1) -> pr_yr_per_L
+
+prop_harvest <- read.csv(paste0(here::here(), '/results/tanner/harvest/', cur_yr, '/proportion_total_harvest_', cur_yr, '.csv'))
+
+prop_harvest %>% 
+  filter(Year == cur_yr-1) -> temp
+
+```
+
+
+```{r stockstatusprep, echo = FALSE}
+
+# Stock status tables ----
+
+stock.stat <- data.frame(matrix(vector(), 12, 22, dimnames = list(c(), c("survey.area", "cpueLT.diff.fem", "cpueLT.score.fem", "cpueST.score.fem", "cpueLT.diff.pre", "cpueLT.score.pre", "cpueST.score.pre", "cpueLT.diff.rec", "cpueLT.score.rec", "cpueST.score.rec", "cpueLT.diff.post", "cpueLT.score.post", "cpueST.score.post", "clutch.lt.diff", "clutch.lt.score", "clutch.st.score", "pryr.tot", "pryr.stat", "pryr.hr", "curyr.tot", "curyr.stat", "curyr.hr"))))
+
+stock.stat$survey.area <- c("Icy Strait", "Glacier Bay", "Stephens Passage", "Thomas Bay", "Holkham Bay", "Seymour Canal", "North Juneau", "Excursion Inlet", "Pybus Bay", "Gambier Bay", "Peril Strait", "Lynn Sisters")
+
+# Fall survey areas stock status ----
+
+# fill in table values for TCS areas
+
+lt.tcs <- read_csv(paste0(here::here(), "/results/tanner/tanner_tcs/", cur_yr, "/long_term.csv"))
+st.tcs <- read_csv(paste0(here::here(), "/results/tanner/tanner_tcs/", cur_yr, "/shortterm.csv"))
+sh.tcs <- read_csv(paste0(here::here(), "/results/tanner/tanner_tcs/", cur_yr, "/stock_health.csv"))
+sh.tcs.py <- read_csv(paste0(here::here(), "/results/tanner/tanner_tcs/", pr_yr, "/stock_health.csv"))
+lt.clutch.tcs <- read_csv(paste0(here::here(), "/results/tanner/tanner_tcs/", cur_yr, "/Female_long_term.csv"))
+st.clutch.tcs <- read_csv(paste0(here::here(), "/results/tanner/tanner_tcs/", cur_yr, "/female_shortterm.csv"))
+
+tcs.areas <- c("Icy Strait", "Glacier Bay", "Thomas Bay", "Holkham Bay")
+
+for (i in tcs.areas) {
+  # large females: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.fem[stock.stat$survey.area== i] <- (lt.tcs$mean[lt.tcs$Location== i & lt.tcs$recruit.status=="large.female"] - lt.tcs$lt.mean[lt.tcs$Location== i & lt.tcs$recruit.status=="large.female"]) / lt.tcs$lt.mean[lt.tcs$Location== i & lt.tcs$recruit.status=="large.female"]
+  # large females: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.fem[stock.stat$survey.area== i] <- lt.tcs$significant[lt.tcs$Location== i & lt.tcs$recruit.status=="large.female"]
+  # large females: score for short-term cpue trend score
+  stock.stat$cpueST.score.fem[stock.stat$survey.area== i] <- st.tcs$score[st.tcs$Location== i & st.tcs$mod_recruit=="Large.Females"]
+  # prerecruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.pre[stock.stat$survey.area== i] <- (lt.tcs$mean[lt.tcs$Location== i & lt.tcs$recruit.status=="pre.recruit"] - lt.tcs$lt.mean[lt.tcs$Location== i & lt.tcs$recruit.status=="pre.recruit"]) / lt.tcs$lt.mean[lt.tcs$Location== i & lt.tcs$recruit.status=="pre.recruit"]
+  # prerecruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.pre[stock.stat$survey.area== i] <- lt.tcs$significant[lt.tcs$Location== i & lt.tcs$recruit.status=="pre.recruit"]
+  # prerecruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.pre[stock.stat$survey.area== i] <- st.tcs$score[st.tcs$Location== i & st.tcs$mod_recruit=="Pre_Recruit"]
+  # recruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.rec[stock.stat$survey.area== i] <- (lt.tcs$mean[lt.tcs$Location== i & lt.tcs$recruit.status=="recruit"] - lt.tcs$lt.mean[lt.tcs$Location== i & lt.tcs$recruit.status=="recruit"]) / lt.tcs$lt.mean[lt.tcs$Location== i & lt.tcs$recruit.status=="recruit"]
+  # recruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.rec[stock.stat$survey.area== i] <- lt.tcs$significant[lt.tcs$Location== i & lt.tcs$recruit.status=="recruit"]
+  # recruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.rec[stock.stat$survey.area== i] <- st.tcs$score[st.tcs$Location== i & st.tcs$mod_recruit=="Recruit"]
+  # postrecruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.post[stock.stat$survey.area== i] <- (lt.tcs$mean[lt.tcs$Location== i & lt.tcs$recruit.status=="post.recruit"] - lt.tcs$lt.mean[lt.tcs$Location== i & lt.tcs$recruit.status=="post.recruit"]) / lt.tcs$lt.mean[lt.tcs$Location== i & lt.tcs$recruit.status=="post.recruit"]
+  # postrecruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.post[stock.stat$survey.area== i] <- lt.tcs$significant[lt.tcs$Location== i & lt.tcs$recruit.status=="post.recruit"]
+  # postrecruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.post[stock.stat$survey.area== i] <- st.tcs$score[st.tcs$Location== i & st.tcs$mod_recruit=="Post_Recruit"]
+  # percent clutch fullness <25% comparison with long-term mean: percent difference
+      # note: the long-term mean is just defined as 10%?
+  stock.stat$clutch.lt.diff[stock.stat$survey.area== i] <- (lt.clutch.tcs$mean[lt.clutch.tcs$area== i] - 0.1) / 0.1
+  # percent clutch fullness <25% comparison with long-term mean: score
+  stock.stat$clutch.lt.score[stock.stat$survey.area== i] <- lt.clutch.tcs$significant[lt.clutch.tcs$area== i]
+  # percent clutch fullness <25% short-term trend score
+  stock.stat$clutch.st.score[stock.stat$survey.area== i] <- st.clutch.tcs$score[st.clutch.tcs$Location== i]
+  # previous year total stock health score
+  stock.stat$pryr.tot[stock.stat$survey.area== i] <- sh.tcs.py$score[sh.tcs.py$Location== i]
+  # previous year stock status
+  stock.stat$pryr.stat[stock.stat$survey.area== i] <- sh.tcs.py$health_status[sh.tcs.py$Location== i]
+  # previous year harvest rate
+  stock.stat$pryr.hr[stock.stat$survey.area== i] <- sh.tcs.py$harvest_per[sh.tcs.py$Location== i]
+  # current year total stock health score
+  stock.stat$curyr.tot[stock.stat$survey.area== i] <- sh.tcs$score[sh.tcs$Location== i]
+  # current year stock status
+  stock.stat$curyr.stat[stock.stat$survey.area== i] <- sh.tcs$health_status[sh.tcs$Location== i]
+  # current year harvest rate
+  stock.stat$curyr.hr[stock.stat$survey.area== i] <- sh.tcs$harvest_per[sh.tcs$Location== i]
+}
+ 
+# Summer survey areas stock status ----
+
+# fill in table values for Stephens Passage
+
+lt.sp <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/SP_longterm.csv"))
+st.sp <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/SP_shortterm.csv"))
+sh.sp <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/NJSP_stock_health.csv"))
+sh.sp.py <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", pr_yr, "/NJSP_stock_health.csv"))
+lt.clutch.sp <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/SP_female_long_term.csv"))
+st.clutch.sp <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/SP_Fem_shortterm.csv"))
+
+# large females: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.fem[stock.stat$survey.area== "Stephens Passage"] <- (lt.sp$mean[lt.sp$recruit.status=="large.female"] - lt.sp$lt.mean[lt.sp$recruit.status=="large.female"]) / lt.sp$lt.mean[lt.sp$recruit.status=="large.female"]
+  # large females: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.fem[stock.stat$survey.area== "Stephens Passage"] <- lt.sp$significant[lt.sp$recruit.status=="large.female"]
+  # large females: score for short-term cpue trend score
+  stock.stat$cpueST.score.fem[stock.stat$survey.area== "Stephens Passage"] <- st.sp$score[st.sp$mod_recruit=="Large.Females"]
+  # prerecruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.pre[stock.stat$survey.area== "Stephens Passage"] <- (lt.sp$mean[lt.sp$recruit.status=="pre.recruit"] - lt.sp$lt.mean[lt.sp$recruit.status=="pre.recruit"]) / lt.sp$lt.mean[lt.sp$recruit.status=="pre.recruit"]
+  # prerecruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.pre[stock.stat$survey.area== "Stephens Passage"] <- lt.sp$significant[lt.sp$recruit.status=="pre.recruit"]
+  # prerecruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.pre[stock.stat$survey.area== "Stephens Passage"] <- st.sp$score[st.sp$mod_recruit=="Pre_Recruit"]
+  # recruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.rec[stock.stat$survey.area== "Stephens Passage"] <- (lt.sp$mean[lt.sp$recruit.status=="recruit"] - lt.sp$lt.mean[lt.sp$recruit.status=="recruit"]) / lt.sp$lt.mean[lt.sp$recruit.status=="recruit"]
+  # recruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.rec[stock.stat$survey.area== "Stephens Passage"] <- lt.sp$significant[lt.sp$recruit.status=="recruit"]
+  # recruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.rec[stock.stat$survey.area== "Stephens Passage"] <- st.sp$score[st.sp$mod_recruit=="Recruit"]
+  # postrecruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.post[stock.stat$survey.area== "Stephens Passage"] <- (lt.sp$mean[lt.sp$recruit.status=="post.recruit"] - lt.sp$lt.mean[lt.sp$recruit.status=="post.recruit"]) / lt.sp$lt.mean[lt.sp$recruit.status=="post.recruit"]
+  # postrecruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.post[stock.stat$survey.area== "Stephens Passage"] <- lt.sp$significant[lt.sp$recruit.status=="post.recruit"]
+  # postrecruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.post[stock.stat$survey.area== "Stephens Passage"] <- st.sp$score[st.sp$mod_recruit=="Post_Recruit"]
+  # percent clutch fullness <25% comparison with long-term mean: percent difference
+      # note: the long-term mean is just defined as 10%?
+  stock.stat$clutch.lt.diff[stock.stat$survey.area== "Stephens Passage"] <- (lt.clutch.sp$mean - 0.1) / 0.1
+  # percent clutch fullness <25% comparison with long-term mean: score
+  stock.stat$clutch.lt.score[stock.stat$survey.area== "Stephens Passage"] <- lt.clutch.sp$significant
+  # percent clutch fullness <25% short-term trend score
+  stock.stat$clutch.st.score[stock.stat$survey.area== "Stephens Passage"] <- st.clutch.sp$score
+  # previous year total stock health score
+  stock.stat$pryr.tot[stock.stat$survey.area== "Stephens Passage"] <- sh.sp.py$score[sh.sp.py$Location=="SP"]
+  # previous year stock status
+  stock.stat$pryr.stat[stock.stat$survey.area== "Stephens Passage"] <- sh.sp.py$health_status[sh.sp.py$Location=="SP"]
+  # previous year harvest rate
+  stock.stat$pryr.hr[stock.stat$survey.area== "Stephens Passage"] <- sh.sp.py$harvest_per[sh.sp.py$Location=="SP"]
+  # current year total stock health score
+  stock.stat$curyr.tot[stock.stat$survey.area== "Stephens Passage"] <- sh.sp$score[sh.sp.py$Location=="SP"]
+  # current year stock status
+  stock.stat$curyr.stat[stock.stat$survey.area== "Stephens Passage"] <- sh.sp$health_status[sh.sp.py$Location=="SP"]
+  # current year harvest rate
+  stock.stat$curyr.hr[stock.stat$survey.area== "Stephens Passage"] <- sh.sp$harvest_per[sh.sp.py$Location=="SP"]
+
+# fill in table values for North Juneau
+
+lt.nj <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/NJ_longterm.csv"))
+st.nj <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/NJ_shortterm.csv"))
+sh.nj <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/NJSP_stock_health.csv"))
+sh.nj.py <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", pr_yr, "/NJSP_stock_health.csv"))
+lt.clutch.nj <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/NJ_female_long_term.csv"))
+st.clutch.nj <- read_csv(paste0(here::here(), "/results/tanner/nj_stp/", cur_yr, "/NJ_Fem_shortterm.csv"))
+
+# large females: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.fem[stock.stat$survey.area== "North Juneau"] <- (lt.nj$mean[lt.nj$recruit.status=="large.female"] - lt.nj$lt.mean[lt.nj$recruit.status=="large.female"]) / lt.nj$lt.mean[lt.nj$recruit.status=="large.female"]
+  # large females: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.fem[stock.stat$survey.area== "North Juneau"] <- lt.nj$significant[lt.nj$recruit.status=="large.female"]
+  # large females: score for short-term cpue trend score
+  stock.stat$cpueST.score.fem[stock.stat$survey.area== "North Juneau"] <- st.nj$score[st.nj$mod_recruit=="Large.Females"]
+  # prerecruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.pre[stock.stat$survey.area== "North Juneau"] <- (lt.nj$mean[lt.nj$recruit.status=="pre.recruit"] - lt.nj$lt.mean[lt.nj$recruit.status=="pre.recruit"]) / lt.nj$lt.mean[lt.nj$recruit.status=="pre.recruit"]
+  # prerecruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.pre[stock.stat$survey.area== "North Juneau"] <- lt.nj$significant[lt.nj$recruit.status=="pre.recruit"]
+  # prerecruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.pre[stock.stat$survey.area== "North Juneau"] <- st.nj$score[st.nj$mod_recruit=="Pre_Recruit"]
+  # recruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.rec[stock.stat$survey.area== "North Juneau"] <- (lt.nj$mean[lt.nj$recruit.status=="recruit"] - lt.nj$lt.mean[lt.nj$recruit.status=="recruit"]) / lt.nj$lt.mean[lt.nj$recruit.status=="recruit"]
+  # recruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.rec[stock.stat$survey.area== "North Juneau"] <- lt.nj$significant[lt.nj$recruit.status=="recruit"]
+  # recruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.rec[stock.stat$survey.area== "North Juneau"] <- st.nj$score[st.nj$mod_recruit=="Recruit"]
+  # postrecruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.post[stock.stat$survey.area== "North Juneau"] <- (lt.nj$mean[lt.nj$recruit.status=="post.recruit"] - lt.nj$lt.mean[lt.nj$recruit.status=="post.recruit"]) / lt.nj$lt.mean[lt.nj$recruit.status=="post.recruit"]
+  # postrecruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.post[stock.stat$survey.area== "North Juneau"] <- lt.nj$significant[lt.nj$recruit.status=="post.recruit"]
+  # postrecruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.post[stock.stat$survey.area== "North Juneau"] <- st.nj$score[st.nj$mod_recruit=="Post_Recruit"]
+  # percent clutch fullness <25% comparison with long-term mean: percent difference
+      # note: the long-term mean is just defined as 10%?
+  stock.stat$clutch.lt.diff[stock.stat$survey.area== "North Juneau"] <- (lt.clutch.nj$mean - 0.1) / 0.1
+  # percent clutch fullness <25% comparison with long-term mean: score
+  stock.stat$clutch.lt.score[stock.stat$survey.area== "North Juneau"] <- lt.clutch.nj$significant
+  # percent clutch fullness <25% short-term trend score
+  stock.stat$clutch.st.score[stock.stat$survey.area== "North Juneau"] <- st.clutch.nj$score
+  # previous year total stock health score
+  stock.stat$pryr.tot[stock.stat$survey.area== "North Juneau"] <- sh.nj.py$score[sh.nj.py$Location=="NJ"]
+  # previous year stock status
+  stock.stat$pryr.stat[stock.stat$survey.area== "North Juneau"] <- sh.nj.py$health_status[sh.nj.py$Location=="NJ"]
+  # previous year harvest rate
+  stock.stat$pryr.hr[stock.stat$survey.area== "North Juneau"] <- sh.nj.py$harvest_per[sh.nj.py$Location=="NJ"]
+  # current year total stock health score
+  stock.stat$curyr.tot[stock.stat$survey.area== "North Juneau"] <- sh.nj$score[sh.nj.py$Location=="NJ"]
+  # current year stock status
+  stock.stat$curyr.stat[stock.stat$survey.area== "North Juneau"] <- sh.nj$health_status[sh.nj.py$Location=="NJ"]
+  # current year harvest rate
+  stock.stat$curyr.hr[stock.stat$survey.area== "North Juneau"] <- sh.nj$harvest_per[sh.nj.py$Location=="NJ"]
+
+# fill in table values for other summer survey areas
+
+lt.rkc <- read_csv(paste0(here::here(), "/results/tanner/tanner_rkc/", cur_yr, "/long_term.csv")) %>%
+  mutate(Location = case_when(
+    AREA == "SC" ~ "Seymour Canal",
+    AREA == "EI" ~ "Excursion Inlet",
+    AREA == "PB" ~ "Pybus Bay",
+    AREA == "GB" ~ "Gambier Bay",
+    AREA == "PS" ~ "Peril Strait",
+    AREA == "LS" ~ "Lynn Sisters"
+  ))
+st.rkc <- read_csv(paste0(here::here(), "/results/tanner/tanner_rkc/", cur_yr, "/shortterm.csv")) %>%
+  mutate(Location = case_when(
+    AREA == "SC" ~ "Seymour Canal",
+    AREA == "EI" ~ "Excursion Inlet",
+    AREA == "PB" ~ "Pybus Bay",
+    AREA == "GB" ~ "Gambier Bay",
+    AREA == "PS" ~ "Peril Strait",
+    AREA == "LS" ~ "Lynn Sisters"
+  ))
+sh.rkc <- read_csv(paste0(here::here(), "/results/tanner/tanner_rkc/", cur_yr, "/stock_health.csv")) %>%
+  mutate(Location = case_when(
+    AREA == "SC" ~ "Seymour Canal",
+    AREA == "EI" ~ "Excursion Inlet",
+    AREA == "PB" ~ "Pybus Bay",
+    AREA == "GB" ~ "Gambier Bay",
+    AREA == "PS" ~ "Peril Strait",
+    AREA == "LS" ~ "Lynn Sisters"
+  ))
+sh.rkc.py <- read_csv(paste0(here::here(), "/results/tanner/tanner_rkc/", pr_yr, "/stock_health.csv")) %>%
+  mutate(Location = case_when(
+    AREA == "SC" ~ "Seymour Canal",
+    AREA == "EI" ~ "Excursion Inlet",
+    AREA == "PB" ~ "Pybus Bay",
+    AREA == "GB" ~ "Gambier Bay",
+    AREA == "PS" ~ "Peril Strait",
+    AREA == "LS" ~ "Lynn Sisters"
+  ))
+lt.clutch.rkc <- read_csv(paste0(here::here(), "/results/tanner/tanner_rkc/", cur_yr, "/Female_long_term.csv")) %>%
+  mutate(Location = case_when(
+    area == "SC" ~ "Seymour Canal",
+    area == "EI" ~ "Excursion Inlet",
+    area == "PB" ~ "Pybus Bay",
+    area == "GB" ~ "Gambier Bay",
+    area == "PS" ~ "Peril Strait",
+    area == "LS" ~ "Lynn Sisters"
+  ))
+st.clutch.rkc <- read_csv(paste0(here::here(), "/results/tanner/tanner_rkc/", cur_yr, "/female_shortterm.csv")) %>%
+  mutate(Location = case_when(
+    AREA == "SC" ~ "Seymour Canal",
+    AREA == "EI" ~ "Excursion Inlet",
+    AREA == "PB" ~ "Pybus Bay",
+    AREA == "GB" ~ "Gambier Bay",
+    AREA == "PS" ~ "Peril Strait",
+    AREA == "LS" ~ "Lynn Sisters"
+  ))
+
+#rkc.areas <- c("Seymour Canal", "Excursion Inlet", "Pybus Bay", "Gambier Bay", "Peril Strait", "Lynn Sisters") # use in even years
+rkc.areas <- c("Seymour Canal", "Excursion Inlet", "Pybus Bay", "Gambier Bay", "Lynn Sisters")
+
+for (i in rkc.areas) {
+  # large females: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.fem[stock.stat$survey.area== i] <- (lt.rkc$mean[lt.rkc$Location== i & lt.rkc$recruit.status=="large.female"] - lt.rkc$lt.mean[lt.rkc$Location== i & lt.rkc$recruit.status=="large.female"]) / lt.rkc$lt.mean[lt.rkc$Location== i & lt.rkc$recruit.status=="large.female"]
+  # large females: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.fem[stock.stat$survey.area== i] <- lt.rkc$significant[lt.rkc$Location== i & lt.rkc$recruit.status=="large.female"]
+  # large females: score for short-term cpue trend score
+  stock.stat$cpueST.score.fem[stock.stat$survey.area== i] <- st.rkc$score[st.rkc$Location== i & st.rkc$mod_recruit=="Large.Females"]
+  # prerecruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.pre[stock.stat$survey.area== i] <- (lt.rkc$mean[lt.rkc$Location== i & lt.rkc$recruit.status=="pre.recruit"] - lt.rkc$lt.mean[lt.rkc$Location== i & lt.rkc$recruit.status=="pre.recruit"]) / lt.rkc$lt.mean[lt.rkc$Location== i & lt.rkc$recruit.status=="pre.recruit"]
+  # prerecruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.pre[stock.stat$survey.area== i] <- lt.rkc$significant[lt.rkc$Location== i & lt.rkc$recruit.status=="pre.recruit"]
+  # prerecruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.pre[stock.stat$survey.area== i] <- st.rkc$score[st.rkc$Location== i & st.rkc$mod_recruit=="Pre_Recruit"]
+  # recruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.rec[stock.stat$survey.area== i] <- (lt.rkc$mean[lt.rkc$Location== i & lt.rkc$recruit.status=="recruit"] - lt.rkc$lt.mean[lt.rkc$Location== i & lt.rkc$recruit.status=="recruit"]) / lt.rkc$lt.mean[lt.rkc$Location== i & lt.rkc$recruit.status=="recruit"]
+  # recruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.rec[stock.stat$survey.area== i] <- lt.rkc$significant[lt.rkc$Location== i & lt.rkc$recruit.status=="recruit"]
+  # recruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.rec[stock.stat$survey.area== i] <- st.rkc$score[st.rkc$Location== i & st.rkc$mod_recruit=="Recruit"]
+  # postrecruit males: percent difference between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.diff.post[stock.stat$survey.area== i] <- (lt.rkc$mean[lt.rkc$Location== i & lt.rkc$recruit.status=="post.recruit"] - lt.rkc$lt.mean[lt.rkc$Location== i & lt.rkc$recruit.status=="post.recruit"]) / lt.rkc$lt.mean[lt.rkc$Location== i & lt.rkc$recruit.status=="post.recruit"]
+  # postrecruit males: score for comparison between current year's mean cpue and long-term mean cpue
+  stock.stat$cpueLT.score.post[stock.stat$survey.area== i] <- lt.rkc$significant[lt.rkc$Location== i & lt.rkc$recruit.status=="post.recruit"]
+  # postrecruit males: score for short-term cpue trend score
+  stock.stat$cpueST.score.post[stock.stat$survey.area== i] <- st.rkc$score[st.rkc$Location== i & st.rkc$mod_recruit=="Post_Recruit"]
+  # percent clutch fullness <25% comparison with long-term mean: percent difference
+      # note: the long-term mean is just defined as 10%?
+  stock.stat$clutch.lt.diff[stock.stat$survey.area== i] <- (lt.clutch.rkc$mean[lt.clutch.rkc$Location== i] - 0.1) / 0.1
+  # percent clutch fullness <25% comparison with long-term mean: score
+  stock.stat$clutch.lt.score[stock.stat$survey.area== i] <- lt.clutch.rkc$significant[lt.clutch.rkc$Location== i]
+  # percent clutch fullness <25% short-term trend score
+  stock.stat$clutch.st.score[stock.stat$survey.area== i] <- st.clutch.rkc$score[st.clutch.rkc$Location== i]
+  # previous year total stock health score
+  stock.stat$pryr.tot[stock.stat$survey.area== i] <- sh.rkc.py$score[sh.rkc.py$Location== i]
+  # previous year stock status
+  stock.stat$pryr.stat[stock.stat$survey.area== i] <- sh.rkc.py$health_status[sh.rkc.py$Location== i]
+  # previous year harvest rate
+  stock.stat$pryr.hr[stock.stat$survey.area== i] <- sh.rkc.py$harvest_per[sh.rkc.py$Location== i]
+  # current year total stock health score
+  stock.stat$curyr.tot[stock.stat$survey.area== i] <- sh.rkc$score[sh.rkc$Location== i]
+  # current year stock status
+  stock.stat$curyr.stat[stock.stat$survey.area== i] <- sh.rkc$health_status[sh.rkc$Location== i]
+  # current year harvest rate
+  stock.stat$curyr.hr[stock.stat$survey.area== i] <- sh.rkc$harvest_per[sh.rkc$Location== i]
+}
+
+# fill in Peril Strait values for previous year (only use this code in years without a Peril survey)
+  # previous year total stock health score
+  stock.stat$pryr.tot[stock.stat$survey.area== "Peril Strait"] <- sh.rkc.py$score[sh.rkc.py$Location== "Peril Strait"]
+  # previous year stock status
+  stock.stat$pryr.stat[stock.stat$survey.area== "Peril Strait"] <- sh.rkc.py$health_status[sh.rkc.py$Location== "Peril Strait"]
+  # previous year harvest rate
+  stock.stat$pryr.hr[stock.stat$survey.area== "Peril Strait"] <- sh.rkc.py$harvest_per[sh.rkc.py$Location== "Peril Strait"]
+  
+stock.stat$cpueLT.diff.fem <- round(100 * stock.stat$cpueLT.diff.fem, 0)
+stock.stat$cpueLT.diff.pre <- round(100 * stock.stat$cpueLT.diff.pre, 0)
+stock.stat$cpueLT.diff.rec <- round(100 * stock.stat$cpueLT.diff.rec, 0)
+stock.stat$cpueLT.diff.post <- round(100 * stock.stat$cpueLT.diff.post, 0)
+stock.stat$clutch.lt.diff <- round(100 * stock.stat$clutch.lt.diff, 0)
+stock.stat$pryr.hr <- paste0(round(stock.stat$pryr.hr*100, 0), "%")
+stock.stat$curyr.hr <- paste0(round(stock.stat$curyr.hr*100, 0), "%")
+
+# transpose all but the first column (name)
+n <- stock.stat$survey.area
+stock.stat.2 <- as.data.frame(t(stock.stat[,-1]))
+colnames(stock.stat.2) <- n
+
+stock.stat.3 <- cbind(rownames(stock.stat.2), data.frame(stock.stat.2, row.names=NULL))
+names(stock.stat.3)[names(stock.stat.3) == "rownames(stock.stat.2)"] <- "type" 
+
+stock.stat.4 <- stock.stat.3 %>%
+  mutate(categ = case_when(
+    type == "cpueLT.diff.fem" ~ "Female CPUE",
+    type == "cpueLT.score.fem" ~ "Female CPUE",
+    type == "cpueST.score.fem" ~ "Female CPUE",
+    type == "cpueLT.diff.pre" ~ "Prerecruit CPUE",
+    type == "cpueLT.score.pre" ~ "Prerecruit CPUE",
+    type == "cpueST.score.pre" ~ "Prerecruit CPUE",
+    type == "cpueLT.diff.rec" ~ "Recruit CPUE",
+    type == "cpueLT.score.rec" ~ "Recruit CPUE",
+    type == "cpueST.score.rec" ~ "Recruit CPUE",
+    type == "cpueLT.diff.post" ~ "Postrecruit CPUE",
+    type == "cpueLT.score.post" ~ "Postrecruit CPUE",
+    type == "cpueST.score.post" ~ "Postrecruit CPUE",
+    type == "clutch.lt.diff" ~ "Percent clutch fullness < 25%",
+    type == "clutch.lt.score" ~ "Percent clutch fullness < 25%",
+    type == "clutch.st.score" ~ "Percent clutch fullness < 25%",
+    type == "pryr.tot" ~ paste0(pr_yr),
+    type == "pryr.stat" ~ paste0(pr_yr),
+    type == "pryr.hr" ~ paste0(pr_yr),
+    type == "curyr.tot" ~ paste0(cur_yr),
+    type == "curyr.stat" ~ paste0(cur_yr),
+    type == "curyr.hr" ~ paste0(cur_yr)
+  )) %>%
+  mutate(type = case_when(
+    type == "cpueLT.diff.fem" ~ "vs. long-term average: % of baseline",
+    type == "cpueLT.score.fem" ~ "vs. long-term average: score",
+    type == "cpueST.score.fem" ~ "short-term trend: score",
+    type == "cpueLT.diff.pre" ~ "vs. long-term average: % of baseline",
+    type == "cpueLT.score.pre" ~ "vs. long-term average: score",
+    type == "cpueST.score.pre" ~ "short-term trend: score",
+    type == "cpueLT.diff.rec" ~ "vs. long-term average: % of baseline",
+    type == "cpueLT.score.rec" ~ "vs. long-term average: score",
+    type == "cpueST.score.rec" ~ "short-term trend: score",
+    type == "cpueLT.diff.post" ~ "vs. long-term average: % of baseline",
+    type == "cpueLT.score.post" ~ "vs. long-term average: score",
+    type == "cpueST.score.post" ~ "short-term trend: score",
+    type == "clutch.lt.diff" ~ "vs. long-term average: % of baseline",
+    type == "clutch.lt.score" ~ "vs. long-term average: score",
+    type == "clutch.st.score" ~ "short-term trend: score",
+    type == "pryr.tot" ~ "total score",
+    type == "pryr.stat" ~ "stock status",
+    type == "pryr.hr" ~ "mature harvest rate",
+    type == "curyr.tot" ~ "total score",
+    type == "curyr.stat" ~ "stock status",
+    type == "curyr.hr" ~ "mature harvest rate"
+  ))
+
+# split into three tables to fit one on each page
+fall.stock.stat <- stock.stat.4 %>%
+  select(categ, type, Icy.Strait, Glacier.Bay, Thomas.Bay, Holkham.Bay) %>%
+  dplyr::rename("Icy Strait" = Icy.Strait, "Glacier Bay" = Glacier.Bay, "Thomas Bay" = Thomas.Bay, "Holkham Bay" = Holkham.Bay)
+
+summer.stock.stat.a <- stock.stat.4 %>%
+  select(categ, type, Stephens.Passage, Seymour.Canal, North.Juneau, Excursion.Inlet) %>%
+  dplyr::rename("Stephens Passage" = Stephens.Passage, "Seymour Canal" = Seymour.Canal, "North Juneau" = North.Juneau, "Excursion Inlet" = Excursion.Inlet)
+
+summer.stock.stat.b <- stock.stat.4 %>%
+  select(categ, type, Pybus.Bay, Gambier.Bay, Peril.Strait, Lynn.Sisters) %>%
+  dplyr::rename("Pybus Bay" = Pybus.Bay, "Gambier Bay" = Gambier.Bay, "Peril Strait" = Peril.Strait, "Lynn Sisters" = Lynn.Sisters)
+
+
+```
+
+
+
+
+```{r fortext,  echo = FALSE}
+
+# stock status ----
+
+is.status <- stock.stat.3 %>% select(type, Icy.Strait) %>% filter(type == "curyr.stat") %>% pull()
+gl.status <- stock.stat.3 %>% select(type, Glacier.Bay) %>% filter(type == "curyr.stat") %>% pull()
+tb.status <- stock.stat.3 %>% select(type, Thomas.Bay) %>% filter(type == "curyr.stat") %>% pull()
+hb.status <- stock.stat.3 %>% select(type, Holkham.Bay) %>% filter(type == "curyr.stat") %>% pull()
+pc.status <- "not surveyed since 2015"
+sp.status <- stock.stat.3 %>% select(type, Stephens.Passage) %>% filter(type == "curyr.stat") %>% pull()
+sc.status <- stock.stat.3 %>% select(type, Seymour.Canal) %>% filter(type == "curyr.stat") %>% pull()
+nj.status <- stock.stat.3 %>% select(type, North.Juneau) %>% filter(type == "curyr.stat") %>% pull()
+ei.status <- stock.stat.3 %>% select(type, Excursion.Inlet) %>% filter(type == "curyr.stat") %>% pull()
+pb.status <- stock.stat.3 %>% select(type, Pybus.Bay) %>% filter(type == "curyr.stat") %>% pull()
+ga.status <- stock.stat.3 %>% select(type, Gambier.Bay) %>% filter(type == "curyr.stat") %>% pull()
+ps.status <- "not surveyed in 2023"
+ls.status <- stock.stat.3 %>% select(type, Lynn.Sisters) %>% filter(type == "curyr.stat") %>% pull()
+pf.status <- "not surveyed since 2015"
+
+# harvest rate ----
+
+is.hr <- stock.stat.3 %>% select(type, Icy.Strait) %>% filter(type == "curyr.hr") %>% pull()
+gl.hr <- stock.stat.3 %>% select(type, Glacier.Bay) %>% filter(type == "curyr.hr") %>% pull()
+tb.hr <- stock.stat.3 %>% select(type, Thomas.Bay) %>% filter(type == "curyr.hr") %>% pull()
+hb.hr <- stock.stat.3 %>% select(type, Holkham.Bay) %>% filter(type == "curyr.hr") %>% pull()
+pc.hr <- "not surveyed since 2015"
+sp.hr <- stock.stat.3 %>% select(type, Stephens.Passage) %>% filter(type == "curyr.hr") %>% pull()
+sc.hr <- stock.stat.3 %>% select(type, Seymour.Canal) %>% filter(type == "curyr.hr") %>% pull()
+nj.hr <- stock.stat.3 %>% select(type, North.Juneau) %>% filter(type == "curyr.hr") %>% pull()
+ei.hr <- stock.stat.3 %>% select(type, Excursion.Inlet) %>% filter(type == "curyr.hr") %>% pull()
+pb.hr <- stock.stat.3 %>% select(type, Pybus.Bay) %>% filter(type == "curyr.hr") %>% pull()
+ga.hr <- stock.stat.3 %>% select(type, Gambier.Bay) %>% filter(type == "curyr.hr") %>% pull()
+ps.hr <- "10%" # this is the 2022 harvest rate; using this because Peril Strait was not surveyed in 2023
+ls.hr <- stock.stat.3 %>% select(type, Lynn.Sisters) %>% filter(type == "curyr.hr") %>% pull() 
+pf.hr <- "not surveyed since 2015"
+
+# percent of current year's annual harvest for each area ----
+# (see area summaries)  
+
+perc.h <- read.csv(paste0(here::here(),'/results/tanner/harvest/', cur_yr, '/proportion_total_harvest_', cur_yr, '.csv')) %>%
+  filter(Year == pr_yr)
+perc.h.is <- perc.h %>% filter(survey.area == "Icy Strait") %>% pull(percent_total) %>% round(1)
+perc.h.gl <- perc.h %>% filter(survey.area == "Glacier Bay") %>% pull(percent_total) %>% round(1)
+perc.h.tb <- perc.h %>% filter(survey.area == "Thomas Bay") %>% pull(percent_total) %>% round(1)
+perc.h.hb <- perc.h %>% filter(survey.area == "Holkham Bay") %>% pull(percent_total) %>% round(1)
+perc.h.pc <- perc.h %>% filter(survey.area == "Port Camden") %>% pull(percent_total) %>% round(1)
+perc.h.sp <- perc.h %>% filter(survey.area == "Stephens Passage") %>% pull(percent_total) %>% round(1)
+perc.h.sc <- perc.h %>% filter(survey.area == "Seymour Canal") %>% pull(percent_total) %>% round(1)
+perc.h.nj <- perc.h %>% filter(survey.area == "North Juneau") %>% pull(percent_total) %>% round(1)
+perc.h.ei <- perc.h %>% filter(survey.area == "Excursion Inlet") %>% pull(percent_total) %>% round(1)
+perc.h.pb <- perc.h %>% filter(survey.area == "Pybus Bay") %>% pull(percent_total) %>% round(1)
+perc.h.ga <- perc.h %>% filter(survey.area == "Gambier Bay") %>% pull(percent_total) %>% round(1)
+perc.h.ps <- perc.h %>% filter(survey.area == "Peril Strait") %>% pull(percent_total) %>% round(1)
+perc.h.ls <- perc.h %>% filter(survey.area == "Lynn Sisters") %>% pull(percent_total) %>% round(1)
+perc.h.pf <- perc.h %>% filter(survey.area == "PFred") %>% pull(percent_total) %>% round(1)
+
+```
+
+
+```{r modelestprep, echo = FALSE}
+
+# Model estimates table ----
+
+expansion = 0.66
+
+# add 2022 estimates to 2023 for Peril Strait, due to lack of survey in 2023
+biomass_ps_2023 <- biomass %>% filter(Year == 2022 & Area == "Peril Strait") %>% mutate(Year = 2023)
+biomass_ps <- rbind(biomass, biomass_ps_2023)
+
+regional_totals <- biomass_ps %>% 
+  filter(Year == cur_yr) %>% 
+  dplyr::select(Year, Area, Legal, Mature) %>%  
+  group_by(Year) %>% 
+  summarise(Legal = sum(Legal), Mature = sum(Mature)) %>% 
+  gather(type, surveyed, Legal:Mature, factor_key = TRUE) %>% 
+  mutate(other.areas = ((surveyed/expansion) - surveyed), 
+         total = surveyed + other.areas) %>% 
+  gather(Area, pounds, surveyed:total) %>% 
+  cast(Year+Area~type)
+  
+Area <- c("Icy Strait", "Glacier Bay", "Holkham Bay", "Thomas Bay", "Stephens Passage", "North Juneau", "Lynn Sisters", "Pybus Bay",        "Gambier Bay", "Peril Strait", "Excursion Inlet", "Seymour Canal")
+cur.hr <- c(is.hr, gl.hr, hb.hr, tb.hr, sp.hr, nj.hr, ls.hr, pb.hr, ga.hr, ps.hr, ei.hr, sc.hr)
+cur.hr.use <- as.numeric( sub("%", "", cur.hr, fixed = TRUE))/100
+current_hr <- as.data.frame(cbind(Area, cur.hr.use))
+current_hr$cur.hr.use <- as.numeric(current_hr$cur.hr.use)
+
+biomass_rate1 <- biomass_ps %>% 
+  filter(Year == cur_yr) %>% 
+  dplyr::select(Year, Area, Legal, Mature) %>% 
+  bind_rows(regional_totals) %>% 
+  mutate(Healthy_HR = round(0.20, 2), 
+         Healthy_GHL = round(Healthy_HR*Mature, 0),
+         Healthy_legalHR = round(Healthy_GHL/Legal, 2), 
+         Healthy_GHL = case_when(
+           Healthy_legalHR < 0.38 ~ round(Healthy_HR*Mature, 0),
+           Healthy_legalHR >= 0.38 ~ round(Legal*0.38, 0)
+         ))
+
+biomass_rate2 <- merge(biomass_rate1, current_hr, by = "Area", all = T)
+
+biomass_rate <- biomass_rate2 %>% 
+  mutate(Current_HR = round(cur.hr.use, 2), 
+         Current_GHL = round(Current_HR*Mature, 0),
+         Current_legalHR = round(Current_GHL/Legal, 2), 
+         Current_GHL = case_when(
+           Current_legalHR < 0.38 ~ round(Current_HR*Mature, 0),
+           Current_legalHR >= 0.38 ~ round(Legal*0.38, 0)
+         )) %>%
+  mutate(Current_HR = case_when(
+    Area == "total" ~ round(mean(Current_HR, na.rm=TRUE), 2),
+    .default = round(Current_HR, 2)
+  )) %>%
+  mutate(Current_legalHR = case_when(
+    Area == "total" ~ round(mean(Current_legalHR, na.rm=TRUE), 2),
+    .default = round(Current_legalHR, 2)
+  )) %>%
+  mutate(Current_GHL = case_when(
+    Area == "other.areas" ~ round(mean(Current_legalHR, na.rm=TRUE)*Mature, 0),
+    .default = round(Current_GHL, 0)
+  )) %>%
+  mutate(Current_GHL = case_when(
+    Area == "total" ~ round(sum(Current_GHL, na.rm=TRUE), 0),
+    .default = round(Current_GHL, 0)
+  )) %>%
+  select(Area, Legal, Mature, Healthy_HR, Healthy_legalHR, Healthy_GHL, Current_HR, Current_legalHR, Current_GHL)
+
+modelest_tab1 <- biomass_rate %>% 
+  filter(Area != "surveyed") %>%
+  mutate(Area = case_when(
+    Area == "other.areas" ~ "Other areas",
+    Area == "total" ~ "Total",
+    .default = Area
+  )) %>%
+  mutate(Legal = round(Legal, 0), Mature = round(Mature, 0))
+
+# add in historical data
+hist.area <- c("Icy Strait", "Glacier Bay", "Holkham Bay", "Thomas Bay", "Stephens Passage", "North Juneau", "Lynn Sisters", "Pybus Bay", "Gambier Bay", "Peril Strait", "Excursion Inlet", "Seymour Canal", "Other areas", "Total")
+hist.avg.harvest <- c(160673, 118541, 103853, 54997, 128405, 91575, 11220, 15011, 27005, 10989, 80896, 89027, 459614, 1351806)
+hist.est.mat.biomass <- c(375023, 659423, 204314, 182570, 370280, 271604, 38146, 55938, 89805, 94317, 279146, 256921, 1482342, 4359829)
+hist.harvest.biomass <- as.data.frame(cbind(hist.area, hist.avg.harvest, hist.est.mat.biomass)) %>% dplyr::rename(Area = hist.area)
+
+modelest_tab2 <- merge(modelest_tab1, hist.harvest.biomass, by = "Area") %>%
+  mutate(hist.avg.harvest = as.numeric(hist.avg.harvest), hist.est.mat.biomass = as.numeric(hist.est.mat.biomass))
+
+modelest_tab2$Area <- factor(modelest_tab2$Area, levels = c("Icy Strait", "Glacier Bay", "Holkham Bay", "Thomas Bay", "Stephens Passage", "North Juneau", "Lynn Sisters", "Pybus Bay", "Gambier Bay", "Peril Strait", "Excursion Inlet", "Seymour Canal", "Other areas", "Total")) 
+
+modelest_tab3 <- modelest_tab2 %>% arrange(Area) %>%
+  # display harvest rates as percentages
+  mutate(Healthy_HR = case_when(
+              is.na(Healthy_HR) == FALSE ~ paste0(Healthy_HR*100, "%"),
+              .default = as.character(Healthy_HR)), # have to do this to avoid error during render
+         Healthy_legalHR = case_when(
+              is.na(Healthy_legalHR) == FALSE ~ paste0(Healthy_legalHR*100, "%"),
+              .default = as.character(Healthy_legalHR)), 
+         Current_HR = case_when(
+              is.na(Current_HR) == FALSE ~ paste0(Current_HR*100, "%"),
+              .default = as.character(Current_HR)), 
+         Current_legalHR = case_when(
+              is.na(Current_legalHR) == FALSE ~ paste0(Current_legalHR*100, "%"),
+              .default = as.character(Current_legalHR))) %>%
+  # assign labels to display in the table
+  dplyr::rename("Survey area" = Area, "Biomass of legal crab" = Legal, "Biomass of mature crab" = Mature, "HMature harvest rate" = Healthy_HR, "HLegal harvest rate" = Healthy_legalHR, "HGHL" = Healthy_GHL, "CMature harvest rate" = Current_HR, "CLegal harvest rate" = Current_legalHR, "CGHL" = Current_GHL, "Average harvest" = hist.avg.harvest, "Est. mature biomass" = hist.est.mat.biomass)
+
+# harvest rates and GHLs for summary ----
+mean.hr <- modelest_tab3 %>% filter(`Survey area` == "Total") %>% pull(`CMature harvest rate`) 
+max.GHL <- modelest_tab3 %>% filter(`Survey area` == "Total") %>% pull(HGHL) %>% comma()
+rec.GHL <- modelest_tab3 %>% filter(`Survey area` == "Total") %>% pull(CGHL) %>% comma()
+
+```
+
+
+FYI: CONFIDENTIAL biometrics draft; 
+prepared for Southeast Shellfish staff 
+
+# `r cur_yr` QUICK SUMMARY {-}
+  - Regional biomass has been generally steady or increasing under the current effort-based management framework, allowing for a stable population and a consistent annual harvest (Figures \@ref(fig:regionalbio), \@ref(fig:stdcpue), and \@ref(fig:regionalbio2)).
+  - The trends in legal and mature male biomass have been generally increasing since 2010; this year's projection has both mature and legal biomass increasing from the previous year. Historic point estimates show a different trajectory for this stock, but both have the stock at healthy levels (Figures \@ref(fig:regionalbio) and \@ref(fig:regionalbio2)). 
+  - Overall stock health is mixed with some areas improving and others declining from last year. Stock status is “Poor” in two areas, “Below Average” in two areas, “Moderate” in two areas, “Above Average” in five areas, and “Healthy” in no areas (Tables 2 and 3).
+
+# SUMMARY {-}
+The estimated `r cur_yr`/`r fut_yr` Southeast Alaska Region mature male Tanner crab biomass is **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb**, down approximately **`r pr_yr_diff` million lb** from the `r pr_yr`/`r cur_yr` estimate of **`r pr_yr_mat` million lb**. 
+This estimate exceeds the 2.3-million-pound threshold of mature male biomass in regulation [5 AAC 35.113(a)] required to open the commercial fishery. Once the threshold is met, season length is determined using a regulatory harvest strategy based on effort and mature male biomass. No guideline harvest level (GHL) is set or targeted through inseason management. Despite the lack of a GHL-based harvest strategy, harvestable surplus (GHL) of legal male Tanner crab is estimated to provide a basis for evaluating fishery performance and removals from the stock. 
+Applying the stock health status recommended (`r mean.hr`) and maximum (20%) exploitation rates to mature male biomass results in a range of GHLs between `r rec.GHL` and `r max.GHL` pounds, respectively (Table \@ref(tab:modelest)). Harvesting at higher levels, when stock health is poor to moderate, may increase the probability of population declines. Since 2010, the stock status of Southeast Alaska Tanner crab has generally improved or remained stable (Figure \@ref(fig:regionalbio)). 
+
+# SOUTHEAST TANNER CRAB SURVEY AND ANALYSIS {-}
+Methods to estimate mature male biomass and assess stock health are similar to those used since 2013; changes to the sampling areas, sampling methods, and catch per unit effort (CPUE) calculations are described below. Background and details of historic methods can be found in Bishop et al. 2013.  In general, a three-stage Catch Survey Analysis (CSA) model is used to estimate biomass and the Alaska Department of Fish and Game (ADF&G) survey data are used to assess stock health (Seber 2002, Zheng and Kruse 1999). 
+
+## 2023 changes {-}
+Peril Strait has been moved to a biennial survey schedule due to budget constraints and was not surveyed in 2023. The Peril Strait biomass estimates from the 2022 model and stock status from the 2022 survey were used in GHL calculations (Table \@ref(tab:modelest)).
+
+## 2016–2022: No updates or changes {-}
+
+## 2015 updates and changes {-}
+Due to budget constraints, Port Camden and Port Frederick were removed as surveyed areas in 2015 and are now considered part of the non-surveyed area for biomass calculations. To estimate regional Tanner crab biomass, the survey area biomass is extrapolated to the non-surveyed areas using an expansion factor. The expansion factor was adjusted in 2015 by removing the average contribution of commercial catch from the two areas removed from the survey during the years used for expansion factor estimation (1980-2000). From 1980 to 2000, an average of 1% of the commercial harvest was from Port Frederick and 4% of the commercial harvest was from Port Camden. Therefore, the previous expansion factor of 71% was reduced to 66%. The current analysis calculates biomass assuming 66% of the biomass is found in the survey areas and 34% in the non-surveyed areas. All graphs and figures reflect these changes.  
+
+Also in 2015, the Stephens Passage area was removed from the October Tanner crab survey. In the past, data from the summer red king/Tanner crab survey and the October Tanner crab survey were combined to assess stock health and estimate biomass in this area. Retrospective analysis of these data showed that the summer red king crab survey adequately allowed for an estimation of biomass in Stephens Passage and that the October survey data could be removed. Long- and short-term trends of stock health were recalculated using ONLY summer red king/Tanner crab survey data during the baseline years (1997–2006) and the biomass estimates were also adjusted by a correction factor. This correction factor was calculated by comparing a retrospective analysis from 1997 (when the survey began for Tanner crab) to 2014 (the last year Stephens Passage was surveyed in October). Biomass estimates using only the red king crab survey data were compared to those using both data sets. The difference between these estimates was used to adjust ONLY the red king crab survey data biomass estimates to be comparable to previous years. On average the biomass estimates using ONLY the red king crab survey data were 7% higher than those with both data sets. For 2015 and beyond, the biomass estimate was adjusted down 7% to compare to previous years' reported biomass estimates using data from both surveys. 
+
+## 2014: No updates or changes {-}
+
+## 2013 updates and changes {-}
+In preparation for the 2013 Tanner crab survey, the survey areas were stratified based on crab density and depth, modeled on the density stratification currently in place for red king crab survey areas (Clark 2008). Prior to this stratification, simple random sampling was used to determine pot placement in the survey areas. The goal of density stratified sampling is to provide more statistically robust estimates of CPUE for use in the CSA model, which in turn will provide additional confidence in our biomass forecasts. Survey sampling from 2013 forward will be performed using these density strata to guide randomized pot placement. All of the previous year’s CPUE calculations and biomass estimates were also re-estimated to accommodate the changes in sampling methods.  
+
+A CSA model is performed for each of the survey areas, and accurate harvest data in each area is vital to biomass estimation. Harvest, in numbers of crab, is used in the model to scale the survey CPUE to estimate biomass in each area.  Inaccurate accounting of harvest can lead to over or under estimation of the biomass. To better match spatial harvest with survey areas, the statistical areas included in harvest calculations for each survey area were reevaluated. The CSA model requires that the harvest input accounts for all harvest on the stock being modeled; prior to this reevaluation, some statistical areas adjacent to our survey areas were not included when they should have been. Historic harvests from fish tickets were recalculated using these improved statistical area divisions and used in the 2013 CSA models. The recalculated harvest in these areas changed the magnitude of the biomass estimates in some of the surveyed areas.  
+
+The final change in 2013 and future analyses was the graphical representation of legal biomass from the CSA in the area figures. In the past, the forecasted biomass for each year was represented here. However, this led to inaccuracies in the actual trend in legal biomass (forecasted biomass estimates in each year only include data up to that year). In this document, the estimated biomass for each year is based on the current year’s model, which includes all data available for each area. Displaying the biomass estimates from the current year’s model allows for a more accurate representation of the trends in biomass over time, which more closely follows the historic harvest in most areas. 
+
+# Harvestable surplus {-}
+Since the 2009/2010 fishing season, the Southeast Alaska Tanner commercial crab fishery has been managed using a minimum mature male biomass threshold with a variable season length, in days, determined by a regulatory harvest strategy reliant on fishing effort and mature male biomass. Even though the fishery is not managed using a GHL, the department continues to determine stock health, establish a biologically appropriate mature male harvest rate, and calculate GHLs to provide a biologically sound benchmark by which actual fishery performance can be evaluated. Based on the analysis of Tanner crab biology and harvest strategies adopted in other regions, region-wide exploitation rate (ER) should not exceed 20% of mature male or 38% of legal male estimated biomass.  
+
+Catch-survey modeling of the `r cur_yr` fishery and survey data yields a biomass estimate of **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** of mature (greater than 108 mm carapace width) and **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb** of legal (greater than 140 mm carapace width) male Tanner crab (Table \@ref(tab:modelest)). This is a decrease of **`r pr_yr_diff_L` million lb** of legal male Tanner crab (`r pr_yr_per_L `%) from the `r pr_yr` estimate (Figure \@ref(fig:regionalbio2)). Harvesting at the maximum rate (20% of mature biomass) would equate to a GHL of approximately `r max.GHL` pounds (Table \@ref(tab:modelest)). Harvest above this level will increase the probability of population declines. Incorporating stock health information suggests a regional exploitation rate of `r mean.hr` of the mature male biomass would reduce the likelihood of population decline and may provide higher probability of an increase in biomass (Table \@ref(tab:modelest)).
+
+
+# STOCK STATUS BY SURVEY AREA (TABLES 2 and 3, FIGS. \@ref(fig:icy2) – \@ref(fig:lynn3)) {-}
+Stock health status is determined by a combination of long- and short-term trends in CPUE. Significance in long-term or short-term trends is defined as a p-value < 0.05. Long-term trends compare the current year's mean to the long-term baseline value (generally 1997-2010, or the first ten years for which survey data are available); short-term trends regress the last four years of survey data to determine if a significant increasing or decreasing trend is present. Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy. Recommended exploitation rates based on stock health are 0% for “Poor”, 5% for “Below Average”, 10% for “Moderate”, 15% for “Above Average”, and 20% for “Healthy”.
+
+# Fall survey areas (previously Tanner crab areas) {-}
+
+## Icy Strait, `r is.status`, `r is.hr` {-}
+The Icy Strait stock status decreased from moderate in the `r pr_yr` survey to `r is.status` stock status in `r cur_yr` (Table \@ref(tab:stockstatfall)). This change in the population status was due to a decrease in recruit and postrecruit male CPUEs from the previous year (Figures \@ref(fig:icy2) and \@ref(fig:icy3)). Recruit and postrecruit male CPUEs are significantly below their long-term baselines. There are short-term increasing trends in mature female and prerecruit male CPUEs. The percent of females with poor clutch fullness is not significantly different from 10%. Harvest in Icy Strait has always been close to the estimated legal biomass (see relationship between circles and solid legal biomass line in Figure \@ref(fig:icy2)), suggesting that the population is not isolated to the survey area and that there is likely movement of crab in and out of this area. This hypothesis would suggest that the CSA model is underestimating biomass in Icy Strait, which is apparent in the high harvest rates in this area that are likely not sustainable without population fluctuations. Harvest from this area provided an average of 12.0% of the commercial harvest over the baseline years and `r perc.h.is`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:icy2)).
+
+## Glacier Bay, `r gl.status`, `r gl.hr` {-}
+The Glacier Bay stock status increased from moderate in the `r pr_yr` survey to `r gl.status` stock status in `r cur_yr` (Table \@ref(tab:stockstatfall)). The increased stock health score is primarily due short-term increasing trends in prerecruit male and mature female CPUEs. All mature male CPUEs are not significantly different from their long-term baselines (Figures \@ref(fig:glacier2) and \@ref(fig:glacier3)). The percent of females with poor clutch fullness is significantly lower than 10%. The legal population is slightly above baseline levels, and legal biomass had a small decrease while mature biomass showed a large increase. Harvest from this area provided an average of 9.2% of the commercial harvest over the baseline years and `r perc.h.gl`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:glacier2)).
+
+## Thomas Bay, `r tb.status`, `r tb.hr` {-}
+The Thomas Bay stock status decreased from moderate in `r pr_yr` to `r tb.status` stock status in `r cur_yr` (Table \@ref(tab:stockstatfall)). Recruit and postrecruit male CPUEs are significantly below the long-term baseline values, while mature female and pre-recruit male CPUEs are not significantly different from their long-term averages (Figure \@ref(fig:thomas2) and \@ref(fig:thomas3)). There are significant short-term decreasing trends in prerecruit and recruit male CPUEs. The percent of females with poor clutch fullness is not significantly different from 10%. The legal biomass estimate is below the baseline level but similar to last year, while mature biomass is down slightly from last year. Thomas Bay commercial harvest provided an average of 4.8% of the regional commercial harvest over the baseline years and `r perc.h.tb`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:thomas2)).
+
+## Holkham Bay, `r hb.status`, `r hb.hr` {-}
+The Holkham Bay stock remained at `r hb.status` status (Table \@ref(tab:stockstatfall)). Prerecruit and recruit male CPUEs were significantly above their long-term averages, while mature female and postrecruit males were not significantly different from their long-term averages (Figures \@ref(fig:holkham2) and \@ref(fig:holkham3)). There are no significant short-term trends in mature male or female CPUEs. The percentage of females with poor clutch fullness is not significantly different from the baseline 10% level. There is a significant short-term increase in the proportion of poor clutches. Mature biomass estimates are increasing due to a high prerecruit male CPUE, and legal biomass estimates are up as well. Harvest from this area provided an average of 7.1% of the commercial harvest over the baseline years and `r perc.h.hb`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:holkham2)).
+
+## Port Camden, `r pc.status` {-}
+The Port Camden area was removed from the survey in 2015 due to budgetary constraints as well as the low contribution of this area to the overall Tanner crab commercial harvest.  Port Camden is now included in the non-surveyed areas; the average contribution of the catch from Port Camden from 1980 to 2000 (catch years used for survey expansion value calculation) was removed from the survey expansion percentage. See comments at the beginning of this document for specific methods. The harvest from this area provided an average of 3.8% of the commercial harvest over the baseline years and 0% of the harvest during the `r pr_yr`/`r cur_yr` fishery. 
+
+# Summer survey areas (previously red king crab areas) {-}
+
+## Stephens Passage, `r sp.status`, `r sp.hr` {-}
+The Stephens Passage stock status fell to `r sp.status` from healthy stock status in `r pr_yr` (Table \@ref(tab:stockstatsummera)). Prerecruit male CPUE is significantly above the long-term average, while recruit and postrecruit male CPUEs, as well as mature female CPUE, are not significantly different from their long-term averages (Figures \@ref(fig:sp2) and \@ref(fig:sp3)). Both prerecruit and postrecruit male CPUEs showed significant short-term decreasing trends. The percentage of females with poor clutch fullness was significantly below the 10% threshold. The legal biomass estimate is above the baseline value, although both legal and mature biomass are down from `r pr_yr`. The harvest from this area provided an average of 9.5% of the commercial harvest over the baseline years and `r perc.h.sp`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:sp2)). Starting in 2015, only survey data from the summer crab survey is used to assess the Stephens Passage area. Refer to the assessment updates and changes at the beginning of this document.  
+
+## Seymour Canal, `r sc.status`, `r sc.hr` {-}
+The Seymour Canal stock status remained `r sc.status` (Table \@ref(tab:stockstatsummera)). Prerecruit and recruit male CPUEs are significantly above their long-term averages, while mature female and postrecruit male CPUEs are not significantly different from their long-term averages (Figures \@ref(fig:seymour2) and \@ref(fig:seymour3)). There is a short-term increasing trend in recruit male CPUE. The percentage of females with poor clutch fullness is not significantly different from 10%, indicating an average number of females with poor or low clutches. Both legal and mature biomass estimates increased from the previous year, and legal biomass remains above the baseline value. The harvest from this area provided an average of 6.3% of the commercial harvest over the baseline years and `r perc.h.sc`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:seymour2)).
+
+## North Juneau, `r nj.status`, `r nj.hr` {-}
+The North Juneau stock status fell to `r nj.status` from 
+above average stock status in `r pr_yr` (Table \@ref(tab:stockstatsummera)). Recruit male CPUE is significantly below the long-term average, while other size/sex category CPUEs are not significantly different from their long-term averages (Figures \@ref(fig:nj2) and \@ref(fig:nj3)). Both prerecruit and recruit male CPUEs showed significant short-term decreasing trends. The percentage of females with poor clutch fullness is significantly less than 10%. Both legal and mature biomass estimates decreased from the previous year. The harvest from this area provided an average of 7.1% of the commercial harvest over the baseline years and `r perc.h.nj`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:nj2)).
+
+## Excursion Inlet, `r ei.status`, `r ei.hr` {-}
+The Excursion Inlet stock score decreased to `r ei.status` from below average in the `r pr_yr` survey (Table \@ref(tab:stockstatsummera)). All mature male CPUEs are significantly below their baseline values, as is mature female CPUE. There are significant short-term decreasing trends in prerecruit, recruit, and postrecruit male CPUEs (Figures \@ref(fig:ei2) and \@ref(fig:ei3)). The percentage of females with poor clutches is significantly below the 10% threshold. The legal biomass estimate is below the baseline value and is down from the previous year. The harvest from this area provided an average of 6.3% of the commercial harvest over the baseline years and `r perc.h.ei`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:ei2)).
+
+## Pybus Bay, `r pb.status`, `r pb.hr` {-}
+The Pybus Bay stock status is `r pb.status`, as in the `r pr_yr` survey (Table \@ref(tab:stockstatsummerb)). Mature female CPUE is significantly above the long-term average, postrecruit male CPUE is significantly below the long-term average, and recruit and postrecruit male CPUEs are not significantly different from their long-term averages (Figures \@ref(fig:pybus2) and \@ref(fig:pybus3)). There is a significantly short-term decreasing trend in prerecruit male CPUE. The percentage of females with poor clutches is not significantly different from the 10% threshold. The legal biomass estimate is just above the baseline value, with a slight increase from last year, while mature biomass is showing a slight increasing trend. The harvest from this area provided an average of 1.2% of the commercial harvest over the baseline years and `r perc.h.pb`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:pybus2)).
+
+## Gambier Bay, `r ga.status`, `r ga.hr` {-}
+The Gambier Bay stock status decreased to `r ga.status` from moderate stock status in the `r pr_yr` survey (Table \@ref(tab:stockstatsummerb)). All size/sex class CPUEs are significantly below their baseline values. There are no significant short-term trends (Figures \@ref(fig:gambier2) and \@ref(fig:gambier3)). The percentage of females with poor clutches is not significantly different from the 10% threshold. The legal biomass estimate is below the baseline value and the mature biomass is estimated to be declining. The harvest from this area provided an average of 1.9% of the commercial harvest over the baseline years and `r perc.h.ga`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:gambier2)).
+
+## Peril Strait, `r ps.status`, `r ps.hr` {-}
+The Peril Strait stock status was moderate in `r pr_yr`, but Peril Strait was not surveyed in 2023 and so no new information is available (Table \@ref(tab:stockstatsummerb)). The most recent available information is for `r pr_yr` (Figures \@ref(fig:peril2) and \@ref(fig:peril3)). In `r pr_yr`, the legal biomass estimate was above its baseline value. The harvest from this area contributed an average of 0.7% of the commercial harvest over the baseline years and `r perc.h.ps`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:peril2)).
+
+## Lynn Sisters, `r ls.status`, `r ls.hr` {-}
+The Lynn Sisters stock status increased to `r ls.status` from moderate stock status in the `r pr_yr` survey (Table \@ref(tab:stockstatsummerb)). Prerecruit CPUE is significantly above the long-term average, while all other size/sex categories are not significantly different from their long-term baseline values (Figures \@ref(fig:lynn2) and \@ref(fig:lynn3)). There are no significant short-term trends. The percentage of females with poor clutch fullness is significantly below the 10% threshold level. The legal biomass estimate is above the baseline value. The harvest from this area provided an average of 0.7% of the commercial harvest over the baseline years and `r perc.h.ls`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:lynn2)).
+
+## Port Frederick, `r pf.status` {-}
+The Port Frederick survey area was removed from the survey in 2015 due to its low contribution to the overall Tanner crab catch and department budget constraints.  Port Frederick is now included in the non-surveyed areas. The average contribution of catch in Port Frederick from 1980 to 2000 was removed from the survey expansion percentage. See comments at the beginning of this document for more detail. The harvest from this area provided an average of 0.5% of the commercial harvest over the baseline years and `r perc.h.pf`% of the harvest during the `r pr_yr`/`r cur_yr` fishery.
+
+
+# `r cur_yr`/`r fut_yr` TANNER FISHERY MANAGEMENT ACTIONS {-}
+TBD
+
+# FISHERY MANAGEMENT CONCERNS {-}
+TBD
+
+\newpage
+# TABLES AND FIGURES {-}
+```{r explain, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
+# Tables 1 (model estimates), 2 (stock status for fall survey areas), 3 (stock status for summer survey areas) 
+
+
+```
+
+
+```{r modelest, tab.cap = paste("Results of", cur_yr, "catch-survey modeling estimation of legal and mature Tanner crab biomass (in lbs.) and guideline harvest level (GHL) calculations using proposed maximum 20% region-wide mature exploitation rates and exploitation rates based upon the current stock health status for each of the 12 survey areas. See matrices below for a more detailed look at the basis of stock status determinations. The expansion factor of 66% (34% for non-surveyed areas) for the total legal and mature male crab biomass was based on the percent of commercial harvest taken from 1980–2000 in surveyed areas. The average harvest and biomass from the first ten years of survey data in each area represents a mean historical baseline (long-term average) of harvest; in most areas, these years are 1997 to 2006. Both fall and summer crab survey areas are presented. Note that, if calculating GHL as 20% of the mature male biomass results in a legal harvest rate that is greater than 38%, the GHL is adjusted to be 38% of legal male biomass. Peril Strait was not surveyed in 2023; the 2022 model-estimated biomass and survey stock status were used here."), echo = FALSE}
+
+ft <- flextable(modelest_tab3) %>%
+  add_header_row(values = c("", "Healthy stock status", "Current stock status", "1997 - 2006"), colwidths = c(3, 3, 3, 2), top = TRUE) %>%
+  align(i = 1, j = NULL, align = "center", part = "header") %>%
+  vline(j = c(1, 3, 6, 9)) %>%
+  italic(i = 10, j = NULL, italic = TRUE, part = "body")
+
+set_table_properties(ft, layout = "autofit")
+```
+
+\newpage
+```{r stockstatfall, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "Tanner crab survey. The long-term average is defined as the first 10 years of available data from 1997–2010. Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
+
+ft <- flextable(fall.stock.stat) %>%
+  set_header_labels(categ = " ", type = " ") %>%
+  merge_v(j = 1) %>%
+  valign(j = 1, valign = "top", part = "all") %>%
+  hline(i = c(3, 6, 9, 12, 15, 18)) %>%
+  fix_border_issues()
+ft
+
+```
+
+\newpage
+
+```{r stockstatsummera, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "red king crab survey. The long-term average is defined from 1997–2006. Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
+
+ft <- flextable(summer.stock.stat.a) %>%
+  set_header_labels(categ = " ", type = " ") %>%
+  merge_v(j = 1) %>%
+  valign(j = 1, valign = "top", part = "all") %>%
+  hline(i = c(3, 6, 9, 12, 15, 18)) %>%
+  fix_border_issues()
+ft
+
+
+```
+
+\newpage
+
+```{r stockstatsummerb, tab.cap = "continued.", echo = FALSE}
+
+ft <- flextable(summer.stock.stat.b) %>%
+  set_header_labels(categ = " ", type = " ") %>%
+  merge_v(j = 1) %>%
+  valign(j = 1, valign = "top", part = "all") %>%
+  hline(i = c(3, 6, 9, 12, 15, 18)) %>%
+  fix_border_issues()
+ft
+
+
+```
+
+
+\newpage
+```{r regionalbio, fig.cap = "Trends in Southeast Alaska Tanner crab mature and legal biomass estimated from the current year's catch-survey (CSA) modeling using the pot survey data for Southeast Alaska. Prior to 2001 the biomass of areas initially not surveyed (Thomas Bay, Glacier Bay), but added in subsequent years, is as estimated as their average percent contribution to the total surveyed biomass in all subsequent years (first year surveyed to current year’s survey). Bar graphs represent commercial harvest from fish tickets. Threshold lines indicate the lower (dashed orange) and upper (dashed green) thresholds of mature male biomass for the Tanner crab harvest strategy."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_comm_catch_yr.png'), dpi = 125)
+```
+
+\newpage
+```{r stdcpue, fig.cap = "Southeast Alaska commercial Tanner crab harvest and standardized commercial catch-per-unit-effort (CPUE) for 1991/1992 through 2022/2023 fishery seasons. Fishery year corresponds to the later year listed for a given fishery season; e.g., the 2018/2019 season is the 2019 fishery year. CPUE was calculated using logbook data, which began during the 1993/1994 season. Standardized CPUE was calculated by using a similar number of pot lifts for each year, based on the year (2008/2009) with the fewest number of pot lifts (12,521)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 125)
+```
+
+```{r icy2, fig.cap = "Icy Strait Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There is a significant short-term increasing trend for prerecruit CPUE, and a significant short-term decreasing trend for recruit CPUE (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Icy Strait_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r icy3, fig.cap = "Female information for Icy Strait Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There is a significant short-term increasing trend for mature female CPUE (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Icy Strait_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r glacier2, fig.cap = "Glacier Bay Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There is a significant short-term increasing trend for pre-recruit male CPUE (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Glacier Bay_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r glacier3, fig.cap = "Female information for Glacier Bay Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There is a significant short-term increasing trend for mature female CPUE (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Glacier Bay_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r thomas2, fig.cap = "Thomas Bay Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There are significant short-term decreasing trends for prerecruit and recruit male CPUEs (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Thomas Bay_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r thomas3, fig.cap = "Female information for Thomas Bay Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends for female measures."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Thomas Bay_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r holkham2, fig.cap = "Holkham Bay Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There are no significant short-term trends for male CPUE measures."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Holkham Bay_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r holkham3, fig.cap = "Female information for Holkham Bay Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There is a significant short-term increasing trend in the proportion of poor clutches."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Holkham Bay_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r sp2, fig.cap = "Stephens Passage red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There are significant short-term decreasing trends for pre-recruit and post-recruit male CPUE (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Juneau_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r sp3, fig.cap = "Female information for Tanner crab in the Stephens Passage red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in either mature female CPUE or the proportion of poor clutches (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Juneau_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r seymour2, fig.cap = "Seymour Canal red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There is a significant short-term increasing trend in recruit male CPUE (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/SC_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r seymour3, fig.cap = "Female information for Tanner crab in the Seymour Canal red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or in the proportion of poor clutches (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/SC_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r nj2, fig.cap = "North Juneau red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There are significant short-term decreasing trends for pre-recruit and recruit male CPUEs (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/North Juneau_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r nj3, fig.cap = "Female information for Tanner crab in the North Juneau red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or the proportion of poor clutches."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/North Juneau_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r ei2, fig.cap = "Excursion Inlet red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There are significant short-term decreasing trends for prerecruit, recruit, and postrecruit male CPUEs (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/EI_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r ei3, fig.cap = "Female information for Tanner crab in the Excursion Inlet red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or in the proportion of poor clutches (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/EI_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r pybus2, fig.cap = "Pybus Bay red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There is a significant short-term decreasing trend in prerecruit male CPUE (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PB_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r pybus3, fig.cap = "Female information for Tanner crab in the Pybus Bay red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends (p < 0.05) for either mature female CPUE or the proportion of poor clutches."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PB_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r gambier2, fig.cap = "Gambier Bay red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There are no significant short-term trends (p < 0.05) for male CPUEs."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/GB_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r gambier3, fig.cap = "Female information for Tanner crab in the Gambier Bay red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or the proportion of poor clutches."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/GB_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r peril2, fig.cap = "Peril Strait red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). Peril Strait was not surveyed in 2023 so no new information about trends in male CPUE is available."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PS_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r peril3, fig.cap = "Female information for Tanner crab in the Peril Strait red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. Peril Strait was not surveyed in 2023 so no new information about trends in female CPUE or the proportion of poor clutches is available."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PS_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+```{r lynn2, fig.cap = "Lynn Sisters red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There are no significant short-term trends in male CPUEs (p < 0.05)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/LS_', cur_yr, '_2confidential.png'), dpi = 90)
+```
+
+```{r lynn3, fig.cap = "Female information for Tanner crab in the Lynn Sisters red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or the proportion of poor clutches."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/LS_', cur_yr, '_3confidential.png'), dpi = 90)
+```
+
+\newpage
+# Appendix A {-}
+
+
+## Figures and Tables {-}
+### Table A1: Regional biomass estimates from surveyed areas ONLY. The “`r cur_yr` model” reflects biomass estimates from the `r cur_yr` CSA models (displayed in Figure \@ref(fig:regionalbio)) and the “Annual Point Estimates” reflects the survey area biomass as a point estimate from each modeling year. {-}
+
+```{r tableA1prep, include = FALSE}
+
+A1_curyrmodel <- read.csv(paste0(here::here(), '/results/tanner/', cur_yr, '/surveyed_areas_total_', cur_yr, '_model.csv')) %>%
+  select(Year, Legal, Mature) %>%
+  mutate(!! paste(cur_yr, "Model.Legal") := Legal, !! paste(cur_yr, "Model.Mature") := Mature) %>%
+  select(-c(Legal, Mature))
+A1_ptest <- read.csv(paste0(here::here(), '/data/tanner/tanner_annual_pt_estimate_historic_', cur_yr, '.csv')) %>%
+  select(Year, legal, mature) %>%
+  mutate(!! paste0("Annual Point Estimates", ".Legal") := legal, !! paste0("Annual Point Estimates", ".Mature") := mature) %>%
+  select(-c(legal, mature))
+
+A1_tab <- merge(A1_curyrmodel, A1_ptest) %>%
+  mutate(Year = as.character(Year))
+
+```
+
+
+```{r tableA1, results = "asis"}
+# update Nov 2023: this table is now generated in this .Rmd, so no need to place it in from word.
+
+#place this in from word doc "tanner_crab_tables.docx"
+# current year's model is from file C:\Users\kjpalof\Documents\SE_crab_assessments\results\tanner\2021\surveyed_areas_total_2021_model.csv
+
+ft <- flextable(A1_tab) %>% split_header() %>% span_header() %>% align(align = "center", part = "header")
+ft
+```
+
+\newpage
+
+```{r regionalbio2, fig.cap = "Trends in Tanner crab mature and legal biomass for the surveyed areas estimated from each year’s projection or point estimate using the pot survey data for Southeast Alaska.  The points above reflect the survey area biomass as a point estimate from each modeling year, i.e. 2007 values are taken from the 2007 CSA model. Biomass estimates do NOT include non-surveyed areas (starting in 2015 Port Camden and Port Frederick were removed from the survey areas, they are not included in any biomass estimates here). Prior to 2001 the biomass of areas initially not surveyed (Thomas Bay, Glacier Bay), but added in subsequent years, is as estimated as their average percent contribution to the total surveyed biomass in all subsequent years (first year surveyed until current year’s survey)."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_figureA1_historic_data.png'), dpi = 125)
+```
+
+\newpage
+
+```{r stockstatsum, echo = FALSE}
+# This is for the managers to use at the KTTF meeting - doesn't need to be included in the final document
+
+stock.stat.sum1 <- stock.stat %>%
+  select(survey.area, pryr.tot, pryr.stat, pryr.hr, curyr.tot, curyr.stat, curyr.hr) %>%
+  dplyr::rename("Survey Area" = survey.area, "2022 total score" = pryr.tot, "2022 stock status" = pryr.stat, "2022 harvest rate" = pryr.hr, "2023 total score" = curyr.tot, "2023 stock status" = curyr.stat, "2023 harvest rate" = curyr.hr)
+
+ft <- flextable(stock.stat.sum1) 
+ft
+
+```
+
+\newpage
+ 
+# References {-}
+Bishop, G., C. Siddon, and A. Olson. 2013. Southeast Alaska Tanner crab survey and stock health prior to the 2011/2012 season. Regional information report No. 1J13-03. Alaska Department of Fish and Game, Division of Commercial Fisheries.
+
+Clark, J.E. 2008. Restratification of the red king crab stock assessment survey in Southeast Alaska (pp.96). Juneau: Alaska Department of Fish and Game, Division of Commercial Fisheries.
+
+Seber, G. A. F. 2002. The estimation of animal abundance, 2 edition. Blackburn Press, Caldwell, New Jersey.  654 pp.
+
+Zheng, J., and G. H. Kruse. 1999. Evaluation of harvest strategies for Tanner crab stocks that exhibit periodic 
+recruitment. Journal of Shellfish Research 18:667-679.
