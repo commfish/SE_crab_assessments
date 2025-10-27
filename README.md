@@ -107,6 +107,10 @@ NOTE: For steps 4 and 6, there is a QC aspect for the survey data. Pay attention
 
 7\. Run figures\_1\_and\_2\_Tanner.R
 
+7a. Run curyr\_tanner\_draft.Rmd (in the text folder) as far as the line that creates tanner\_annual\_pt\_estimate\_historic\_curyr.csv
+
+----you'll need this for figures\_1\_and\_2\_Tanner.R
+
 
 
 8\. Update and run cur\_yr\_tanner\_draft.rmd
