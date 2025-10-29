@@ -430,10 +430,10 @@ reg_harvest_comm_catch <- biomass_harvest2 %>%
   geom_label(label = "Commercial harvest", x = 2005, y = 1.25, color = "black", fill = "gray") +
   geom_hline(yintercept = 2.3, color = "#D55E00", 
              linetype = "longdash", lwd = 0.75) +
-  geom_label(label = "Lower threshold", x = 2014, y = 2.3, label.size = NA, vjust = +1.25, color = "#D55E00")+
+  geom_label(label = "Lower threshold", x = 2013, y = 2.3, label.size = NA, vjust = +1.25, color = "#D55E00")+
   geom_hline(yintercept = 5.5, color = "chartreuse4", 
              linetype = "longdash", lwd = 0.75) +
-  geom_label(label = "Upper threshold", x = 2014, y = 5.5, label.size = NA, vjust = +1.15, color = "chartreuse4")+
+  geom_label(label = "Upper threshold", x = 2013, y = 5.5, label.size = NA, vjust = +1.15, color = "chartreuse4")+
   scale_y_continuous(limits = c(0,max(biomass_harvest2$Regional_Mature/1000000, 
                                       na.rm = TRUE) + .5), 
                      breaks= seq(min(0), max(max(biomass_harvest2$Regional_Mature/1000000, 
