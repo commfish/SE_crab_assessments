@@ -494,9 +494,9 @@ nj.status <- stock.stat.3 %>% select(type, North.Juneau) %>% filter(type == "cur
 ei.status <- stock.stat.3 %>% select(type, Excursion.Inlet) %>% filter(type == "curyr.stat") %>% pull()
 pb.status <- stock.stat.3 %>% select(type, Pybus.Bay) %>% filter(type == "curyr.stat") %>% pull()
 ga.status <- stock.stat.3 %>% select(type, Gambier.Bay) %>% filter(type == "curyr.stat") %>% pull()
-ps.status <- "not surveyed in 2023"
+ps.status <- "not surveyed in 2025" #update year AGR 25
 ls.status <- stock.stat.3 %>% select(type, Lynn.Sisters) %>% filter(type == "curyr.stat") %>% pull()
-pf.status <- "not surveyed since 2015"
+pf.status <- "not surveyed since 2015"#AGR could uodaet this 25
 
 # harvest rate ----
 
@@ -511,9 +511,9 @@ nj.hr <- stock.stat.3 %>% select(type, North.Juneau) %>% filter(type == "curyr.h
 ei.hr <- stock.stat.3 %>% select(type, Excursion.Inlet) %>% filter(type == "curyr.hr") %>% pull()
 pb.hr <- stock.stat.3 %>% select(type, Pybus.Bay) %>% filter(type == "curyr.hr") %>% pull()
 ga.hr <- stock.stat.3 %>% select(type, Gambier.Bay) %>% filter(type == "curyr.hr") %>% pull()
-ps.hr <- "10%" # this is the 2022 harvest rate; using this because Peril Strait was not surveyed in 2023
+ps.hr <- "5%" #"10%" # this is the 2022 harvest rate; using this because Peril Strait was not surveyed in 2023 #um this right in 25?? AGR. I think we'll need to change this since ps is "below average". I gave it 5% temporarily....
 ls.hr <- stock.stat.3 %>% select(type, Lynn.Sisters) %>% filter(type == "curyr.hr") %>% pull() 
-pf.hr <- "not surveyed since 2015"
+pf.hr <- "not surveyed since 2015" #agr could update this 25
 
 # percent of current year's annual harvest for each area ----
 # (see area summaries)  
@@ -654,27 +654,33 @@ FYI: CONFIDENTIAL biometrics draft;
 prepared for Southeast Shellfish staff 
 
 # `r cur_yr` QUICK SUMMARY {-}
-  - Regional biomass has been generally steady or increasing under the current effort-based management framework, allowing for a stable population and a consistent annual harvest (Figures \@ref(fig:regionalbio), \@ref(fig:stdcpue), and \@ref(fig:regionalbio2)).
-  - The trends in legal and mature male biomass have been generally increasing since 2010; this year's projection has both mature and legal biomass increasing from the previous year. Historic point estimates show a different trajectory for this stock, but both have the stock at healthy levels (Figures \@ref(fig:regionalbio) and \@ref(fig:regionalbio2)). 
-  - Overall stock health is mixed with some areas improving and others declining from last year. Stock status is “Poor” in two areas, “Below Average” in two areas, “Moderate” in two areas, “Above Average” in five areas, and “Healthy” in no areas (Tables 2 and 3).
+  - Regional biomass has been generally steady under the current effort-based management framework, but has notably declined in recent years (Figures \@ref(fig:regionalbio), \@ref(fig:stdcpue), and \@ref(fig:regionalbio2)).
+  - This year's projection has mature biomass increasing slightly and legal biomass decreasing compared to the previous year. Historic point estimates show a slight decrease in mature biomass and a notable decrease legal biomass estimates (Figures \@ref(fig:regionalbio) and \@ref(fig:regionalbio2)). 
+  - Overall stock health is mixed with some areas improving and others declining from last year. Stock status is “Poor” in two areas, “Below Average” in two areas, “Moderate” in four areas, “Above Average” in three areas, and “Healthy” in no areas (Tables 2 and 3).
 
 # SUMMARY {-}
-The estimated `r cur_yr`/`r fut_yr` Southeast Alaska Region mature male Tanner crab biomass is **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb**, down approximately **`r pr_yr_diff` million lb** from the `r pr_yr`/`r cur_yr` estimate of **`r pr_yr_mat` million lb**. 
+The estimated `r cur_yr`/`r fut_yr` Southeast Alaska Region mature male Tanner crab biomass is **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb**, up approximately **`r pr_yr_diff` million lb** from the `r pr_yr`/`r cur_yr` estimate of **`r pr_yr_mat` million lb**. 
 This estimate exceeds the 2.3-million-pound threshold of mature male biomass in regulation [5 AAC 35.113(a)] required to open the commercial fishery. Once the threshold is met, season length is determined using a regulatory harvest strategy based on effort and mature male biomass. No guideline harvest level (GHL) is set or targeted through inseason management. Despite the lack of a GHL-based harvest strategy, harvestable surplus (GHL) of legal male Tanner crab is estimated to provide a basis for evaluating fishery performance and removals from the stock. 
-Applying the stock health status recommended (`r mean.hr`) and maximum (20%) exploitation rates to mature male biomass results in a range of GHLs between `r rec.GHL` and `r max.GHL` pounds, respectively (Table \@ref(tab:modelest)). Harvesting at higher levels, when stock health is poor to moderate, may increase the probability of population declines. Since 2010, the stock status of Southeast Alaska Tanner crab has generally improved or remained stable (Figure \@ref(fig:regionalbio)). 
+Applying the stock health status recommended (`r mean.hr`) and maximum (20%) exploitation rates to mature male biomass results in a range of GHLs between `r rec.GHL` and `r max.GHL` pounds, respectively (Table \@ref(tab:modelest)). Harvesting at higher levels, when stock health is poor to moderate, may increase the probability of population declines. The stock status of Southeast Alaska Tanner crab has a decreasing trend in recent years, with mature male biomass decreasing overall from 2017 to 2024 before the slight increase in 2025, and legal biomass remaining steady from 2018-2021 before declining from 2022 to 2025 (Figure \@ref(fig:regionalbio)). 
 
 # SOUTHEAST TANNER CRAB SURVEY AND ANALYSIS {-}
 Methods to estimate mature male biomass and assess stock health are similar to those used since 2013; changes to the sampling areas, sampling methods, and catch per unit effort (CPUE) calculations are described below. Background and details of historic methods can be found in Bishop et al. 2013.  In general, a three-stage Catch Survey Analysis (CSA) model is used to estimate biomass and the Alaska Department of Fish and Game (ADF&G) survey data are used to assess stock health (Seber 2002, Zheng and Kruse 1999). 
 
+## 2025 changes {-}
+The strata area sizes used in calculating weighted CPUE for Glacier Bay were updated, and survey CPUEs and crab weights were updated accordingly for all Glacier Bay survey years. This improved the survey CPUE calculation for Glacier Bay. Port Frederick was surveyed in 2025. Port Frederick remains an "unsurveyed area" in this analysis and can be re-incorporated as a survey area in the future with additional years of recent data. Peril Strait was not surveyed in 2025, as this area is now surveyed only on even years.
+
+## 2024 changes {-}
+The area of the Glacier Bay survey was reduced in order to streamline the sampling process (Figure A2) AGR FLAG - ADD THIS FIG!!. The strata area sizes used in calculating weighted CPUE for Glacier Bay were not yet updated, but because the removed areas primarily consisted of strata 1 and 2, 2024's Glacier Bay biomass estimate is conservative.
+
 ## 2023 changes {-}
-Peril Strait has been moved to a biennial survey schedule due to budget constraints and was not surveyed in 2023. The Peril Strait biomass estimates from the 2022 model and stock status from the 2022 survey were used in GHL calculations (Table \@ref(tab:modelest)).
+Peril Strait has been moved to a biennial survey schedule due to budget constraints and was not surveyed in 2023.
 
 ## 2016–2022: No updates or changes {-}
 
 ## 2015 updates and changes {-}
 Due to budget constraints, Port Camden and Port Frederick were removed as surveyed areas in 2015 and are now considered part of the non-surveyed area for biomass calculations. To estimate regional Tanner crab biomass, the survey area biomass is extrapolated to the non-surveyed areas using an expansion factor. The expansion factor was adjusted in 2015 by removing the average contribution of commercial catch from the two areas removed from the survey during the years used for expansion factor estimation (1980-2000). From 1980 to 2000, an average of 1% of the commercial harvest was from Port Frederick and 4% of the commercial harvest was from Port Camden. Therefore, the previous expansion factor of 71% was reduced to 66%. The current analysis calculates biomass assuming 66% of the biomass is found in the survey areas and 34% in the non-surveyed areas. All graphs and figures reflect these changes.  
 
-Also in 2015, the Stephens Passage area was removed from the October Tanner crab survey. In the past, data from the summer red king/Tanner crab survey and the October Tanner crab survey were combined to assess stock health and estimate biomass in this area. Retrospective analysis of these data showed that the summer red king crab survey adequately allowed for an estimation of biomass in Stephens Passage and that the October survey data could be removed. Long- and short-term trends of stock health were recalculated using ONLY summer red king/Tanner crab survey data during the baseline years (1997–2006) and the biomass estimates were also adjusted by a correction factor. This correction factor was calculated by comparing a retrospective analysis from 1997 (when the survey began for Tanner crab) to 2014 (the last year Stephens Passage was surveyed in October). Biomass estimates using only the red king crab survey data were compared to those using both data sets. The difference between these estimates was used to adjust ONLY the red king crab survey data biomass estimates to be comparable to previous years. On average the biomass estimates using ONLY the red king crab survey data were 7% higher than those with both data sets. For 2015 and beyond, the biomass estimate was adjusted down 7% to compare to previous years' reported biomass estimates using data from both surveys. 
+Also in 2015, the Stephens Passage area was removed from the October Tanner crab survey. In the past, data from the summer red king/Tanner crab survey and the October Tanner crab survey were combined to assess stock health and estimate biomass in this area. Retrospective analysis of these data showed that the summer red king crab survey adequately allowed for an estimation of biomass in Stephens Passage and that the October survey data could be removed. Long- and short-term trends of stock health were recalculated using only summer red king/Tanner crab survey data during the baseline years (1997–2006) and the biomass estimates were also adjusted by a correction factor. This correction factor was calculated by comparing a retrospective analysis from 1997 (when the survey began for Tanner crab) to 2014 (the last year Stephens Passage was surveyed in October). Biomass estimates using only the red king crab survey data were compared to those using both data sets. The difference between these estimates was used to adjust only the red king crab survey data biomass estimates to be comparable to previous years. On average the biomass estimates using only the red king crab survey data were 7% higher than those with both data sets. For 2015 and beyond, the biomass estimate was adjusted down 7% to compare to previous years' reported biomass estimates using data from both surveys. 
 
 ## 2014: No updates or changes {-}
 
@@ -819,7 +825,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur
 ```
 
 \newpage
-```{r stdcpue, fig.cap = "Southeast Alaska commercial Tanner crab harvest and standardized commercial catch-per-unit-effort (CPUE) for 1991/1992 through 2022/2023 fishery seasons. Fishery year corresponds to the later year listed for a given fishery season; e.g., the 2018/2019 season is the 2019 fishery year. CPUE was calculated using logbook data, which began during the 1993/1994 season. Standardized CPUE was calculated by using a similar number of pot lifts for each year, based on the year (2008/2009) with the fewest number of pot lifts (12,521)."}
+```{r stdcpue, fig.cap = "Southeast Alaska commercial Tanner crab harvest and standardized commercial catch-per-unit-effort (CPUE) for 1991/1992 through 2024/2025 fishery seasons. Fishery year corresponds to the later year listed for a given fishery season; e.g., the 2018/2019 season is the 2019 fishery year. CPUE was calculated using logbook data, which began during the 1993/1994 season. Standardized CPUE was calculated by using a similar number of pot lifts for each year, based on the year (2008/2009) with the fewest number of pot lifts (12,521)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 125)
 ```
 
