@@ -805,7 +805,7 @@ ft
 
 \newpage
 
-```{r stockstatsummerb, tab.cap = "continued.", echo = FALSE}
+```{r stockstatsummerb, tab.cap = "continued. Note that Peril Strait was not surveyed in 2025, so 2024 values were used to inform the 2025 stock assessment", echo = FALSE}
 
 ft <- flextable(summer.stock.stat.b) %>%
   set_header_labels(categ = " ", type = " ") %>%
@@ -963,6 +963,14 @@ ft
 
 ```{r regionalbio2, fig.cap = "Trends in Tanner crab mature and legal biomass for the surveyed areas estimated from each year’s projection or point estimate using the pot survey data for Southeast Alaska.  The points above reflect the survey area biomass as a point estimate from each modeling year, i.e. 2007 values are taken from the 2007 CSA model. Biomass estimates do NOT include non-surveyed areas (starting in 2015 Port Camden and Port Frederick were removed from the survey areas, they are not included in any biomass estimates here). Prior to 2001 the biomass of areas initially not surveyed (Thomas Bay, Glacier Bay), but added in subsequent years, is as estimated as their average percent contribution to the total surveyed biomass in all subsequent years (first year surveyed until current year’s survey)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_figureA1_historic_data.png'), dpi = 125)
+```
+
+\newpage
+
+```{r changeGbay, fig.cap = "Glacier Bay 2024 survey footprint update, with areas removed from the survey in 2024 colored pink. Map created by Zane Chapman in ArcGIS."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/New GB Strata.tif'),  dpi = 125)
+
+#I added manually in 2024 because knitting in was causing me problems
 ```
 
 \newpage
