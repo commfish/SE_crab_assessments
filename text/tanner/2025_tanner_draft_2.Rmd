@@ -758,13 +758,13 @@ TBD
 ```
 
 
-```{r modelest, tab.cap = paste("Results of", cur_yr, "catch-survey modeling estimation of legal and mature Tanner crab biomass (in lbs.) and guideline harvest level (GHL) calculations using proposed maximum 20% region-wide mature exploitation rates and exploitation rates based upon the current stock health status for each of the 12 survey areas. See matrices below for a more detailed look at the basis of stock status determinations. The expansion factor of 66% (34% for non-surveyed areas) for the total legal and mature male crab biomass was based on the percent of commercial harvest taken from 1980–2000 in surveyed areas. The average harvest and biomass from the first ten years of survey data in each area represents a mean historical baseline (long-term average) of harvest; in most areas, these years are 1997 to 2006. Both fall and summer crab survey areas are presented. Note that, if calculating GHL as 20% of the mature male biomass results in a legal harvest rate that is greater than 38%, the GHL is adjusted to be 38% of legal male biomass. Peril Strait was not surveyed in 2023; the 2022 model-estimated biomass and survey stock status were used here."), echo = FALSE}
+```{r modelest, tab.cap = paste("Results of", cur_yr, "catch-survey modeling estimation of legal and mature Tanner crab biomass (in lbs.) and guideline harvest level (GHL) calculations using proposed maximum 20% region-wide mature exploitation rates and exploitation rates based upon the current stock health status for each of the 12 survey areas. See matrices below for a more detailed look at the basis of stock status determinations. The expansion factor of 66% (34% for non-surveyed areas) for the total legal and mature male crab biomass was based on the percent of commercial harvest taken from 1980–2000 in surveyed areas. The average harvest and biomass from the first ten years of survey data in each area represents a mean historical baseline (long-term average) of harvest; in most areas, these years are 1997 to 2006. Both fall and summer crab survey areas are presented. Note that, if calculating GHL as 20% of the mature male biomass results in a legal harvest rate that is greater than 38%, the GHL is adjusted to be 38% of legal male biomass. Peril Strait was not surveyed in 2025; the 2024 model-estimated biomass and survey stock status were used here."), echo = FALSE}
 
 ft <- flextable(modelest_tab3) %>%
   add_header_row(values = c("", "Healthy stock status", "Current stock status", "1997 - 2006"), colwidths = c(3, 3, 3, 2), top = TRUE) %>%
   align(i = 1, j = NULL, align = "center", part = "header") %>%
   vline(j = c(1, 3, 6, 9)) %>%
-  italic(i = 10, j = NULL, italic = TRUE, part = "body")
+  italic(i = 10, j = NULL, italic = TRUE, part = "body") #no italics in the even years (you'd hastag out this line and the pipe immediately before)
 
 set_table_properties(ft, layout = "autofit")
 ```
@@ -823,99 +823,99 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 125)
 ```
 
-```{r icy2, fig.cap = "Icy Strait Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There is a significant short-term increasing trend for prerecruit CPUE, and a significant short-term decreasing trend for recruit CPUE (p < 0.05)."}
+```{r icy2, fig.cap = "Icy Strait Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Icy Strait_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r icy3, fig.cap = "Female information for Icy Strait Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There is a significant short-term increasing trend for mature female CPUE (p < 0.05)."}
+```{r icy3, fig.cap = "Female information for Icy Strait Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Icy Strait_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r glacier2, fig.cap = "Glacier Bay Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There is a significant short-term increasing trend for pre-recruit male CPUE (p < 0.05)."}
+```{r glacier2, fig.cap = "Glacier Bay Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Glacier Bay_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r glacier3, fig.cap = "Female information for Glacier Bay Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There is a significant short-term increasing trend for mature female CPUE (p < 0.05)."}
+```{r glacier3, fig.cap = "Female information for Glacier Bay Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Glacier Bay_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r thomas2, fig.cap = "Thomas Bay Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There are significant short-term decreasing trends for prerecruit and recruit male CPUEs (p < 0.05)."}
+```{r thomas2, fig.cap = "Thomas Bay Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Thomas Bay_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r thomas3, fig.cap = "Female information for Thomas Bay Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends for female measures."}
+```{r thomas3, fig.cap = "Female information for Thomas Bay Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Thomas Bay_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r holkham2, fig.cap = "Holkham Bay Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There are no significant short-term trends for male CPUE measures."}
+```{r holkham2, fig.cap = "Holkham Bay Tanner crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Holkham Bay_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r holkham3, fig.cap = "Female information for Holkham Bay Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There is a significant short-term increasing trend in the proportion of poor clutches."}
+```{r holkham3, fig.cap = "Female information for Holkham Bay Tanner crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Holkham Bay_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r sp2, fig.cap = "Stephens Passage red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There are significant short-term decreasing trends for pre-recruit and post-recruit male CPUE (p < 0.05)."}
+```{r sp2, fig.cap = "Stephens Passage red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Juneau_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r sp3, fig.cap = "Female information for Tanner crab in the Stephens Passage red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in either mature female CPUE or the proportion of poor clutches (p < 0.05)."}
+```{r sp3, fig.cap = "Female information for Tanner crab in the Stephens Passage red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Juneau_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r seymour2, fig.cap = "Seymour Canal red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There is a significant short-term increasing trend in recruit male CPUE (p < 0.05)."}
+```{r seymour2, fig.cap = "Seymour Canal red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dash line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/SC_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r seymour3, fig.cap = "Female information for Tanner crab in the Seymour Canal red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or in the proportion of poor clutches (p < 0.05)."}
+```{r seymour3, fig.cap = "Female information for Tanner crab in the Seymour Canal red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/SC_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r nj2, fig.cap = "North Juneau red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb). There are significant short-term decreasing trends for pre-recruit and recruit male CPUEs (p < 0.05)."}
+```{r nj2, fig.cap = "North Juneau red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average (1997-2006) for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/North Juneau_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r nj3, fig.cap = "Female information for Tanner crab in the North Juneau red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or the proportion of poor clutches."}
+```{r nj3, fig.cap = "Female information for Tanner crab in the North Juneau red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/North Juneau_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r ei2, fig.cap = "Excursion Inlet red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There are significant short-term decreasing trends for prerecruit, recruit, and postrecruit male CPUEs (p < 0.05)."}
+```{r ei2, fig.cap = "Excursion Inlet red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/EI_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r ei3, fig.cap = "Female information for Tanner crab in the Excursion Inlet red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or in the proportion of poor clutches (p < 0.05)."}
+```{r ei3, fig.cap = "Female information for Tanner crab in the Excursion Inlet red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/EI_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r pybus2, fig.cap = "Pybus Bay red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There is a significant short-term decreasing trend in prerecruit male CPUE (p < 0.05)."}
+```{r pybus2, fig.cap = "Pybus Bay red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PB_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r pybus3, fig.cap = "Female information for Tanner crab in the Pybus Bay red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends (p < 0.05) for either mature female CPUE or the proportion of poor clutches."}
+```{r pybus3, fig.cap = "Female information for Tanner crab in the Pybus Bay red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PB_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r gambier2, fig.cap = "Gambier Bay red king crab survey area. Biomass estimates of legal and mature Tanner crab are based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There are no significant short-term trends (p < 0.05) for male CPUEs."}
+```{r gambier2, fig.cap = "Gambier Bay red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/GB_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r gambier3, fig.cap = "Female information for Tanner crab in the Gambier Bay red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or the proportion of poor clutches."}
+```{r gambier3, fig.cap = "Female information for Tanner crab in the Gambier Bay red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/GB_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r peril2, fig.cap = "Peril Strait red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). Peril Strait was not surveyed in 2023 so no new information about trends in male CPUE is available."}
+```{r peril2, fig.cap = "Peril Strait red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). Peril Strait was not surveyed in 2025."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PS_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r peril3, fig.cap = "Female information for Tanner crab in the Peril Strait red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. Peril Strait was not surveyed in 2023 so no new information about trends in female CPUE or the proportion of poor clutches is available."}
+```{r peril3, fig.cap = "Female information for Tanner crab in the Peril Strait red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. Peril Strait was not surveyed in 2025."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PS_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r lynn2, fig.cap = "Lynn Sisters red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for pre-recruit male (orange), recruit (blue), and post-recruit (grey) crabs. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb). There are no significant short-term trends in male CPUEs (p < 0.05)."}
+```{r lynn2, fig.cap = "Lynn Sisters red king crab survey area. Biomass estimates of legal and mature Tanner crab based on catch-survey analysis methodologies. Commercial harvest is the total pounds harvested in associated and adjacent statistical areas. Reference lines represent long-term benchmark (1997-2006) for prerecruit male (orange dot-dashed line), recruit (blue dashed line), and postrecruit (grey line) crab. Reference line for biomass (dashed line) represents the long-term average for legal biomass (lb)."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/LS_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
-```{r lynn3, fig.cap = "Female information for Tanner crab in the Lynn Sisters red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values. There are no significant short-term trends in mature female CPUE or the proportion of poor clutches."}
+```{r lynn3, fig.cap = "Female information for Tanner crab in the Lynn Sisters red king crab survey area. Reference lines represent long-term benchmark (1997-2006) values."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/LS_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
