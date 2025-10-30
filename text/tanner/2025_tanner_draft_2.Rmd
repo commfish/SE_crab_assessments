@@ -544,9 +544,9 @@ perc.h.pf <- perc.h %>% filter(survey.area == "PFred") %>% pull(percent_total) %
 
 expansion = 0.66
 
-# add 2022 estimates to 2023 for Peril Strait, due to lack of survey in 2023
-biomass_ps_2023 <- biomass %>% filter(Year == 2022 & Area == "Peril Strait") %>% mutate(Year = 2023)
-biomass_ps <- rbind(biomass, biomass_ps_2023)
+# add 2022 estimates to 2023 for Peril Strait, due to lack of survey in 2023 #AGR 25- that's out of date, I will fix
+biomass_ps_2025 <- biomass %>% filter(Year == 2024 & Area == "Peril Strait") %>% mutate(Year = 2025) #updated years to 24 and 25
+biomass_ps <- rbind(biomass, biomass_ps_2025)
 
 regional_totals <- biomass_ps %>% 
   filter(Year == cur_yr) %>% 
