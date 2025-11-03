@@ -369,39 +369,6 @@ cur_yr_biomass %>%
   left_join(annual_harvest_all) %>% 
   mutate(hrate = pounds/Regional_Mature*100) -> biomass_harvest
 
-#biomass_harvest %>% 
-#  select(Year, Regional_Mature, Regional_Legal, harvest = pounds) %>% 
-#  gather(type, pounds, Regional_Mature:harvest, factor_key = TRUE) %>% 
-#  ggplot(aes(Year, y = pounds/1000000, group = type)) +
-#  geom_line(aes(color = type, linetype = type))+
-#  geom_point(aes(fill = type, shape = type), size =3) +
-#  scale_fill_manual(name = "", values = c("black", "gray100", "white")) + 
-#  scale_colour_manual(name = "", values = c("gray1", "grey48", "grey20"))+
-#  scale_shape_manual(name = "", values = c(21, 21, 15))
-  
-  
-#  geom_bar(stat = "identity", 
-#           fill = "grey75", colour = "black")
-
-## this version has survey year but this isn't matched with comm harvest year. 
-  ## harvest 2021 is really 2020/2021 season
-biomass_harvest %>% #this graph crashes. AGR 25. Not sure if needed.
-    select(Year, Regional_Mature, Regional_Legal, harvest = pounds) %>% 
-    #gather(type, pounds, Regional_Mature:Regional_Legal, factor_key = TRUE) %>% 
-    ggplot() +
-    geom_line(aes(x = Year, y = Regional_Mature/1000000), stat = "identity", color = "gray48", 
-              linetype = "dashed", size = 1.5) +
-    geom_line(aes(x = Year, y = Regional_Legal/1000000), stat = "identity", color = "black") +
-    geom_point(aes(x = Year, y = Regional_Legal/1000000), stat = "identity", shape = 21, 
-               fill = "black", size = 3) +
-    geom_bar(aes(x=Year, y=harvest/1000000),stat="identity", fill="gray",colour="black") +
-   labs(title= "Southeast Alaska Tanner crab regional biomass (survey and non areas)",
-     x="Survey Year",y="Biomass (1,000,000 lb)") +
-  geom_label(label = "Mature biomass", x = 2002, y = 4.5, color = "gray48") +
-  geom_label(label = "Legal biomass", x = 2002, y = 2.5, color = "black") +
-  geom_label(label = "Commercial harvest", x = 2005, y = 1.25, color = "black", fill = "gray") +
-ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_survey_yr.png'), dpi = 800,
-       width = 8.5, height = 6.0)
 
 # NEW Figure 1 - regional bio with harvest matching survey year and harvest year - need to lag harvest by one ---------------
 annual_harvest_all %>% 
@@ -445,29 +412,87 @@ reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like
   ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_comm_catch_yr.png'), dpi = 800,
          width = 8.5, height = 6.0)
   
-# Old with point estimates Figure 1 ------------
-##?????
-survey_biomass %>% #yeah IDK, maybe an obsolete graph- agr 25
-  gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
-  ggplot(aes(Year, y = pounds/1000000, group = type)) +
-  geom_line(aes(color = type, linetype = type))+
-  geom_point(aes(fill = type, shape = type), size =3) +
-  scale_fill_manual(name = "", values = c("black", "gray100")) + 
-  scale_colour_manual(name = "", values = c("gray1", "grey48"))+
-  scale_shape_manual(name = "", values = c(21, 21))+
-  scale_linetype_manual(name = "", values = c("solid", "dashed")) +
-  ylab("Biomass (1,000,000 lbs)") + 
-  xlab("Survey Year") +
-  theme(plot.title = element_text(hjust =0.5)) + 
-  scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
-  scale_y_continuous(labels = comma, limits = c(0,max(survey_biomass$Mature/1000000, 
-                                                      na.rm = TRUE) + 1.5), 
-                     breaks= seq(min(0), max(max(survey_biomass$Mature/1000000, 
-                                                 na.rm = TRUE)+ 1.5), by = 1.0)) +
-  theme(legend.position = c(0.65,0.80), 
-        axis.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, vjust = 0.5),
-        axis.title=element_text(size=14,face="bold"))
-
-#ggsave(paste0('./figures/tanner/', cur_yr,'_figure1.png'), dpi = 800,
-#       width = 8, height = 5.75)
+##Figure A2 - historical point estimates expanded, and formatted like fig 1.
+  #where is my df with the historical?- found it
+  #Figure A2 - added 11/17/24 AGR - Figure A1 but expanded
+  #ok step 1- how to expand...
+  ###Get expanded df
+  hist_biomass_exp <- hist_biomass2 %>%
+    mutate(Regional_Legal = Legal/.66, Regional_Mature = Mature/0.66) #expanding to all areas based on our designated expansion factor
+  
+  ##Graph, same as A1 but with this new dataframe
+  hist_biomass_exp %>% 
+    gather(type, pounds, Regional_Legal:Regional_Mature, factor_key = TRUE) %>% #idk what this does but following the pattern
+    ggplot(aes(Year, y = pounds/1000000, group = type)) +
+    geom_line(aes(color = type, linetype = type))+
+    geom_point(aes(fill = type, shape = type), size =3) +
+    scale_fill_manual(name = "", values = c("black", "gray100")) + 
+    scale_colour_manual(name = "", values = c("gray1", "grey48"))+
+    scale_shape_manual(name = "", values = c(21, 21))+
+    scale_linetype_manual(name = "", values = c("solid", "dashed")) +
+    ylab("Biomass (1,000,000 lbs)") + 
+    xlab("Survey Year") +
+    ggtitle("Historic Point Estimates (Expanded)") + #agr 11/27/24 changed title at biologists' request
+    theme(plot.title = element_text(hjust =0.5)) + 
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 in odd years
+    scale_y_continuous(labels = comma, limits = c(0,max(hist_biomass_exp$Regional_Mature/1000000, 
+                                                        na.rm = TRUE) + 1.5), 
+                       breaks= seq(min(0), max(max(hist_biomass_exp$Regional_Mature/1000000, 
+                                                   na.rm = TRUE)+ 1.5), by = 1.0)) +
+    theme(legend.position = c(0.3,0.85), 
+          axis.text = element_text(size = 12),
+          axis.text.x = element_text(angle = 45, vjust = 0.5),
+          axis.title=element_text(size=14,face="bold"))
+  
+  ggsave(paste0('./figures/tanner/', cur_yr,'/', cur_yr, '_figureA2_historic_data_expanded.png'), dpi = 800,
+         width = 8, height = 5.75)
+#agrh, and now format it like the other one.
+  
+#fig A2 edited
+  #Figure A2 edited: added 12/5/24 at Zane's request
+  ##Zane wants (1) harvest geom_bar like the updated figure 1, (2) upper and lower threshold lines like figure 1
+  harvest <- biomass_harvest2 %>% select(Year, pounds)%>%
+    dplyr::rename(Harvest=pounds)
+  
+  hist_biomass_exp_2 <- left_join(hist_biomass_exp, harvest)
+  
+  gathered<- hist_biomass_exp_2 %>% 
+    gather(type, pounds, Regional_Legal:Regional_Mature, factor_key = TRUE)# %>% #idk what this does but following the pattern
+  A2<- ggplot(data=gathered,aes(Year, y = pounds/1000000, group = type)) +
+    geom_line(aes(color = type, linetype = type))+
+    geom_point(aes(fill = type, shape = type), size =3) +
+    scale_fill_manual(name = "", values = c("black", "gray100")) + 
+    scale_colour_manual(name = "", values = c("gray1", "grey48"))+
+    scale_shape_manual(name = "", values = c(21, 21))+
+    scale_linetype_manual(name = "", values = c("solid", "dashed")) +
+    ylab("Biomass (1,000,000 lbs)") + 
+    xlab("Survey Year") +
+    ggtitle("Historic point estimates used for annual management (not updated with current year's data)") + 
+    theme(plot.title = element_text(hjust =0.5)) + 
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 in odd years
+    scale_y_continuous(labels = comma, limits = c(0,max(hist_biomass_exp$Regional_Mature/1000000, 
+                                                        na.rm = TRUE) + 1.5), 
+                       breaks= seq(min(0), max(max(hist_biomass_exp$Regional_Mature/1000000, 
+                                                   na.rm = TRUE)+ 1.5), by = 1.0)) +
+    theme(legend.position = c(0.3,0.85), 
+          axis.text = element_text(size = 12),
+          axis.text.x = element_text(angle = 45, vjust = 0.5),
+          axis.title=element_text(size=14,face="bold"))
+  
+  A2.2 <- A2 +   
+    geom_bar(data=harvest, aes(x=Year, y=Harvest/1000000),stat="identity", fill="gray",colour="black", inherit.aes = FALSE)+
+    geom_label(label = "Commercial harvest", x = 2005, y = 1.25, color = "black", fill = "gray") +
+    geom_hline(yintercept = 2.3, color = "#D55E00", 
+               linetype = "longdash", lwd = 0.75) +
+    geom_label(label = "Lower threshold", x = 2013, y = 2.3, label.size = NA, vjust = +1.25, color = "#D55E00")+
+    geom_hline(yintercept = 5.5, color = "chartreuse4", 
+               linetype = "longdash", lwd = 0.75) +
+    geom_label(label = "Upper threshold", x = 2013, y = 5.5, label.size = NA, vjust = +1.15, color = "chartreuse4")
+  
+  
+  A2.2
+  
+  ggsave(paste0('./figures/tanner/', cur_yr,'/', cur_yr, '_figureA2_historic_data_expanded_edited.png'), dpi = 800,
+         width = 8, height = 5.75)  
+  
+  
