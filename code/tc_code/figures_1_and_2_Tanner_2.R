@@ -385,10 +385,12 @@ reg_harvest_comm_catch <- biomass_harvest2 %>%
   #gather(type, pounds, Regional_Mature:Regional_Legal, factor_key = TRUE) %>% 
   ggplot() +
   geom_line(aes(x = Survey_year, y = Regional_Mature/1000000), stat = "identity", color = "gray48", 
-            linetype = "dashed", size = 1.5) +
+            linetype = "dashed") +
   geom_line(aes(x = Survey_year, y = Regional_Legal/1000000), stat = "identity", color = "black") +
   geom_point(aes(x = Survey_year, y = Regional_Legal/1000000), stat = "identity", shape = 21, 
              fill = "black", size = 3) +
+  geom_point(aes(x = Survey_year, y = Regional_Mature/1000000), stat = "identity", shape = 1, 
+             fill = "black", size = 3) +#adding mature points 2025
   geom_bar(aes(x=Survey_year, y=harvest/1000000),stat="identity", fill="gray",colour="black") +
   labs(title= "Southeast Alaska Tanner crab regional biomass (survey and non survey areas)",
        x="Survey Year",y="Biomass (1,000,000 lb)") +
@@ -434,7 +436,7 @@ reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like
     xlab("Survey Year") +
     ggtitle("Historic Point Estimates (Expanded)") + #agr 11/27/24 changed title at biologists' request
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 in odd years
+    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) + #1993 in odd years
     scale_y_continuous(labels = comma, limits = c(0,max(hist_biomass_exp$Regional_Mature/1000000, 
                                                         na.rm = TRUE) + 1.5), 
                        breaks= seq(min(0), max(max(hist_biomass_exp$Regional_Mature/1000000, 
@@ -469,7 +471,7 @@ reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like
     xlab("Survey Year") +
     ggtitle("Historic point estimates used for annual management (not updated with current year's data)") + 
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 in odd years
+    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) + #1993 in odd years
     scale_y_continuous(labels = comma, limits = c(0,max(hist_biomass_exp$Regional_Mature/1000000, 
                                                         na.rm = TRUE) + 1.5), 
                        breaks= seq(min(0), max(max(hist_biomass_exp$Regional_Mature/1000000, 
