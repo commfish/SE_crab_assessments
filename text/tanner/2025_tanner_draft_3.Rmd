@@ -968,6 +968,12 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur
 
 \newpage
 
+```{r regionalbio2, fig.cap = "Figure A2: Trends in Tanner crab mature and legal biomass for the regional biomass estimated from each year’s projection or point estimate using the pot survey data for Southeast Alaska. The points above reflect the regional biomass as a point estimate from each modeling year, i.e., 2007 values are taken from the 2007 CSA model. The biomass estimates here include non-surveyed areas."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_figureA2_historic_data_expanded_edited.png'), dpi = 125)
+```
+
+\newpage
+
 ```{r changeGbay, fig.cap = "Glacier Bay 2024 survey footprint update, with areas removed from the survey in 2024 colored pink. Map created by Zane Chapman in ArcGIS."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/New GB Strata.tif'),  dpi = 125)
 
