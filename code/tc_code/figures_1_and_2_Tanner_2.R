@@ -35,7 +35,7 @@ hist_biomass_update <- read.csv(paste0("./data/tanner/tanner_annual_pt_estimate_
 # this is updated in the cur_yr_tanner_draft.Rmd file - in the 2nd block
 
 # repeat previous year's estimates for Peril Strait, due to lack of survey in 2023 - agr updated for this same thing in 2025
-biomass_ps_2025 <- biomass %>% filter(Year == 2022 & Area == "Peril Strait") %>% mutate(Year = 2025)
+biomass_ps_2025 <- biomass %>% filter(Year == 2024 & Area == "Peril Strait") %>% mutate(Year = 2025)
 biomass_ps <- rbind(biomass, biomass_ps_2025)
 biomass <- biomass_ps
 
