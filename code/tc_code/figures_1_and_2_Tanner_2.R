@@ -12,7 +12,7 @@
 # katie.palof@alaska.gov
 # 11/07/2018 / 11-15-2020 / 3-2-21 / 11-8-21/ 11-7-22
 
-#AGR 10/27/25
+#AGR 10/27/25 - 11/4/25
 cur_yr <- 2025
 # load -----
 source('./code/tanner_functions.R')
@@ -389,8 +389,8 @@ reg_harvest_comm_catch <- biomass_harvest2 %>%
   geom_line(aes(x = Survey_year, y = Regional_Legal/1000000), stat = "identity", color = "black") +
   geom_point(aes(x = Survey_year, y = Regional_Legal/1000000), stat = "identity", shape = 21, 
              fill = "black", size = 3) +
-  geom_point(aes(x = Survey_year, y = Regional_Mature/1000000), stat = "identity", shape = 1, 
-             fill = "black", size = 3) +#adding mature points 2025
+  geom_point(aes(x = Survey_year, y = Regional_Mature/1000000), stat = "identity", shape = 21, 
+             fill = "grey100", size = 3) +#adding mature points 2025
   geom_bar(aes(x=Survey_year, y=harvest/1000000),stat="identity", fill="gray",colour="black") +
   labs(title= "Southeast Alaska Tanner crab regional biomass (survey and non survey areas)",
        x="Survey Year",y="Biomass (1,000,000 lb)") +
