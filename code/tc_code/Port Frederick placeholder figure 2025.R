@@ -129,7 +129,7 @@ PF_gg_scratch <- ggplot(df_cpue_fred)+
         plot.title = element_text(size = 24))
 
 
-ggsave("figures/tanner/tanner_rkc/2025/PF_scratch.png", PF_gg_scratch)
+ggsave("figures/tanner/tanner_rkc/2025/PF_scratch.png", PF_gg_scratch, dpi = 800, width = 8, height = 4.75)
 
 
 
