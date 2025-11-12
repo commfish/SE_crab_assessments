@@ -108,7 +108,7 @@ PF_gg_scratch <- ggplot(df_cpue_fred)+
   geom_line(aes(y= Postrecruit, x= Year), color = "#999999")+
   
   annotate("text", label = area, 
-           x = 2013.5, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
+           x = 2019, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
            size = 6, fontface = "bold"    
   )+ 
   
