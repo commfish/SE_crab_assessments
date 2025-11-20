@@ -548,7 +548,7 @@ expansion = 0.66
 biomass_ps_2025 <- biomass %>% filter(Year == 2024 & Area == "Peril Strait") %>% mutate(Year = 2025) #updated years to 24 and 25
 biomass_ps <- rbind(biomass, biomass_ps_2025)
 
-regional_totals <- biomass_ps %>% #agr there is a counting problem in this bloc
+regional_totals <- biomass_ps %>% 
   filter(Year == cur_yr) %>% 
   dplyr::select(Year, Area, Legal, Mature) %>%  
   group_by(Year) %>% 
@@ -568,17 +568,17 @@ current_hr$cur.hr.use <- as.numeric(current_hr$cur.hr.use)
 biomass_rate1 <- biomass_ps %>% 
   filter(Year == cur_yr) %>% 
   dplyr::select(Year, Area, Legal, Mature) %>% 
-  #bind_rows(regional_totals) %>% #agr problem is somewhere in the bloc below
+  #bind_rows(regional_totals) %>% 
   mutate(Healthy_HR = round(0.20, 2), 
-         Healthy_GHL = round(Healthy_HR*Mature, 0), #does this step need to be lower??
+         Healthy_GHL = round(Healthy_HR*Mature, 0),
          Healthy_legalHR = round(Healthy_GHL/Legal, 2), 
          Healthy_GHL = case_when( 
            Healthy_legalHR < 0.38 ~ round(Healthy_HR*Mature, 0),
            Healthy_legalHR >= 0.38 ~ round(Legal*0.38, 0)
-         ))# %>%
+         ))
 
 
-regional_totals$Healthy_HR <- 0.2
+regional_totals$Healthy_HR <- 0.2 #table 1 error fix - correcting total values. 2025
 other_areas <- sum(biomass_rate1$Healthy_GHL)/expansion- sum(biomass_rate1$Healthy_GHL)
 surveyed <- sum(biomass_rate1$Healthy_GHL)
 total <- other_areas + surveyed
@@ -586,7 +586,7 @@ regional_totals$Healthy_GHL <- c(other_areas, surveyed, total)
 regional_totals$Healthy_legalHR <- 0.38
 
 biomass_rate1 <- biomass_rate1 %>%
-  bind_rows(regional_totals)
+  bind_rows(regional_totals) #end table 1 error fix
   
 
 biomass_rate2 <- merge(biomass_rate1, current_hr, by = "Area", all = T)
