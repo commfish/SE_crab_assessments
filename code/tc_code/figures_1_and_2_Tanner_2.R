@@ -463,10 +463,10 @@ reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like
   A2<- ggplot(data=gathered,aes(Year, y = pounds/1000000, group = type)) +
     geom_line(aes(color = type, linetype = type))+
     geom_point(aes(fill = type, shape = type), size =3) +
-    scale_fill_manual(name = "", values = c("black", "gray100")) + 
-    scale_colour_manual(name = "", values = c("gray1", "grey48"))+
-    scale_shape_manual(name = "", values = c(21, 21))+
-    scale_linetype_manual(name = "", values = c("solid", "dashed")) +
+    scale_fill_manual(name = "", values = c("black", "gray100"), labels = c("Legal biomass", "Mature biomass")) + 
+    scale_colour_manual(name = "", values = c("gray1", "grey48"), labels = c("Legal biomass", "Mature biomass"))+
+    scale_shape_manual(name = "", values = c(21, 21), labels = c("Legal biomass", "Mature biomass"))+
+    scale_linetype_manual(name = "", values = c("solid", "dashed"), labels = c("Legal biomass", "Mature biomass")) +
     ylab("Biomass (1,000,000 lbs)") + 
     xlab("Survey Year") +
     ggtitle("Historic point estimates used for annual management (not updated with current year's data)") + 
@@ -490,6 +490,9 @@ reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like
     geom_hline(yintercept = 5.5, color = "chartreuse4", 
                linetype = "longdash", lwd = 0.75) +
     geom_label(label = "Upper threshold", x = 2013, y = 5.5, label.size = NA, vjust = +1.15, color = "chartreuse4")
+    #theme(legend.positon = "none")#+ #agr 11/20/25 I decided to turn off the legend
+    #geom_label(label = "Mature biomass", x = 2002, y = 4.5, label.size = NA, color = "gray48") +
+    #geom_label(label = "Legal biomass", x = 2002, y = 2.65, label.size = NA, color = "black") #and add labels, like the other graph (fig 1)
   
   
   A2.2
