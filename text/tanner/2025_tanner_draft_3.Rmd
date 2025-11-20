@@ -548,7 +548,7 @@ expansion = 0.66
 biomass_ps_2025 <- biomass %>% filter(Year == 2024 & Area == "Peril Strait") %>% mutate(Year = 2025) #updated years to 24 and 25
 biomass_ps <- rbind(biomass, biomass_ps_2025)
 
-regional_totals <- biomass_ps %>% 
+regional_totals <- biomass_ps %>% #agr there is a counting problem in this bloc
   filter(Year == cur_yr) %>% 
   dplyr::select(Year, Area, Legal, Mature) %>%  
   group_by(Year) %>% 
@@ -568,14 +568,24 @@ current_hr$cur.hr.use <- as.numeric(current_hr$cur.hr.use)
 biomass_rate1 <- biomass_ps %>% 
   filter(Year == cur_yr) %>% 
   dplyr::select(Year, Area, Legal, Mature) %>% 
-  bind_rows(regional_totals) %>% 
+  #bind_rows(regional_totals) %>% #agr problem is somewhere in the bloc below
   mutate(Healthy_HR = round(0.20, 2), 
-         Healthy_GHL = round(Healthy_HR*Mature, 0),
+         Healthy_GHL = round(Healthy_HR*Mature, 0), #does this step need to be lower??
          Healthy_legalHR = round(Healthy_GHL/Legal, 2), 
-         Healthy_GHL = case_when(
+         Healthy_GHL = case_when( 
            Healthy_legalHR < 0.38 ~ round(Healthy_HR*Mature, 0),
            Healthy_legalHR >= 0.38 ~ round(Legal*0.38, 0)
-         ))
+         ))# %>%
+
+#agrh Idk. combine below with regional totals 1 to create the last two lines of biomass_Rate_1. Flag flag flag flag flag
+regional_totals_2 <- biomass_rate1 %>% #agr adding 11/20/25
+  summarise(Legal = sum(Legal), Mature = sum(Mature)) %>% 
+  #(type, surveyed, Legal:Mature, factor_key = TRUE) %>% 
+  mutate(other.areas = ((sum(Mature)/expansion) - sum(Mature)), 
+         total = sum(Mature) + other.areas) #%>% 
+  #gather(Area, pounds, surveyed:total) %>% 
+  #cast(Year+Area~type)
+  
 
 biomass_rate2 <- merge(biomass_rate1, current_hr, by = "Area", all = T)
 
@@ -670,7 +680,7 @@ Methods to estimate mature male biomass and assess stock health are similar to t
 The strata area sizes used in calculating weighted CPUE for Glacier Bay were updated, and survey CPUEs and crab weights were updated accordingly for all Glacier Bay survey years. This improved the survey CPUE calculation for Glacier Bay. Port Frederick was surveyed in 2025. Port Frederick remains an "unsurveyed area" in this analysis and can be re-incorporated as a survey area in the future with additional years of recent data. Peril Strait was not surveyed in 2025, as this area is now surveyed only in even years.
 
 ## 2024 changes {-}
-The area of the Glacier Bay survey was reduced in order to reduce the time and effort spent on sampling in light of budget constraints (Figure A2). The strata area sizes used in calculating weighted CPUE for Glacier Bay were not yet updated, but because the removed areas primarily consisted of strata 1 and 2, 2024's Glacier Bay biomass estimate is conservative.
+The area of the Glacier Bay survey was reduced in order to reduce the time and effort spent on sampling in light of budget constraints (Figure A2). The strata area sizes used in calculating weighted CPUE for Glacier Bay were not yet updated, but because the removed areas primarily consisted of strata 1 and 2, the 2024 Glacier Bay biomass estimate was conservative.
 
 ## 2023 changes {-}
 Peril Strait has been moved to a biennial survey schedule due to budget constraints and was not surveyed in 2023.
