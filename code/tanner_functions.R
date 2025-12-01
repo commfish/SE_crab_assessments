@@ -382,7 +382,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     filter(Year < 2007) %>% 
     spread(type, pounds) %>% 
     summarise(legal_mean = mean(Legal.Biomass, na.rm = TRUE), 
-              mature_mean = mean(Mature.Biomass, na.rm = TRUE)) -> baseline_means
+              mature_mean = mean(Mature.Biomass, na.rm = TRUE)) -> baseline_means 
   
   # Figure panel -----
   #### F1a mature male plot -----------
@@ -785,8 +785,10 @@ panel_figure_pres <- function(survey.location, cur_yr, area, option, conf){
           legend.key.size = unit(1.5, 'lines'),
           axis.text = element_text(size = 16), 
           axis.title=element_text(size=18,face="bold")) + 
-    geom_hline(data = baseline_means, aes(yintercept = legal_mean/100000), color = "grey1", 
-               linetype = "dashed")
+    geom_hline(data = baseline_means, aes(yintercept = legal_mean/100000), color = "grey", 
+               linetype = "dashed") +
+    geom_hline(data = baseline_means, aes(yintercept = mature_mean/100000), color = "grey1", 
+               linetype = "dashed") #Jan requested this added Dec 1 2025
   #geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey62", linetype = "dashed")
   #if(scale == 1){
   #  p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1400000),
