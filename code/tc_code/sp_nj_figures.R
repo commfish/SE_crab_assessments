@@ -280,7 +280,9 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) + 
     geom_hline(data = baseline_means, aes(yintercept = legal_mean), color = "grey1", 
-               linetype = "dashed")
+               linetype = "solid")+
+    geom_hline(data = baseline_means, aes(yintercept = mature_mean), color = "grey55", 
+               linetype = "dashed") #AGR Dec 2025
   #geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey62", linetype = "dashed")
   #if(scale == 1){
   #  p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1400000),

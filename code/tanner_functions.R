@@ -526,6 +526,8 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) + 
     geom_hline(data = baseline_means, aes(yintercept = legal_mean), color = "grey1", 
+               linetype = "solid")+
+    geom_hline(data = baseline_means, aes(yintercept = mature_mean), color = "grey55", 
                linetype = "dashed")
   #geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey62", linetype = "dashed")
   #if(scale == 1){
