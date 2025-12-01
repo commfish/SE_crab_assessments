@@ -10,7 +10,7 @@
 source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with multiple areas at once.
 
 ## setup global ---------------
-cur_yr <- 2025
+cur_yr <- 2024 #ran 2024 graphs again for Jan in 2025
 pr_yr <- cur_yr - 1
 n_yr <- cur_yr + 1
 fig_path <- paste0('figures/tanner/tanner_rkc/', cur_yr) # folder to hold all figs for a given year
@@ -216,8 +216,8 @@ baseline
 #     function needs to be edited with the current year and confirmed that the 
 #     input files are the same names.
 
-# areas <- c('PB', 'EI', 'LS', 'GB', 'SC', 'PS') # use this for years with a Peril survey
-areas <- c('PB', 'EI', 'LS', 'GB', 'SC') # use this for years without a Peril survey
+ areas <- c('PB', 'EI', 'LS', 'GB', 'SC', 'PS') # use this for years with a Peril survey
+#areas <- c('PB', 'EI', 'LS', 'GB', 'SC') # use this for years without a Peril survey
 
 long_term <- lapply(areas, long_loop_17, curyr = cur_yr)
 
@@ -226,7 +226,7 @@ long_term2 <- long_term[[1]] %>%
   bind_rows(long_term[[3]]) %>% 
   bind_rows(long_term[[4]]) %>% 
   bind_rows(long_term[[5]]) #%>% 
-  #bind_rows(long_term[[6]]) # use this for years with a Peril survey
+  bind_rows(long_term[[6]]) # use this for years with a Peril survey
 write.csv(long_term2, paste0('./results/tanner/tanner_rkc/', cur_yr, '/long_term.csv'))
 
 # calculate % difference from baseline
@@ -309,7 +309,7 @@ Fem_long_term2 <- Fem_long_term[[1]] %>%
   bind_rows(Fem_long_term[[3]]) %>% 
   bind_rows(Fem_long_term[[4]]) %>% 
   bind_rows(Fem_long_term[[5]]) #%>% 
-  #bind_rows(Fem_long_term[[6]]) # use this in years with a Peril survey
+  bind_rows(Fem_long_term[[6]]) # use this in years with a Peril survey
 write.csv(Fem_long_term2, paste0('./results/tanner/tanner_rkc/', cur_yr, '/Female_long_term.csv'))
 # need to figure out a way to store these results in a better format
 

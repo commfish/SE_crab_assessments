@@ -174,7 +174,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
              size = 6, fontface = "bold"    
     )+ 
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #1993 to 1994 for the even year (2024)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 to 1994 for the even year (2024)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -207,7 +207,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #chagned 1993 to 1994 for the even year (2024)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #chagned 1993 to 1994 for the even year (2024)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -244,7 +244,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
     xlab(NULL) +
     geom_hline(yintercept = 10, color = "black") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #chagned 1993 to 1994 for the even year (2024)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #chagned 1993 to 1994 for the even year (2024)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     theme(legend.position = c(0.2,0.5), 
@@ -271,7 +271,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
     ylab("Biomass (lb)") + 
     xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #changed 1993 to 1994 for even-year numbering
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #changed 1993 to 1994 for even-year numbering
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                         na.rm = TRUE) + 25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds, 
