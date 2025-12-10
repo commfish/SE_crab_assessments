@@ -337,7 +337,10 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>% #EYES HERE! THIS
   )) %>%
   dplyr::rename("Legal" = expanded_legal, "Mature" = expanded_mature) %>%
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>%
-  #mutate(status = replace(status, which(status == "TBD"), "Closed")) %>% # can replace the TBD with open or closed #TUrN ON AFTER WE DECIDE!!!
+  ##BELOW  LINE NEEDS MANUAL EDIT IN ACCORDANCE WITH WHEN YOU RUN THIS CODE!! TURN THE 
+  ##FOLLOWING MUTATE LINE OFF WHEN RUNNING THIS FOR THE STOCK ASSESSMENT. tURN BACK ON AND RUN AFTER THE CRAB TEAM
+  ##MAKES  A dECISION! FLAG FLAG FLAg
+  #mutate(status = replace(status, which(status == "TBD"), "Open")) %>% # can replace the TBD with open or closed #TUrN ON AFTER WE DECIDE!!!- EDIT YEARLY
   dplyr::rename(`Fishery Status` = status) %>%
   ggplot(aes(Year, pounds, group = type)) +
   geom_line(aes(color = type, group = type, linetype = type))+
@@ -364,7 +367,15 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>% #EYES HERE! THIS
   #hjust = -0.45, vjust = 1.5, nudge_y = 0.05, size = 4) +
   guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol = 1)))
 
+#CHOOSE THE SAVE OPTION BELOW BASED ON IF ITS BEFORE OR AFTER THE CRAB TEAM MADE THE OPEN CLOSE DECISION!!
 ggsave(fig2_expand_mr_regional_biomass_edited, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
+#ggsave(fig2_expand_mr_regional_biomass_edited, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '_edited_POST_DECISION.png'), dpi = 800, width = 7.5, height = 5.5)
+
+
+###AGR December 2025 - creating the above fig but after they make a fishery decision. This one is for use in publication, 
+##because the decision will have been made by then...
+
+
 
 #AGR 2025- the fig2_expand_mr_regional_biomass_edited - with medians!
 ##what do we care about??
