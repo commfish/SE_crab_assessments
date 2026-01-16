@@ -6,9 +6,9 @@
 
 #####Load ------------
 source('./code/tanner_functions.R')
-cur_yr <- 2024 #re-ran 2024 graphs for Jan after the 2025 analysis
+cur_yr <- 2025 #re-ran 2024 graphs for Jan after the 2025 analysis
 pr_yr <- cur_yr -1
-cur_yr2 <- 24
+cur_yr2 <- 25
 n_yr <- cur_yr + 1 # need this because the tanner_yr_biomassmodel.csv file has yr = the next year, not the current year
 fig_path <- paste0('figures/tanner/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder

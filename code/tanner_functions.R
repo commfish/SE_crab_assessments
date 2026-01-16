@@ -399,13 +399,13 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
     #                   oob = rescale_none) +
     #ggtitle(area) + nope- agr 25
-    ylab("CPUE (number/pot)")+ xlab(NULL)+ 
+    ylab("CPUE (number of crab per pot)")+ xlab(NULL)+ 
     annotate("text", label = area, 
              x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning
              size = 6, fontface = "bold"    
     )+ #instead of title agr 25
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -446,9 +446,9 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                       labels =c("Mature female")) +
     #ylim(0,25) + 
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
-    ylab("CPUE (number/pot)")+ xlab(NULL)+
+    ylab("CPUE (number of crab per pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)#change to 1997 insetead of 1996 in odd years
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)#change to 1997 insetead of 1996 in odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -480,7 +480,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     scale_fill_manual(name = "", values = c("black", "gray45")) +
     ylab("Percentage") + 
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     
@@ -514,10 +514,10 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                        labels= c("Harvest", "Legal", "Mature"))+
     scale_linetype_manual(name = "", values = c("blank", "solid", "solid"),
                           labels= c("Harvest", "Legal", "Mature")) +
-    ylab("Biomass (lb)") + 
+    ylab("Biomass estimates and harvest (lb)") + 
     xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994) #added: limits = c(1997, cur_yr), to try to troubleshoot different plots lining up bad error,
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #change the seq to odd #'s in odd years( 1993 instead of 1994) #added: limits = c(1997, cur_yr), to try to troubleshoot different plots lining up bad error,
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                         na.rm = TRUE) + 25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds, 

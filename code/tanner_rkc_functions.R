@@ -615,9 +615,9 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
              size = 6, fontface = "bold"    
     )+ #instead adding the labels inside the plot agr 25
     
-    ylab("CPUE (number/pot)")+ xlab(NULL)+
+    ylab("CPUE (number of crab per pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -652,9 +652,9 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                       labels =c("Mature female")) +
     #ylim(0,25) + 
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
-    ylab("CPUE (number/pot)")+ xlab(NULL)+
+    ylab("CPUE (number of crab per pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #seq(min(1994...)) for even years and 1993 for odd years
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -686,7 +686,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     scale_fill_manual(name = "", values = c("black", "gray45")) +
     ylab("Percentage") + 
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 or 1994 if even or odd yr- agr
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #1993 or 1994 if even or odd yr- agr
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     
@@ -721,10 +721,10 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                        labels= c("Harvest", "Legal", "Mature"))+ 
     scale_linetype_manual(name = "", values = c("blank", "solid", "solid"),
                           labels= c("Harvest", "Legal", "Mature")) +
-    ylab("Biomass (lb)") + 
+    ylab("Biomass estimates and harvest (lb)") + 
     xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #1993, 1994 depending on even or odd yr- arg
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #1993, 1994 depending on even or odd yr- arg
     scale_y_continuous(labels = scales::comma, #agr added to put comma 25
       limits = c(0,max(biomass_graph$pounds, 
                                                         na.rm = TRUE) + 25000),

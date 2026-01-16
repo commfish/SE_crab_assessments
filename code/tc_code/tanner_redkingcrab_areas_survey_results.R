@@ -10,7 +10,7 @@
 source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with multiple areas at once.
 
 ## setup global ---------------
-cur_yr <- 2024 #ran 2024 graphs again for Jan in 2025
+cur_yr <- 2025 #ran 2024 graphs again for Jan in 2025
 pr_yr <- cur_yr - 1
 n_yr <- cur_yr + 1
 fig_path <- paste0('figures/tanner/tanner_rkc/', cur_yr) # folder to hold all figs for a given year

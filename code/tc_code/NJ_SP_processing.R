@@ -18,7 +18,7 @@
 # source('./code/tanner_functions.R')
 source('./code/tanner_rkc_functions.R')
 
-cur_yr <- 2024
+cur_yr <- 2025
 pr_yr <- cur_yr -1
 
 source('./code/tc_code/sp_nj_figures.R')
