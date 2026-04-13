@@ -2,6 +2,7 @@
 ##Alex Reich
 ##7/16/25
 ##4/13/26- revisit and revise
+###I remember- the CI's need a bootstrap so they don't go negative
 ##Corresponds to version 9 of the test code
 
 ##############################################################################
@@ -35,6 +36,7 @@
 library(tidyverse)
 library(RTMB)
 library(here)
+#devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 library(TMBhelper)
 library(abind)
 
@@ -113,6 +115,7 @@ CV <- sqrt(exp(1/(2*WEIGHTS))-1)
 CATCH <- as.numeric(gsub(",", "", df$Catch..Number.)) #get rid of commas, ideally before...
 #replace NA in catch with 0
 CATCH[is.na(CATCH)] <- 0 #replace NA with 0
+##flag - this will have data in 2026, since the commercial fishery was open this year
 
 ##there was some thing in the juneau csa excel readme about how calculating PU is not straightforward. So... check that plz
 
@@ -188,7 +191,7 @@ array_postrec_cpue <- array(c(YEARS, CPUE_postrec, CV), #weights will be replace
                            dim = c(nrow(df), 3), 
                            dimnames = list(NULL, c("YEARS", "CPUE_postrec", "CV")))
 
-array_all_stages <- abind::abind(array_prerec_cpue, array_rec_cpue, array_postrec_cpue, along = 3)
+array_all_stages <- abind::abind(array_prerec_cpue, array_rec_cpue, array_postrec_cpue, along = 3) #noted that a huge CV in years 1990 and 1992. Why is that, because CPUE of postrecruits is 0??
 
 # Set dimnames for the third dimension (stage)
 dimnames(array_all_stages)[[3]] <- c("Stage_1", "Stage_2", "Stage_3")
