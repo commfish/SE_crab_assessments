@@ -184,10 +184,14 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-mod <- run_csa_model(data, pars, map, newtonsteps = 1)
+mod <- run_csa_model(data, pars, map, newtonsteps = 3)
 
 # Quick convergence check
-cat("Max gradient:", max(abs(mod$pop_mod$gr())), "\n")
+best_par  <- mod$pop_mod$env$last.par.best
+max_grad  <- max(abs(mod$pop_mod$gr(best_par)))
+
+cat("Max gradient (at last.par.best):", max_grad, "\n")
+cat("Converged (< 0.001)?", max_grad < 0.001, "\n")
 cat("Optimized jnLL:", mod$report$jnLL, "\n")
 cat("Estimated q:", mod$report$q, "\n")
 cat("Estimated T12:", mod$report$T12, "\n")

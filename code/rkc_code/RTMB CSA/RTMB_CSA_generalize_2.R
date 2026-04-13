@@ -226,7 +226,7 @@ run_csa_model <- function(data, pars, map,
   )
   
   # SD report
-  sdrep <- sdreport(pop_mod)
+  invisible(capture.output(sdrep <- sdreport(pop_mod))) #AGR recent change
   
   # Extract report at optimized parameters
   report <- pop_mod$report(pop_mod$env$last.par.best)
@@ -391,7 +391,7 @@ bootstrap_ci <- function(pop_mod, data, pars, map,
       )
       
       # Check convergence (max gradient < 0.01 is a loose check for bootstrap)
-      max_grad <- max(abs(sim_result$pop_mod$gr()))
+      max_grad <- max(abs(sim_result$pop_mod$gr(sim_result$pop_mod$env$last.par.best)))
       if (max_grad < 0.01 && !is.na(max_grad)) {
         n_success <- n_success + 1
         boot_cpue[, , n_success] <- sim_result$report$PredSrvCPUE
