@@ -380,14 +380,9 @@ bootstrap_ci <- function(pop_mod, data, pars, map,
 # =============================================================================
 # 5. merge_results_ci  --  Combine point estimates with bootstrap CIs
 # =============================================================================
-#' @param results  Data frame from extract_results() or run_csa_model()$results
-#' @param ci       List from bootstrap_ci()
-#'
-#' @return Data frame with point estimates and lower/upper CI columns
 
 merge_results_ci <- function(results, ci) {
   merged <- merge(results, ci$ci_df, by = "year", all.x = TRUE)
   return(merged)
 }
 
-#AGR flag- QC the bootstrap, make sure it calls the population model
