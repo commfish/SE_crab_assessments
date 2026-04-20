@@ -1,11 +1,8 @@
-### Juneau RTMB CSA 2025 ###
+### Lynn Sisters RTMB CSA 2025 ###
 ## Alex Reich
-## 7/16/25
-## 4/13/26 - revised to use generalized functions from RTMB_CSA_functions.R
+### 4/20/26 - building the base off excursion for future years
 ##
-## This script handles Juneau-specific data wrangling, then calls the
-## generalized model functions for fitting, result extraction, and
-## bootstrap confidence intervals.
+
 
 ##############################################################################
 
@@ -15,7 +12,7 @@
 ##3. Source generalized functions and run model
 ##4. Bootstrap CIs (non-negative)
 ##5. Comparison plots (RTMB vs Excel vs Observed)
-##6. Output tables (GHL calculations)
+##6. Outputs (Save them!!)
 
 ##################################################################################
 
@@ -35,44 +32,44 @@ source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize_4.R")
 # ============================================================================
 # AREA-SPECIFIC SETTINGS
 # ============================================================================
-area_name <- "JNU"          # short label for filenames and plot titles
+area_name <- "LS"            # short label for filenames and plot titles
 cur_yr    <- 2025            # current analysis year
 
 # ============================================================================
 # DATA WRANGLING (area-specific -- will be streamlined in the future)
 # ============================================================================
 
-df <- read.csv("CSA_excel/Juneau 2024 CPUE correction.csv")
+df <- read.csv("CSA_excel/Lynn sisters 2025 input data RTMB.csv")
 
-this_year_cpue <- read.csv("results/rkc/Juneau/2025/JNU_CPUE_2025.csv") %>%
+this_year_cpue <- read.csv("results/rkc/LynnSisters/2025/LS_CPUE_2025.csv") %>% #results from the CPUE standardization and summary script
   filter(Year == cur_yr)
-this_year_crab_weights <- read.csv("results/rkc/Juneau/2025/maleweights.csv") %>%
+this_year_crab_weights <- read.csv("results/rkc/LynnSisters/2025/maleweights.csv") %>% #from that same R summary
   filter(Year == cur_yr)
 
-df$Catch..Number.[46] <- 2985   # PU catch for previous year (automate later) - FLAG - add a commercial catch for 2026 for relevant areas
-df$Catch.Mid.Date[46] <- "22-Aug-24" # flag -atomate this later
+df$Catch..Number.[46] <- 0       # No commercial catch in Lynn sisters in 24/25(fishery closed)
+df$Catch.Mid.Date[46] <- NA #AGR HERE- Need to change Lynn sisters blanks to match excursion blanks. Compare CSV;s
 
 df <- df %>% select(Survey.Year, Catch.Season, Pre.recruit, Recruit, Post.recruit,
                     Catch..Number., Catch.Mid.Date, Survey.Mid.Date,
                     Mature.Weight, Legal.Weight, Prerecruit.Weight, Weight,
                     Estimated.Recruits, Estimated.Postrecruits)
 
-# Add current year row
+# Add current year row (already added for my LS 2025 trial run)
 new_line <- data.frame(
-  Survey.Year        = cur_yr, #this year
-  Catch.Season       = paste0(cur_yr, "/", cur_yr + 1), #2025/26 for 2025
+  Survey.Year        = cur_yr,
+  Catch.Season       = paste0(cur_yr, "/", cur_yr + 1),
   Pre.recruit        = this_year_cpue$Pre_Recruit_wt,
   Recruit            = this_year_cpue$Recruit_wt,
   Post.recruit       = this_year_cpue$Post_Recruit_wt,
-  Catch..Number.     = NA, #fishing hasn't started yet for the most recent year, so this is a placeholder
-  Catch.Mid.Date     = NA, #fishing hasn't started yet for the most recent year, so this is a placeholder
-  Survey.Mid.Date    = "11-Jul-25", #automate date entry later
+  Catch..Number.     = NA,
+  Catch.Mid.Date     = NA,
+  Survey.Mid.Date    = "19-Jul-25",  # LS-specific survey date (automate later)
   Mature.Weight      = this_year_crab_weights$mature_lbs,
   Legal.Weight       = this_year_crab_weights$legal_lbs,
   Prerecruit.Weight  = this_year_crab_weights$prer_lbs,
   Estimated.Recruits     = 0,
   Estimated.Postrecruits = 0,
-  Weight             = 12 #by the established weighting mechanism, recent years are 12.
+  Weight             = 12
 )
 
 df <- rbind(df, new_line)
@@ -80,42 +77,47 @@ df <- rbind(df, new_line)
 # --- Process vectors for RTMB ---
 YEARS   <- df$Survey.Year
 WEIGHTS <- df$Weight
-WEIGHTS[is.na(WEIGHTS)] <- 0.1
+WEIGHTS[WEIGHTS == 0] <- 0.1 
 
 # Convert weights to CV
-CV <- sqrt(exp(1 / (2 * WEIGHTS)) - 1) #flag that the years with 0 (0.1 after revision line above) weights have really high CV's. I can manually change that if problems
+CV <- sqrt(exp(1 / (2 * WEIGHTS)) - 1)
 
-CATCH <- as.numeric(gsub(",", "", df$Catch..Number.)) #make sure commercial catch is added to this in 2026 (as well as the personal use catch)
-CATCH[is.na(CATCH)] <- 0
+CATCH <- as.numeric(gsub(",", "", df$Catch..Number.))
+CATCH[is.na(CATCH)] <- 0 #ok here?? AGR FLAG
 
 CATCH_MIDDATE  <- as.Date(df$Catch.Mid.Date, format = "%d-%b-%y")
 REF_DATE       <- CATCH_MIDDATE[1]
-CATCH_MIDDATE  <- as.numeric(CATCH_MIDDATE - REF_DATE) #some NA's, which I think is ok
+CATCH_MIDDATE  <- as.numeric(CATCH_MIDDATE - REF_DATE)
 
 SURVEY_MIDDATE <- as.Date(df$Survey.Mid.Date, format = "%d-%b-%y")
 SURVEY_MIDDATE <- as.numeric(SURVEY_MIDDATE - REF_DATE)
-for (i in 2:length(SURVEY_MIDDATE)) { #fills in the NA's with the value before
+for (i in 2:length(SURVEY_MIDDATE)) {
   if (is.na(SURVEY_MIDDATE[i])) SURVEY_MIDDATE[i] <- SURVEY_MIDDATE[i - 1]
 }
 
-# TAUs
+# EI-specific fix: year 34 has missing catch mid-date (see original notes)
+# "Year 2012 is missing a catch mid-year date"
+#CATCH_MIDDATE[34] <- CATCH_MIDDATE[33]
+#hmm, lots of LS is missing a catch middate. Not sure what to do about that. AGR FLAG.
+
+# TAUs - note EI-specific starting value for CATCH_SURVEY_TAU[1]
 CATCH_SURVEY_TAU    <- rep(0, length(CATCH_MIDDATE))
-CATCH_SURVEY_TAU[1] <- 0
+CATCH_SURVEY_TAU[1] <- 0.5815   #AGR HERE put LS here## EI starting value from Excel (differs from Juneau's 0)
 for (i in 2:length(CATCH_MIDDATE)) {
   if (CATCH[i - 1] == 0) {
-    CATCH_SURVEY_TAU[i] <- 1 #if the catch is 0, the catch_survey_tau=1 for the next year
+    CATCH_SURVEY_TAU[i] <- 1
   } else {
-    CATCH_SURVEY_TAU[i] <- abs(SURVEY_MIDDATE[i] - CATCH_MIDDATE[i - 1]) / 365 #same formula as excel to get the tao adjustor
+    CATCH_SURVEY_TAU[i] <- abs(SURVEY_MIDDATE[i] - CATCH_MIDDATE[i - 1]) / 365
   }
 }
 
-SURVEY_TAU    <- rep(0, length(SURVEY_MIDDATE)) #vector of 0's
-SURVEY_TAU[1] <- 0 #first year is 0
+SURVEY_TAU    <- rep(0, length(SURVEY_MIDDATE))
+SURVEY_TAU[1] <- 0
 for (i in 2:length(SURVEY_MIDDATE)) {
-  SURVEY_TAU[i] <- abs(SURVEY_MIDDATE[i] - SURVEY_MIDDATE[i - 1]) / 365 #same formula as excel to get the tao adjustor
+  SURVEY_TAU[i] <- abs(SURVEY_MIDDATE[i] - SURVEY_MIDDATE[i - 1]) / 365
 }
 
-# Survey CPUE vectors; replace NA's in survey CPUEs with 0
+# Survey CPUE vectors
 CPUE_prerec  <- df$Pre.recruit;   CPUE_prerec[is.na(CPUE_prerec)]   <- 0
 CPUE_rec     <- df$Recruit;       CPUE_rec[is.na(CPUE_rec)]         <- 0
 CPUE_postrec <- df$Post.recruit;  CPUE_postrec[is.na(CPUE_postrec)] <- 0
@@ -137,11 +139,11 @@ dimnames(array_all_stages)[[3]] <- c("Stage_1", "Stage_2", "Stage_3")
 array_all_stages <- array_all_stages[!is.na(array_all_stages[, 2, 1]), , ]  # drop NA years
 
 # ============================================================================
-# AREA-SPECIFIC STARTING VALUES - FLAG -  please automate these later
+# AREA-SPECIFIC STARTING VALUES
 # ============================================================================
-T12_start <- 83.0319247141511 / 100   # from 2024 Juneau Excel CSA (Q2) 
-q_start   <- 103.799911855061 / 1e6   # from 2024 Juneau Excel CSA (Q3)
-S_fixed   <- 0.32                      # natural mortality (fixed)
+T12_start <- 4.6443533917851 / 100       # from 2024 Lynn sisters Excel CSA (Q2)
+q_start   <- 76.1472017408894 / 1e5       # from 2024 LYnn sisters Excel CSA (Q3)
+S_fixed   <- 0.32                     # natural mortality (fixed, same across areas)
 
 # ============================================================================
 # BUILD DATA AND PARAMETER LISTS
@@ -158,23 +160,22 @@ data <- list(
 )
 
 pars <- list(
-  ln_mean_rec          = log(1.7),
+  ln_mean_rec          = log(1.1),     #I forget what goes here. 1.7 for juneau, 1.1 for Excursion. AGR FLAG
   ln_Eps_R             = log(rep(1, length(YEARS))),
-  ln_q                 = log(q_start), #catchability
-  ln_T12               = log(T12_start), #preR to R survival rate and molt rate, both
-  S                    = S_fixed, #mortality, estentially
-  ln_sigma_survey      = log(0.25), #try changing
-  ln_init_rec_cpue     = log(pred_CPUE_rec[1]), #initial recruitment CPE
-  ln_init_postrec_cpue = log(pred_CPUE_postrec[1]) #initial postrecruit CPUE
+  ln_q                 = log(q_start),
+  ln_T12               = log(T12_start),
+  S                    = S_fixed,
+  ln_sigma_survey      = log(0.25),
+  ln_init_rec_cpue     = log(pred_CPUE_rec[1]),
+  ln_init_postrec_cpue = log(pred_CPUE_postrec[1])
 )
 
 # Map: fix S and mean recruitment
 map <- list()
-map$S             <- factor(NA) #turns estimation off, fixes the variable
-map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
-#can turn other variables off here if desired
+map$S             <- factor(NA)
+map$ln_mean_rec   <- factor(NA)
 
-# Save crab weight vectors for plotting before rm (used by plots below)
+# Save weight vectors for plotting before rm (used by plots and GHL tables below)
 wt_df <- data.frame(
   wt_prerec = data$wt_prerec,
   wt_legal  = data$wt_legal,
@@ -184,9 +185,9 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-mod <- run_csa_model(data, pars, map, newtonsteps = 1) # a werid note:Note that `getReportCovariance=FALSE` causes an error in `TMB::sdreport` when no ADREPORTed variables are present
-##seems non-consequential tho
+mod <- run_csa_model(data, pars, map, newtonsteps = 3)
 
+# Quick convergence check
 # Quick convergence check
 best_par  <- mod$pop_mod$env$last.par.best
 max_grad  <- max(abs(mod$pop_mod$gr(best_par)))
@@ -205,11 +206,12 @@ head(results)
 # ============================================================================
 # BOOTSTRAP CONFIDENCE INTERVALS (non-negative by construction)
 # ============================================================================
-# NOTE: n_boot = 500 is a reasonable starting point. Increase for final publication.
-# For quick testing, try n_boot = 50.
+# NOTE: This is especially important for Excursion Inlet where the old
+# +/- 1.96*SE method produced negative CI lower bounds.
+# n_boot = 500 is a reasonable starting point. For quick testing try n_boot = 50.
 boot <- bootstrap_ci(mod$pop_mod, data, pars, map,
                      n_boot = 500, ci_level = 0.95,
-                     seed = 42, verbose = TRUE) #FLAG- BOOTSTRAP CONVERGENCE ISSUES NOTED- AGR
+                     seed = 42, verbose = TRUE, newtonsteps=3) #EI - some iterations have nonconvergence. Try more newtonsteps? Most converge tho
 
 # Merge point estimates with bootstrap CIs
 results_df <- merge_results_ci(results, boot)
@@ -217,7 +219,7 @@ results_df <- merge_results_ci(results, boot)
 # ============================================================================
 # LOAD EXCEL COMPARISON DATA
 # ============================================================================
-df_excel <- read.csv("CSA_excel/Juneau 2025 CPUE correction.csv")
+df_excel <- read.csv("CSA_excel/Excursion Inlet 2025 Excel results comparison.csv")
 df_excel$Mature.Biomass     <- as.numeric(gsub(",", "", df_excel$Mature.Biomass))
 df_excel$Legal.Biomass      <- as.numeric(gsub(",", "", df_excel$Legal.Biomass))
 df_excel$Prerecruit.Biomass <- as.numeric(gsub(",", "", df_excel$Prerecruit.Biomass))
@@ -347,6 +349,11 @@ p4
 ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass.png"),
        plot = p4, width = 8, height = 5, dpi = 300)
 
+# Extra zoom views for EI (biomass can be small, useful to see detail)
+p5 <- p4 + ylim(0, 500000)
+ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_zoom.png"),
+       plot = p5, width = 8, height = 5, dpi = 300)
+
 
 # ============================================================================
 # OUTPUT TABLE CONSTRUCTION
@@ -363,55 +370,5 @@ output_df <- df_excel %>%
     Mature.Biomass        = results_df$mature_biomass[match(Survey.Year, results_df$year)]
   )
 
-#SAVE output csv (overwrite the old biomass file)
-# write.csv(output_df, paste0("results/rkc/Juneau/", cur_yr, "/CSA_output_", cur_yr, ".csv"), row.names = FALSE)
-
-
-# ============================================================================
-# GHL TABLE CALCULATIONS (Table 3)
-# ============================================================================
-Legal_biomass_curyr  <- results_df %>% filter(year == max(year)) %>% pull(legal_biomass)
-Mature_biomass_curyr <- results_df %>% filter(year == max(year)) %>% pull(mature_biomass)
-legal_weight_curyr   <- wt_df$wt_legal[nrow(wt_df)]
-
-# Table 3.1: GHL in pounds at various harvest rates
-GHL_Allocation <- c("PU Summer", "PU Winter", "Commercial",
-                    "Total legal", "Total mature",
-                    "Percent legal if targeting total mature")
-hr_rates <- c(0.20, 0.17, 0.15, 0.12, 0.10, 0.08, 0.07, 0.06, 0.05)
-hr_names <- paste0("HR_", hr_rates * 100)
-
-# PU allocations: Summer 50%, Winter 10%, Commercial 40% of legal biomass * HR
-alloc_fracs <- c(0.5, 0.1, 0.4)
-Table3.1 <- sapply(hr_rates, function(hr) Legal_biomass_curyr * hr * alloc_fracs)
-colnames(Table3.1) <- hr_names
-Table3.1 <- as.data.frame(Table3.1)
-
-Total_legal  <- colSums(Table3.1)
-Total_mature <- Mature_biomass_curyr * hr_rates
-Pct_legal    <- (Total_mature / Legal_biomass_curyr) * 100
-
-Table_3.1_final <- rbind(Table3.1, Total_legal, Total_mature, Pct_legal)
-Table_3.1_final <- cbind(GHL_Allocation, round(Table_3.1_final))
-Table_3.1_final
-
-# Table 3.2: GHL in numbers of crab
-mature_weight_curyr <- wt_df$wt_mature[nrow(wt_df)]
-legal_numbers_approx  <- round(Legal_biomass_curyr / legal_weight_curyr)
-mature_numbers_approx <- round(Mature_biomass_curyr / mature_weight_curyr)
-
-Table3.2 <- Table3.1 / legal_weight_curyr
-Table3.2 <- round(Table3.2)
-Total_legal_nums  <- colSums(Table3.2)
-Total_mature_nums <- round(mature_numbers_approx * hr_rates)
-names(Total_mature_nums) <- hr_names
-
-Table3.2_final <- rbind(Table3.2, Total_legal_nums, Total_mature_nums)
-Table3.2_final <- cbind(GHL_Allocation[-6], Table3.2_final)
-Table3.2_final
-
-cat("\n=== Juneau CSA analysis complete ===\n")
-cat("Legal biomass (current year):", round(Legal_biomass_curyr), "lbs\n")
-cat("Mature biomass (current year):", round(Mature_biomass_curyr), "lbs\n")
-cat("Bootstrap CI successes:", boot$n_success, "/", 500, "\n")
-
+#SAVE output csv
+write.csv(output_df, paste0("results/rkc/Excursion/", cur_yr, "/CSA_output_2", cur_yr, ".csv"), row.names = FALSE)
