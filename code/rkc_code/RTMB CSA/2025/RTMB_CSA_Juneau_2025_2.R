@@ -30,7 +30,7 @@ library(patchwork)
 set.seed(100)
 
 # Source the generalized CSA functions
-source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize_2.R")
+source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize_4.R")
 
 # ============================================================================
 # AREA-SPECIFIC SETTINGS
@@ -184,13 +184,14 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-mod <- run_csa_model(data, pars, map, newtonsteps = 3)
+mod <- run_csa_model(data, pars, map, newtonsteps = 1) # a werid note:Note that `getReportCovariance=FALSE` causes an error in `TMB::sdreport` when no ADREPORTed variables are present
+##seems non-consequential tho
 
 # Quick convergence check
 best_par  <- mod$pop_mod$env$last.par.best
 max_grad  <- max(abs(mod$pop_mod$gr(best_par)))
 
-cat("Max gradient (at last.par.best):", max_grad, "\n")
+cat("Max gradient (at last.par.best):", max_grad, "\n") 
 cat("Converged (< 0.001)?", max_grad < 0.001, "\n")
 cat("Optimized jnLL:", mod$report$jnLL, "\n")
 cat("Estimated q:", mod$report$q, "\n")
@@ -208,7 +209,7 @@ head(results)
 # For quick testing, try n_boot = 50.
 boot <- bootstrap_ci(mod$pop_mod, data, pars, map,
                      n_boot = 500, ci_level = 0.95,
-                     seed = 42, verbose = TRUE)
+                     seed = 42, verbose = TRUE) #FLAG- BOOTSTRAP CONVERGENCE ISSUES NOTED- AGR
 
 # Merge point estimates with bootstrap CIs
 results_df <- merge_results_ci(results, boot)
@@ -297,6 +298,7 @@ p3 <- ggplot(results_df, aes(x = year, y = postrec_cpue)) +
   theme_minimal()
 
 (p123 <- p1 / p2 / p3)
+#AGR NOTE- ERROR ON EACH POINT CAN GO NEGATIVE -  SHOULD I LIMIT THIS???
 ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE.png"),
        plot = p123, width = 8, height = 10, dpi = 300)
 

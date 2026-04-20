@@ -201,14 +201,17 @@ run_csa_model <- function(data, pars, map,
   }
   
   # Optimize
+ suppressMessages( #agr add
   opt <- TMBhelper::fit_tmb(
     obj          = pop_mod,
     fn           = pop_mod$fn,
     gr           = pop_mod$gr,
     newtonsteps  = newtonsteps,
-    getsd        = TRUE #AGR recent change
-    #control = list(trace = 0) #AGR off
+    getsd        = FALSE, #AGR recent change
+    control = list(trace = 0) #AGR off
   )
+ )#agr add
+
   
   # SD report
  # invisible(capture.output(sdrep <- sdreport(pop_mod, getReportCovariance=TRUE))) #AGR recent change
@@ -284,8 +287,8 @@ bootstrap_ci <- function(pop_mod, data, pars, map,
     sim_data <- data
     sim_data$survey_data <- sim_survey
     
-    # Fit model to simulated data (lightweight — no sdreport or sanity checks) #AGR HERE
-    tryCatch({
+    # Fit model to simulated data (lightweight — no sdreport or sanity checks) 
+    tryCatch({#try turning off?? AGR- ok I'll keep it.
       # Set up environment for data scoping
       sim_env <- new.env(parent = globalenv())
       sim_env$data <- sim_data
@@ -297,13 +300,15 @@ bootstrap_ci <- function(pop_mod, data, pars, map,
                                  silent = TRUE)
       
       # Optimize (skip sdreport — we only need the report)
-      sim_opt <- TMBhelper::fit_tmb(
+      sim_opt <- suppressMessages(
+        TMBhelper::fit_tmb(
         obj         = sim_mod,
-        fn          = sim_mod$fn,
+       fn          = sim_mod$fn,
         gr          = sim_mod$gr,
         newtonsteps = newtonsteps,
         getsd       = FALSE ,  # no sdreport needed for bootstrap
         control = list(trace = 0)
+      )
       )
       
       # Check convergence (max gradient < 0.01 is a loose check for bootstrap)
@@ -321,8 +326,9 @@ bootstrap_ci <- function(pop_mod, data, pars, map,
       }
     }, error = function(e) {
       n_fail <<- n_fail + 1
+      if (verbose) cat("Replicate", b, "error:", conditionMessage(e), "\n") #print error message if it fails
     })
-  }
+  } #trycatch end 
   
   if (verbose) {
     cat(sprintf("\nBootstrap complete: %d / %d replicates converged.\n",
