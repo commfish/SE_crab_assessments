@@ -35,6 +35,8 @@ source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize_4.R")
 area_name <- "LS"            # short label for filenames and plot titles
 cur_yr    <- 2025            # current analysis year
 
+#flag for lynn 2025 shakedown- I used the 2025 starting values. I think this is ok
+
 # ============================================================================
 # DATA WRANGLING (area-specific -- will be streamlined in the future)
 # ============================================================================
@@ -54,7 +56,7 @@ df <- df %>% select(Survey.Year, Catch.Season, Pre.recruit, Recruit, Post.recrui
                     Mature.Weight, Legal.Weight, Prerecruit.Weight, Weight,
                     Estimated.Recruits, Estimated.Postrecruits)
 
-# Add current year row (already added for my LS 2025 trial run)
+# Add current year row 
 new_line <- data.frame(
   Survey.Year        = cur_yr,
   Catch.Season       = paste0(cur_yr, "/", cur_yr + 1),
@@ -102,7 +104,7 @@ for (i in 2:length(SURVEY_MIDDATE)) {
 
 # TAUs - note EI-specific starting value for CATCH_SURVEY_TAU[1]
 CATCH_SURVEY_TAU    <- rep(0, length(CATCH_MIDDATE))
-CATCH_SURVEY_TAU[1] <- 0.5815   #AGR HERE put LS here## EI starting value from Excel (differs from Juneau's 0)
+CATCH_SURVEY_TAU[1] <- 0.6499   #AGR HERE put LS starting value from excel- FLAG, this is hand wavey
 for (i in 2:length(CATCH_MIDDATE)) {
   if (CATCH[i - 1] == 0) {
     CATCH_SURVEY_TAU[i] <- 1
@@ -160,7 +162,7 @@ data <- list(
 )
 
 pars <- list(
-  ln_mean_rec          = log(1.1),     #I forget what goes here. 1.7 for juneau, 1.1 for Excursion. AGR FLAG
+  ln_mean_rec          = log(1.6),     #about 1.6 for lynn sisters, the prerecruits each year (ie recruitment)
   ln_Eps_R             = log(rep(1, length(YEARS))),
   ln_q                 = log(q_start),
   ln_T12               = log(T12_start),
@@ -174,6 +176,7 @@ pars <- list(
 map <- list()
 map$S             <- factor(NA)
 map$ln_mean_rec   <- factor(NA)
+#consider fixing q if issues
 
 # Save weight vectors for plotting before rm (used by plots and GHL tables below)
 wt_df <- data.frame(
@@ -209,7 +212,7 @@ head(results)
 # NOTE: This is especially important for Excursion Inlet where the old
 # +/- 1.96*SE method produced negative CI lower bounds.
 # n_boot = 500 is a reasonable starting point. For quick testing try n_boot = 50.
-boot <- bootstrap_ci(mod$pop_mod, data, pars, map,
+boot <- bootstrap_ci(mod$pop_mod, data, pars, map, #convergence issues on 20/500 for lynn sisters
                      n_boot = 500, ci_level = 0.95,
                      seed = 42, verbose = TRUE, newtonsteps=3) #EI - some iterations have nonconvergence. Try more newtonsteps? Most converge tho
 
@@ -219,7 +222,8 @@ results_df <- merge_results_ci(results, boot)
 # ============================================================================
 # LOAD EXCEL COMPARISON DATA
 # ============================================================================
-df_excel <- read.csv("CSA_excel/Excursion Inlet 2025 Excel results comparison.csv")
+##AGR HERE- get lynn data for comparison
+df_excel <- read.csv("CSA_excel/Lynn sisters 2025 Excel results comparison.csv")
 df_excel$Mature.Biomass     <- as.numeric(gsub(",", "", df_excel$Mature.Biomass))
 df_excel$Legal.Biomass      <- as.numeric(gsub(",", "", df_excel$Legal.Biomass))
 df_excel$Prerecruit.Biomass <- as.numeric(gsub(",", "", df_excel$Prerecruit.Biomass))
@@ -349,7 +353,7 @@ p4
 ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass.png"),
        plot = p4, width = 8, height = 5, dpi = 300)
 
-# Extra zoom views for EI (biomass can be small, useful to see detail)
+# Extra zoom view
 p5 <- p4 + ylim(0, 500000)
 ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_zoom.png"),
        plot = p5, width = 8, height = 5, dpi = 300)
@@ -371,4 +375,6 @@ output_df <- df_excel %>%
   )
 
 #SAVE output csv
-write.csv(output_df, paste0("results/rkc/Excursion/", cur_yr, "/CSA_output_2", cur_yr, ".csv"), row.names = FALSE)
+write.csv(output_df, paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_2", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
+
+#output biomass only into a biomass csv:
