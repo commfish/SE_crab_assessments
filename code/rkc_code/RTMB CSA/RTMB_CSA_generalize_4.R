@@ -265,6 +265,8 @@ bootstrap_ci <- function(pop_mod, data, pars, map,
   
   # optimizer
   
+  mle_pars <- pop_mod$env$parList(pop_mod$env$last.par.best) #RECENT ADD
+  
   for (b in 1:n_boot) {
     if (verbose && (b %% 100 == 0 || b == 1)) { #print progress every 100 iterations
       cat(sprintf("Bootstrap replicate %d / %d  (successes: %d, failures: %d)\n", #part of the print progress
@@ -296,7 +298,7 @@ bootstrap_ci <- function(pop_mod, data, pars, map,
       environment(sim_fn) <- sim_env
       
       # Build AD object
-      sim_mod <- RTMB::MakeADFun(sim_fn, parameters = pars, map = map,
+      sim_mod <- RTMB::MakeADFun(sim_fn, parameters = mle_pars, map = map, #mle_pars changed from pars recently
                                  silent = TRUE)
       
       # Optimize (skip sdreport — we only need the report)
