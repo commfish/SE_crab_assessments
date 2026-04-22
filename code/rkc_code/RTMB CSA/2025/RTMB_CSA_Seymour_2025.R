@@ -1,6 +1,9 @@
 ### Seymour Canal RTMB CSA 2025 ###
 ## Alex Reich
 ## 4/21/26
+
+
+
 ##
 ## This script handles Seymour-specific data wrangling, then calls the
 ## generalized model functions for fitting, result extraction, and
@@ -171,7 +174,7 @@ map <- list()
 map$S             <- factor(NA) #turns estimation off, fixes the variable
 map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
 #can turn other variables off here if desired
-map$ln_q <- factor(NA) #q is acting up. - AGR recent addition
+#map$ln_q <- factor(NA) #q is acting up. - AGR recent addition
 
 # Save crab weight vectors for plotting before rm (used by plots below)
 wt_df <- data.frame(
@@ -208,7 +211,7 @@ head(results)
 #I need to set up map again?
 boot <- bootstrap_ci(mod$pop_mod, data, pars, map,
                      n_boot = 500, ci_level = 0.95,
-                     seed = 42, verbose = TRUE, newtonsteps = 0) #FLAG- BOOTSTRAP CONVERGENCE ISSUES NOTED- AGR
+                     seed = 42, verbose = TRUE, newtonsteps = 0)
 
 # Merge point estimates with bootstrap CIs
 results_df <- merge_results_ci(results, boot)
@@ -346,8 +349,6 @@ p4
 ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass.png"),
        plot = p4, width = 8, height = 5, dpi = 300)
 
-
-
 # ============================================================================
 # OUTPUT TABLE CONSTRUCTION
 # ============================================================================
@@ -367,3 +368,4 @@ output_df <- df_excel %>%
 write.csv(output_df, paste0("results/rkc/Seymour/", cur_yr, "/CSA_output_2", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
 
 #output biomass only into a biomass csv:
+
