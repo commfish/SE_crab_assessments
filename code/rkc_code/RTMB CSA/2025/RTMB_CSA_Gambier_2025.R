@@ -180,6 +180,7 @@ pars <- list(
 map <- list()
 map$S             <- factor(NA) #turns estimation off, fixes the variable
 map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
+#map$ln_sigma_survey <-  factor(NA) #AGR test- wjat happens to q when I map sigman survey  
 #can turn other variables off here if desired
 #map$ln_q <- factor(NA) #q is acting up. - AGR recent addition
 
@@ -193,7 +194,7 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-mod <- run_csa_model(data, pars, map, newtonsteps = 0) #if newtonsteps are on. Can turn newtonsteps off for the other ones and see what happens? Default newtonsteps to 0 I think
+mod <- run_csa_model(data, pars, map, newtonsteps = 1) #if newtonsteps are on. Can turn newtonsteps off for the other ones and see what happens? Default newtonsteps to 0 I think
 
 # Quick convergence check
 best_par  <- mod$pop_mod$env$last.par.best
@@ -218,7 +219,7 @@ head(results)
 #I need to set up map again?
 boot <- bootstrap_ci(mod$pop_mod, data, pars, map,
                      n_boot = 500, ci_level = 0.95,
-                     seed = 42, verbose = TRUE, newtonsteps = 0)
+                     seed = 42, verbose = TRUE, newtonsteps = 1)
 
 # Merge point estimates with bootstrap CIs
 results_df <- merge_results_ci(results, boot)

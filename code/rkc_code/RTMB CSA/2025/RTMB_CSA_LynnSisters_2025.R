@@ -178,6 +178,7 @@ pars <- list(
 map <- list()
 map$S             <- factor(NA)
 map$ln_mean_rec   <- factor(NA)
+#map$ln_sigma_survey <-  factor(NA) #AGR test- wjat happens to q when I map sigman survey  
 #consider fixing q if issues
 
 # Save weight vectors for plotting before rm (used by plots and GHL tables below)
@@ -190,7 +191,7 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-mod <- run_csa_model(data, pars, map, newtonsteps = 0)
+mod <- run_csa_model(data, pars, map, newtonsteps = 1)
 
 # Quick convergence check
 # Quick convergence check
@@ -216,7 +217,7 @@ head(results)
 # n_boot = 500 is a reasonable starting point. For quick testing try n_boot = 50.
 boot <- bootstrap_ci(mod$pop_mod, data, pars, map, #convergence issues on 20/500 for lynn sisters
                      n_boot = 500, ci_level = 0.95,
-                     seed = 42, verbose = TRUE, newtonsteps=0) #EI - some iterations have nonconvergence. Try more newtonsteps? Most converge tho
+                     seed = 42, verbose = TRUE, newtonsteps=1) #EI - some iterations have nonconvergence. Try more newtonsteps? Most converge tho
 
 # Merge point estimates with bootstrap CIs
 results_df <- merge_results_ci(results, boot)

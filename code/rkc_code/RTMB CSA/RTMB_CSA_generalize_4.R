@@ -112,7 +112,7 @@ basic_pop_model <- function(pars) {
     }
     # Weighted negative log-likelihood (normal)
     SrvIdx_nLL[h] <- -sum(
-      dnorm(survey_data[, 2, h], pred, sigma_survey, TRUE) * survey_data[, 4, h]
+      dnorm(survey_data[, 2, h], pred, sigma_survey, TRUE) * survey_data[, 4, h] #see Claude fix- not applyinh now.
     )
   }
   
