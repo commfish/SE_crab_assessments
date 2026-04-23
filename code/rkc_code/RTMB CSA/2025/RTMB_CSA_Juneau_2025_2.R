@@ -99,11 +99,17 @@ for (i in 2:length(SURVEY_MIDDATE)) { #fills in the NA's with the value before
 }
 
 # TAUs
+
+N2 <- 8.007 #average taos of early years on excel N4 for juneau
+##shit, this is an inconsistency with the other area calculations
+##
+
+
 CATCH_SURVEY_TAU    <- rep(0, length(CATCH_MIDDATE))
 CATCH_SURVEY_TAU[1] <- 0
 for (i in 2:length(CATCH_MIDDATE)) {
   if (CATCH[i - 1] == 0) {
-    CATCH_SURVEY_TAU[i] <- 1 #if the catch is 0, the catch_survey_tau=1 for the next year
+    CATCH_SURVEY_TAU[i] <- N2#1 #if the catch is 0, the catch_survey_tau=1 for the next year- NOTE- this is only for JUNEAU, the other areas use an average N2 instead of 1...
   } else {
     CATCH_SURVEY_TAU[i] <- abs(SURVEY_MIDDATE[i] - CATCH_MIDDATE[i - 1]) / 365 #same formula as excel to get the tao adjustor
   }
@@ -184,7 +190,7 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-mod <- run_csa_model(data, pars, map, newtonsteps = 1) # a werid note:Note that `getReportCovariance=FALSE` causes an error in `TMB::sdreport` when no ADREPORTed variables are present
+mod <- run_csa_model(data, pars, map, newtonsteps = 1) 
 ##seems non-consequential tho
 
 # Quick convergence check
@@ -364,7 +370,7 @@ output_df <- df_excel %>%
   )
 
 #SAVE output csv (overwrite the old biomass file)
-# write.csv(output_df, paste0("results/rkc/Juneau/", cur_yr, "/CSA_output_", cur_yr, ".csv"), row.names = FALSE)
+write.csv(output_df, paste0("results/rkc/Juneau/", cur_yr, "/CSA_output_", cur_yr, ".csv"), row.names = FALSE)
 
 
 # ============================================================================

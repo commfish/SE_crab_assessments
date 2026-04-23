@@ -100,11 +100,13 @@ for (i in 2:length(SURVEY_MIDDATE)) { #fills in the NA's with the value before
 }
 
 # TAUs
+N2 <- 0.6867  # fallback value from Excel $N$2- of Seymour specifically, from Excel - average of the early years
+
 CATCH_SURVEY_TAU    <- rep(0, length(CATCH_MIDDATE))
 CATCH_SURVEY_TAU[1] <- 0
 for (i in 2:length(CATCH_MIDDATE)) {
   if (CATCH[i - 1] == 0) {
-    CATCH_SURVEY_TAU[i] <- 1 #if the catch is 0, the catch_survey_tau=1 for the next year
+    CATCH_SURVEY_TAU[i] <- N2 #if the catch is 0, the catch_survey_tau=1 for the next year
   } else {
     CATCH_SURVEY_TAU[i] <- abs(SURVEY_MIDDATE[i] - CATCH_MIDDATE[i - 1]) / 365 #same formula as excel to get the tao adjustor
   }

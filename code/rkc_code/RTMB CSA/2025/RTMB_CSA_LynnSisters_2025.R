@@ -102,12 +102,14 @@ for (i in 2:length(SURVEY_MIDDATE)) {
 #CATCH_MIDDATE[34] <- CATCH_MIDDATE[33]
 #hmm, lots of LS is missing a catch middate. Not sure what to do about that. AGR FLAG.
 
-# TAUs - note EI-specific starting value for CATCH_SURVEY_TAU[1]
+# TAUs - 
+N2 <- 0.6443  # fallback value from Excel $N$3- of Lynn specifically, from Excel
+
 CATCH_SURVEY_TAU    <- rep(0, length(CATCH_MIDDATE))
-CATCH_SURVEY_TAU[1] <- 0.6499   #AGR HERE put LS starting value from excel- FLAG, this is hand wavey
+CATCH_SURVEY_TAU[1] <- 0#0.6499   #AGR HERE put LS starting value from excel- FLAG, this is hand wavey
 for (i in 2:length(CATCH_MIDDATE)) {
   if (CATCH[i - 1] == 0) {
-    CATCH_SURVEY_TAU[i] <- 1
+    CATCH_SURVEY_TAU[i] <- N2
   } else {
     CATCH_SURVEY_TAU[i] <- abs(SURVEY_MIDDATE[i] - CATCH_MIDDATE[i - 1]) / 365
   }
@@ -143,7 +145,7 @@ array_all_stages <- array_all_stages[!is.na(array_all_stages[, 2, 1]), , ]  # dr
 # ============================================================================
 # AREA-SPECIFIC STARTING VALUES
 # ============================================================================
-T12_start <- 4.6443533917851 / 100       # from 2024 Lynn sisters Excel CSA (Q2)
+T12_start <- 4.6443533917851 / 10       # from 2024 Lynn sisters Excel CSA (Q2)
 q_start   <- 76.1472017408894 / 1e5       # from 2024 LYnn sisters Excel CSA (Q3)
 S_fixed   <- 0.32                     # natural mortality (fixed, same across areas)
 
@@ -188,7 +190,7 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-mod <- run_csa_model(data, pars, map, newtonsteps = 3)
+mod <- run_csa_model(data, pars, map, newtonsteps = 0)
 
 # Quick convergence check
 # Quick convergence check
@@ -214,7 +216,7 @@ head(results)
 # n_boot = 500 is a reasonable starting point. For quick testing try n_boot = 50.
 boot <- bootstrap_ci(mod$pop_mod, data, pars, map, #convergence issues on 20/500 for lynn sisters
                      n_boot = 500, ci_level = 0.95,
-                     seed = 42, verbose = TRUE, newtonsteps=3) #EI - some iterations have nonconvergence. Try more newtonsteps? Most converge tho
+                     seed = 42, verbose = TRUE, newtonsteps=0) #EI - some iterations have nonconvergence. Try more newtonsteps? Most converge tho
 
 # Merge point estimates with bootstrap CIs
 results_df <- merge_results_ci(results, boot)

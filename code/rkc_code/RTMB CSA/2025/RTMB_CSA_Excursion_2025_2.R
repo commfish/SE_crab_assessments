@@ -106,18 +106,23 @@ for (i in 2:length(SURVEY_MIDDATE)) {
 
 # EI-specific fix: year 34 has missing catch mid-date (see original notes)
 # "Year 2012 is missing a catch mid-year date"
-CATCH_MIDDATE[34] <- CATCH_MIDDATE[33]
+#CATCH_MIDDATE[34] <- CATCH_MIDDATE[33] #hmm
 
 # TAUs - note EI-specific starting value for CATCH_SURVEY_TAU[1]
-CATCH_SURVEY_TAU    <- rep(0, length(CATCH_MIDDATE))
+N2 <- 0.7722  #from excel- average of the taos with data years
+
+CATCH_SURVEY_TAU    <- rep(0, length(CATCH_MIDDATE))  
 CATCH_SURVEY_TAU[1] <- 0.5815   # EI starting value from Excel (differs from Juneau's 0)
 for (i in 2:length(CATCH_MIDDATE)) {
   if (CATCH[i - 1] == 0) {
-    CATCH_SURVEY_TAU[i] <- 1
+    CATCH_SURVEY_TAU[i] <- N2
   } else {
     CATCH_SURVEY_TAU[i] <- abs(SURVEY_MIDDATE[i] - CATCH_MIDDATE[i - 1]) / 365
   }
 }
+
+#if there are still NA's in the catch survey tau, make them 1:
+CATCH_SURVEY_TAU[is.na(CATCH_SURVEY_TAU)] <- N2
 
 SURVEY_TAU    <- rep(0, length(SURVEY_MIDDATE))
 SURVEY_TAU[1] <- 0
@@ -193,7 +198,7 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-mod <- run_csa_model(data, pars, map, newtonsteps = 3)
+mod <- run_csa_model(data, pars, map, newtonsteps = 0)
 
 # Quick convergence check
 # Quick convergence check
@@ -219,7 +224,7 @@ head(results)
 # n_boot = 500 is a reasonable starting point. For quick testing try n_boot = 50.
 boot <- bootstrap_ci(mod$pop_mod, data, pars, map,
                      n_boot = 500, ci_level = 0.95,
-                     seed = 42, verbose = TRUE, newtonsteps=3) #EI - some iterations have nonconvergence. Try more newtonsteps? Most converge tho
+                     seed = 42, verbose = TRUE, newtonsteps=0) #EI - some iterations have nonconvergence. Try more newtonsteps? Most converge tho
 
 # Merge point estimates with bootstrap CIs
 results_df <- merge_results_ci(results, boot)

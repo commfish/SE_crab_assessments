@@ -99,17 +99,19 @@ for (i in 2:length(SURVEY_MIDDATE)) { #fills in the NA's with the value before
 }
 
 # TAUs
+N2 <- 0.6774  # fallback value from Excel $N$2- of Gambier specifically, from Excel - the average of the years with data I think
+
 CATCH_SURVEY_TAU    <- rep(0, length(CATCH_MIDDATE))
 CATCH_SURVEY_TAU[1] <- 0 #might not be accurate for PYbus. FLAG!!
 for (i in 2:length(CATCH_MIDDATE)) {
   if (CATCH[i - 1] == 0) {
-    CATCH_SURVEY_TAU[i] <- 1 #if the catch is 0, the catch_survey_tau=1 for the next year
+    CATCH_SURVEY_TAU[i] <- N2 #if the catch is 0, the catch_survey_tau=1 for the next year
   } else {
     CATCH_SURVEY_TAU[i] <- abs(SURVEY_MIDDATE[i] - CATCH_MIDDATE[i - 1]) / 365 #same formula as excel to get the tao adjustor
   }
 }
 #if there are still NA's in the catch survey tau, make them 1:
-CATCH_SURVEY_TAU[is.na(CATCH_SURVEY_TAU)] <- 1 #will likely have to expand this to other areas (Seymour, etc)
+CATCH_SURVEY_TAU[is.na(CATCH_SURVEY_TAU)] <- N2 #will likely have to expand this to other areas (Seymour, etc)
 
 
 SURVEY_TAU    <- rep(0, length(SURVEY_MIDDATE)) #vector of 0's
