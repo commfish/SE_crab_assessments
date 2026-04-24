@@ -2,6 +2,9 @@
 ## Alex Reich
 ## 4/21/26
 
+#seymour rtmb has inflated q compared to excel
+##still inflated with - weights bug fixed
+## sigma survey mapped
 
 
 ##
@@ -175,6 +178,7 @@ pars <- list(
 map <- list()
 map$S             <- factor(NA) #turns estimation off, fixes the variable
 map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
+#map$ln_sigma_survey <- factor(NA) #turns estimation off, fixes the variable
 #can turn other variables off here if desired
 #map$ln_q <- factor(NA) #q is acting up. - AGR recent addition
 

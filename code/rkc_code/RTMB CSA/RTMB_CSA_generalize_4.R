@@ -104,6 +104,10 @@ basic_pop_model <- function(pars) {
   # For each stage, match observed survey years to the full year index,
   # then evaluate a weighted normal log-likelihood.
   pred <- numeric(nrow(survey_data[, , 1]))
+  #turn weights of 0.1 into 0 
+  for (s in 1:3) { #band-aid
+    survey_data[survey_data[, 4, s] < 0.2, 4, s] <- 0
+  }
   
   for (h in 1:n_stages) {
     for (y in 1:nrow(survey_data[, , h])) {
@@ -112,13 +116,24 @@ basic_pop_model <- function(pars) {
     }
     # Weighted negative log-likelihood (normal)
     SrvIdx_nLL[h] <- -sum(
-      dnorm(survey_data[, 2, h], pred, sigma_survey, TRUE) * survey_data[, 4, h] #see Claude fix- not applyinh now.
+      dnorm(survey_data[, 2, h], pred, sigma_survey, TRUE) * survey_data[, 4, h] #might want a way to make weights of 0.1 actually 0
+      #dnorm(survey_data[, 2, h], pred, sigma_survey*survey_data[, 3, h], TRUE)
     )
+    
+    #log liklelihood formula
+    #SrvIdx_nLL[h] <- -sum(dnorm(log(obs), log(pred), sqrt(log(1 + CV^2)), log = TRUE)
+    
+    #weighted sum of squares
+  #  SrvIdx_nLL[h] <- sum( #removed the negative sign
+      #dnorm(survey_data[, 2, h], pred, sigma_survey, TRUE) * survey_data[, 4, h] AGR off- will be the CV version if I incorporate that later
+   #   survey_data[, 4, h] * (survey_data[, 2, h] - pred)^2 #weights times squared residuals. ln_sigma_survey needs to be mapped for this to make sense
+    #)
+    
   }
   
   #note- can add recruitment in here later (see RTMB_CSA_Juneau_2025.R for draft)
   
-  # Joint negative log-likelihood
+  # Joint negative log-likelihood (or positive weighted sum of squares, pending what is turned on above)
   jnLL <- sum(SrvIdx_nLL)
   
   # ===========================================================================
