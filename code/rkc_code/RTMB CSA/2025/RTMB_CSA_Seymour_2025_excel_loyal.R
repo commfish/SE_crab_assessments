@@ -34,8 +34,8 @@ library(patchwork)
 set.seed(100)
 
 # Source the generalized CSA functions
-source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize_4.R")
-#source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize_5_replicate.R")
+#source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize_4.R")
+source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize_5_replicate.R")
 
 # ============================================================================
 # AREA-SPECIFIC SETTINGS
@@ -162,7 +162,7 @@ data <- list(
   wt_prerec        = df$Prerecruit.Weight,
   SURVEY_TAU       = SURVEY_TAU,
   CATCH_SURVEY_TAU = CATCH_SURVEY_TAU#,
-  #data$free_prerec = 1 # 1 is Excel replication mode. 0 is RTMB mode (Eps_R*mean_rec) TRIAL.
+ # data$free_prerec = 1 # 1 is Excel replication mode. 0 is RTMB mode (Eps_R*mean_rec) TRIAL.
 )
 
 pars <- list(
@@ -172,18 +172,20 @@ pars <- list(
   ln_T12               = log(T12_start), #preR to R survival rate and molt rate, both
   S                    = S_fixed, #mortality, estentially
   ln_sigma_survey      = log(0.25), #try changing
-  ln_init_rec_cpue     = log(pred_CPUE_rec[1]), #initial recruitment CPE
-  ln_init_postrec_cpue = log(pred_CPUE_postrec[1])#, #initial postrecruit CPUE
-  #pars$ln_prerec_cpue <- rep(log(mean(obs_prerec_cpue)), n_yrs)  # starting values ADDED
+  ln_init_rec_cpue     = log(2.60647497281333), #-fixed to Seymour-specific starting value from the excel spreadsheet, for replication reasons #log(pred_CPUE_rec[1]), #initial recruitment CPE
+  ln_init_postrec_cpue = log(1.58756924748598), #THIS TOO, same as above #log(pred_CPUE_postrec[1]), #initial postrecruit CPUE
+  ln_prerec_cpue =  log(pmax(CPUE_prerec, 0.001))  # starting values ADDED
 )
 
 # Map: fix S and mean recruitment
 map <- list()
 map$S             <- factor(NA) #turns estimation off, fixes the variable
-#map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
+map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
 # Excel replication mode — free pre-recruits, fix mean_rec and Eps_R
 #map$ln_mean_rec <- factor(NA)
-#map$ln_Eps_R    <- factor(rep(NA, n_yrs))
+map$ln_Eps_R    <- factor(rep(NA, length(pars$ln_Eps_R))) #turns estimation off, fixes the variable)))
+#map$ln_init_rec_cpue     <- factor(NA) #added to not estiamte initial value
+#map$ln_init_postrec_cpue <- factor(NA) #added to not estimate the initial value
 # Process model mode — fix ln_prerec_cpue, free mean_rec and Eps_R
 #map$ln_prerec_cpue <- factor(rep(NA, n_yrs))
 
@@ -197,39 +199,14 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-
-##
-#test- tangent
-#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map = map, silent = TRUE)
-
-# Now run with loose tolerances
-#opt_loose <- TMBhelper::fit_tmb(
-#  obj         = pop_mod,
-#  fn          = pop_mod$fn,
-#  gr          = pop_mod$gr,
-#  newtonsteps = 0,
-#  getsd       = FALSE,
-#  control     = list(
-#    rel.tol  = 1e-3,
-#    abs.tol  = 1e-3,
-#    iter.max = 50,
-#    eval.max = 100
-#  )
-#)
-# Check final q
-#report_loose <- pop_mod$report(pop_mod$env$last.par.best)
-#report_loose$q
-##end test
-
 mod <- run_csa_model(data, pars, map, newtonsteps = 0) #if newtonsteps are on. Can turn newtonsteps off for the other ones and see what happens? Default newtonsteps to 0 I think
-
 
 # Quick convergence check
 best_par  <- mod$pop_mod$env$last.par.best
 max_grad  <- max(abs(mod$pop_mod$gr(best_par)))
 
 cat("Max gradient (at last.par.best):", max_grad, "\n") 
-cat("Converged (< 0.001)?", max_grad < 0.001, "\n")
+cat("Converged (< 0.001)?", max_grad < 0.001, "\n") #RTMB model converges better than the excel-loyal model
 cat("Optimized jnLL:", mod$report$jnLL, "\n")
 cat("Estimated q:", mod$report$q, "\n")
 cat("Estimated T12:", mod$report$T12, "\n")
@@ -336,7 +313,7 @@ p3 <- ggplot(results_df, aes(x = year, y = postrec_cpue)) +
   theme_minimal()
 
 (p123 <- p1 / p2 / p3)
-ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE.png"),
+ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE_excelloyal.png"),
        plot = p123, width = 8, height = 10, dpi = 300)
 
 # ============================================================================
@@ -382,7 +359,7 @@ p4 <- ggplot(results_df, aes(x = year)) +
         legend.box.background = element_rect(color = "gray80"))
 
 p4
-ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass.png"),
+ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_Excelloyal.png"),
        plot = p4, width = 8, height = 5, dpi = 300)
 
 # ============================================================================
@@ -401,7 +378,19 @@ output_df <- df_excel %>%
   )
 
 #SAVE output csv
-write.csv(output_df, paste0("results/rkc/Seymour/", cur_yr, "/CSA_output_2", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
+write.csv(output_df, paste0("results/rkc/Seymour/", cur_yr, "/CSA_output_2_excel_loyal", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
 
 #output biomass only into a biomass csv:
+
+##test vs actual excel.
+test_pars <- best_par  
+test_pars[1] <- log(1.4995e-04)
+test_pars[2] <- log(1.32428)
+# Plug Excel's params into RTMB's likelihood:
+mod$pop_mod$fn(unlist(test_pars[!names(test_pars) %in% c("S", "ln_mean_rec", "ln_Eps_R")])) #812.4451
+
+#RTMB excel loyal model likelihood: 
+cat("Optimized jnLL:", mod$report$jnLL, "\n") #393.1532 - lower is better because this is the joint negative log likelihood
+
+
 

@@ -41,7 +41,6 @@ basic_pop_model <- function(pars) {
   
   # Containers ----------------------------------------------------------------
   PredSrvCPUE <- array(0, dim = c(n_yrs, n_stages))  # predicted CPUE by stage
-  
   PredSrvIdx  <- array(0, dim = c(n_yrs, n_stages))  # predicted biomass indices
   SrvIdx_nLL  <- rep(0, n_stages)  # 3 stages                   # neg-log-lik per stage
   jnLL        <- 0                                     # joint neg-log-lik
@@ -53,7 +52,9 @@ basic_pop_model <- function(pars) {
   sigma_survey     <- exp(ln_sigma_survey)
   init_rec_cpue    <- exp(ln_init_rec_cpue)
   init_postrec_cpue <- exp(ln_init_postrec_cpue)
-  Eps_R            <- exp(ln_Eps_R)
+  Eps_R             <- exp(ln_Eps_R)          # unused in Excel mode - kept for compatibility
+  prerec_cpue       <- exp(ln_prerec_cpue)    # NEW: free pre-recruit CPUE per year
+  
   
   # Convert CV column in survey_data to likelihood weights --------------------
   # WEIGHTS = 1 / (2 * (sqrt(log(1 + CV^2)))^2)   i.e., inverse of log-normal variance
@@ -65,14 +66,15 @@ basic_pop_model <- function(pars) {
   # ===========================================================================
   
   # Year 1 initialization ----------------------------------------------------
-  PredSrvCPUE[1, 1] <- Eps_R[1] * mean_rec          # pre-recruit
+  PredSrvCPUE[1, 1] <-   prerec_cpue[1]          # CHANGED: free parameter exp(ln_prerec_cpue[1]) #CHANGED  # free parameter year 1 # Eps_R[1] * mean_rec          # pre-recruit
   PredSrvCPUE[1, 2] <- init_rec_cpue                 # recruit
   PredSrvCPUE[1, 3] <- init_postrec_cpue             # post-recruit
   
   # Forward projection --------------------------------------------------------
   for (t in 2:n_yrs) {
-    # Pre-recruits: recruitment deviate * mean recruitment
-    PredSrvCPUE[t, 1] <- Eps_R[t] * mean_rec
+    
+    # Pre-recruits: free parameter per year (matches Excel's optimized column)
+    PredSrvCPUE[t, 1] <- prerec_cpue[t]        # CHANGED: was Eps_R[t] * mean_rec
     
     # Recruits: transition from last year's pre-recruits
     PredSrvCPUE[t, 2] <- T12 * PredSrvCPUE[t - 1, 1]
@@ -106,6 +108,7 @@ basic_pop_model <- function(pars) {
   # For each stage, match observed survey years to the full year index,
   # then evaluate a weighted normal log-likelihood.
   pred <- numeric(nrow(survey_data[, , 1]))
+  
   #turn weights of 0.1 into 0 
   for (s in 1:3) { #band-aid
     survey_data[survey_data[, 4, s] < 0.2, 4, s] <- 0
@@ -148,13 +151,11 @@ basic_pop_model <- function(pars) {
   RTMB::REPORT(q)
   RTMB::REPORT(T12)
   RTMB::REPORT(Eps_R)
+  RTMB::REPORT(prerec_cpue)     # NEW: report the free pre-recruit estimates
   RTMB::REPORT(survey_data)
   
   return(jnLL)
 }
-# END basic_pop_model
-##that was the population model that I create in RTMB. It will be called in the next function to run the model, and get results
-##looks good- QC'ed
 
 
 # =============================================================================
