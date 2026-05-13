@@ -170,12 +170,12 @@ Estimated.Prerecruits <- df$Estimated.Prerecruits
 Estimated.Prerecruits[nrow(df)] <- Estimated.Prerecruits[nrow(df)-1] #prerecruit start same as the previous year
 
 pars <- list(
-  ln_mean_rec          = log(1.6), 
-  ln_Eps_R             = log(rep(1, length(YEARS))),
+  #ln_mean_rec          = log(1.6), 
+  #ln_Eps_R             = log(rep(1, length(YEARS))),
   ln_q                 = log(q_start), #catchability
   ln_T12               = log(T12_start), #preR to R survival rate and molt rate, both
   S                    = S_fixed, #mortality, estentially
-  ln_sigma_survey      = log(.75), #try changing
+  #ln_sigma_survey      = log(.75), #try changing
   ln_init_rec_cpue     = log(3.32636969172464), #-Lynn-specific starting value from the excel spreadsheet, for replication reasons #log(pred_CPUE_rec[1]), #initial recruitment CPE
   ln_init_postrec_cpue = log(3.54706720162948), #THIS TOO, same as above #log(pred_CPUE_postrec[1]), #initial postrecruit CPUE
   ln_prerec_cpue =  log(pmax(Estimated.Prerecruits, 0.001))  # starting values ADDED #AG flag - CPUE prerec is the unestimated value, perhaps add here the est prerecruit starting values
@@ -184,15 +184,16 @@ pars <- list(
 # Map: fix S and mean recruitment
 map <- list()
 map$S             <- factor(NA) #turns estimation off, fixes the variable
-map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
-map$ln_sigma_survey <- factor(NA) #tuns sigma estimation off - NEEDS to be off for the excel loyal sumsq model.
+#map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
+#map$ln_sigma_survey <- factor(NA) #tuns sigma estimation off - NEEDS to be off for the excel loyal sumsq model.
 # Excel replication mode — free pre-recruits, fix mean_rec and Eps_R
 #map$ln_mean_rec <- factor(NA)
-map$ln_Eps_R    <- factor(rep(NA, length(pars$ln_Eps_R))) #turns estimation off, fixes the variable)))
+#map$ln_Eps_R    <- factor(rep(NA, length(pars$ln_Eps_R))) #turns estimation off, fixes the variable)))
+#map$ln_prerec_cpue <- factor(rep(NA, length(Estimated.Prerecruits)))
 #map$ln_init_rec_cpue     <- factor(NA) #added to not estiamte initial value
-#map$ln_init_postrec_cpue <- factor(NA) #added to not estimate the initial value
-# Process model mode — fix ln_prerec_cpue, free mean_rec and Eps_R
-#map$ln_prerec_cpue <- factor(rep(NA, n_yrs))
+#map$ln_init_postrec_cpue <- factor(NA) #added to not estimate the initial valueln
+#map$ln_q <- factor(NA) #turns estimation off, fixes the variable
+map$ln_T12 <- factor(NA) #turns estimation off, fixes the variable
 
 # Save crab weight vectors for plotting before rm (used by plots below)
 wt_df <- data.frame(
@@ -318,7 +319,7 @@ p3 <- ggplot(results_df, aes(x = year, y = postrec_cpue)) +
   theme_minimal()
 
 (p123 <- p1 / p2 / p3)
-ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE_excelloyal_sumsq.png"),
+ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE_excelloyal_sums_fixT12.png"),
        plot = p123, width = 8, height = 10, dpi = 300)
 
 # ============================================================================
@@ -364,7 +365,7 @@ p4 <- ggplot(results_df, aes(x = year)) +
         legend.box.background = element_rect(color = "gray80"))
 
 p4
-ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_Excelloyal_sumsq.png"),
+ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_Excelloyal_sumsq_fixT12.png"),
        plot = p4, width = 8, height = 5, dpi = 300)
 
 # ============================================================================
@@ -383,8 +384,17 @@ output_df <- df_excel %>%
   )
 
 #SAVE output csv
-write.csv(output_df, paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_excel_loyal_sumsq", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
+write.csv(output_df, paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_excel_loyal_sumsq_fixT12", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
 
+
+#take aways
+##when I let q and prereq estimate, q is lower and biomass is higher.
+### fix prerecs, and that improves
+#fix only q, and everything looks fine
+#fixing just T12 doesnt do much.
+##maybe jitter - q for sure
+###and also - T12...?
+### not gonna jitter prerecs.
 
 
 ####Obsolete below, written for Seymour

@@ -46,13 +46,13 @@ basic_pop_model <- function(pars) {
   jnLL        <- 0                                     # joint neg-log-lik
   
   # Parameter transformations (log -> natural scale) --------------------------
-  mean_rec         <- exp(ln_mean_rec)
+  #mean_rec         <- exp(ln_mean_rec) #turn off for excel loyal
   q                <- exp(ln_q)
   T12              <- exp(ln_T12)
-  sigma_survey     <- exp(ln_sigma_survey)
+  #sigma_survey     <- exp(ln_sigma_survey) #off for excel loyal
   init_rec_cpue    <- exp(ln_init_rec_cpue)
   init_postrec_cpue <- exp(ln_init_postrec_cpue)
-  Eps_R             <- exp(ln_Eps_R)          # unused in Excel mode - kept for compatibility
+#  Eps_R             <- exp(ln_Eps_R)          # turn off in excel loyal
   prerec_cpue       <- exp(ln_prerec_cpue)    # NEW: free pre-recruit CPUE per year
   
   
@@ -146,13 +146,13 @@ basic_pop_model <- function(pars) {
   # ===========================================================================
   # Report section
   # ===========================================================================
-  RTMB::REPORT(sigma_survey)
+  #RTMB::REPORT(sigma_survey) #off for excel loyal
   RTMB::REPORT(PredSrvIdx)
   RTMB::REPORT(PredSrvCPUE)
   RTMB::REPORT(jnLL)
   RTMB::REPORT(q)
   RTMB::REPORT(T12)
-  RTMB::REPORT(Eps_R)
+  #RTMB::REPORT(Eps_R) #turn off for excel loyal
   RTMB::REPORT(prerec_cpue)     # NEW: report the free pre-recruit estimates
   RTMB::REPORT(survey_data)
   
@@ -171,7 +171,7 @@ extract_results <- function(report, data) {
   
   df <- data.frame(
     year              = data$YEARS,
-    sigma_survey      = rep(report$sigma_survey, n_yrs),
+    #sigma_survey      = rep(report$sigma_survey, n_yrs), #off for excel loyal
     q                 = rep(report$q, n_yrs),
     T12               = rep(report$T12, n_yrs),
     prerec_cpue       = report$PredSrvCPUE[, 1],
@@ -179,8 +179,8 @@ extract_results <- function(report, data) {
     postrec_cpue      = report$PredSrvCPUE[, 3],
     prerec_biomass    = report$PredSrvIdx[, 1],
     legal_biomass     = report$PredSrvIdx[, 2],
-    mature_biomass    = report$PredSrvIdx[, 3],
-    Eps_R             = report$Eps_R
+    mature_biomass    = report$PredSrvIdx[, 3]#, #comma off for excel-loyal
+    #Eps_R             = report$Eps_R #turn off for excel loyal
   )
   
   return(df)
@@ -261,7 +261,7 @@ run_csa_model <- function(data, pars, map,
 bootstrap_ci <- function(pop_mod, data, pars, map,
                          n_boot = 1000, ci_level = 0.95,
                          seed = 42, newtonsteps = 1,
-                         verbose = TRUE) {
+                         verbose = TRUE, sigma_manual = 0.5) { #added sigma_manual for the excel-loyal version
   
   set.seed(seed)
   
@@ -270,7 +270,8 @@ bootstrap_ci <- function(pop_mod, data, pars, map,
   
   # Get MLE report for the "true" predicted values
   mle_report <- pop_mod$report(pop_mod$env$last.par.best)
-  sigma_mle  <- mle_report$sigma_survey
+  #sigma_mle  <- mle_report$sigma_survey #off for excel loyal
+  sigma_mle  <- sigma_manual #added for excel loyal
   pred_cpue  <- mle_report$PredSrvCPUE  # [n_yrs x 3]
   
   # Identify which years have observed data (from the survey_data array)

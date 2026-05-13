@@ -150,8 +150,8 @@ array_all_stages <- array_all_stages[!is.na(array_all_stages[, 2, 1]), , ]  # dr
 # ============================================================================
 # AREA-SPECIFIC STARTING VALUES - FLAG -  please automate these later
 # ============================================================================
-T12_start <- 13.24282525 / 10   # from 2024 Seymour Excel CSA (Q2) 
-q_start   <- 149.9470188 / 1e6   # from 2024 Seymour Excel CSA (Q3)
+T12_start <- 13.24282525 / 10  #2025 for excel loyal # from 2024 Seymour Excel CSA (Q2) 
+q_start   <- 149.9470188 / 1e6 #2025 for excel loyal  # from 2024 Seymour Excel CSA (Q3)
 S_fixed   <- 0.32                      # natural mortality (fixed, and the same for every area)
 
 # ============================================================================
@@ -173,12 +173,12 @@ Estimated.Prerecruits <- df$Estimated.Prerecruits
 Estimated.Prerecruits[nrow(df)] <- Estimated.Prerecruits[nrow(df)-1] #prerecruit start same as the previous year
 
 pars <- list(
-  ln_mean_rec          = log(1), #1.7
-  ln_Eps_R             = log(rep(1, length(YEARS))),
+  #ln_mean_rec          = log(1), #1.7 #Ithink this can go off for excel loyal
+  #ln_Eps_R             = log(rep(1, length(YEARS))), this too can go off for excel loyal
   ln_q                 = log(q_start), #catchability
   ln_T12               = log(T12_start), #preR to R survival rate and molt rate, both
   S                    = S_fixed, #mortality, estentially
-  ln_sigma_survey      = log(.75), #try changing
+  #ln_sigma_survey      = log(.75), #off for excel loyal
   ln_init_rec_cpue     = log(2.60647497281333), #-Seymour-specific starting value from the excel spreadsheet, for replication reasons #log(pred_CPUE_rec[1]), #initial recruitment CPE
   ln_init_postrec_cpue = log(1.58756924748598), #THIS TOO, same as above #log(pred_CPUE_postrec[1]), #initial postrecruit CPUE
   ln_prerec_cpue =  log(pmax(Estimated.Prerecruits, 0.001))  # starting values ADDED
@@ -188,15 +188,18 @@ pars <- list(
 # Map: fix S and mean recruitment
 map <- list()
 map$S             <- factor(NA) #turns estimation off, fixes the variable
-map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
-map$ln_sigma_survey <- factor(NA) #tuns sigma estimation off - NEEDS to be off for the excel loyal sumsq model.
+#map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
+#map$ln_sigma_survey <- factor(NA) #tuns sigma estimation off - NEEDS to be off for the excel loyal sumsq model.
 # Excel replication mode — free pre-recruits, fix mean_rec and Eps_R
 #map$ln_mean_rec <- factor(NA)
-map$ln_Eps_R    <- factor(rep(NA, length(pars$ln_Eps_R))) #turns estimation off, fixes the variable)))
+#map$ln_Eps_R    <- factor(rep(NA, length(pars$ln_Eps_R))) #turns estimation off, fixes the variable)))
+#MAP EVERYTHING EXCEL DOES -> TEST - turns out I cant map everything- at least one parameter needs to be estiamted.
+map$ln_prerec_cpue <- factor(rep(NA, length(Estimated.Prerecruits)))
 #map$ln_init_rec_cpue     <- factor(NA) #added to not estiamte initial value
 #map$ln_init_postrec_cpue <- factor(NA) #added to not estimate the initial value
-# Process model mode — fix ln_prerec_cpue, free mean_rec and Eps_R
-#map$ln_prerec_cpue <- factor(rep(NA, n_yrs))
+#map$ln_q                 <- factor(NA) #the problem child
+map$ln_T12               <- factor(NA) #fixed
+
 
 # Save crab weight vectors for plotting before rm (used by plots below)
 wt_df <- data.frame(
@@ -322,7 +325,7 @@ p3 <- ggplot(results_df, aes(x = year, y = postrec_cpue)) +
   theme_minimal()
 
 (p123 <- p1 / p2 / p3)
-ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE_excelloyal_sumsq.png"),
+ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE_excelloyal_sumsq_freeq_freeinits.png"),
        plot = p123, width = 8, height = 10, dpi = 300)
 
 # ============================================================================
@@ -368,7 +371,7 @@ p4 <- ggplot(results_df, aes(x = year)) +
         legend.box.background = element_rect(color = "gray80"))
 
 p4
-ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_Excelloyal_sumsq.png"),
+ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_Excelloyal_sumsq_freeq_freeprerec_freeinits.png"),
        plot = p4, width = 8, height = 5, dpi = 300)
 
 # ============================================================================
@@ -387,19 +390,28 @@ output_df <- df_excel %>%
   )
 
 #SAVE output csv
-write.csv(output_df, paste0("results/rkc/Seymour/", cur_yr, "/CSA_output_excel_loyal_sumsq", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
+write.csv(output_df, paste0("results/rkc/Seymour/", cur_yr, "/CSA_output_excel_loyal_sumsq_justestq_freeq_freeinits", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
 
+#dang- RTMB q estimates closer to Excel when ALL other parameters are fixed!!
+# when just q and T12 are free - q is slightly lower - making biomass notably higher.
+# free q free prerec results in a much lower q estimate, which makes the biomass much higher - freeing S on this setup as well (another run) did not help things
+# free q, free rec and postrec intis results in a similar to excel q estimate
+##problem combos -  q and prerecruits (all of them), q and T12.
+## problem free combos - q alone, q and prerec and rec inits, everything else free and q fixed
+
+
+#obsolete below
 #output biomass only into a biomass csv:
 
 ##test vs actual excel.
-test_pars <- best_par  
-test_pars[1] <- log(1.4995e-04)
-test_pars[2] <- log(1.32428)
-# Plug Excel's params into RTMB's likelihood:
-mod$pop_mod$fn(unlist(test_pars[!names(test_pars) %in% c("S", "ln_mean_rec", "ln_Eps_R")])) #812.4451
+#test_pars <- best_par  
+#test_pars[1] <- log(1.4995e-04)
+#test_pars[2] <- log(1.32428)
+## Plug Excel's params into RTMB's likelihood:
+#mod$pop_mod$fn(unlist(test_pars[!names(test_pars) %in% c("S", "ln_mean_rec", "ln_Eps_R")])) #812.4451
 
 #RTMB excel loyal model likelihood: 
-cat("Optimized jnLL:", mod$report$jnLL, "\n") #393.1532 - lower is better because this is the joint negative log likelihood
+#cat("Optimized jnLL:", mod$report$jnLL, "\n") #393.1532 - lower is better because this is the joint negative log likelihood
 
 
 
