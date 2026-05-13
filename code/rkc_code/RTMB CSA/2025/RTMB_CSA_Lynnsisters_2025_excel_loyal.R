@@ -183,16 +183,17 @@ pars <- list(
 
 # Map: fix S and mean recruitment
 map <- list()
-map$S             <- factor(NA) #turns estimation off, fixes the variable
+map$S             <- factor(NA) #turns estimation off, fixes the variable - FIXED !!
+#not needed in excel loyal:
 #map$ln_mean_rec   <- factor(NA) #turns estimation off, fixes the variable
 #map$ln_sigma_survey <- factor(NA) #tuns sigma estimation off - NEEDS to be off for the excel loyal sumsq model.
-# Excel replication mode — free pre-recruits, fix mean_rec and Eps_R
 #map$ln_mean_rec <- factor(NA)
 #map$ln_Eps_R    <- factor(rep(NA, length(pars$ln_Eps_R))) #turns estimation off, fixes the variable)))
+#turn off and on in excel model:
 #map$ln_prerec_cpue <- factor(rep(NA, length(Estimated.Prerecruits)))
 #map$ln_init_rec_cpue     <- factor(NA) #added to not estiamte initial value
 #map$ln_init_postrec_cpue <- factor(NA) #added to not estimate the initial valueln
-#map$ln_q <- factor(NA) #turns estimation off, fixes the variable
+map$ln_q <- factor(NA) #turns estimation off, fixes the variable
 map$ln_T12 <- factor(NA) #turns estimation off, fixes the variable
 
 # Save crab weight vectors for plotting before rm (used by plots below)
@@ -201,6 +202,12 @@ wt_df <- data.frame(
   wt_legal  = data$wt_legal,
   wt_mature = data$wt_mature
 )
+
+# ============================================================================
+# JITTER if relevant! (may take a while); will need to update year in future
+# ============================================================================
+#source("code/rkc_code/RTMB CSA/2025/RTMB_CSA_Lynnsisters_2025_excel_loyal_jitter.R") #turns on jitter, which can help with convergence and finding the global minimum.
+
 
 # ============================================================================
 # RUN MODEL (using generalized function)
@@ -319,8 +326,8 @@ p3 <- ggplot(results_df, aes(x = year, y = postrec_cpue)) +
   theme_minimal()
 
 (p123 <- p1 / p2 / p3)
-ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE_excelloyal_sums_fixT12.png"),
-       plot = p123, width = 8, height = 10, dpi = 300)
+#ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE_excelloyal_sums_freeq.png"),
+ #      plot = p123, width = 8, height = 10, dpi = 300)
 
 # ============================================================================
 # BIOMASS COMPARISON PLOT
@@ -365,8 +372,8 @@ p4 <- ggplot(results_df, aes(x = year)) +
         legend.box.background = element_rect(color = "gray80"))
 
 p4
-ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_Excelloyal_sumsq_fixT12.png"),
-       plot = p4, width = 8, height = 5, dpi = 300)
+#ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_Excelloyal_sumsq_freeq.png"),
+ #      plot = p4, width = 8, height = 5, dpi = 300)
 
 # ============================================================================
 # OUTPUT TABLE CONSTRUCTION
@@ -384,7 +391,7 @@ output_df <- df_excel %>%
   )
 
 #SAVE output csv
-write.csv(output_df, paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_excel_loyal_sumsq_fixT12", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
+#write.csv(output_df, paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_excel_loyal_freeq", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
 
 
 #take aways
@@ -392,6 +399,7 @@ write.csv(output_df, paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_exc
 ### fix prerecs, and that improves
 #fix only q, and everything looks fine
 #fixing just T12 doesnt do much.
+#fixing everything else and estimating q- q estimates fine.
 ##maybe jitter - q for sure
 ###and also - T12...?
 ### not gonna jitter prerecs.
