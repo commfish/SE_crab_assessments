@@ -1,15 +1,12 @@
-### Seymour Canal RTMB CSA 2025 ###
+### Lynn Sisters RTMB CSA 2025 EXCEL LOYAL SUMSQ ###
 ## Alex Reich
-## 4/21/26
-##changed to excel loyal sumsq versioning on 5/13/26
+## 5/13/26
 
-#seymour rtmb has inflated q compared to excel
-##still inflated with - weights bug fixed
-## sigma survey mapped
+## sigma survey needs to be mapped
 
 
 ##
-## This script handles Seymour-specific data wrangling, then calls the
+## This script handles Lynn-specific data wrangling, then calls the
 ## generalized model functions for fitting, result extraction, and
 ## bootstrap confidence intervals.
 
@@ -43,18 +40,18 @@ source("code/rkc_code/RTMB CSA/RTMB_CSA_generalize_5_replicate_excelloyal_sumsq.
 # ============================================================================
 # AREA-SPECIFIC SETTINGS
 # ============================================================================
-area_name <- "SC"          # short label for filenames and plot titles
+area_name <- "LS"          # short label for filenames and plot titles
 cur_yr    <- 2025            # current analysis year
 
 # ============================================================================
 # DATA WRANGLING (area-specific -- will be streamlined in the future)
 # ============================================================================
 
-df <- read.csv("CSA_excel/Seymour Canal 2025 input raw data RTMB.csv")
+df <- read.csv("CSA_excel/Lynn Sisters 2025 input data RTMB.csv")
 
-this_year_cpue <- read.csv("results/rkc/Seymour/2025/SC_CPUE_2025.csv") %>% #results from the CPUE standardization and summary script
+this_year_cpue <- read.csv("results/rkc/LynnSisters/2025/LS_CPUE_2025.csv") %>% #results from the CPUE standardization and summary script
   filter(Year == cur_yr)
-this_year_crab_weights <- read.csv("results/rkc/Seymour/2025/maleweights.csv") %>% #from that same R summary
+this_year_crab_weights <- read.csv("results/rkc/LynnSisters/2025/maleweights.csv") %>% #from that same R summary
   filter(Year == cur_yr)
 
 df$Catch..Number.[46] <- 0       # No commercial catch in Seymour canal sisters in 24/25(fishery closed)
@@ -62,7 +59,7 @@ df$Catch.Mid.Date[46] <- NA
 
 df <- df %>% select(Survey.Year, Catch.Season, Pre.recruit, Recruit, Post.recruit,
                     Catch..Number., Catch.Mid.Date, Survey.Mid.Date,
-                    Mature.Weight, Legal.Weight, Prerecruit.Weight, Weight,
+                    Mature.Weight, Legal.Weight, Prerecruit.Weight, Weight, Estimated.Prerecruits, #agr added estimated.prerecruits 5/13/26- to add as starting values
                     Estimated.Recruits, Estimated.Postrecruits)
 
 # Add current year row
@@ -74,10 +71,11 @@ new_line <- data.frame(
   Post.recruit       = this_year_cpue$Post_Recruit_wt,
   Catch..Number.     = NA, #fishing hasn't started yet for the most recent year, so this is a placeholder
   Catch.Mid.Date     = NA, #fishing hasn't started yet for the most recent year, so this is a placeholder
-  Survey.Mid.Date    = "12-Aug-25", #automate date entry later
+  Survey.Mid.Date    = "19-Jul-25", #automate date entry later
   Mature.Weight      = this_year_crab_weights$mature_lbs,
   Legal.Weight       = this_year_crab_weights$legal_lbs,
   Prerecruit.Weight  = this_year_crab_weights$prer_lbs,
+  Estimated.Prerecruits = 0, #agr add 5/13/26
   Estimated.Recruits     = 0,
   Estimated.Postrecruits = 0,
   Weight             = 12 #by the established weighting mechanism, recent years are 12.
@@ -107,7 +105,7 @@ for (i in 2:length(SURVEY_MIDDATE)) { #fills in the NA's with the value before
 }
 
 # TAUs
-N2 <- 0.6867  # fallback value from Excel $N$2- of Seymour specifically, from Excel - average of the early years
+N2 <- 0.6443  # fallback value from Excel $N$2- of Seymour specifically, from Excel - average of the early years
 
 CATCH_SURVEY_TAU    <- rep(0, length(CATCH_MIDDATE))
 CATCH_SURVEY_TAU[1] <- 0
@@ -149,9 +147,9 @@ array_all_stages <- array_all_stages[!is.na(array_all_stages[, 2, 1]), , ]  # dr
 # ============================================================================
 # AREA-SPECIFIC STARTING VALUES - FLAG -  please automate these later
 # ============================================================================
-T12_start <- 13.24282525 / 10   # from 2024 Seymour Excel CSA (Q2) 
-q_start   <- 149.9470188 / 1e6   # from 2024 Seymour Excel CSA (Q3)
-S_fixed   <- 0.32                      # natural mortality (fixed, and the same for every area)
+T12_start <- 4.6443533917851 / 10       # from 2024 Lynn sisters Excel CSA (Q2)
+q_start   <- 76.1472017408894 / 1e5       # from 2024 LYnn sisters Excel CSA (Q3)
+S_fixed   <- 0.32                     # natural mortality (fixed, same across areas)
 
 # ============================================================================
 # BUILD DATA AND PARAMETER LISTS
@@ -168,17 +166,20 @@ data <- list(
  # data$free_prerec = 1 # 1 is Excel replication mode. 0 is RTMB mode (Eps_R*mean_rec) TRIAL.
 )
 
+Estimated.Prerecruits <- df$Estimated.Prerecruits
+Estimated.Prerecruits[nrow(df)] <- Estimated.Prerecruits[nrow(df)-1] #prerecruit start same as the previous year
+
 pars <- list(
-  ln_mean_rec          = log(1), #1.7
+  ln_mean_rec          = log(1.6), 
   ln_Eps_R             = log(rep(1, length(YEARS))),
   ln_q                 = log(q_start), #catchability
   ln_T12               = log(T12_start), #preR to R survival rate and molt rate, both
   S                    = S_fixed, #mortality, estentially
   ln_sigma_survey      = log(.75), #try changing
-  ln_init_rec_cpue     = log(2.60647497281333), #-Seymour-specific starting value from the excel spreadsheet, for replication reasons #log(pred_CPUE_rec[1]), #initial recruitment CPE
-  ln_init_postrec_cpue = log(1.58756924748598), #THIS TOO, same as above #log(pred_CPUE_postrec[1]), #initial postrecruit CPUE
-  ln_prerec_cpue =  log(pmax(CPUE_prerec, 0.001))  # starting values ADDED
-)
+  ln_init_rec_cpue     = log(3.32636969172464), #-Lynn-specific starting value from the excel spreadsheet, for replication reasons #log(pred_CPUE_rec[1]), #initial recruitment CPE
+  ln_init_postrec_cpue = log(3.54706720162948), #THIS TOO, same as above #log(pred_CPUE_postrec[1]), #initial postrecruit CPUE
+  ln_prerec_cpue =  log(pmax(CPUE_prerec, 0.001))  # starting values ADDED #AG flag - CPUE prerec is the unestimated value, perhaps add here the est prerecruit starting values
+  )
 
 # Map: fix S and mean recruitment
 map <- list()
@@ -203,7 +204,7 @@ wt_df <- data.frame(
 # ============================================================================
 # RUN MODEL (using generalized function)
 # ============================================================================
-mod <- run_csa_model(data, pars, map, newtonsteps = 0) #if newtonsteps are on. Can turn newtonsteps off for the other ones and see what happens? Default newtonsteps to 0 I think
+mod <- run_csa_model(data, pars, map, newtonsteps = 0) ##crashes for Lynn if newtonsteps are on
 
 # Quick convergence check
 best_par  <- mod$pop_mod$env$last.par.best
@@ -236,7 +237,7 @@ results_df <- merge_results_ci(results, boot)
 # ============================================================================
 # LOAD EXCEL COMPARISON DATA
 # ============================================================================
-df_excel <- read.csv("CSA_excel/Seymour Canal 2025 Excel results comparison.csv")
+df_excel <- read.csv("CSA_excel/Lynn Sisters 2025 Excel results comparison.csv")
 df_excel$Mature.Biomass     <- as.numeric(gsub(",", "", df_excel$Mature.Biomass))
 df_excel$Legal.Biomass      <- as.numeric(gsub(",", "", df_excel$Legal.Biomass))
 df_excel$Prerecruit.Biomass <- as.numeric(gsub(",", "", df_excel$Prerecruit.Biomass))
@@ -382,7 +383,7 @@ output_df <- df_excel %>%
   )
 
 #SAVE output csv
-write.csv(output_df, paste0("results/rkc/Seymour/", cur_yr, "/CSA_output_excel_loyal_sumsq", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
+write.csv(output_df, paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_excel_loyal_sumsq", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
 
 #output biomass only into a biomass csv:
 
