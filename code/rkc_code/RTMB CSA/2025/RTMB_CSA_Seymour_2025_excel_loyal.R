@@ -62,7 +62,7 @@ df$Catch.Mid.Date[46] <- NA
 
 df <- df %>% select(Survey.Year, Catch.Season, Pre.recruit, Recruit, Post.recruit,
                     Catch..Number., Catch.Mid.Date, Survey.Mid.Date,
-                    Mature.Weight, Legal.Weight, Prerecruit.Weight, Weight,
+                    Mature.Weight, Legal.Weight, Prerecruit.Weight, Weight, Estimated.Prerecruits,
                     Estimated.Recruits, Estimated.Postrecruits)
 
 # Add current year row
@@ -80,6 +80,7 @@ new_line <- data.frame(
   Prerecruit.Weight  = this_year_crab_weights$prer_lbs,
   Estimated.Recruits     = 0,
   Estimated.Postrecruits = 0,
+  Estimated.Prerecruits    = 0,
   Weight             = 12 #by the established weighting mechanism, recent years are 12.
 )
 
@@ -168,6 +169,9 @@ data <- list(
  # data$free_prerec = 1 # 1 is Excel replication mode. 0 is RTMB mode (Eps_R*mean_rec) TRIAL.
 )
 
+Estimated.Prerecruits <- df$Estimated.Prerecruits
+Estimated.Prerecruits[nrow(df)] <- Estimated.Prerecruits[nrow(df)-1] #prerecruit start same as the previous year
+
 pars <- list(
   ln_mean_rec          = log(1), #1.7
   ln_Eps_R             = log(rep(1, length(YEARS))),
@@ -177,7 +181,8 @@ pars <- list(
   ln_sigma_survey      = log(.75), #try changing
   ln_init_rec_cpue     = log(2.60647497281333), #-Seymour-specific starting value from the excel spreadsheet, for replication reasons #log(pred_CPUE_rec[1]), #initial recruitment CPE
   ln_init_postrec_cpue = log(1.58756924748598), #THIS TOO, same as above #log(pred_CPUE_postrec[1]), #initial postrecruit CPUE
-  ln_prerec_cpue =  log(pmax(CPUE_prerec, 0.001))  # starting values ADDED
+  ln_prerec_cpue =  log(pmax(Estimated.Prerecruits, 0.001))  # starting values ADDED
+  
 )
 
 # Map: fix S and mean recruitment

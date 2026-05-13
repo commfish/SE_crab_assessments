@@ -178,7 +178,7 @@ pars <- list(
   ln_sigma_survey      = log(.75), #try changing
   ln_init_rec_cpue     = log(3.32636969172464), #-Lynn-specific starting value from the excel spreadsheet, for replication reasons #log(pred_CPUE_rec[1]), #initial recruitment CPE
   ln_init_postrec_cpue = log(3.54706720162948), #THIS TOO, same as above #log(pred_CPUE_postrec[1]), #initial postrecruit CPUE
-  ln_prerec_cpue =  log(pmax(CPUE_prerec, 0.001))  # starting values ADDED #AG flag - CPUE prerec is the unestimated value, perhaps add here the est prerecruit starting values
+  ln_prerec_cpue =  log(pmax(Estimated.Prerecruits, 0.001))  # starting values ADDED #AG flag - CPUE prerec is the unestimated value, perhaps add here the est prerecruit starting values
   )
 
 # Map: fix S and mean recruitment
@@ -385,17 +385,20 @@ output_df <- df_excel %>%
 #SAVE output csv
 write.csv(output_df, paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_excel_loyal_sumsq", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
 
+
+
+####Obsolete below, written for Seymour
 #output biomass only into a biomass csv:
 
 ##test vs actual excel.
-test_pars <- best_par  
-test_pars[1] <- log(1.4995e-04)
-test_pars[2] <- log(1.32428)
+#test_pars <- best_par  
+#test_pars[1] <- log(1.4995e-04)
+#test_pars[2] <- log(1.32428)
 # Plug Excel's params into RTMB's likelihood:
-mod$pop_mod$fn(unlist(test_pars[!names(test_pars) %in% c("S", "ln_mean_rec", "ln_Eps_R")])) #812.4451
+#mod$pop_mod$fn(unlist(test_pars[!names(test_pars) %in% c("S", "ln_mean_rec", "ln_Eps_R")])) #812.4451
 
 #RTMB excel loyal model likelihood: 
-cat("Optimized jnLL:", mod$report$jnLL, "\n") #393.1532 - lower is better because this is the joint negative log likelihood
+#cat("Optimized jnLL:", mod$report$jnLL, "\n") #393.1532 - lower is better because this is the joint negative log likelihood
 
 
 
