@@ -26,15 +26,35 @@ The biomass is calculated by EQUATION.
 ### Parameters - maybe make this a table
 The parameters are catchability (q), the compound transition/survival/catchability variable from stage 1 to stage 2(T12), intial recruit CPUE, initial postrecruit CPUE, and one prerecurit CPUE per year of data.
 
-## Run RTMB model with all variables fixed, does it get the same result as the Excel model?
+## Run RTMB model with all variables fixed, does it get the same result as the Excel model? 
+I need to write this still - some work around to make it work in RTMB
+
+CPUE comparison
+```{r}
+
+```
+
+Biomass comparison
+```{r}
+
+```
+
+Table- numerical comparison of parameters
 ```{r}
 
 ```
 
 
 ## Run RTMB model with just q estimted
-```{r Lynn3, fig.cap="Lynn sisters RTMB CPUEs for RKC prerecurits, recruits, and postrecruits with all variables estimated, compared to the Excel CPUE results."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_CPUE_excelloyal_sums.png'), dpi = 125)
+```{r Lynn2.1, fig.cap="Lynn sisters RTMB CPUEs for RKC prerecurits, recruits, and postrecruits with only q estimated, compared to the Excel CPUE results."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_CPUE_excelloyal_sums_freeq.png'), dpi = 125)
+```
+```{r Lynn2.2, fig.cap="Lynn sisters RTMB biomass estimates for RKC prerecurits, recruits, and postrecruits with only q estimated, compared to the Excel biomass results."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_Biomass_Excelloyal_sumsq_freeq.png'), dpi = 125)
+```
+Add a table comparing values (will have to make in the OG code...)
+```{r}
+
 ```
 
 
@@ -45,7 +65,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_CPUE_excel
 ```
 
 
-```{r Lynn3.2, fig.cap="Lynn sisters RTMB Biomass estimates for RKC prerecurits, recruits, and postrecruits with all variables estimated, compared to the Excel biomass results."}
+```{r Lynn3.2, fig.cap="Lynn sisters RTMB biomass estimates for RKC prerecurits, recruits, and postrecruits with all variables estimated, compared to the Excel biomass results."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_Biomass_Excelloyal_sumsq.png'), dpi = 125)
 ```
 ### Try putting the RTMB estimated q into the starting value of excel and see what happens- another resutls report
