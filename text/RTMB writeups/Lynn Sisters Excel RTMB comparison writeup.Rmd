@@ -1,0 +1,66 @@
+---
+title: "RTMB vs Excel Lynn Sisters summary"
+author: "Alex Reich"
+date: "2026-06-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+library(knitr)
+
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Abstract
+
+I am working on moving the southeast Alaska red king crab (RKC) stock assessment from an Excel residual sum of squares model into an RTMB framework. As the first step towrads this, I wrote an RTMB model that is identical in framework to that of the one in Excel, with the Lynn Sisters stock as a case study. Ultimtely, what I found is that in this case, the Excel and RTMB models do not have the same convergence and have substantially different estiamtes of the catchability (q), which has a large impact on the biomass estiamte downstream, with the RTMB model estimating a higher biomass. This document provides the step by step comparison of the models in order to provide information to those making the decision about if we can shift the analysis to the RTMB model over the Excel model.
+
+
+## Methods
+### Model
+This is a 3-stage catch-survey analysis, documented in REFERENCE et al. (DATE).
+
+The biomass is calculated by EQUATION.
+
+### Parameters - maybe make this a table
+The parameters are catchability (q), the compound transition/survival/catchability variable from stage 1 to stage 2(T12), intial recruit CPUE, initial postrecruit CPUE, and one prerecurit CPUE per year of data.
+
+## Run RTMB model with all variables fixed, does it get the same result as the Excel model?
+```{r}
+
+```
+
+
+## Run RTMB model with just q estimted
+```{r Lynn3, fig.cap="Lynn sisters RTMB CPUEs for RKC prerecurits, recruits, and postrecruits with all variables estimated, compared to the Excel CPUE results."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_CPUE_excelloyal_sums.png'), dpi = 125)
+```
+
+
+## Run RTMB model with everything estiamted - add some tables in this and those above too. Table of results
+
+```{r Lynn3.1, fig.cap="Lynn sisters RTMB CPUEs for RKC prerecurits, recruits, and postrecruits with all variables estimated, compared to the Excel CPUE results."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_CPUE_excelloyal_sums.png'), dpi = 125)
+```
+
+
+```{r Lynn3.2, fig.cap="Lynn sisters RTMB Biomass estimates for RKC prerecurits, recruits, and postrecruits with all variables estimated, compared to the Excel biomass results."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_Biomass_Excelloyal_sumsq.png'), dpi = 125)
+```
+### Try putting the RTMB estimated q into the starting value of excel and see what happens- another resutls report
+
+## Discussion
+## Excel model further details -  move to discussion, maybe
+The Excel model uses solver's GRG-nonlinear optimizer, the gritty specifics of which do not appear to be available in a public-facing document. According to FrontlineSolvers (n.d.), Solver may stop early, at the non-optimal answer, if the objective function has little change from one trial to the next. I believe this is the case here, with q's flat likelihood profile. Excel solver finds a solution that is "good enough" and then stops looking, because the optimal solution has a small gradient change. (But a small gradient change, and a small difference in q, makes a huge difference to the biomass estimate.)
+
+From FrontlineSolvers - "the GRG method stops if the absolute value of the relative change in the objective function is less than the value in the Convergence box in the Solver Options dialog for the last 5 iterations. While the default value of 1E-4 (0.0001) is suitable for most problems, it may be too large for some models, causing the GRG method to stop prematurely when this test is satisfied, instead of continuing for more iterations until the KKT conditions are satisfied." - AGR note -  try to make the convergence box in solver options smaller...? -  also something about scaling - what is a "poorly scaled model"?? - " So it pays to design your model to be reasonably well scaled in the first place:  The typical values of the objective and constraints should not differ from each other, or from the decision variable values, by more than three or four orders of magnitude." - the q and T12 values are converted so that the solver estimates are not at a wildly different scale - so that part is ccovered?
+
+GRG nonlinear documentation also warns of the objective function getting stuck at a local minimum (FrontLine solvers nd., OTHER), but that does not appear to be the issue here.
+
+### Disucss the M-R implications -  that these areas biomasses are adjusted with mark-recapture, and the RTMB etimate might remove the need for a mark-recapture adjustment to the biomass output. However, that also doesn't alighn exactly with current Excel then M-R biomass adjustment results.
+
+
+## References
+Frontline Solvers, n.d. Excel Solver - GRG Nonlinear Solving Method Stopping Conditions.
+https://www.solver.com/excel-solver-grg-nonlinear-solving-method-stopping-conditions.
