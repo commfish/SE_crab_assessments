@@ -48,20 +48,11 @@ tab #make this table prettier plz. it has Q in it at least
 ```
 
 
-## Run RTMB model with just q estimted
-```{r Lynn2.1, fig.cap="Lynn sisters RTMB CPUEs for RKC prerecurits, recruits, and postrecruits with only q estimated, compared to the Excel CPUE results."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_CPUE_excelloyal_sums_freeq.png'), dpi = 125)
-```
+
 ```{r Lynn2.2, fig.cap="Lynn sisters RTMB biomass estimates for RKC prerecurits, recruits, and postrecruits with only q estimated, compared to the Excel biomass results."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_Biomass_Excelloyal_sumsq_freeq.png'), dpi = 125)
 ```
-Add a table comparing values (will have to make in the OG code...)
-```{r}
-tab <- read.csv("../../results/rkc/LynnSisters/2025/Results_FREE_q2025.csv")
-tab 
 
-#emphasize q. Q has decreased a tiny but but is very similar to the excel model
-```
 
 
 ## Run RTMB model with everything estiamted - add some tables in this and those above too. Table of results
@@ -76,21 +67,44 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_Biomass_Ex
 ```
 
 
-Table of q vs not q
-```{r}
-tab <- read.csv("../../results/rkc/LynnSisters/2025/Results_FREE_ALL2025.csv")
-tab 
-```
 
-3 q's compared, graphically perhaps
+
+3 q's compared, graphically perhaps, or in a table
 ```{r}
 x <- read.csv("../../results/rkc/LynnSisters/2025/Results_BASE2025.csv") %>% select(q) %>% unique()
-y <- read.csv("../../results/rkc/LynnSisters/2025/Results_FREE_ALL2025.csv") %>% select(q) %>% unique()
+y <- read.csv("../../results/rkc/LynnSisters/2025/Results_FREE_q2025.csv") %>% select(q) %>% unique()
 z <- read.csv("../../results/rkc/LynnSisters/2025/Results_FREE_ALL2025.csv") %>% select(q) %>% unique()
+excel_q <- 75.6645583278715/100000 #for lynn sisters
+
+#names <- c("Base model", "Only q estimated", "All parameters estimated")
+q <- as.numeric(c(excel_q, x,y,z))
+
+data.frame(q)
+
+names(q) <- c("Excel q", "Base model q", "Only q estimated q", "All parameters estimated q")
+q
+
 ```
 
 
 ### Try putting the RTMB estimated q into the starting value of excel and see what happens- another resutls report
+I tried. She runs (unlike Seymour, where the Excel model crashes if the RTMB q is inserted. Brings q back up to 0.00076. Idk why it does that. Another weird thing. Excel q is at the top of its range right now. If I let Excel q be higher than 76 in the excel model, it crashes pretty quickly (postrecruits drop into the negatives). So the excel model on its own is up against some sort of upper constraint on q. Yet it passes right over the RTMB q value of 58 and goes back to 76. Interesting
+
+### Flat likelihood profile of q- in the RTMB model
+Show that here, I think, from the PPT
+```{r}
+
+```
+
+
+### Likilood graphs of q for prerecuits, q likilohood for recruits, q likelihood for postrecruits
+See where that flatness is
+```{r}
+#maybe see the "jitter" file for Lynn Sisters
+
+```
+
+
 
 ## Discussion
 ## Excel model further details -  move to discussion, maybe
