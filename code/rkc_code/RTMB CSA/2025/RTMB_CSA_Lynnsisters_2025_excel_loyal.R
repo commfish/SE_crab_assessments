@@ -193,8 +193,8 @@ map$S             <- factor(NA) #turns estimation off, fixes the variable - FIXE
 #map$ln_prerec_cpue <- factor(rep(NA, length(Estimated.Prerecruits)))
 #map$ln_init_rec_cpue     <- factor(NA) #added to not estiamte initial value
 #map$ln_init_postrec_cpue <- factor(NA) #added to not estimate the initial valueln
-map$ln_q <- factor(NA) #turns estimation off, fixes the variable
-map$ln_T12 <- factor(NA) #turns estimation off, fixes the variable
+#map$ln_q <- factor(NA) #turns estimation off, fixes the variable
+#map$ln_T12 <- factor(NA) #turns estimation off, fixes the variable
 
 # Save crab weight vectors for plotting before rm (used by plots below)
 wt_df <- data.frame(
@@ -208,6 +208,21 @@ wt_df <- data.frame(
 # ============================================================================
 #source("code/rkc_code/RTMB CSA/2025/RTMB_CSA_Lynnsisters_2025_excel_loyal_jitter.R") #turns on jitter, which can help with convergence and finding the global minimum.
 
+
+#####
+#BASE MODEL RUN, no parameter estimates- when everything is mapped
+#####
+# Build the AD object as usual
+#pop_mod <- RTMB::MakeADFun(basic_pop_model, parameters = pars, map = map, silent = TRUE)
+
+# Check that par is indeed empty (all mapped out)
+#cat("Free parameters:", length(pop_mod$par), "\n")  # should be 0
+
+# Evaluate at the fixed starting values — no optimization needed
+#report <- pop_mod$report(pop_mod$env$last.par.best)
+#results <- extract_results(report, data)
+#results_df <- results
+#ok so, turn this on for the base model run.
 
 # ============================================================================
 # RUN MODEL (using generalized function)
@@ -230,17 +245,18 @@ results <- mod$results
 head(results)
 
 # ============================================================================
-# BOOTSTRAP CONFIDENCE INTERVALS (non-negative by construction)
+# BOOTSTRAP CONFIDENCE INTERVALS (non-negative by construction) - AR edit not going to BOOT for the base model
 # ============================================================================
 # NOTE: n_boot = 500 is a reasonable starting point. Increase for final publication.
 # For quick testing, try n_boot = 50.
 #I need to set up map again?
-boot <- bootstrap_ci(mod$pop_mod, data, pars, map,
-                     n_boot = 500, ci_level = 0.95,
-                     seed = 42, verbose = TRUE, newtonsteps = 0)
+#boot <- bootstrap_ci(mod$pop_mod, data, pars, map,
+ #                    n_boot = 500, ci_level = 0.95,
+  #                   seed = 42, verbose = TRUE, newtonsteps = 0)
 
 # Merge point estimates with bootstrap CIs
-results_df <- merge_results_ci(results, boot)
+results_df <- results #band aid for dropping boot
+#results_df <- merge_results_ci(results, boot)
 
 # ============================================================================
 # LOAD EXCEL COMPARISON DATA
@@ -276,8 +292,8 @@ color_levels <- c("RTMB", "Excel", "Observed")
 
 # Pre-recruit CPUE
 p1 <- ggplot(results_df, aes(x = year, y = prerec_cpue)) +
-  geom_ribbon(aes(ymin = prerec_cpue_lower, ymax = prerec_cpue_upper),
-              alpha = 0.3, fill = "lightblue") +
+  #geom_ribbon(aes(ymin = prerec_cpue_lower, ymax = prerec_cpue_upper),
+   #           alpha = 0.3, fill = "lightblue") +
   geom_line(aes(color = factor("RTMB", levels = color_levels)), linewidth = 1) +
   geom_point(aes(color = factor("RTMB", levels = color_levels))) +
   geom_line(data = df_excel,
@@ -299,8 +315,8 @@ p1 <- ggplot(results_df, aes(x = year, y = prerec_cpue)) +
 
 # Recruit CPUE
 p2 <- ggplot(results_df, aes(x = year, y = rec_cpue)) +
-  geom_ribbon(aes(ymin = rec_cpue_lower, ymax = rec_cpue_upper),
-              alpha = 0.3, fill = "lightblue") +
+  #geom_ribbon(aes(ymin = rec_cpue_lower, ymax = rec_cpue_upper),
+   #           alpha = 0.3, fill = "lightblue") +
   geom_line(color = "lightblue", linewidth = 1) +
   geom_point(color = "lightblue") +
   geom_point(data = df_excel, aes(y = Recruit, x = Survey.Year)) +
@@ -313,8 +329,8 @@ p2 <- ggplot(results_df, aes(x = year, y = rec_cpue)) +
 
 # Post-recruit CPUE
 p3 <- ggplot(results_df, aes(x = year, y = postrec_cpue)) +
-  geom_ribbon(aes(ymin = postrec_cpue_lower, ymax = postrec_cpue_upper),
-              alpha = 0.3, fill = "lightblue") +
+  #geom_ribbon(aes(ymin = postrec_cpue_lower, ymax = postrec_cpue_upper),
+   #           alpha = 0.3, fill = "lightblue") +
   geom_line(color = "lightblue", linewidth = 1) +
   geom_point(color = "lightblue") +
   geom_point(data = df_excel, aes(y = Post.recruit, x = Survey.Year)) +
@@ -326,7 +342,7 @@ p3 <- ggplot(results_df, aes(x = year, y = postrec_cpue)) +
   theme_minimal()
 
 (p123 <- p1 / p2 / p3)
-#ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE_excelloyal_sums_freeq.png"),
+#ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_CPUE_excelloyal_sums_BASE.png"),
  #      plot = p123, width = 8, height = 10, dpi = 300)
 
 # ============================================================================
@@ -372,7 +388,7 @@ p4 <- ggplot(results_df, aes(x = year)) +
         legend.box.background = element_rect(color = "gray80"))
 
 p4
-#ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_Excelloyal_sumsq_freeq.png"),
+#ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_Biomass_Excelloyal_sumsq_BASE.png"),
  #      plot = p4, width = 8, height = 5, dpi = 300)
 
 # ============================================================================
@@ -392,6 +408,10 @@ output_df <- df_excel %>%
 
 #SAVE output csv
 #write.csv(output_df, paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_excel_loyal_freeq", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
+
+#save results in a table for the comparison writeup
+#write.csv(results_df, paste0("results/rkc/LynnSisters/", cur_yr, "/Results_FREE_ALL", cur_yr, ".csv"), row.names = FALSE) #fkag- output date is bad
+
 
 
 #take aways
@@ -419,4 +439,53 @@ output_df <- df_excel %>%
 #cat("Optimized jnLL:", mod$report$jnLL, "\n") #393.1532 - lower is better because this is the joint negative log likelihood
 
 
+#################################################################
+#does this replace Lynn-sister's mark-recapture adjustment?
+#################################################################
+##let's trty it
+#xx <- read.csv(paste0("results/rkc/LynnSisters/", cur_yr, "/CSA_output_excel_loyal_sumsq", cur_yr, ".csv"))
+xx <-df_excel
+MR_adj <- 1.75 #for Lynn sisters
 
+yy <- xx %>% mutate(Prerecruit.Biomass.Adj = Prerecruit.Biomass*MR_adj,
+             Mature.Biomass.Adj =  Mature.Biomass*MR_adj,
+             Legal.Biomass.Adj = Legal.Biomass*MR_adj)
+
+zz <- ggplot(results_df, aes(x = year)) +
+  # Mature biomass
+  # geom_ribbon(aes(ymin = mature_bio_lower, ymax = mature_bio_upper),
+  #            alpha = 0.3, fill = "#56B4E9") +
+  geom_line(aes(y = mature_biomass, color = factor("Mature RTMB", levels = color_levels_2)),
+            linewidth = 1) +
+  geom_line(data = yy,
+            aes(y = Mature.Biomass.Adj, x = Survey.Year,
+                color = factor("Mature Excel", levels = color_levels_2))) +
+  # Legal biomass
+  #geom_ribbon(aes(ymin = legal_bio_lower, ymax = legal_bio_upper),
+  #           alpha = 0.2, fill = "#009E73") +
+  geom_line(aes(y = legal_biomass, color = factor("Legal RTMB", levels = color_levels_2)),
+            linewidth = 1) +
+  geom_line(data = yy,
+            aes(y = Legal.Biomass.Adj, x = Survey.Year,
+                color = factor("Legal Excel", levels = color_levels_2))) +
+  # Pre-recruit biomass
+  #geom_ribbon(aes(ymin = prerec_bio_lower, ymax = prerec_bio_upper),
+  #           alpha = 0.2, fill = "#CC79A7") +
+  geom_line(aes(y = prerec_biomass, color = factor("Pre-recruit RTMB", levels = color_levels_2)),
+            linewidth = 1) +
+  geom_line(data = yy,
+            aes(y = Prerecruit.Biomass.Adj, x = Survey.Year,
+                color = factor("Pre-recruit Excel", levels = color_levels_2))) +
+  labs(title = paste(area_name, "Mature, Legal, and Pre-recruit Biomass"),
+       x = "Year", y = "Biomass (lbs)") +
+  scale_color_manual(name = NULL,
+                     values = c("Mature RTMB" = "#56B4E9", "Mature Excel" = "darkblue",
+                                "Legal RTMB" = "#009E73",  "Legal Excel" = "darkgreen",
+                                "Pre-recruit RTMB" = "#CC79A7", "Pre-recruit Excel" = "#542788")) +
+  theme_minimal() +
+  theme(legend.position = c(0.15, 0.8),
+        legend.background = element_rect(fill = alpha("white", 0.7), color = "gray80"),
+        legend.box.background = element_rect(color = "gray80"))
+
+ggsave(paste0("figures/rkc/", cur_yr, "/CSA_", area_name, "_markrecap_compare.png"),
+            plot = zz, width = 8, height = 5, dpi = 300)

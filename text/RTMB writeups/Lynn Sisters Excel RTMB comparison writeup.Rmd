@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Abstract
 
-I am working on moving the southeast Alaska red king crab (RKC) stock assessment from an Excel residual sum of squares model into an RTMB framework. As the first step towrads this, I wrote an RTMB model that is identical in framework to that of the one in Excel, with the Lynn Sisters stock as a case study. Ultimtely, what I found is that in this case, the Excel and RTMB models do not have the same convergence and have substantially different estiamtes of the catchability (q), which has a large impact on the biomass estiamte downstream, with the RTMB model estimating a higher biomass. This document provides the step by step comparison of the models in order to provide information to those making the decision about if we can shift the analysis to the RTMB model over the Excel model.
+I am working on moving the southeast Alaska red king crab (RKC) stock assessment from an Excel residual sum of squares model into an RTMB framework. As the first step towards this, I wrote an RTMB model that is identical in framework to that of the one in Excel, with the Lynn Sisters stock as a case study. Ultimately, what I found is that in this case, the Excel and RTMB models do not have the same convergence and have substantially different estimates of the catchability (q), which has a large impact on the biomass estiamte downstream, with the RTMB model estimating a higher biomass. This document provides the step by step comparison of the models in order to provide information to those making the decision about if we can shift the analysis to the RTMB model over the Excel model.
 
 
 ## Methods
@@ -31,17 +31,20 @@ I need to write this still - some work around to make it work in RTMB
 
 CPUE comparison
 ```{r}
-
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_CPUE_excelloyal_sums_BASE.png'), dpi = 125)
 ```
 
 Biomass comparison
 ```{r}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_Biomass_Excelloyal_sumsq_freeq.png'), dpi = 125)
 
 ```
 
 Table- numerical comparison of parameters
 ```{r}
-
+tab <- read.csv("../../results/rkc/LynnSisters/2025/Results_BASE2025.csv")
+tab #make this table prettier plz. it has Q in it at least
+#comapre est q to obs q. doesnt matter here because i didnt estimate q in the base model
 ```
 
 
@@ -54,7 +57,10 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_Biomass_Ex
 ```
 Add a table comparing values (will have to make in the OG code...)
 ```{r}
+tab <- read.csv("../../results/rkc/LynnSisters/2025/Results_FREE_q2025.csv")
+tab 
 
+#emphasize q. Q has decreased a tiny but but is very similar to the excel model
 ```
 
 
@@ -68,6 +74,22 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_CPUE_excel
 ```{r Lynn3.2, fig.cap="Lynn sisters RTMB biomass estimates for RKC prerecurits, recruits, and postrecruits with all variables estimated, compared to the Excel biomass results."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/CSA_LS_Biomass_Excelloyal_sumsq.png'), dpi = 125)
 ```
+
+
+Table of q vs not q
+```{r}
+tab <- read.csv("../../results/rkc/LynnSisters/2025/Results_FREE_ALL2025.csv")
+tab 
+```
+
+3 q's compared, graphically perhaps
+```{r}
+x <- read.csv("../../results/rkc/LynnSisters/2025/Results_BASE2025.csv") %>% select(q) %>% unique()
+y <- read.csv("../../results/rkc/LynnSisters/2025/Results_FREE_ALL2025.csv") %>% select(q) %>% unique()
+z <- read.csv("../../results/rkc/LynnSisters/2025/Results_FREE_ALL2025.csv") %>% select(q) %>% unique()
+```
+
+
 ### Try putting the RTMB estimated q into the starting value of excel and see what happens- another resutls report
 
 ## Discussion
