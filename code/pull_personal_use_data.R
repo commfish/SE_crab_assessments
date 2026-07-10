@@ -25,12 +25,12 @@ library(lubridate)
 odbcDataSources()
 
 # set current year
-cur_yr <- 2025
+cur_yr <- 2026
 pr_yr <- cur_yr - 1
-st_yr <- 2018
+st_yr <- 2018 #sure...
 
-cur_yr2 <- 25
-pr_yr2 <- 24
+cur_yr2 <- 26
+pr_yr2 <- 25
 
 # load database password
 password <- read_file("./code/crab_survey_password.txt")

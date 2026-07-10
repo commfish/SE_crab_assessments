@@ -33,11 +33,11 @@ library(RODBC)
 library(tidyverse)
 
 # set current year
-cur_yr <- 2025 #new year
+cur_yr <- 2026 #new year
 pr_yr <- cur_yr - 1
 
-cur_yr2 <- 25
-pr_yr2 <- 24
+cur_yr2 <- 26
+pr_yr2 <- 25
 
 # *****************************************************************************************************************************
 # establish database connection ----
