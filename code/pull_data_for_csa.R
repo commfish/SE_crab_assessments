@@ -81,11 +81,11 @@ tables <- dbListTables(con)
 # set location to filter data
 # should be one of c("Barlow Cove", "Juneau"), "Excursion Inlet", "Lynn Sisters", "Gambier Bay", "Pybus Bay", "Peril Strait", 
 # "Seymour Canal"
-sur.location <- c("Barlow Cove", "Juneau") #CAUTION POTENTIAL BUG!! AGR 25
+sur.location <- c("Juneau") #CAUTION POTENTIAL BUG!! AGR 25
 
 # set location to export files
 # should be one of "Excursion", "Gambier", "Juneau", "LynnSisters", "Peril", "Pybus", "Seymour"
-survey.location <- c("Barlow Cove", "Juneau")
+survey.location <- c("Juneau")
 
 # find trip ID for current year (use PROJECT_CODE = 007 which should correspond to PROJECT = "Red King Crab Survey")
 trip_year <- tbl(con, "TRIP") %>%
@@ -153,10 +153,9 @@ data_for_csa <- spec_year %>%
   # replace 0 in Egg.Condition.Code with NA
   mutate_at(vars(Egg.Condition.Code), ~replace(., . == 0, NA))
 
-# export csv to use in CSA model
-write.csv(data_for_csa, paste0('./data/rkc/', survey.location, '/TEST25_RKC_survey_CSA_', survey.location, '_', pr_yr2, '_', cur_yr2, '.csv'), row.names = FALSE) 
-
-
+# export csv to use in CSA model #MANUAL CHANGE NEEDED!!
+write.csv(data_for_csa, paste0('./data/rkc/', survey.location, '/RKC_survey_CSA_', survey.location, '_', pr_yr2, '_', cur_yr2, '.csv'), row.names = FALSE) 
+#write.csv(data_for_csa, paste0('./data/rkc/Juneau/RKC_survey_CSA_justJuneautest_', pr_yr2, '_', cur_yr2, '.csv'), row.names = FALSE) 
 
 # *****************************************************************************************************************************
 # For pulling information on the number of pots set in RKC areas ----

@@ -82,8 +82,9 @@ permit_sel11 <- permit_sel[10001:11000]
 permit_sel12 <- permit_sel[11001:12000]
 permit_sel13 <- permit_sel[12001:13000]       
 permit_sel14 <- permit_sel[13001:14000]
-permit_sel15 <- permit_sel[14001:length(permit_sel)] #will have to extend this manually each yr- AGR
-
+permit_sel15 <- permit_sel[14001:15000] 
+permit_sel16 <- permit_sel[15001:16000]
+permit_sel17 <- permit_sel[16001:length(permit_sel)]#will have to extend this manually each yr- AGR
 
 # filter effort table to include only effort from the relevant trips
 effort_tab01 <- tbl(con, "CRAB_EFFORT") %>%
@@ -145,10 +146,18 @@ effort_tab14 <- tbl(con, "CRAB_EFFORT") %>%
 effort_tab15 <- tbl(con, "CRAB_EFFORT") %>%
   filter(PERMIT_ID %in% permit_sel15) %>%
   select(PERMIT_ID, EFFORT_ID, CATCH_DATE, LOCATION_CODE, CODED_LOCATION, DISTRICT, PERMITTEE_PROVIDED_LOCATION) %>%
+  as.data.frame()
+effort_tab16 <- tbl(con, "CRAB_EFFORT") %>%
+  filter(PERMIT_ID %in% permit_sel16) %>%
+  select(PERMIT_ID, EFFORT_ID, CATCH_DATE, LOCATION_CODE, CODED_LOCATION, DISTRICT, PERMITTEE_PROVIDED_LOCATION) %>%
+  as.data.frame()
+effort_tab17 <- tbl(con, "CRAB_EFFORT") %>%
+  filter(PERMIT_ID %in% permit_sel17) %>%
+  select(PERMIT_ID, EFFORT_ID, CATCH_DATE, LOCATION_CODE, CODED_LOCATION, DISTRICT, PERMITTEE_PROVIDED_LOCATION) %>%
   as.data.frame() #have to extend this every year, in accordance with how many permit_sel lists I had to make. AGR 25
 
 #extend below every year please as needed AGR 25
-effort_tab <- rbind(effort_tab01, effort_tab02, effort_tab03, effort_tab04, effort_tab05, effort_tab06, effort_tab07, effort_tab08, effort_tab09, effort_tab10, effort_tab11, effort_tab12, effort_tab13, effort_tab14, effort_tab15)
+effort_tab <- rbind(effort_tab01, effort_tab02, effort_tab03, effort_tab04, effort_tab05, effort_tab06, effort_tab07, effort_tab08, effort_tab09, effort_tab10, effort_tab11, effort_tab12, effort_tab13, effort_tab14, effort_tab15, effort_tab16, effort_tab17)
 
 # vector of effort IDs to use in filtering catch table
 effort_sel <- effort_tab %>%
@@ -167,7 +176,8 @@ effort_sel04 <- effort_sel[3001:4000]
 effort_sel05 <- effort_sel[4001:5000]
 effort_sel06 <- effort_sel[5001:6000] 
 effort_sel07 <- effort_sel[6001:7000]
-effort_sel08 <- effort_sel[7001:length(effort_sel)] #AGR extended to here 25
+effort_sel08 <- effort_sel[7001:8000] 
+effort_sel09 <- effort_sel[8001:length(effort_sel)] #AGR extended to here 26
 
 # filter catch table to include only catch from the relevant trips
 catch_tab1 <- tbl(con, "CRAB_CATCH") %>%
@@ -207,10 +217,15 @@ catch_tab7 <- tbl(con, "CRAB_CATCH") %>%
 
 catch_tab8 <- tbl(con, "CRAB_CATCH") %>%
   filter(EFFORT_ID %in% effort_sel08) %>%
-  select(EFFORT_ID, CATCH_ID, SPECIES_CODE, SPECIES, NUMBER_OF_CRAB) %>% #agr extended to here in 2025
+  select(EFFORT_ID, CATCH_ID, SPECIES_CODE, SPECIES, NUMBER_OF_CRAB) %>% 
   as.data.frame()
 
-catch_tab <- rbind(catch_tab1, catch_tab2, catch_tab3, catch_tab4, catch_tab5, catch_tab6, catch_tab7, catch_tab8) #AGR lengthened in 2025
+catch_tab9 <- tbl(con, "CRAB_CATCH") %>%
+  filter(EFFORT_ID %in% effort_sel09) %>%
+  select(EFFORT_ID, CATCH_ID, SPECIES_CODE, SPECIES, NUMBER_OF_CRAB) %>% #agr extended to here in 2026
+  as.data.frame()
+
+catch_tab <- rbind(catch_tab1, catch_tab2, catch_tab3, catch_tab4, catch_tab5, catch_tab6, catch_tab7, catch_tab8, catch_tab9) #AGR lengthened in 2026
 
 # join catch and effort information, such that each effort ID has information about how many crab were caught
 effort_catch <- merge(effort_tab, catch_tab, by="EFFORT_ID", all=T) %>%
@@ -241,7 +256,7 @@ effort_catch_ar <- effort_catch %>%
   ))
 
 # calculate catch mid-date for use in CSA model #AGR... update for 2025? nah, I left the below alone. Need to source functions.R I think
-
+# perhabs the Lynn sisters stuff below is obsolete code - AGR 2026
 # Lynn Sisters in 2022
 LSdates1_22 <- effort_catch_ar %>%
   filter(survey.area == "Lynn Sisters" & crab_year == 2022)
@@ -289,7 +304,7 @@ pu_harvest_reg <- effort_catch_ar %>%
 write.csv(pu_harvest_reg, paste0('./data/harvest/', cur_yr, '_regional_PU_harvest.csv'), row.names = FALSE) #this works in 2025 and I am SO GRATEFUL- AGR
 
 # *******************************************************************************************************************
-# information about number of permits fished
+# information about number of permits fished - perhaps obsolete below- AGR 2026
 
 # number of permits per year
 
