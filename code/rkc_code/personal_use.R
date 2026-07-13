@@ -328,5 +328,4 @@ pu_tab_tot <- pu_tab %>% #I made this to calc the ratios of permits not returned
          ratio_permits_not_returned = total_permits_not_returned/total_permits)
 
 # export- UPDATE YEAR EVERY YEAR
-
-write.csv(pu_tab_export, paste0(here::here(), "/results/rkc/Juneau/PU_since_2018_updated2025.csv"), row.names = F)
+write.csv(pu_tab_export, paste0(here::here(), "/results/rkc/Juneau/PU_since_2018_updated2026.csv"), row.names = F)
