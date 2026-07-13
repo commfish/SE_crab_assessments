@@ -3,6 +3,7 @@
 # ADF&G updated for JUNEAU area
 ##AR update: 7/10/24 - for 23-24 rkc stock assessment
 #AGR 7/22/25 - 24-25 stock assessment
+#AGR 7/13/26 - 25-26 stock assessment
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -16,7 +17,7 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2025 # change this upon receiving new data
+cur_yr <- 2026 # change this upon receiving new data
 pr_yr <- cur_yr -1
 survey.location <- 'Juneau'
 
@@ -25,7 +26,7 @@ dir.create(file.path(paste0('text'), cur_yr))
 dir.create(file.path(paste0('figures/rkc/'), cur_yr))
 
 ## data -------------------
-dat <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_24_25.csv")) # file name will change annually
+dat <- read.csv(paste0(here::here(), "/data/rkc/Juneau/RKC_survey_CSA_Juneau_25_26.csv")) # file name will change annually
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file
 #   Juneau area includes Juneau and Barlow
@@ -49,7 +50,7 @@ glimpse(dat) # confirm that data was read in correctly.
 sapply(dat, unique)
 
 # remove pots with Pot condition code that's not "normal" or 1 
-levels(dat$Pot.Condition)
+levels(as.factor(dat$Pot.Condition))
 
 dat %>%
   filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> dat1
@@ -62,6 +63,7 @@ dat1 %>%
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1, Year == cur_yr) -> temp
 
 # write out csv of rows with missing recruit status, if they exist
+#View(temp)
 #write_csv(temp, paste0('./data/rkc/', survey.location, '/JNU_missing_recruit_status' , cur_yr, '.csv'))
 
 # **FIX ** issues with recruit class 2021 pot# 191
@@ -69,7 +71,7 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1, Year == cur_yr) 
                           #cur_yr, '/data_issues' , cur_yr, '.csv'), row.names = FALSE)
 
 # Calculate soak time - RKC soak time should be 18-24 hrs
-dat_soak <- dat1 %>%
+dat_soak <- dat1 %>%  #agr- broken code and needs to be fixed. But as I was on both 2025 and 2026 surveys and can confirm nothing weird with soak time.
   mutate(time_set = as.POSIXct(Time.Set,format="%m/%d/%Y %H:%M",tz=Sys.timezone())) %>%
   mutate(time_hauled = as.POSIXct(Time.Hauled,format="%m/%d/%Y %H:%M",tz=Sys.timezone())) %>%
   mutate(soak_time = as.numeric(difftime(time_hauled, time_set, units = "hours")))%>%
@@ -156,7 +158,7 @@ dat4 %>%
 dat5 %>%
   dplyr::rename(Missing = Var.6, Large.Females = `Large Females`, Small.Females = `Small Females`) -> dat5
 
-# this is neccessary so that current years file (dat5) matches the historic file names
+# this is necessary so that current years file (dat5) matches the historic file names
 
 # This version is ready to calculate CPUE for each recruit class
 # Calculates a weighted mean CPUE and SE for each recruit class
@@ -188,12 +190,11 @@ dat5 %>%
 #### survey mid date -----  
 
 # list of unique dates (day only, excluding time)
-#dates <- unique(round_date(ymd_hms(dat$Time.Hauled), unit="day")) #sigh, formats failing to parse- 25 AGR. 
-dates <- unique(round_date(mdy_hm(dat$Time.Hauled), unit="day")) #agr 25 fix
+dates <- unique(round_date(ymd_hms(dat$Time.Hauled), unit="day")) #agr back to this one for 2026 
+#dates <- unique(round_date(mdy_hm(dat$Time.Hauled), unit="day")) #agr 25 fix
 
 # only survey dates from the current year
 dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))] 
-#agr 25- an NA in there
 
 # interval of minimum and maximum survey dates
 date.int <- interval(min(dates.cur, na.rm=TRUE), max(dates.cur, na.rm=TRUE))
@@ -296,12 +297,13 @@ weights_stage <- function(dat, slope, intercept, area, year){
                                          Number.Of.Specimens[Recruit.Status == "Recruit"], na.rm = TRUE), 
               postr_lbs = weighted.mean(weight_lb[Recruit.Status == "Post_Recruit"], 
                                         Number.Of.Specimens[Recruit.Status == "Post_Recruit"], na.rm = TRUE)) %>%
-    mutate(across(where(is.numeric), round, 3))
+    mutate(across(where(is.numeric), \(x) round(x,3))) #agr just changed this to avoid obsolete warning
+    #mutate(across(where(is.numeric), round, 3)) # the obsolete code I removed in 2026
   # final results with score - save here
   write_csv(male_weights, paste0('results/rkc/', area, '/', year, '/maleweights_stage.csv'))
 }
 
-weights_stage(dat_allyrs, 3.03, 7.23, "Juneau", cur_yr) # warning: depreciated- AR - still works tho?
+weights_stage(dat_allyrs, 3.03, 7.23, "Juneau", cur_yr) #output does not include year 2026 which confuses me - AGR; but this may be obsolete.
 
 ###### Females ----------------------------------------------------------
 # large or mature females
@@ -368,6 +370,7 @@ total_health('Juneau', cur_yr)
 
 #AGR 25 here
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
+##copy paste juneau.rmd from text/2025 into text/2026, and go from there.
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ## see 'personal_use.R' and 'rkc_harvest_XX.R' - the latter is obsolete-agr 25- to get all data for CSA model

@@ -12,21 +12,23 @@
 library(tidyverse)
 library(xlsx)
 
-cur_yr = 2025 # survey year
+cur_yr = 2026 # survey year
 
 prv_yr = cur_yr-1 # fishery year NOT survey year
 
 
 # 11-A personal use summary for 11-A -----------------
 #####Load Data ---------------------------------------------------
-personal_use1 <- read.csv(paste0(here::here(), "/data/harvest/11-A rkc pu_catch_updated2025.csv")) #AR edited to avoid df conflict #AR 25 in hand
-permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2023 2024 2025 permit status summary.csv")) #current year and last two, it appears - AR #AR pulled 25
-permit_type_18 <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau permit status summary 2018 to present_updated 2025.csv")) #AGR got for 2025 - from Caitlin's user reports
+#manually download from OceanAK the files below. They are in: Shared Folders/Commercial Fisheries/Region I/Invertebrates/User Reports/agreich/SE RKC. mind the silent row limit.
+##I had trouble changing the titles of the datafiles, so in name they are for 2025 on OceanAK but updated with data from 2026 (I blame OceanAK for being user-unfriendly in that regard)
+personal_use1 <- read.csv(paste0(here::here(), "/data/harvest/11-A rkc pu_catch_updated2026.csv")) #AR edited to avoid df conflict #AR 25 in hand
+permit_type <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2024 2025 2026 permit status summary.csv")) #current year and last two
+permit_type_18 <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau permit status summary 2018 to present_updated 2026.csv"))
 # **FIX** get biologist to help summarize this in future...way to time consuming for me and they have to do it already.
 
 ## reported number ----
 # ** in order to get permits not returned that do NOT have catch need to click on "xyz" and select "include rows with only null values"
-# this does NOT translate to .csv output..... **FIX**
+# this does NOT translate to .csv output..... **FIX** #This note was caitlin's and I'm not sure if still relevant - AGR 2026
 personal_use1 %>% # *
   filter(Year == cur_yr | Year == prv_yr | Year == prv_yr-1) %>%  # remove this to do all years, currently just want current 18/19 season
   group_by(Personal.Use.Area, Year, Season, Permit.Returned.Status) %>% 
@@ -90,11 +92,7 @@ by_status_current2 %>%
          est.total.catch.numbers = adjustment*as.numeric(total_c)) -> summary_current2
 write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_total2_', cur_yr, '.csv'), row.names = FALSE)
 
-## can use legal weight from last years to extrapolate this into pounds ***need to have run current survey year data
-          #   in JNUprocessingCODE.R 
-          # use weight that matches fishery timing i.e. 2018 for 2018 summer
-## only works IF the male_weights is loaded from the processing code - if not need to bring it in from
-###     results folder
+## can use legal weight from last years to extrapolate this into pounds 
 male_weights <- read.csv(paste0('./results/rkc/Juneau', 
                                 '/', cur_yr, '/maleweights.csv'))
 
@@ -103,11 +101,12 @@ male_weights %>%
 summary_current2 %>% 
   right_join(male_weights1) %>% 
   mutate(est.catch.lbs = est.total.catch.numbers*legal_lbs) -> summary_current2
-summary_current2 %>% 
+(summary_current2 %>% 
   group_by(crab_year) %>% 
-  summarise(est.total.numbers = sum(est.total.catch.numbers, na.rm = TRUE)) ### This value is put into the spreadsheet for the CSA for personal use catch for Juneau
+  summarise(est.total.numbers = sum(est.total.catch.numbers, na.rm = TRUE)) -> spreadsheet) ### This value is put into the spreadsheet for the CSA for personal use catch for Juneau
 
 write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_total2_', cur_yr, '.csv'), row.names = FALSE)
+write.csv(spreadsheet, paste0('./results/rkc/Juneau/personal_use_estimate_summarized_for_csa_input', cur_yr, '.csv'), row.names = FALSE)
 
 ## regionwide PU data ----------
 
@@ -115,7 +114,8 @@ write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_t
 # OR by downloading from OceanAK using the query "KC PU permit details 2018-present" (and save "present" as the current year)
 
 # load data -----
-personal_use <- read.csv(paste0(here::here(), "/data/harvest/KC PU permit details 2018-2025.csv")) #update the end year every year
+personal_use <- read.csv(paste0(here::here(), "/data/harvest/KC PU permit details 2018-2026.csv")) #update the end year every year. Called KC PU permit details 2018-present.csv in OceanAK in agreich's shared crab folder. Save and change the name.
+##oceanak folder:Shared Folders/Commercial Fisheries/Region I/Invertebrates/User Reports/agreich/SE RKC
 
 personal_use %>% 
   summarise(total = sum(Harvest.Reported))
@@ -134,6 +134,7 @@ pu_sum %>%
   group_by(Year, Location, Personal.Use.District, Location.Code) %>% 
   summarise(harvest = sum(Harvest.Reported), not_fish = sum(Did.Not.Fish)) -> step1
 
+#make the current year's folder in results/rkc/Region1
 write.csv(step1, paste0(here::here(), "/results/rkc/Region1/", cur_yr, "/pu_regional_harvest.csv"))
 
 pu_sum %>% 
@@ -170,9 +171,10 @@ pu_sum %>%
 # (August of the previous year and January of the current year), and
 # calculate the cumulative percentage of total catch for each catch date #get from oceanAK- and update the year when saved
 
-pu_catch_dates <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2024_2025 catch dates.csv")) %>%
-  mutate(Date = round_date(mdy_hm(Catch.Date), unit="day")) %>%
-  filter(Date > as.Date("2024-02-01")) %>%  #update the year to cur_yr-1 each year. I'm not interested in the 2024 winter catch in 2025
+pu_catch_dates <- read.csv(paste0(here::here(), "/data/harvest/PU RKC Juneau 2025_2026 catch dates.csv")) %>%
+  #mutate(Date = round_date(mdy_hm(Catch.Date), unit="day")) %>%
+  mutate(Date = round_date(ymd_hms(Catch.Date), unit="day")) %>%
+  filter(Date > as.Date("2025-02-01")) %>%  #update the year to cur_yr-1 each year. I'm not interested in the 2024 winter catch in 2025
   mutate(cum.per = 100*cumsum(Number.of.Crab)/sum(Number.of.Crab))
 
 # select the two dates that have the percentage of cumulative catch closest to 50

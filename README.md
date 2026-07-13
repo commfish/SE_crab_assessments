@@ -8,17 +8,13 @@ Both Southeast Alaska species have annual pot surveys that results in a weighted
 
 The Juneau area is run first and has its own deadline, and own memo.
 
-1. Read in data - MANUALLY FROM ORACLE!!
-   Ideally using SE\_crab\_assessments/code/pull\_data\_for\_csa and SE\_crab\_assessments/code/pull\_personal\_use\_data. I do not know if the Oracle connection is active as of 2025. Alternatively, read in from OceanAK and put that OceanAK link HERE!!
+1. Read in data -  pull from Oracle with R code using SE\_crab\_assessments/code/pull\_data\_for\_csa and SE\_crab\_assessments/code/pull\_personal\_use\_data and pull_data_for_csa.R. Alternatively, read in from OceanAK and put that OceanAK link HERE -  should be saved in Alex Reich's public folders!!
 
 * for the pull\_data\_for\_csa.R, one will need the crab\_survey\_password text file. For obvious reasons, that password won't be stored on the GitHub. It will be on the S drive HERE. Save it into the code on your local project.
-* the oracle connection that Caitlin had set up is broken, meaning the data needs to be pulled manually for now.
+* the oracle connection that Caitlin is currently functioning. If that breaks or needs to be independtly QCed, manually pull from the link below.
   Manual data pulls: https://oceanak.adfg.alaska.gov/analytics/saw.dll?Answers#resultsTab1980f482e50
-* update the filtered years to the current year and previous year. Re-save the downloaded file as a csv instead of csv-8
-* the sablefish analysis did not like csv-8
-
-For RKC\_survey\_CSA\_Juneau\_all\_years.csv - had to import two csv's from OCeanAK, by changing the years on the aforementioned link.
-Careful! OceakAK has a silent row max
+* update the filtered years to the current year and previous year. 
+* If the data is manually pulled, re-save the downloaded file as a csv instead of csv-8. Careful! OceakAK has a silent row max. Noted that when I manually pulled data in 2025 RKC_survey_CSA_Juneau_all_years.csv needed two OceanAK pulls due to the row max.
 
 2. Open SE\_crab\_assessments/code/rkc\_code/survey\_areas/Juneau.R
    Work through the script, checking each output that is produced as you go. When you get to the part that says
@@ -29,18 +25,19 @@ Careful! OceakAK has a silent row max
 
 then...
 
-3. Open SE\_crab\_assessments/text/2023/juneau.Rmd
+3. Open SE\_crab\_assessments/text/(current year)/juneau.Rmd
    Run the script and check the resulting html file against the one on the S: drive.
 4. Open SE\_crab\_assessments/code/rkc\_code/personal\_use.R
    Run through the script and check the outputs
-5. Run the Juneau CSA model, using the outputs from the Juneau.R and personal\_use.R scripts
-   SE\_crab\_assessments/CSA excel/Juneau 2023 new weighting
+5. Run the Juneau CSA Excel model, using the outputs from the Juneau.R and personal\_use.R scripts
+   SE\_crab\_assessments/CSA excel/Juneau (current year) new weighting
 
-* note: most recent modle is Juneau 2025 CPUE fix exce; (and Juneau 2024 CPUE fix, accordingly)
+* note: most recent model is Juneau 2026 CPUE fix excel; (and Juneau 2024 CPUE fix, accordingly)
 
-5.1 ALT -  run the Juneau CSA RTMB model, using R and necessary imputs
+5.1 An improved model that uses RTMB and not Excel is in development, but is not ready yet.
 
-6. Update the biomass file (SE\_crab\_assessments/data/rkc/biomass.csv) with the estimates from the Juneau CSA model
+6. Update the biomass file (SE\_crab\_assessments/data/rkc/biomass.csv) with the estimates from the Juneau CSA model (for all years)
+
 7. Return to SE\_crab\_assessments/code/rkc\_code/suvey\_areas/Juneau.R
 
 
