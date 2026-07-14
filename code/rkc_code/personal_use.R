@@ -90,7 +90,9 @@ by_status_current2 %>%
          total_permits = (`1` + `2` +`0`), 
          adjustment = (total_permits / (total_permits - 0.762*(`0`))), 
          est.total.catch.numbers = adjustment*as.numeric(total_c)) -> summary_current2
-write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_total2_', cur_yr, '.csv'), row.names = FALSE)
+#write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_total2_', cur_yr, '.csv'), row.names = FALSE)
+
+  
 
 ## can use legal weight from last years to extrapolate this into pounds 
 male_weights <- read.csv(paste0('./results/rkc/Juneau', 
@@ -105,8 +107,22 @@ summary_current2 %>%
   group_by(crab_year) %>% 
   summarise(est.total.numbers = sum(est.total.catch.numbers, na.rm = TRUE)) -> spreadsheet) ### This value is put into the spreadsheet for the CSA for personal use catch for Juneau
 
+#I want to make a 2026 table that multiplies last years weight to the PU catch to get the PU biomass - AGR 2026
+last_year_legal_weight <- male_weights1 %>% 
+  filter(crab_year == cur_yr-1) %>% 
+  select(legal_lbs) %>% 
+  as.numeric()
+summary_current3 <- summary_current2 %>%
+  filter(crab_year == cur_yr) %>%
+  mutate(est.catch.lbs_last_year = est.total.catch.numbers*last_year_legal_weight) %>%
+  summarize(est_total_catch_numbers = sum(est.total.catch.numbers),
+    est_total_lbs = sum(est.catch.lbs_last_year))
+
 write.csv(summary_current2, paste0('./results/rkc/Juneau/personal_use_estimate_total2_', cur_yr, '.csv'), row.names = FALSE)
 write.csv(spreadsheet, paste0('./results/rkc/Juneau/personal_use_estimate_summarized_for_csa_input', cur_yr, '.csv'), row.names = FALSE)
+write.csv(summary_current3, paste0('./results/rkc/Juneau/personal_use_estimate_total2_', cur_yr, '_last_year_weight.csv'), row.names = FALSE)
+##AGR 's 2026 changes to calc a more accurate biomass estimate end here. Use summary_current3 and it derivative for PU #'s in the CSA excel
+
 
 ## regionwide PU data ----------
 
@@ -329,3 +345,4 @@ pu_tab_tot <- pu_tab %>% #I made this to calc the ratios of permits not returned
 
 # export- UPDATE YEAR EVERY YEAR
 write.csv(pu_tab_export, paste0(here::here(), "/results/rkc/Juneau/PU_since_2018_updated2026.csv"), row.names = F)
+

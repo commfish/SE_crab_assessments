@@ -373,9 +373,12 @@ total_health('Juneau', cur_yr)
 ##copy paste juneau.rmd from text/2025 into text/2026, and go from there.
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-## see 'personal_use.R' and 'rkc_harvest_XX.R' - the latter is obsolete-agr 25- to get all data for CSA model
+## run 'personal_use.R' 
 
-##and then I need to load in the biomass file again...Right? AGR 25
+## run the CSA (in this case, Juneau 2026 CPUE correction.xlxs. In the future this will be updated to be an R file)
+##copy paste the results (for all years) into the biomass csv file, and save a copy of the old biomass file somewhere too.
+
+##and then I need to load in the biomass file again, either by re-running this script or loading it below
 #biomass <- read.csv("./data/rkc/biomass.csv")
 
 ### raw sample size -----------
@@ -417,7 +420,7 @@ CPUE_wt_from95 %>%
   summarise_all(mean, na.rm = TRUE)
 
 
-panel_figure('Juneau', cur_yr, 'Juneau', 1, 0) # panel with all 3 figures
+panel_figure('Juneau', cur_yr, 'Juneau', 1, 0) # panel with all 3 figures #ugh I think this is the one I need to work AGR 2026
 panel_figure('Juneau', cur_yr, 'Juneau', 2, 0) # male panel
 panel_figure('Juneau', cur_yr, 'Juneau', 3, 0) # female panel
 
@@ -427,12 +430,12 @@ panel_figure('Juneau', cur_yr, 'Juneau', 3, 0) # female panel
 ### see 'juneau_hindcast_figure.R' file for other figures for the Juneau document
 
 ### presentation figure -----
-panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 2, 0, 'Juneau Area')
-panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 3, 0, 'Juneau Area')
+#panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 2, 0, 'Juneau Area')
+#panel_figure_NC_PRES('Juneau', cur_yr, 'Juneau', 3, 0, 'Juneau Area')
 
 ### presentation figures with different titles -----
-panel_figure_NC_PRES_title('Juneau', cur_yr, 'Juneau', 2, 0, "Males", "Females and juveniles")
-panel_figure_NC_PRES_title('Juneau', cur_yr, 'Juneau', 3, 0, "Males", "Females and juveniles")
+#panel_figure_NC_PRES_title('Juneau', cur_yr, 'Juneau', 2, 0, "Males", "Females and juveniles")
+#panel_figure_NC_PRES_title('Juneau', cur_yr, 'Juneau', 3, 0, "Males", "Females and juveniles")
 
 
 ### total mature male CPUE and CV -----
@@ -489,8 +492,8 @@ CPUE_wt_gmacs <- CPUE_ALL_YEARS %>%
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Estimates 3 Stage", range = "A8:F55") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Estimates 3 Stage", range = "R8:T55")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Estimates 3 Stage", range = "A8:F56") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Estimates 3 Stage", range = "R8:T56")) %>%
   select(-c(`...2`, `...3`)) %>%
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...4`, Obs_recruits = `...5`, Obs_postrecruits = `...6`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>%
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- ar
@@ -515,7 +518,8 @@ cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)
   #facet_grid(. ~ stage)
   facet_wrap(vars(stage)) + #ncol=1 to make it long form
   theme_bw() +
-  ylab("CPUE")
+  ylab("CPUE")+
+  scale_x_continuous(breaks = seq(min(1980), max(cur_yr), by =10)) 
 
 ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
                          'Juneau_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
@@ -539,7 +543,7 @@ ggplot(biom_change_plot, aes(x = `Est. harvest rate in previous year`, y = `pop 
   geom_hline(yintercept=0, linetype="dashed", 
              color = "grey", size=1) +
   ylab("Est. % change in mature population") + 
-  geom_text(aes(label = Year), hjust = -0.25,  vjust = 0.5)
+  geom_text(aes(label = Year), hjust = -0.25,  vjust = 0.5) #agr 2026 depreciation warning
 
 #################
 #Adam's requested graph of just the top panel from Juneau figure 2-specific to 2024

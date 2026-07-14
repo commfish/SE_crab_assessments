@@ -311,7 +311,7 @@ write_csv(stock_health, paste0('results/rkc/', area, '/', year, '/stock_health.c
 ## CONF panel figure ---------------
 panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   #survey.location = "Juneau"
-  #cur_yr=2025
+  #cur_yr=2026
   #base.location="Juneau"
   #option=2
   #scale=0
@@ -473,8 +473,8 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       #       )+
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
-    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
     #              width =.4) +
@@ -536,8 +536,8 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     scale_y_continuous(limits = c(0,(max(round((femjuv_graph$mean + femjuv_graph$se), 0) +1))), oob = rescale_none) +
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
-    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
     #              width =.4) +
@@ -601,7 +601,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     ylab("Percentage") + 
     xlab(NULL) +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
     theme(legend.position = c(0.2,0.5), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) 
@@ -722,7 +722,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+      scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
       scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                           na.rm = TRUE) + 25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -769,18 +769,32 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   #       dpi = 800, width = 8, height = 9.5)
   #dev.off()
   
-  ifelse(option == 1 , 
-         panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
-         ifelse(option == 2, 
-                panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
-                ifelse(option == 3, 
-                       panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  ggsave(paste0('./figures/rkc/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
-                            option, '.png'), panel,  
-         dpi = 800, width = 8, height = 9.5)
-}
+ # ifelse(option == 1 , 
+  #       panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
+  #       ifelse(option == 2, 
+  #              panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
+  #              ifelse(option == 3, 
+  #                     panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
+#  ggsave(paste0('./figures/rkc/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
+ #                           option, '.png'), panel,  
+  #       dpi = 800, width = 8, height = 9.5)
   
+#2026 error fix:
+if (option == 1) {
+  panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v')
+} else if (option == 2) {
+  panel <- plot_grid(p1, p4, ncol = 1, align = 'v')
+} else if (option == 3) {
+  panel <- plot_grid(p2, p3, ncol = 1, align = 'v')
+} else {
+  panel <- 0
+}
 
+ggsave(paste0('./figures/rkc/', cur_yr, '/', survey.location, '_', cur_yr, '_', 
+              option, '.png'), panel,  
+       dpi = 800, width = 8, height = 9.5)
+
+}
 
 
 ##AGR add
@@ -988,7 +1002,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
-    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+    geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
     #              width =.4) +
@@ -1035,7 +1049,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
-    geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
+    geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), #perhaps add 1.96*se
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
     #              width =.4) +

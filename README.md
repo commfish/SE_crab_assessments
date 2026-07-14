@@ -28,7 +28,8 @@ then...
 3. Open SE\_crab\_assessments/text/(current year)/juneau.Rmd
    Run the script and check the resulting html file against the one on the S: drive.
 4. Open SE\_crab\_assessments/code/rkc\_code/personal\_use.R
-   Run through the script and check the outputs
+   Run through the script and check the outputs.
+4.1 If commercial fishery the prior year, run code/RKC commercial catch summary.R
 5. Run the Juneau CSA Excel model, using the outputs from the Juneau.R and personal\_use.R scripts
    SE\_crab\_assessments/CSA excel/Juneau (current year) new weighting
 
