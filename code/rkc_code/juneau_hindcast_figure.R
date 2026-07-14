@@ -1,8 +1,11 @@
 # K.Palof
 # 7-10-19n updated / 7-15-2020 / 7-14-2021/7-7-22
+# AGR 7-14-26
 
 # Juneau area RKC forecast / hindcast figures
 # Current figures used for stock health memo 
+
+#AGR 26, some of the end graphs did not run, but I suspect they may be obsolete.
 
 # Load packages -------------
 library(tidyverse)
@@ -21,17 +24,52 @@ theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
 
 # global --------
 # update each year
-cur_yr = 2025
+cur_yr = 2026
 
 #Load data ----------------
-#biomass <- read.csv("./data/redcrab/biomass.csv") no record of historic mature biomass point estimates
-# in each year so using 2017 model output
+biomass <- read.csv("./data/rkc/biomass.csv")#  no record of historic mature biomass point estimates
 
-hindcast <- read.csv("./data/rkc/Juneau/hind_fore_cast_JNU_current.csv") #updated 2025
-    # **FIX** currently needs manual updating...fix this.
+#take the final year
+cur_yr_legal <- biomass %>%
+  filter(Location == "Juneau") %>%
+  filter(Year == cur_yr) %>% 
+  select(legal.biomass) %>% 
+  pull()
+
+cur_yr_mature <- biomass %>%
+  filter(Location == "Juneau") %>%
+  filter(Year == cur_yr) %>% 
+  select(mature.biomass) %>% 
+  pull()
+
+biomass_JNU_curyr <- biomass %>% filter(Location == "Juneau") %>%
+  select(year = Year,legal.biomass, mature.biomass)
+
+status_pryr <- "open" #UPDATE with "closed", "open" or "PU only"
+pryr =  cur_yr-1 #half baked wrangle, return
+
+hindcast <- read.csv("./data/rkc/Juneau/hind_fore_cast_JNU_current.csv")
     # "these "forecast" are historic estimates in the "forecast" columns 
     # "cur_yr" needs to be updated with current years CSA model output for all years  
     # and only update the current year in the "forecast" columns
+#does automatically below
+
+#add in fishery status to the previus year
+hindcast_1 <- hindcast %>%
+  mutate(status = if_else(year == pryr, status_pryr, status))
+
+#make hindcast one section longer
+vector_temp <- data.frame(year=cur_yr, legal_curyr=cur_yr_legal, mature_curyr=cur_yr_mature, legal_forecast=cur_yr_legal, mature_forecast=cur_yr_mature, status="TBD")
+
+hindcast_2 <- rbind(hindcast_1, vector_temp)
+
+#replace the current year columns with the CSA model output
+hindcast_3 <- biomass_JNU_curyr %>% left_join(hindcast_2) %>%
+  select(-legal_curyr, -mature_curyr)
+
+hindcast_4 <- hindcast_3 %>% dplyr::rename(legal_curyr=legal.biomass,
+                                           mature_curyr = mature.biomass)
+hindcast <- hindcast_4
 
 
 hindcast_long <- gather(hindcast, type, pounds, legal_curyr:mature_forecast, factor_key = TRUE)
@@ -48,9 +86,11 @@ baseline_mean_curyr <- as.data.frame(baseline_mean[1:2,])
 baseline_mean_forecast <- as.data.frame(baseline_mean[3:4,])  
 
 # when status for current year confirmed
-hindcast_updated <- hindcast %>%
-  mutate(status = case_when(status == "TBD" ~ "PU only",
-                            status != "TBD" ~ status))
+#hindcast_updated <- hindcast %>%
+ # mutate(status = case_when(status == "TBD" ~ "PU only",
+  #                          status != "TBD" ~ status))
+
+hindcast_updated <- hindcast
 
 # Figure 1 redo ---------
     # should have current year's model with longterm baselines (1993-2007) and closure status. 
@@ -112,7 +152,7 @@ jnu_rkc_fig1_edited <- hindcast %>%
   
   #ggtitle(paste0("Juneau ", cur_yr," model")) + 
   ylab("Biomass (lb)")+ xlab("Year") +
-  scale_x_continuous(breaks = seq(min(1975), max(max(hindcast$year)), by = 2)) +
+  scale_x_continuous(breaks = seq(min(1974), max(max(hindcast$year)), by = 2)) +
   #scale_x_continuous(breaks = seq(min(1975), max(max(hindcast$year) + 1), by = 2)) + #I dont like this so I did it differently (line immediately above) - AGR
   #theme(plot.title = element_text(hjust =0.5)) +
   #scale_x_continuous(breaks = seq(min(1975),max(cur_yr), by = 5)) +
