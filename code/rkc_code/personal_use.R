@@ -123,6 +123,14 @@ write.csv(spreadsheet, paste0('./results/rkc/Juneau/personal_use_estimate_summar
 write.csv(summary_current3, paste0('./results/rkc/Juneau/personal_use_estimate_total2_', cur_yr, '_last_year_weight.csv'), row.names = FALSE)
 ##AGR 's 2026 changes to calc a more accurate biomass estimate end here. Use summary_current3 and it derivative for PU #'s in the CSA excel
 
+#Juneau area PU % fished by year
+summary_current4 <- summary_current2%>%
+  group_by(crab_year) %>%
+  summarize(percent_permits_not_returned = sum(`0`)/sum(total_permits))
+
+write.csv(summary_current4, paste0('./results/rkc/Juneau/personal_use_', cur_yr, '_percent_not_returned.csv'), row.names = FALSE)
+
+
 
 ## regionwide PU data ----------
 
