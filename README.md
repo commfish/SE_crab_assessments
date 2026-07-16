@@ -41,7 +41,7 @@ then...
 
 7. Return to SE\_crab\_assessments/code/rkc\_code/suvey\_areas/Juneau.R
 
-8. Run code/rkc_code/juneau_hindcast_figure.R to create other figures for the Juneau memo
+8. Run code/rkc_code/juneau_hindcast_figure.R to create other figures for the Juneau memo. Update the write.csv and read.csv's to the relevant year
 
 9. Copy paste Juneau memo_pdf 1.rmd into the current year's text folder. Then update the text and run. This drafty document will be submitted and discussed with the SE crab biologists about ~2 weeks after the Juneau-area RKC survey.
 
