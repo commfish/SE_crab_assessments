@@ -45,11 +45,12 @@ then...
 
 9. Copy paste Juneau memo_pdf 1.rmd into the current year's text folder. Then update the text and run. This drafty document will be submitted and discussed with the SE crab biologists about ~2 weeks after the Juneau-area RKC survey.
 
+10. Make a powerpoint presentation to discuss results.
 
 
 ## How to run the assessment - all other areas
 
-
+TK
 
 ## Tanner Assessment
 
