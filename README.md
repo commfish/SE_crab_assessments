@@ -34,6 +34,8 @@ then...
    SE\_crab\_assessments/CSA excel/Juneau (current year) new weighting
 
 * note: most recent model is Juneau 2026 CPUE fix excel; (and Juneau 2024 CPUE fix, accordingly)
+* also note: Table 2, Table 2 current year, and Table 3 all need to be updated in the Excel doc. Be really careful not to mess up the numbers with default excel drag-downs. Some important cells call other tables - make sure all is ok.
+* also note: There are a lot of obsolete things going on in the Excel file due to the many years this model has been running and the 5+ biometricians who have run it over the years. I haven't cleaned it up because I want to move the whole model into R shortly and the obsolete stuff can be used for digging through historical context. But it is messy in there.
 
 5.1 An improved model that uses RTMB and not Excel is in development, but is not ready yet.
 
