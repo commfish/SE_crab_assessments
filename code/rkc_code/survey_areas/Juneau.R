@@ -492,8 +492,8 @@ CPUE_wt_gmacs <- CPUE_ALL_YEARS %>%
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Estimates 3 Stage", range = "A8:F56") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction.xls"), sheet = "Estimates 3 Stage", range = "R8:T56")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction postsolver.xls"), sheet = "Estimates 3 Stage", range = "A8:F56") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Juneau ", cur_yr, " CPUE correction postsolver.xls"), sheet = "Estimates 3 Stage", range = "R8:T56")) %>%
   select(-c(`...2`, `...3`)) %>%
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...4`, Obs_recruits = `...5`, Obs_postrecruits = `...6`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>%
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- ar
