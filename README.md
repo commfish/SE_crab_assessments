@@ -52,6 +52,24 @@ then...
 
 ## How to run the assessment - all other areas
 
+1. Use code/pull_data_for_csa.R, specifying the area name.
+
+* If that is currently broken, can pull from OceanAK, link here: TKTK
+
+* Update the area name for the pull and the file name for the save
+
+* For Peril/Deadmans, it's current year-2, not -1. Peril is surveyed every other year.
+
+2. Open code/rkc_code_survey_areas/ and run the R file for the relevant survey area. The year will need to be updated. Run the lines of code one by one.
+
+3. Stop at the STOP line in the R code and run the area's summary RMD in the text file (will need to copy-paste into the current year's folder from the previous year's text folder, and update the in-rmd cur_yr to the current year). Compare the current year's output html to that of the previous year and make sure the previous year matches. If a mismatch, there may be a data pull error. 
+
+4. Run the Excel CSA. Copy-paste the output into the data/biomass.csv folder
+* one day, this analysis will be out of Excel and the manual copy-pasting will be obsolete. That day is not today.
+
+5. Re load the biomass.csv and run the rest of the file.
+
+6. Some edits will need to be made to the functions.R file to make the axes marks relevant to the current year. I change the min for the tick marks back and forth between 1994 and 1995 - automate this perhaps...
 TK
 
 ## Tanner Assessment

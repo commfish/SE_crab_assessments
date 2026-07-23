@@ -648,7 +648,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     ylab("Biomass (lb)") + 
     xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
     #scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
     #                                                    na.rm = TRUE) + 25000),
      #                  breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -757,7 +757,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     p4 <- p4 +
       scale_y_continuous(labels = comma, limits = c(0,300000),
                          breaks= seq(min(0), max(300000), by = 100000), oob = rescale_none)+
-      scale_x_continuous(breaks = seq(min(1995), max(2025.6), by=2)) #specific 2025 peril fix
+      scale_x_continuous(breaks = seq(min(1994), max(2025.6), by=2)) #specific 2025 peril fix
   }
   
   ### FINAL plot -------------
@@ -1001,7 +1001,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     )+
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
     geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -1021,7 +1021,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   
   if(survey.location == "Peril"){ #specific 2025 adjustment to make the graph not wack
     p1 = p1 + 
-      scale_x_continuous(breaks = seq(min(1995), max(2025), by =2, limits= c(1995, 2025.6)))
+      scale_x_continuous(breaks = seq(min(1994), max(2026), by =2, limits= c(1995, 2027.6)))
   }
   
   if(survey.location == "LynnSisters"){ #agr just added this chunk to adjust the Lynn sisters legend
@@ -1048,7 +1048,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     #scale_y_continuous(limits = c(0,(max(round(femjuv_graph$mean, 0) +1))), oob = rescale_none) + #agr 2025 off
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
     geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), #perhaps add 1.96*se
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -1070,6 +1070,8 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       )+
       theme(plot.title = element_text(size = 24))
   }
+  
+  
   
   # if(survey.location == "LynnSisters"){
   #    p2 = p2 + #ggtitle("Female/juvenile CPUE & egg health for Lynn Sisters") +
@@ -1097,7 +1099,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     ylab("Percentage") + 
     xlab(NULL) +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
     theme(legend.position = c(0.2,0.5), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) 
@@ -1139,7 +1141,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+      scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
       #scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
       #                                                    na.rm = TRUE) + 25000),
       #                  breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -1183,7 +1185,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+      scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
       scale_y_continuous(labels = comma, 
                          limits = c(0,max(biomass_graph$pounds, 
                                           na.rm = TRUE) + 25000),
@@ -1221,7 +1223,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+      scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
       scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                           na.rm = TRUE) + 25000),
                          breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -1269,15 +1271,31 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   #       dpi = 800, width = 8, height = 9.5)
   #dev.off()
   
-  ifelse(option == 1 , 
-         panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
-         ifelse(option == 2, 
-                panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
-                ifelse(option == 3, 
-                       panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
+ # ifelse(option == 1 , 
+  #       panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
+   #      ifelse(option == 2, 
+    #            panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
+     #           ifelse(option == 3, 
+      #                 panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
+#  ggsave(paste0('./figures/rkc/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
+#                option, '_NC2.png'), panel,  
+ #        dpi = 800, width = 8, height = 9.5)
+#}
+
+#2026 error fix:
+if (option == 1) {
+  panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v')
+} else if (option == 2) {
+  panel <- plot_grid(p1, p4, ncol = 1, align = 'v')
+} else if (option == 3) {
+  panel <- plot_grid(p2, p3, ncol = 1, align = 'v')
+} else {
+  panel <- 0
+}
+  
   ggsave(paste0('./figures/rkc/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
-                option, '_NC2.png'), panel,  
-         dpi = 800, width = 8, height = 9.5)
+                                option, '_NC2.png'), panel,  
+                        dpi = 800, width = 8, height = 9.5)
 }
 
 

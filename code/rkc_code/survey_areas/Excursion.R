@@ -1,6 +1,6 @@
 # K.Palof  katie.palof@alaska.gov
 # ADF&G 8-1-16 updated for Excursion Inlet  / 
-# updated 8-3-17/7-30-18/7-24-19/ 8-28-20/ 8-18-21/ 7-24-22/ 8-20-24 AGR/ 7-30-25 AGR
+# updated 8-3-17/7-30-18/7-24-19/ 8-28-20/ 8-18-21/ 7-24-22/ 8-20-24 AGR/ 7-30-25 AGR/ 7-23-26 AGR
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
 
@@ -12,11 +12,11 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2025
+cur_yr <- 2026
 pr_yr <- cur_yr -1
 survey.location <- 'Excursion'
-cur_yr2 <- 25
-pr_yr2 <- 24
+cur_yr2 <- 26
+pr_yr2 <- 25
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
@@ -266,6 +266,9 @@ total_health('Excursion', cur_yr)
 ### !!! 
 # Run CSA model - either excel or here --
 # Put Biomass estimates for this area in 'data/biomass.csv'. this contains this years estimates.
+#re-load biomass now that the excursion current values are in  ther:
+biomass <- read.csv("./data/rkc/biomass.csv") 
+
 
 ### raw sample size -----------
 head(dat5)
@@ -326,8 +329,8 @@ panel_figure_NC('Excursion',  cur_yr, 'Excursion', 2, 0)
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Excursion Inlet ", cur_yr, "_(adj HR).xls"), sheet = "Estimates 3S_exper", range = "A8:E55") %>% #fun how the estimates tab is named a different thing in each area
-  cbind(read_excel(paste0(here::here(), "/CSA_excel/Excursion Inlet ", cur_yr, "_(adj HR).xls"), sheet = "Estimates 3S_exper", range = "Q8:S55")) %>% #think I'll have to remove row 2 (line 9 in excel)
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Excursion Inlet ", cur_yr, "_(adj HR)_postsolver.xls"), sheet = "Estimates 3S_exper", range = "A8:E56") %>% #fun how the estimates tab is named a different thing in each area
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Excursion Inlet ", cur_yr, "_(adj HR)_postsolver.xls"), sheet = "Estimates 3S_exper", range = "Q8:S56")) %>% #think I'll have to remove row 2 (line 9 in excel)
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   slice(-1) %>% #added to Peril specifically to remove a row that I do not want, removes 1978 where I do not have data; also works for lynn sisters
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
