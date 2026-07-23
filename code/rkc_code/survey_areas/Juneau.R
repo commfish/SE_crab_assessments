@@ -125,6 +125,66 @@ ggplot(dat1) + aes(x=Length.Millimeters, color=Recruit.Status, fill=Recruit.Stat
   facet_wrap(~factor(Year)) #+ scale_color_manual(values=c("lightgreen", "violet"))+
   #scale_fill_manual(values=c("lightgreen", "violet"))
 
+#AGR add 2026 - check out barlow juvies
+bar <- dat1 %>% filter(Location == "Barlow Cove")
+#View(bar)
+
+ggplot(bar) + aes(x=Length.Millimeters, color=factor(Year), fill=factor(Year), group = factor(Year)) + geom_density(alpha=0.3)+
+  facet_wrap(~Recruit.Status) + scale_color_manual(values=c("lightgreen", "violet"))+
+  scale_fill_manual(values=c("lightgreen", "violet"))
+
+#barlow look sumamrized by pot
+bar_by_pot <- bar %>%
+  group_by(Year, Location, Trip.No, Pot.No, Density.Strata.Code, Recruit.Status) %>%
+  summarise(crab = sum(Number.Of.Specimens))
+bar_by_pot_juvie <- bar_by_pot %>% filter(Recruit.Status == "Juvenile")
+#histogram of juveniles by pot
+bar_juvies_by_pot <- ggplot(bar_by_pot_juvie) + aes(x=Pot.No, y=crab, color=factor(Year), fill=factor(Year), group = factor(Year)) + geom_histogram(stat="identity", alpha=0.3, position="dodge")+
+  facet_wrap(~factor(Year)) + scale_color_manual(values=c("lightgreen", "violet"))+
+  scale_fill_manual(values=c("lightgreen", "violet"))
+ggsave(bar_juvies_by_pot, filename = paste0('./figures/rkc/', cur_yr, '/barlow_juvies_by_pot_', cur_yr, '.png'), width = 8, height = 6, units = "in", dpi = 300)
+
+#do the above but with counts
+(barlow_1 <- ggplot(bar) + aes(x=Length.Millimeters, color=factor(Year), fill=factor(Year), group = factor(Year)) + geom_histogram(alpha=0.3, position="dodge")+
+  facet_wrap(~Recruit.Status) + scale_color_manual(values=c("lightgreen", "violet"))+
+  scale_fill_manual(values=c("lightgreen", "violet")))
+ggsave(barlow_1, filename = paste0('./figures/rkc/', cur_yr, '/barlow_histograms_', cur_yr, '.png'), width = 8, height = 6, units = "in", dpi = 300)
+#summarized by recruit class
+bar2 <- bar %>% group_by(Year, Recruit.Status) %>% summarise(n = n(), mean_length = mean(Length.Millimeters), sd_length = sd(Length.Millimeters), min_length = min(Length.Millimeters), max_length = max(Length.Millimeters))
+#graph that
+(barlow_2 <- (ggplot(bar2) + aes(x=Recruit.Status, y=n, fill=factor(Year)) + geom_bar(stat="identity", position="dodge") +
+  scale_fill_manual(values=c("lightgreen", "violet")) + labs(y="Count of Juveniles by Recruit Class", x="Recruit Class") +
+  theme_minimal()))
+ggsave(barlow_2, filename = paste0('./figures/rkc/', cur_yr, '/barlow_counts_', cur_yr, '.png'), width = 8, height = 6, units = "in", dpi = 300) 
+
+#what about the total area and Juneau not barlow
+not_barlow <- dat1 %>% filter(Location != "Barlow Cove")
+
+(total_1 <- ggplot(dat1) + aes(x=Length.Millimeters, color=factor(Year), fill=factor(Year), group = factor(Year)) + geom_histogram(alpha=0.3, position="dodge")+
+    facet_wrap(~Recruit.Status) + scale_color_manual(values=c("lightgreen", "violet"))+
+    scale_fill_manual(values=c("lightgreen", "violet")))
+
+(just_JNU_1 <- ggplot(not_barlow) + aes(x=Length.Millimeters, color=factor(Year), fill=factor(Year), group = factor(Year)) + geom_histogram(alpha=0.3, position="dodge")+
+    facet_wrap(~Recruit.Status) + scale_color_manual(values=c("lightgreen", "violet"))+
+    scale_fill_manual(values=c("lightgreen", "violet")))
+
+#summarized by recruit class
+tot_2 <- dat1 %>% group_by(Year, Recruit.Status) %>% summarise(n = n(), mean_length = mean(Length.Millimeters), sd_length = sd(Length.Millimeters), min_length = min(Length.Millimeters), max_length = max(Length.Millimeters))
+not_bar_2 <- not_barlow %>% group_by(Year, Recruit.Status) %>% summarise(n = n(), mean_length = mean(Length.Millimeters), sd_length = sd(Length.Millimeters), min_length = min(Length.Millimeters), max_length = max(Length.Millimeters))
+
+(total_2 <- (ggplot(tot_2) + aes(x=Recruit.Status, y=n, fill=factor(Year)) + geom_bar(stat="identity", position="dodge") +
+                scale_fill_manual(values=c("lightgreen", "violet")) + labs(y="Count of Juveniles by Recruit Class", x="Recruit Class") +
+                theme_minimal()))
+
+(just_JNU_2 <- (ggplot(not_bar_2) + aes(x=Recruit.Status, y=n, fill=factor(Year)) + geom_bar(stat="identity", position="dodge") +
+               scale_fill_manual(values=c("lightgreen", "violet")) + labs(y="Count of Juveniles by Recruit Class", x="Recruit Class") +
+               theme_minimal()))
+library(patchwork)
+total_2 + just_JNU_2 + barlow_2
+
+ggsave(just_JNU_2, filename = paste0('./figures/rkc/', cur_yr, '/just_JNU_counts_', cur_yr, '.png'), width = 8, height = 6, units = "in", dpi = 300)
+ggsave(total_2, filename = paste0('./figures/rkc/', cur_yr, '/total_JNU_counts_', cur_yr, '.png'), width = 8, height = 6, units = "in", dpi = 300)
+
 ## CPUE calc --------------
 ##### By Pot -------------------------------
 # Now summarize by pot - remember to keep areas separate.
