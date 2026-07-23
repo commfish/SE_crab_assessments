@@ -34,10 +34,10 @@ library(tidyverse)
 
 # set current year
 cur_yr <- 2026 #new year
-pr_yr <- cur_yr - 1
+pr_yr <- cur_yr - 1 #-2 for peril
 
 cur_yr2 <- 26
-pr_yr2 <- 25
+pr_yr2 <- 25 #prpr yr for peril (every other year surveyed)
 
 # *****************************************************************************************************************************
 # establish database connection ----
@@ -79,13 +79,13 @@ tables <- dbListTables(con)
 # *****************************************************************************************************************************
 
 # set location to filter data
-# should be one of c("Barlow Cove", "Juneau"), "Excursion Inlet", "Lynn Sisters", "Gambier Bay", "Pybus Bay", "Peril Strait", 
+# should be one of c("Barlow Cove", "Juneau"), "Excursion Inlet", "Lynn Sisters", "Gambier Bay", "Pybus Bay", "Peril Strait" - NOPE, now "Deadman Reach" instead of Peril strait, 
 # "Seymour Canal"
-sur.location <- c("Juneau") #CAUTION POTENTIAL BUG!! AGR 25
+sur.location <- c("Deadman Reach") 
 
 # set location to export files
 # should be one of "Excursion", "Gambier", "Juneau", "LynnSisters", "Peril", "Pybus", "Seymour"
-survey.location <- c("Juneau")
+survey.location <- c("Peril")
 
 # find trip ID for current year (use PROJECT_CODE = 007 which should correspond to PROJECT = "Red King Crab Survey")
 trip_year <- tbl(con, "TRIP") %>%
