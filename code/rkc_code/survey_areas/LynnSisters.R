@@ -1,5 +1,5 @@
 # K.Palof - now A. Reich
-# ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19/ 8-23-21/ 7-20-22 / 7-26-2023 / 8-20-24 AGR/ 8-8-25 AGR
+# ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19/ 8-23-21/ 7-20-22 / 7-26-2023 / 8-20-24 AGR/ 8-8-25 AGR/ 7-23-26 AGR
 # code to process data from Ocean AK to use in crab CSA models.  
 #  OceanAK report found under Shared Folders/Commercial Fisheries/Region 1/Invertebrates/User Reports/kjpalof/se rkc areas
 
@@ -7,11 +7,11 @@
 source('./code/functions.R')  #functions here for summarizing data and figures 
 
 ## setup global ---------------
-cur_yr <- 2025 # this needs to be updated annually with current survey year 
+cur_yr <- 2026 # this needs to be updated annually with current survey year 
 pr_yr <- cur_yr -1
 survey.location <- 'LynnSisters'
-cur_yr2 <- 25
-pr_yr2 <- 24
+cur_yr2 <- 26
+pr_yr2 <- 25
 
 # lines below create folders if they don't already exist for current year
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr)) 
@@ -143,6 +143,10 @@ sur.midpoint <- int_midpoint(date.int)
 
 # convert to Julian day
 sur.midpoint.jul <- yday(sur.midpoint)
+#save the survey midpoint in results
+write.csv(data.frame(sur.midpoint, sur.midpoint.jul), 
+          paste0('./results/rkc/', survey.location, '/', cur_yr, '/survey_midpoint_', cur_yr, '.csv'))
+
 
 
 ##### Historic file ---------------------------------------
@@ -270,6 +274,8 @@ total_health('LynnSisters', cur_yr)
 ### !!! 
 # Run CSA model - either excel or here --
 # Put Biomass estimates for this area in 'data/biomass.csv'. this contains this year's estimates.
+biomass <- read.csv("./data/rkc/biomass.csv") 
+
 
 ### raw sample size -----------
 head(dat5)
@@ -327,8 +333,8 @@ panel_figure_NC('LynnSisters', cur_yr, 'LynnSisters', 2, 0)
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR.xls"), sheet = "Estimate 3 Stage", range = "A7:F54") %>% #fun how the estimates tab is named a different thing in each area
-  cbind(read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR.xls"), sheet = "Estimate 3 Stage", range = "R7:T54")) %>% #think I'll have to remove row 2 (line 9 in excel)
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR_postsolver.xls"), sheet = "Estimate 3 Stage", range = "A7:F56") %>% #fun how the estimates tab is named a different thing in each area
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR_postsolver.xls"), sheet = "Estimate 3 Stage", range = "R7:T56")) %>% #think I'll have to remove row 2 (line 9 in excel)
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   slice(-1) %>% #added to Peril specifically to remove a row that I do not want, removes 1978 where I do not have data; also works for lynn sisters
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 

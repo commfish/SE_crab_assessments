@@ -1,5 +1,5 @@
 # K.Palof   katie.palof@alaska.gov
-# ADF&G 8-4-16 updated for Peril Strait(Deadman's Reach)  / updated 8-2-18/ 7-30-19/ 8-23-21/ 7-26-22/ 8-13-24/ 8-18-25 AGR
+# ADF&G 8-4-16 updated for Peril Strait(Deadman's Reach)  / updated 8-2-18/ 7-30-19/ 8-23-21/ 7-26-22/ 8-13-24/ 8-18-25 AGR/ 7-23-26 AGR
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -11,16 +11,20 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2024 # update annually .. Well, I'm just gonna update the graphs and where it is saved.
+cur_yr <- 2026 # update annually .. Well, I'm just gonna update the graphs and where it is saved.
 pr_yr <- cur_yr -1
 prpr_yr <- cur_yr-2
+
+c <- cur_yr -2000
+py <- prpr_yr - 2000
+
 survey.location <- 'Peril'   # area is Peril but in data files it's Deadman Reach
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
 
 ## data -------------------
-dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKC_survey_CSA_Peril_22_24.csv'))# file name will change annually #Peril is special becase every 2 years
+dat <- read.csv(paste0('./data/rkc/', survey.location,'/RKC_survey_CSA_Peril_',py,'_',c,'.csv'))# file name will change annually #Peril is special becase every 2 years
 # this is input from OceanAK - set up as red crab survey data for CSA
 #   survey area should match that in the name of this script file; Deadmans Reach
 area <- read.csv(paste0('./data/rkc/', survey.location, '/Peril_strata_area.csv')) # same every year
@@ -135,10 +139,10 @@ dat %>% filter(Year == cur_yr)  # 7-15
 #survey mid date AGR 2024- added from Gambier
 library(lubridate)
 # list of unique dates (day only, excluding time)
-#dates <- unique(lubridate::round_date(lubridate::mdy_hm(dat$Time.Hauled), unit="day"))
+dates <- unique(lubridate::round_date(lubridate::mdy_hm(dat$Time.Hauled), unit="day"))
 #unique(dat$Time.Hauled)#fix specific error AGR
-dat$Time.Hauled[210] <- "2022-07-23 00:00:00" #why does this not have a time? Well it does now. AGR
-dates <- unique(lubridate::round_date(lubridate::ymd_hms(dat$Time.Hauled), unit="day")) #AGR fix
+#dat$Time.Hauled[210] <- "2022-07-23 00:00:00" #why does this not have a time? Well it does now. AGR
+#dates <- unique(lubridate::round_date(lubridate::ymd_hms(dat$Time.Hauled), unit="day")) #AGR fix
 
 # only survey dates from the current year
 dates.cur <- dates[dates > as.Date(paste0(year(as.Date(as.character(pr_yr), format = "%Y")),"-12-31"))]
@@ -151,6 +155,10 @@ sur.midpoint <- int_midpoint(date.int)
 
 # convert to Julian day
 sur.midpoint.jul <- yday(sur.midpoint)
+
+#this doesnt have a write csv for date yet?
+write.csv(data.frame(sur.midpoint, sur.midpoint.jul), 
+          paste0('./results/rkc/', survey.location, '/', cur_yr, '/survey_midpoint_', cur_yr, '.csv'))
 
 ##### Historic file ---------------------------------------
 # need to add current years pot summary to the historic pot summary file.  
@@ -277,13 +285,16 @@ egg_percent(largef_all, 'Peril', cur_yr)
 total_health('Peril', cur_yr)
 # works as long as all files are saved in folder with area name
 
-#AGR 2024 here
+#AGR 2026 here
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ### !!! 
 # Run CSA model - either excel or here --
 # Put Biomass estimates for this area in 'data/biomass.csv'. this contains this years estimates.
+#reaload biomass after the new peril #'s are in there.
+biomass <- read.csv("./data/rkc/biomass.csv") # ** update ** from CSA model
+
 
 ### raw sample size -----------
 head(dat5)
@@ -374,8 +385,8 @@ panel_figure_NC('Peril', cur_yr, 'Deadman Reach', 2, 0)
 #library(readxl)
 
 if (cur_yr %% 2 == 0) {#if current year is even
-cpue_fit <- read_excel(paste0(here::here(), "/CSA excel/Peril Straits ", cur_yr, " (adj HR)_3.xls"), sheet = "Estimates 3S_experi", range = "A8:E55") %>% #fun how the estimates tab is named a different thing in each area
-  cbind(read_excel(paste0(here::here(), "/CSA excel/Peril Straits ", cur_yr, " (adj HR)_3.xls"), sheet = "Estimates 3S_experi", range = "Q8:S55")) %>% #think I'll have to remove row 2 (line 9 in excel)
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Peril Straits ", cur_yr, " (adj HR)_3_postsolver.xls"), sheet = "Estimates 3S_experi", range = "A8:E57") %>% #fun how the estimates tab is named a different thing in each area
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Peril Straits ", cur_yr, " (adj HR)_3_postsolver.xls"), sheet = "Estimates 3S_experi", range = "Q8:S57")) %>% #think I'll have to remove row 2 (line 9 in excel)
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   slice(-1) %>% #added to Peril specifically to remove a row that I do not want, removes 1978 where I do not have data
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 

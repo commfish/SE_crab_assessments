@@ -514,7 +514,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   
   if(survey.location == "Peril"){ #specific 2025 adjustment to make the graph not wack
     p1 = p1 + 
-      scale_x_continuous(breaks = seq(min(1995), max(2025), by =2), limits= c(1995, 2025.6)) #specific 2025 fix
+      scale_x_continuous(breaks = seq(min(1994), max(2026), by =2)) #specific 2025 fix
   }
   
   #if(survey.location != "Peril"){ #AGR finagling in 2025 with the peril graph
@@ -757,7 +757,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     p4 <- p4 +
       scale_y_continuous(labels = comma, limits = c(0,300000),
                          breaks= seq(min(0), max(300000), by = 100000), oob = rescale_none)+
-      scale_x_continuous(breaks = seq(min(1994), max(2025.6), by=2)) #specific 2025 peril fix
+      scale_x_continuous(breaks = seq(min(1994), max(2026), by=2)) #specific 2025 peril fix
   }
   
   ### FINAL plot -------------
@@ -1021,7 +1021,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   
   if(survey.location == "Peril"){ #specific 2025 adjustment to make the graph not wack
     p1 = p1 + 
-      scale_x_continuous(breaks = seq(min(1994), max(2026), by =2, limits= c(1995, 2027.6)))
+      scale_x_continuous(breaks = seq(min(1994), max(2026), by =2))
   }
   
   if(survey.location == "LynnSisters"){ #agr just added this chunk to adjust the Lynn sisters legend
@@ -1258,7 +1258,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     p4 <- p4 +
       scale_y_continuous(labels = comma, limits = c(0,300000),
                          breaks= seq(min(0), max(300000), by = 100000), oob = rescale_none)+
-      scale_x_continuous(breaks = seq(min(1995), max(2025), by=2))
+      scale_x_continuous(breaks = seq(min(1994), max(2026), by=2))
   }
   
   
