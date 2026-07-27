@@ -66,6 +66,10 @@ then...
 
 4. Run the Excel CSA. Copy-paste the output into the data/biomass.csv folder
 * one day, this analysis will be out of Excel and the manual copy-pasting will be obsolete. That day is not today.
+* Special Note: In 2026, Gambier, Seymour, and Juneau areas have commercial catch. Use RKC commercial catch summary.R to get the commercial catch summaries for those areas. This will need to be updated as different areas open for commercial fishing in different years
+* If the commercial fishery opens, download from OceanAK HERE : LINK TK; or ask Zane for the link.
+* Also note: the line along Lynn Sisters fishes well. That is stat area 115-14. Use the commercial catch from 115-14 as catch from Lynn Sisters, since it is fishing that population of crab (even though geographically that stat area is outside of Lynn Sisters). In past years, I havent included the personal use catch from Lynn Sisters. Perhaps include it this year, and include 115-14 as well as part of the Lynn Sisters catch.
+* Another note: The Bejamin Island stat area, 115-13, is not technically part of the Juneau area but the biologists believe the Juenau population of crab is being fished there. Consider incorporating into the Juneau area catch if not already incorporated. (BUT... they dont want to manage off of the Juneau+ numbers, they want to manage off of the Juneau #'s, so perhaps discuss with Katie and the SE crab bioligists before making this change.)
 
 5. Re load the biomass.csv and run the rest of the file.
 
