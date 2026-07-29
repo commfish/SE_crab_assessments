@@ -2,6 +2,7 @@
 ##Alex Reich
 ## alex.reich@alaska.gov
 ## 7/13/26
+## 7/29/26 Lynn Sisters Pull
 
 ## A file that will read in commercial catch and summarize it by area ##
 
@@ -22,7 +23,7 @@ comm_catch_by_area <- comm_catch %>%
   summarise(Whole_weight_total = sum(Whole.Weight..sum.),
             Landed_weight_total = sum(Landed.Weight..sum.)
             ) %>%#summarized by biomass.
-    ungroup() #so whole weight is the same as landed weight
+    ungroup() #whole weight is the same as landed weight
 
 #Do we want it summarized by number? See the personal use fishery code.
   
@@ -39,5 +40,47 @@ comm_ctach_JNU_table <- comm_catch_by_area %>% filter(Fishery == "Juneau area RK
   mutate(Numbers_crab = Whole_weight_total/legal_wt_JNU_pryr)
 
 write.csv(comm_ctach_JNU_table, file="results/rkc/Juneau/2026/comm_catch_JNU.csv")
+
+
+######################################################################################
+#Lynn Sisters
+#######################################################################################
+#View(comm_catch)
+
+#stat area 115-14 is adjacent to Lynn Sisters. We have reason to believe that the Lynn Sisters stock overflows/moves into 115-14
+## so even though the 115-14 is not in Lynn Sisters, the catch from that area will be included as the Lynn Sisters commercial catch
+## Lynn Sisters was closed to commercial fishing in 2026. If it opens, include the catch from Lynn Sisters proper + catch in 115-14 as the Lynn Sisters comemrcial catch
+
+comm_catch_LS <- comm_catch %>%
+  dplyr::filter(Fishery == "Lynn Sisters RKC"|Stat.Area=="11514") %>%
+  group_by(Fishery) %>%
+  summarise(Whole_weight_total = sum(Whole.Weight..sum.),
+            Landed_weight_total = sum(Landed.Weight..sum.)
+  ) %>%#summarized by biomass.
+  ungroup() #whole weight is the same as landed weight
+
+#how many #'s of crab is that?
+male_weights_LS <- read.csv(paste0('./results/rkc/LynnSisters', 
+                                    '/', cur_yr, '/maleweights.csv'))
+legal_wt_LS_pryr <- male_weights_LS[1,3]
+
+comm_ctach_LS_table <- comm_catch_LS %>%
+  mutate(Numbers_crab = Whole_weight_total/legal_wt_LS_pryr)
+
+write.csv(comm_ctach_LS_table, file="results/rkc/LynnSisters/2026/comm_catch_LS.csv")
+
+
+
+
+
+
+########################################################################################
+#summary
+#####################################################################################
+#perhaps graph the comm catch by area?? Nah?
+
+
+
+
 
 
