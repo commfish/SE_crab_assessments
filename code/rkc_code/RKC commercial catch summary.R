@@ -70,8 +70,30 @@ comm_ctach_LS_table <- comm_catch_LS %>%
 write.csv(comm_ctach_LS_table, file="results/rkc/LynnSisters/2026/comm_catch_LS.csv")
 
 
+##############################
+###comm catch dates
+#######################
+#### survey mid date Lynn Sisters-----  
+# list of unique dates (day only, excluding time)
+dates_LS_temp <- comm_catch %>%
+  dplyr::filter(Fishery == "Lynn Sisters RKC"|Stat.Area=="11514")  #select for Lynn Sisters
+dates.LS <- unique(round_date(ymd_hms(dates_LS_temp$Date.of.Landing), unit="day"))
 
 
+# interval of minimum and maximum survey dates
+date.int <- interval(min(dates.LS, na.rm=TRUE), max(dates.LS, na.rm=TRUE))
+
+# survey midpoint; see functions script for the int_midpoint function
+source('./code/functions.R')
+sur.midpoint <- int_midpoint(date.int)
+
+# convert to Julian day
+sur.midpoint.jul <- yday(sur.midpoint)
+#save the survey midpoint in results
+#write.csv(data.frame(sur.midpoint, sur.midpoint.jul), 
+ #         paste0('./results/rkc/', survey.location, '/', cur_yr, '/survey_midpoint_', cur_yr, '.csv'))
+
+#AGR TK- write for all areas then combine - Juneau, Gambier, Seymour, LS
 
 
 ########################################################################################
