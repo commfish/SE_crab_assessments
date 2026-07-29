@@ -75,20 +75,78 @@ write.csv(comm_ctach_LS_table, file="results/rkc/LynnSisters/2026/comm_catch_LS.
 #######################
 #### survey mid date Lynn Sisters-----  
 # list of unique dates (day only, excluding time)
+#Lynn Sisters comm midpoint
 dates_LS_temp <- comm_catch %>%
   dplyr::filter(Fishery == "Lynn Sisters RKC"|Stat.Area=="11514")  #select for Lynn Sisters
 dates.LS <- unique(round_date(ymd_hms(dates_LS_temp$Date.of.Landing), unit="day"))
 
 
 # interval of minimum and maximum survey dates
-date.int <- interval(min(dates.LS, na.rm=TRUE), max(dates.LS, na.rm=TRUE))
+date.int.LS <- interval(min(dates.LS, na.rm=TRUE), max(dates.LS, na.rm=TRUE))
 
 # survey midpoint; see functions script for the int_midpoint function
 source('./code/functions.R')
-sur.midpoint <- int_midpoint(date.int)
+sur.midpoint.LS <- int_midpoint(date.int.LS)
 
 # convert to Julian day
-sur.midpoint.jul <- yday(sur.midpoint)
+sur.midpoint.jul.LS <- yday(sur.midpoint.LS)
+
+
+
+#Juneau comm midpoint - TK question - when there's a PU and Comm fishery, what's the catch date? 60/40 between PU and comm fish catch?? 
+##doesn't really matter but maybe correct it for next year
+dates_JNU_temp <- comm_catch %>%
+  dplyr::filter(Fishery == "Juneau area RKC")  #select for JNU; perhaps use this in the future: (Fishery == "Juneau area RKC"|Stat.Area=="11513") to include "postage stamp"
+dates.JNU <- unique(round_date(ymd_hms(dates_LS_temp$Date.of.Landing), unit="day"))
+
+# interval of minimum and maximum survey dates
+date.int.JNU <- interval(min(dates.JNU, na.rm=TRUE), max(dates.JNU, na.rm=TRUE))
+
+# survey midpoint; see functions script for the int_midpoint function
+sur.midpoint.JNU <- int_midpoint(date.int.JNU)
+
+# convert to Julian day
+sur.midpoint.jul.JNU <- yday(sur.midpoint.JNU)
+
+
+
+#Seymour Canal comm catch midpoint
+dates_SC_temp <- comm_catch %>%
+  dplyr::filter(Fishery == "Seymour Canal RKC")  #select for Seymour
+dates.SC <- unique(round_date(ymd_hms(dates_SC_temp$Date.of.Landing), unit="day"))
+
+# interval of minimum and maximum survey dates
+date.int.SC <- interval(min(dates.SC, na.rm=TRUE), max(dates.SC, na.rm=TRUE))
+
+# survey midpoint; see functions script for the int_midpoint function
+sur.midpoint.SC <- int_midpoint(date.int.SC)
+
+# convert to Julian day
+sur.midpoint.jul.SC <- yday(sur.midpoint.SC)
+
+
+#Gambier Bay comm catch midpoint
+dates_GB_temp <- comm_catch %>%
+  dplyr::filter(Fishery == "Gambier Bay RKC")  #select for Seymour
+dates.GB <- unique(round_date(ymd_hms(dates_GB_temp$Date.of.Landing), unit="day"))
+
+# interval of minimum and maximum survey dates
+date.int.GB <- interval(min(dates.GB, na.rm=TRUE), max(dates.GB, na.rm=TRUE))
+
+# survey midpoint; see functions script for the int_midpoint function
+sur.midpoint.GB <- int_midpoint(date.int.GB)
+
+# convert to Julian day
+sur.midpoint.jul.GB <- yday(sur.midpoint.GB)
+
+
+#ADD HERE if the comm fishery opens for other areas in future years
+
+
+#combine and write out the CSV
+
+
+
 #save the survey midpoint in results
 #write.csv(data.frame(sur.midpoint, sur.midpoint.jul), 
  #         paste0('./results/rkc/', survey.location, '/', cur_yr, '/survey_midpoint_', cur_yr, '.csv'))
