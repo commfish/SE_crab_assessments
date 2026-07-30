@@ -143,13 +143,12 @@ sur.midpoint.jul.GB <- yday(sur.midpoint.GB)
 #ADD HERE if the comm fishery opens for other areas in future years
 
 
-#combine and write out the CSV
-
-
+#combine and write out the CSV - TK TK AGR
+combined_midpoint <- data.frame(sur.midpoint.LS, sur.midpoint.JNU, sur.midpoint.SC, sur.midpoint.GB)
 
 #save the survey midpoint in results
-#write.csv(data.frame(sur.midpoint, sur.midpoint.jul), 
- #         paste0('./results/rkc/', survey.location, '/', cur_yr, '/survey_midpoint_', cur_yr, '.csv'))
+write.csv(combined_midpoint, 
+          paste0('./results/rkc/Region1/', cur_yr, '/survey_midpoint_combined', cur_yr, '.csv'))
 
 #AGR TK- write for all areas then combine - Juneau, Gambier, Seymour, LS
 
