@@ -1,5 +1,6 @@
 # K.Palof - now A. Reich
 # ADF&G 8-4-16 updated for Lynn Sisters / updated 8-1-18/ 7-23-19/ 8-23-21/ 7-20-22 / 7-26-2023 / 8-20-24 AGR/ 8-8-25 AGR/ 7-23-26 AGR
+## 7-29-26 - incorporate comm catch and PU catch
 # code to process data from Ocean AK to use in crab CSA models.  
 #  OceanAK report found under Shared Folders/Commercial Fisheries/Region 1/Invertebrates/User Reports/kjpalof/se rkc areas
 
@@ -333,8 +334,8 @@ panel_figure_NC('LynnSisters', cur_yr, 'LynnSisters', 2, 0)
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR_postsolver.xls"), sheet = "Estimate 3 Stage", range = "A7:F56") %>% #fun how the estimates tab is named a different thing in each area
-  cbind(read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR_postsolver.xls"), sheet = "Estimate 3 Stage", range = "R7:T56")) %>% #think I'll have to remove row 2 (line 9 in excel)
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR postsolver 2.xls"), sheet = "Estimate 3 Stage", range = "A7:F56") %>% #fun how the estimates tab is named a different thing in each area
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Lynn Canal ", cur_yr, "-adj HR postsolver 2.xls"), sheet = "Estimate 3 Stage", range = "R7:T56")) %>% #think I'll have to remove row 2 (line 9 in excel)
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   slice(-1) %>% #added to Peril specifically to remove a row that I do not want, removes 1978 where I do not have data; also works for lynn sisters
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
@@ -367,8 +368,70 @@ ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/',
 
 
 
+########################################################################33
+## ggridges draft area
+###########################################################################3
+#create a plot that graphs 
+#using ggridges
+##and geom_density_ridges
+## and a wesanderson color palette
+## or a pnwpalette color palette
+## or ADFG colors
 
 
+#AGR TK - write something next year to automatically add year 2027 from dat 1 to this dataset, and save it for the next year
 
+dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv")
+dat_all_1 <- dat_all %>% filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") %>%
+  mutate(Year = as.factor(Year)) %>%
+  filter(Location == "Lynn Sisters") #maybe st james is relevant here too...
 
+nyrs <- length(unique(dat_all_1$Year))
+
+##create the ggridges function here
+ggplot(dat_all_1) +
+  aes(x = Length.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
+  geom_density_ridges(alpha=0.7) +
+  theme_ridges() +
+  xlab("Length (mm)") +
+  scale_fill_gradientn(colors = wes_palette("Zissou1", nyrs, type = "continuous"),
+                       name = "Year") +
+  coord_cartesian(xlim = c(50, 200))
+
+#ggsave
+
+#function draft below:
+plot_rkc_ridges <- function(dat_all, cur_yr, location) {
+  
+  dat_all_1 <- dat_all %>%
+    filter(Pot.Condition == "Normal" | Pot.Condition == "Not observed") %>%
+    mutate(Year = as.factor(Year)) %>%
+    filter(Location == location)
+  
+  nyrs <- length(unique(dat_all_1$Year))
+  
+  p <- ggplot(dat_all_1) +
+    aes(x = Length.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
+    geom_density_ridges(alpha = 0.7) +
+    theme_ridges() +
+    xlab("Length (mm)") +
+    scale_fill_gradientn(colors = wes_palette("Zissou1", nyrs, type = "continuous"),
+                         name = "Year") +
+    coord_cartesian(xlim = c(50, 200))
+  
+  out_dir <- file.path("figures", "rkc", cur_yr)
+  dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+  
+  out_file <- file.path(out_dir, paste0("ridges_", gsub(" ", "_", location), ".png"))
+  
+  ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
+  
+  message("Saved: ", out_file)
+  
+  return(p)
+}
+
+#draft function use:
+dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv") #AGR TK update with each year's new dat1 data
+plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Lynn Sisters")
 
