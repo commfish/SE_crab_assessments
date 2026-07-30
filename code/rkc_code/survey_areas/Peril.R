@@ -419,7 +419,16 @@ ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/',
 }
 
 
+########################################################################33
+## ggridges - MALES
+###########################################################################3
 
+#AGR TK - write something next year to automatically add year 2027 from dat_all to this dataset, and save it for the next year
+
+#load ALL THE DATA
+dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv") #AGR TK update with each year's new dat1 data
+#Plot ridges
+plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Deadman Reach")
 
 
 

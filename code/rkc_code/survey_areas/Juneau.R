@@ -4,6 +4,7 @@
 ##AR update: 7/10/24 - for 23-24 rkc stock assessment
 #AGR 7/22/25 - 24-25 stock assessment
 #AGR 7/13/26 - 25-26 stock assessment
+#AGR 2026 NOTE - make a ggridges plot to track the Juneau cohort through time. Size caught (y axis) by yea (x axis), faceted/stacked by year, with the most recent year at the top
 
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
@@ -670,5 +671,18 @@ p1 <- ggplot(males_graph, aes(Year, mean, group = recruit.class, fill = recruit.
 ggsave(paste0('./figures/rkc/',cur_yr, '/', survey.location, '_', cur_yr, '_', 
               'justJuneauCPUE', '.png'), p1,  #save teh plot
        dpi = 800, width = 8, height = 5)
+
+########################################################################33
+## ggridges- MALES
+###########################################################################3
+
+#AGR TK - write something next year to automatically add year 2027 from dat_all to this dataset, and save it for the next year
+
+#load ALL THE DATA
+dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv") #AGR TK update with each year's new dat1 data
+#Plot ridges
+plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Juneau")
+plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Barlow Cove")
+##perhaps combine these areas, or give the option to combine them, in the future
 
 

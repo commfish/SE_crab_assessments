@@ -361,3 +361,20 @@ cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)
 ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
                          'Excursion_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
 
+
+########################################################################33
+## ggridges
+###########################################################################3
+#create a plot that graphs 
+#using ggridges
+##and geom_density_ridges
+## and a wesanderson color palette
+## or a pnwpalette color palette
+## or ADFG colors
+
+#AGR TK - write something next year to automatically add year 2027 from dat_all to this dataset, and save it for the next year
+
+#load ALL THE DATA
+dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv") #AGR TK update with each year's new dat1 data
+#Plot ridges
+plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Excursion Inlet")

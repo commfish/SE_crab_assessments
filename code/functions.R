@@ -1308,6 +1308,7 @@ plot_rkc_ridges <- function(dat_all, cur_yr, location) {
   dat_all_1 <- dat_all %>%
     filter(Pot.Condition == "Normal" | Pot.Condition == "Not observed") %>%
     mutate(Year = as.factor(Year)) %>%
+    filter(Sex.Code==1) %>%
     filter(Location == location)
   
   nyrs <- length(unique(dat_all_1$Year))
