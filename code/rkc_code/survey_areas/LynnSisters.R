@@ -378,60 +378,10 @@ ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/',
 ## or a pnwpalette color palette
 ## or ADFG colors
 
+#AGR TK - write something next year to automatically add year 2027 from dat_all to this dataset, and save it for the next year
 
-#AGR TK - write something next year to automatically add year 2027 from dat 1 to this dataset, and save it for the next year
-
-dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv")
-dat_all_1 <- dat_all %>% filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") %>%
-  mutate(Year = as.factor(Year)) %>%
-  filter(Location == "Lynn Sisters") #maybe st james is relevant here too...
-
-nyrs <- length(unique(dat_all_1$Year))
-
-##create the ggridges function here
-ggplot(dat_all_1) +
-  aes(x = Length.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
-  geom_density_ridges(alpha=0.7) +
-  theme_ridges() +
-  xlab("Length (mm)") +
-  scale_fill_gradientn(colors = wes_palette("Zissou1", nyrs, type = "continuous"),
-                       name = "Year") +
-  coord_cartesian(xlim = c(50, 200))
-
-#ggsave
-
-#function draft below:
-plot_rkc_ridges <- function(dat_all, cur_yr, location) {
-  
-  dat_all_1 <- dat_all %>%
-    filter(Pot.Condition == "Normal" | Pot.Condition == "Not observed") %>%
-    mutate(Year = as.factor(Year)) %>%
-    filter(Location == location)
-  
-  nyrs <- length(unique(dat_all_1$Year))
-  
-  p <- ggplot(dat_all_1) +
-    aes(x = Length.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
-    geom_density_ridges(alpha = 0.7) +
-    theme_ridges() +
-    xlab("Length (mm)") +
-    scale_fill_gradientn(colors = wes_palette("Zissou1", nyrs, type = "continuous"),
-                         name = "Year") +
-    coord_cartesian(xlim = c(50, 200))
-  
-  out_dir <- file.path("figures", "rkc", cur_yr)
-  dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-  
-  out_file <- file.path(out_dir, paste0("ridges_", gsub(" ", "_", location), ".png"))
-  
-  ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
-  
-  message("Saved: ", out_file)
-  
-  return(p)
-}
-
-#draft function use:
+#load ALL THE DATA
 dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv") #AGR TK update with each year's new dat1 data
+#Plot ridges
 plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Lynn Sisters")
 

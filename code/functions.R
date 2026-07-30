@@ -33,8 +33,9 @@ library(TeachingDemos)
 library(purrr)
 library(TMB)
 library(radiant.data)
-
 library(ragg)
+library(ggridges) #AGR 26 add
+library(wesanderson)
 
 #font_import()
 loadfonts(device="win")
@@ -1298,6 +1299,39 @@ if (option == 1) {
                         dpi = 800, width = 8, height = 9.5)
 }
 
+
+##############################################################AGR add
+# ggridges sizes plot by area
+#############################################################
+plot_rkc_ridges <- function(dat_all, cur_yr, location) {
+  
+  dat_all_1 <- dat_all %>%
+    filter(Pot.Condition == "Normal" | Pot.Condition == "Not observed") %>%
+    mutate(Year = as.factor(Year)) %>%
+    filter(Location == location)
+  
+  nyrs <- length(unique(dat_all_1$Year))
+  
+  p <- ggplot(dat_all_1) +
+    aes(x = Length.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
+    geom_density_ridges(alpha = 0.7) +
+    theme_ridges() +
+    xlab("Length (mm)") +
+    scale_fill_gradientn(colors = wes_palette("Zissou1", nyrs, type = "continuous"),
+                         name = "Year") +
+    coord_cartesian(xlim = c(50, 200))
+  
+  out_dir <- file.path("figures", "rkc", cur_yr)
+  dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+  
+  out_file <- file.path(out_dir, paste0("ridges_", gsub(" ", "_", location), ".png"))
+  
+  ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
+  
+  message("Saved: ", out_file)
+  
+  return(p)
+}
 
 
 
