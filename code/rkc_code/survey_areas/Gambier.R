@@ -12,10 +12,10 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2025 # update annually
+cur_yr <- 2026 # update annually
 pr_yr <- cur_yr -1
-cur_yr2 <- 25
-pr_yr2 <- 24
+cur_yr2 <- 26
+pr_yr2 <- 25
 survey.location <- 'Gambier'
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
 dir.create(file.path(paste0('text'), cur_yr))
@@ -371,8 +371,8 @@ panel_figure_NC('Gambier', cur_yr, 'Gambier', 2, 0)
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "A8:E55") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "Q8:S55")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "A8:E56") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "Q8:S56")) %>%
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
@@ -402,6 +402,25 @@ cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)
 ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
                          'Gambier_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
 #yay! it works!
+
+
+
+#######################################################################33
+## ggridges - MALES
+###########################################################################3
+#create a plot that graphs 
+#using ggridges
+##and geom_density_ridges
+## and a wesanderson color palette
+## or a pnwpalette color palette
+## or ADFG colors
+
+#AGR TK - write something next year to automatically add year 2027 from dat_all to this dataset, and save it for the next year
+
+#load ALL THE DATA
+dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv") #AGR TK update with each year's new dat1 data
+#Plot ridges
+plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Gambier Bay")
 
 
 
