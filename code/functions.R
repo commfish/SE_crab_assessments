@@ -496,7 +496,8 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
   
   if(survey.location == "Gambier"){ #agr just added this chunk to adjust the Gambier legend 9/3/24
       p1 = p1 + #ggtitle("Gambier") +
-        theme(legend.position = c(0.35,0.8))
+        theme(legend.position = c(0.35,0.8)) +
+        coord_cartesian(ylim=c(0,6))
   }
   if(survey.location == "LynnSisters"){ #agr just added this chunk to adjust the Lynn sisters legend
     p1 = p1 +# ggtitle("Lynn Sisters") +
@@ -1044,7 +1045,8 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   
   if(survey.location == "Gambier"){ #agr just added this chunk to adjust the Gambier legend 9/3/24
     p1 = p1 + #ggtitle("Gambier") +
-      theme(legend.position = c(0.35,0.8))
+      theme(legend.position = c(0.35,0.8))+
+      coord_cartesian(ylim=c(0,6))
   }
   
   if(survey.location == "Pybus"){ #specific 2026 adjustment to make the graph not wack

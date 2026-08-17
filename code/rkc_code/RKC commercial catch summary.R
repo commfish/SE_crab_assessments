@@ -5,6 +5,7 @@
 ## 7/29/26 Lynn Sisters Pull
 
 ## A file that will read in commercial catch and summarize it by area ##
+source("code/functions.R")
 
 library(tidyverse)
 library(ggplot2)
@@ -27,19 +28,43 @@ comm_catch_by_area <- comm_catch %>%
 
 #Do we want it summarized by number? See the personal use fishery code.
   
-## can use legal weight from last years to extrapolate this into pounds 
+## can use legal weight from last years to extrapolate this into pounds - need to run up to maleweights in the area.R file first.
 male_weights_JNU <- read.csv(paste0('./results/rkc/Juneau', 
                                 '/', cur_yr, '/maleweights.csv'))
 legal_wt_JNU_pryr <- male_weights_JNU[1,3]
-#male_weights_GB <- read.csv(paste0('./results/rkc/Gambier Bay', 
- #                                   '/', cur_yr, '/maleweights.csv'))
-#male_weights_SC <- read.csv(paste0('./results/rkc/Seymour', 
- #                                   '/', cur_yr, '/maleweights.csv'))
+
+male_weights_GB <- read.csv(paste0('./results/rkc/Gambier', 
+                                    '/', cur_yr, '/maleweights.csv'))
+legal_wt_GB_pryr <- male_weights_GB[1,3]
+
+male_weights_SC <- read.csv(paste0('./results/rkc/Seymour', 
+                                    '/', cur_yr, '/maleweights.csv'))
+
+legal_wt_SC_pryr <- male_weights_SC[1,3]
 
 comm_ctach_JNU_table <- comm_catch_by_area %>% filter(Fishery == "Juneau area RKC") %>%
   mutate(Numbers_crab = Whole_weight_total/legal_wt_JNU_pryr)
 
 write.csv(comm_ctach_JNU_table, file="results/rkc/Juneau/2026/comm_catch_JNU.csv")
+
+
+comm_ctach_GB_table <- comm_catch_by_area %>% filter(Fishery == "Gambier Bay RKC") %>%
+  mutate(Numbers_crab = Whole_weight_total/legal_wt_GB_pryr)
+
+comm_ctach_SC_table <- comm_catch_by_area %>% filter(Fishery == "Seymour Canal RKC") %>%
+  mutate(Numbers_crab = Whole_weight_total/legal_wt_SC_pryr)
+
+write.csv(comm_ctach_GB_table, file="results/rkc/Gambier/2026/comm_catch_GB.csv")
+write.csv(comm_ctach_SC_table, file="results/rkc/Seymour/2026/comm_catch_SC.csv")
+
+
+
+
+##Gambier
+
+##Seymour
+
+
 
 
 ######################################################################################
