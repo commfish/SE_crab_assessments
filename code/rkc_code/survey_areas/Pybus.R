@@ -24,10 +24,10 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2025 # update annually 
+cur_yr <- 2026 # update annually 
 pr_yr <- cur_yr -1
-cur_yr2 <- 25
-pr_yr2 <- 24
+cur_yr2 <- 26
+pr_yr2 <- 25
 survey.location <- 'Pybus'
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
@@ -354,8 +354,8 @@ panel_figure_NC('Pybus', cur_yr, 'Pybus', 2, 0) #conf male
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "A8:E56") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA_excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "Q8:S56")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "A8:E57") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Pybus Bay ", cur_yr, "_adj HR_USE.xls"), sheet = "Estimates 3 State", range = "Q8:S57")) %>%
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR

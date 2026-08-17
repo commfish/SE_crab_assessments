@@ -518,6 +518,13 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       scale_x_continuous(breaks = seq(min(1994), max(2026), by =2)) #specific 2025 fix
   }
   
+  if(survey.location == "Pybus"){ #specific 2026 adjustment to make the graph not wack
+    p1 = p1 + 
+     coord_cartesian(ylim=c(0,6))
+ #     scale_y_continuous(ylim = c(0,)) #specific 2025 fix
+  }
+  
+  
   #if(survey.location != "Peril"){ #AGR finagling in 2025 with the peril graph
    # p1 = p1 + scale_x_continuous(limits = c(1994, 2026)   
   #  )}
@@ -574,6 +581,12 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
                        x = -Inf, y = Inf, hjust = -0.05, vjust = 1.1,  # fine-tune the positioning #AGR ADD THIS
                        size = 6, fontface = "bold"    
     )}
+  
+  if(survey.location == "Pybus"){ #specific 2026 adjustment to make the graph not wack
+    p2 = p2 + 
+      coord_cartesian(ylim=c(0,8))
+    #     scale_y_continuous(ylim = c(0,)) #specific 2025 fix
+  }
   
   
  # if(survey.location == "LynnSisters"){
@@ -1032,6 +1045,12 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
   if(survey.location == "Gambier"){ #agr just added this chunk to adjust the Gambier legend 9/3/24
     p1 = p1 + #ggtitle("Gambier") +
       theme(legend.position = c(0.35,0.8))
+  }
+  
+  if(survey.location == "Pybus"){ #specific 2026 adjustment to make the graph not wack
+    p1 = p1 + 
+      coord_cartesian(ylim=c(0,6))
+    #     scale_y_continuous(ylim = c(0,)) #specific 2025 fix
   }
   
   ### F1b females/juvenile plot ---------------
