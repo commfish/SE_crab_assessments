@@ -1,6 +1,6 @@
 # K.Palof 
 # katie.palof@alaska.gov
-# ADF&G 8-3-16 updated for Seymour Canal  / updated 8-8-17/8-9-18 / 9-4-19/8-23-21 / 7-26-22 / 7-25-24 AGR / 8-15-25 AGR
+# ADF&G 8-3-16 updated for Seymour Canal  / updated 8-8-17/8-9-18 / 9-4-19/8-23-21 / 7-26-22 / 7-25-24 AGR / 8-15-25 AGR/ 8-18-26 AGR
 # R script contains code to process data from Ocean AK to use in crab CSA models, code to run CSA model, and calls to create 
 #     output and figures for annual stock health report.
 
@@ -11,10 +11,10 @@
 source('./code/functions.R')
 
 ## setup global ---------------
-cur_yr <- 2025
+cur_yr <- 2026
 pr_yr <- cur_yr -1
-cur_yr2 <- 25
-pr_yr2 <- 24
+cur_yr2 <- 26
+pr_yr2 <- 25
 survey.location <- 'Seymour'
 
 dir.create(file.path(paste0('results/rkc/', survey.location), cur_yr))
@@ -264,6 +264,8 @@ total_health('Seymour', cur_yr)
 #### STOP HERE AND run .Rmd file for this area for summary and to confirm things look ok
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+##if there's a commercial catch, run RKC commercial catch summary.R to get the commercial numbers for the CSA model.
+
 ### !!! 
 # Run CSA model - either excel or here --
 # Put Biomass estimates for this area in 'data/biomass.csv'. this contains this years estimates.
@@ -349,8 +351,8 @@ panel_figure_NC('Seymour', cur_yr, 'Seymour Canal', 2, 1)
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "A8:E54") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA_excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "Q8:S54")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "A8:E55") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Seymour Canal ", cur_yr, "_current CSA.xls"), sheet = "Estimates 3 stage", range = "Q8:S55")) %>%
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% #uh, might have to adjust this based on Seymour's naming
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
@@ -380,6 +382,18 @@ cpue_fit_plot <- ggplot(cpue_fit, aes(x = Year, y = survey_index, group = stage)
 ggsave(filename = paste0(here::here(), '/figures/rkc/', cur_yr, '/', 
                          'Seymour_cpue_model_fit.png'), plot = cpue_fit_plot, height = 4, width = 6.5, units = "in") #ar- I switched the width and height
 #yay! it works!
+
+#add in length cohort plot
+#load ALL THE DATA
+dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv") #AGR TK update with each year's new dat1 data
+
+dat_all <- dat_all %>% select(-X)
+
+#View(dat1)
+dat1_allyr <- dat1 %>% filter(Year == cur_yr) %>% rbind(dat_all) #adds the new year of data; might need to separate dat_all by area in the future, and smooth this part over
+
+#Plot ridges
+plot_rkc_ridges(dat1_allyr, cur_yr = cur_yr, location = "Seymour Canal") #filters for males and plots the length cohorts
 
 
 

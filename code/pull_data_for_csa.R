@@ -81,11 +81,11 @@ tables <- dbListTables(con)
 # set location to filter data
 # should be one of c("Barlow Cove", "Juneau"), "Excursion Inlet", "Lynn Sisters", "Gambier Bay", "Pybus Bay", "Peril Strait" - NOPE, now "Deadman Reach" instead of Peril strait, 
 # "Seymour Canal"
-sur.location <- c("Pybus Bay") 
+sur.location <- c("Seymour Canal") 
 
 # set location to export files
 # should be one of "Excursion", "Gambier", "Juneau", "LynnSisters", "Peril", "Pybus", "Seymour"
-survey.location <- c("Pybus")
+survey.location <- c("Seymour")
 
 # find trip ID for current year (use PROJECT_CODE = 007 which should correspond to PROJECT = "Red King Crab Survey")
 trip_year <- tbl(con, "TRIP") %>%

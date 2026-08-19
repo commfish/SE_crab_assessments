@@ -122,13 +122,16 @@ sur.midpoint.jul.LS <- yday(sur.midpoint.LS)
 ##doesn't really matter but maybe correct it for next year
 dates_JNU_temp <- comm_catch %>%
   dplyr::filter(Fishery == "Juneau area RKC")  #select for JNU; perhaps use this in the future: (Fishery == "Juneau area RKC"|Stat.Area=="11513") to include "postage stamp"
-dates.JNU <- unique(round_date(ymd_hms(dates_LS_temp$Date.of.Landing), unit="day"))
+dates.JNU <- unique(round_date(ymd_hms(dates_JNU_temp$Date.of.Landing), unit="day"))
 
 # interval of minimum and maximum survey dates
 date.int.JNU <- interval(min(dates.JNU, na.rm=TRUE), max(dates.JNU, na.rm=TRUE))
 
-# survey midpoint; see functions script for the int_midpoint function
-sur.midpoint.JNU <- int_midpoint(date.int.JNU)
+# comm catch midpoint; see functions script for the int_midpoint function
+cc.midpoint.JNU <- int_midpoint(date.int.JNU)
+##so PU midpoint in 2026 is 20-aug-26. Comm catch midpoint in 26 is 05-Nov-26
+## I'll find the midpoint between these two dates for the postage stamp scenario TK
+## 60:40 mid date for the conventional PU:comm calcualtion TK
 
 # convert to Julian day
 sur.midpoint.jul.JNU <- yday(sur.midpoint.JNU)
@@ -144,10 +147,10 @@ dates.SC <- unique(round_date(ymd_hms(dates_SC_temp$Date.of.Landing), unit="day"
 date.int.SC <- interval(min(dates.SC, na.rm=TRUE), max(dates.SC, na.rm=TRUE))
 
 # survey midpoint; see functions script for the int_midpoint function
-sur.midpoint.SC <- int_midpoint(date.int.SC)
+com.midpoint.SC <- int_midpoint(date.int.SC)
 
 # convert to Julian day
-sur.midpoint.jul.SC <- yday(sur.midpoint.SC)
+sur.midpoint.jul.SC <- yday(com.midpoint.SC)
 
 
 #Gambier Bay comm catch midpoint
@@ -184,7 +187,36 @@ write.csv(combined_midpoint,
 #perhaps graph the comm catch by area?? Nah?
 
 
+#########
+#explore adding 115-13 (postage stamp) to JNU area
+#######
+comm_catch_JNU_postage <- comm_catch %>%
+  dplyr::filter(Fishery == "Juneau area RKC"|Stat.Area=="11513") %>%
+  group_by(Fishery) %>%
+  summarise(Whole_weight_total = sum(Whole.Weight..sum.),
+            Landed_weight_total = sum(Landed.Weight..sum.)
+  ) %>%#summarized by biomass.
+  ungroup()
+#what is 95-personal use?? 95 for Disposition.and.code.name - ask Zane/Tessa
+#convert this to #'s crab plz.
+comm_catch_JNU_table_postage <- comm_catch_JNU_postage %>%
+  mutate(Numbers_crab = Whole_weight_total/legal_wt_JNU_pryr)
+##talk to Katie, Caitlin, crab biologists about this... Postage stamp goes hard, and this could have a solid impact on Juneau area analysis if I include it in the catch
+###something I can do: try pluggint the JNU #'s crab + postage stamp #'s crab into JNU CSA, look at results;
+##so in 2026, JNU + postage stamp = 2512+842 = 3354
+##adding in postage stamp changes the 60:40 ratio between PU:comm catch
+## postage stamp added to JNU scenario adds 500lbs to the GHL
+
+com_just_JNU <- comm_catch %>%
+  dplyr::filter(Fishery == "Juneau area RKC") %>%
+  group_by(Fishery) %>%
+  summarise(Whole_weight_total = sum(Whole.Weight..sum.),
+            Landed_weight_total = sum(Landed.Weight..sum.)
+  ) %>%#summarized by biomass.
+  ungroup()
 
 
+View(comm_catch_JNU_postage)
+View(com_just_JNU)
 
 
