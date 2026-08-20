@@ -1,0 +1,1264 @@
+---
+title: "2026 Southeast Alaska red king crab stock assessment CONFIDENTIAL RIR draft "
+author: "Alex Reich (alex.reich@alaska.gov)"
+date: "`r format(Sys.time(), '%B %Y')`"
+output:
+  bookdown::word_document2:
+    fig_caption: yes
+    includes: null
+    toc: no
+    reference_docx: style_settings.docx
+  #word_document:
+    #reference_docx: style_settings.docx
+    #toc: no
+---
+\pagenumbering{arabic}
+
+```{r global_options, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+library(readxl)
+library(officer)
+library(officedown)
+source(paste0(here::here(),'/code/functions.R'))
+cur_yr = 2026 # updated annually
+pr_yr = cur_yr-1
+fut_yr = cur_yr+1
+opts_chunk$set(fig.width = 12, fig.height = 7, echo = FALSE, warning = FALSE, message = FALSE,  dpi=300)
+
+set_flextable_defaults(
+  font.family = "Arial", 
+  font.size = 9,
+  font.color = "black",
+  table.layout = "autofit",
+  text.align = "center"
+  #digits = 1,
+  #theme_fun = "theme_box"
+  )
+#\pagenumbering{gobble}
+```
+
+```{r exesum, echo = FALSE}
+mr_adjust <- read.csv(paste0(here::here(),'/data/rkc/adj_final_stock_assessment.csv'))
+fishery.status <- read.csv(paste0(here::here(),'/data/rkc/Juneau/hind_fore_cast_JNU_current.csv')) # has fishery status
+#                     may want to save this information somewhere else in the future
+biomass <- read.csv(paste0(here::here(),'/data/rkc/biomass.csv'))
+# file for all locations.  Has legal and mature biomass from current year CSA & harvest
+# mr adjustments can be made in the function using mr_adjust file.
+exploit_rate <- read.csv(paste0(here::here(),"/data/rkc/table3.csv"))
+
+baseline_rel <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/relative_to_baseline_', cur_yr,'.csv'))
+LEGAL_baseline_rel <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/LEGAL_relative_to_baseline_', cur_yr,'.csv')) #AGR add, surprised it wasn't here before
+# which R file is this from ?
+
+table2 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2_regional_', cur_yr,'.csv'))
+table2.7 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table2.7_regional_', cur_yr,'.csv'))#AGR added for legal #'s
+# these are created in 'figure2_tables.R'
+table3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table3_regional_', cur_yr,'.csv'))
+table3.6 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table3.6_regional_', cur_yr,'.csv'))
+
+tableA3 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/TableA3_regional_', cur_yr,'.csv'))
+#table4 <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table4_regional_2021.csv'))
+regpu <- read.csv(paste0(here::here(),'/data/harvest/', cur_yr, '_regional_PU_harvest.csv'))
+
+###
+## clean up figure 2-------
+# add in mr adjustments
+mr_adjust %>% 
+  select(-X) %>% 
+  mutate(Location = ifelse(area == "St_James", "LynnSisters", as.character(area))) %>% 
+  select(-area) -> mr_adjust2
+biomass %>% 
+  left_join(mr_adjust2) %>% 
+  mutate(adj.legal = ifelse(Location == "Juneau", legal.biomass, 
+                            legal.biomass*weighted_ADJ), 
+         adj.mature = ifelse(Location == "Juneau", mature.biomass, 
+                            mature.biomass*weighted_ADJ))-> biomass
+#write.csv(biomass, paste0('./results/rkc/Region1/', cur_yr, '/biomass_', cur_yr, '.csv'))
+# use these values for Table A2 in stock health document
+
+# regional biomass ----
+biomass %>% 
+  group_by(Year) %>% 
+  summarise(legal = sum(legal.biomass), mature = sum(mature.biomass), 
+            adj_legal = sum(adj.legal), adj_mature = sum(adj.mature)) %>% 
+  as.data.frame() -> regional.b
+fishery.status %>% 
+  select(Year = year, status) %>% 
+  mutate(status = ifelse(status == "PU only", "closed", as.character(status))) -> fishery.status.update
+  # add next line to deal with current year which is TBD in file but will most 
+  # likely be closed in current year (2018)
+  # %>% mutate(status = ifelse(status == "TBD", "closed", as.character(status))) -> fishery.status.update
+   
+regional.b %>% 
+  left_join(fishery.status.update) -> regional.b
+
+## expansion factor for non-surveyed areas ----
+regional.b %>% 
+  mutate(non_sur_legal = (legal/.528) - legal, 
+         non_sur_mature = (mature/0.528) - mature, 
+         non_sur_adj_legal = (adj_legal/.528) - adj_legal, 
+         non_sur_adj_mature = (adj_mature/0.528) - adj_mature, 
+         bkc_leg = legal*0.0106, 
+         bkc_mat = mature*0.0106, 
+         bkc_adj_leg = adj_legal*0.0106, 
+         bkc_adj_mat = adj_mature*0.0106, 
+         TOTAL_leg = (adj_legal + non_sur_adj_legal + bkc_adj_leg), 
+         TOTAL_mat = (adj_mature + non_sur_adj_mature + bkc_adj_mat)) -> regional.b_table
+
+
+regional.b_table %>% filter(Year == cur_yr) -> b_cur_yr
+
+## harvest rate summary ----
+exploit_rate %>% 
+  select(area, equ.er.adj, avg.inc.hr, alt.equ.hr) %>% 
+  mutate(equ.er.adj = round(equ.er.adj, 2), avg.inc.hr = round(avg.inc.hr, 2), 
+         alt.equ.hr = round(alt.equ.hr, 2), 
+         hr_cur_yr = ifelse(area == 'Juneau', 0.07, 0)) -> exploit_rate2
+## look into doing these calcs in figure2_tables instead and bringing in csv here
+
+```
+```{r harvestrec.prep, echo = FALSE}
+
+# prepare harvest recommendations table so can pull numbers from it for text
+
+survey.locations <- c("Pybus", "Excursion", "Gambier", "Juneau", 
+                      "LynnSisters", "Peril", "Seymour")
+
+# input mature harvest rates. These are determined from stock health & the previous year's results.
+# the Juneau harvest rate should be the one decided upon in the Juneau assessment meeting in July.
+#AGR I did not update in 2024 because not relevant, we use legal hr
+pybus_hr <- 0
+gambier_hr <- 0
+seymour_hr <- 0
+peril_hr <- 0
+juneau_hr <- 0.10 #updated 2025 UPDATE EACH YEAR!!
+lynnsisters_hr <- 0
+excursion_hr <- 0
+bkc_hr_display <- 0
+other_hr <- 0.10
+total_hr <- NA
+
+# input legal harvest rates. These are determined from stock health & the previous year's results.
+# the Juneau harvest rate should be the one decided upon in the Juneau assessment meeting in July.
+#AGR 2025- FLAG - take a look and update manually...#AGR 2026- update manually - TK FLAG!!
+pybus_hr_leg <- 0 #agr updated to legal stock harvest rates 2024
+gambier_hr_leg <- 0.04
+seymour_hr_leg <- 0.1 #debated 0.05 but went with 0.10
+peril_hr_leg <- 0
+juneau_hr_leg <- 0.10 #2025 number UPDATE EACH YEAR
+lynnsisters_hr_leg <- 0.09
+excursion_hr_leg <- 0
+bkc_hr_display_leg <- 0
+other_hr_leg <- 0.10
+total_hr_leg <- NA
+
+bkc_hr <- 0.0106 # note that this represents expected BKC bycatch in the RKC fishery, not a directed harvest rate on BKC.
+
+tbl7_a <- table2 #TK what is going on here AGR #I didn't like table 2 for some reason. Check it has the legal values and calcs that we need please
+tbl7_b <- tbl7_a %>% 
+  mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
+  select(-Year, -Legal.HR) %>% 
+  filter(Location != "surveyed")
+
+tbl7_c <- tbl7_b %>% 
+  mutate(Mature.HR = c(pybus_hr, gambier_hr, seymour_hr, peril_hr, juneau_hr, lynnsisters_hr, excursion_hr, bkc_hr_display, other_hr, total_hr), Legal.HR = c(pybus_hr_leg, gambier_hr_leg, seymour_hr_leg, peril_hr_leg, juneau_hr_leg, lynnsisters_hr_leg, excursion_hr_leg, bkc_hr_display_leg, other_hr_leg, total_hr_leg)) %>% 
+  mutate(Total.GHL = round(adj.mature*Mature.HR,0), 
+         Total.GHL.legal = round(adj.legal*Legal.HR,0), 
+         PU.catch = ifelse(Location == "Juneau", 
+                           round(0.6*Total.GHL,0), ifelse(Location == "other.areas", 1000, 0)),
+         PU.catch.legal = ifelse(Location == "Juneau", 
+                           round(0.6*Total.GHL.legal,0), ifelse(Location == "other.areas", 1000, 0)),
+         Comm.GHL.adj = round(Total.GHL - PU.catch, 0), 
+         Comm.GHL.adj.legal = round(Total.GHL.legal - PU.catch.legal, 0), 
+         bkc_temp = round(sum(Comm.GHL.adj[Location%in%survey.locations], na.rm = TRUE)*bkc_hr, 0), 
+         bkc_temp.legal = round(sum(Comm.GHL.adj.legal[Location%in%survey.locations], na.rm = TRUE)*bkc_hr, 0), 
+         Comm.GHL.adj = ifelse(Location == "bkc", bkc_temp, Comm.GHL.adj),
+         Comm.GHL.adj.legal = ifelse(Location == "bkc", bkc_temp.legal, Comm.GHL.adj.legal)) %>%
+  select(-bkc_temp)
+
+tbl7_d <- tbl7_c %>% 
+  mutate(Comm.GHL.adj = ifelse(Location == "total", sum(tbl7_c$Comm.GHL.adj, na.rm = TRUE), Comm.GHL.adj),
+         Comm.GHL.adj.legal = ifelse(Location == "total", sum(tbl7_c$Comm.GHL.adj.legal, na.rm = TRUE), Comm.GHL.adj.legal),
+         Total.GHL = ifelse(Location == "total", sum(tbl7_c$Total.GHL, na.rm = TRUE), Total.GHL),
+         Total.GHL.legal = ifelse(Location == "total", sum(tbl7_c$Total.GHL.legal, na.rm = TRUE), Total.GHL.legal),
+         PU.catch = ifelse(Location == "total", sum(tbl7_c$PU.catch, na.rm = TRUE), PU.catch),
+         PU.catch.legal = ifelse(Location == "total", sum(tbl7_c$PU.catch.legal, na.rm = TRUE), PU.catch.legal)) %>% 
+  select(Location, adj.legal, adj.mature, Mature.HR, Total.GHL, PU.catch, Comm.GHL.adj, Legal.HR, Total.GHL.legal, PU.catch.legal, Comm.GHL.adj.legal) %>%
+  mutate(Location = case_when(Location == "Pybus" ~ "Pybus Bay", 
+                              Location == "Gambier" ~ "Gambier Bay",
+                              Location == "Seymour" ~ "Seymour Canal",
+                              Location == "Peril" ~ "Peril Strait",
+                              Location == "LynnSisters" ~ "Lynn Sisters",
+                              Location == "Excursion" ~ "Excursion Inlet",
+                              Location == "bkc" ~ "BKC",
+                              Location == "other.areas" ~ "Other areas",
+                              Location == "total" ~ "Total",
+                              .default = as.character(Location)))
+
+
+names(tbl7_d) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Mature HR", 
+               "Total GHL (mature lb)", "PU harvest (mature lb)", paste0(cur_yr, " Commercial GHL (mature lb)"), "Legal HR",
+               "Total GHL (legal lb)", "PU harvest (legal lb)", paste0(cur_yr, " Commercial GHL (legal lb)"))
+
+# alternative table with only one harvest rate, applied to legal biomass. Keep 0.10 as the rate applied to legal biomass for the Juneau- #AGR ummm, this might be out of date for 2024, 0.08 is the 2024 harvest rate#
+# area. Change the harvest rate applied to legal biomass from other areas such that the GHL is the same as it would be if a 0.10 harvest #AGR - WHAT IS THIS RIDDLE?
+# rate was applied to the mature biomass from other areas. 
+#AGR - ok the alt table was made at a manager's request and was not a biometric rec. I got rid of the table in 2024.
+
+other_hr_leg_alt <- tbl7_d %>%
+  filter(`Survey area` == "Other areas") %>%
+  mutate(newHR = `Total GHL (mature lb)`/`Legal biomass (adj)`) %>%
+  pull(newHR)
+
+tbl7_c_alt <- tbl7_b %>% 
+  mutate(Legal.HR = c(pybus_hr_leg, gambier_hr_leg, seymour_hr_leg, peril_hr_leg, juneau_hr_leg, lynnsisters_hr_leg, excursion_hr_leg, bkc_hr_display_leg, other_hr_leg_alt, total_hr_leg)) %>% 
+  mutate(Total.GHL.legal = round(adj.legal*Legal.HR,0), 
+         PU.catch.legal = ifelse(Location == "Juneau", 
+                           round(0.6*Total.GHL.legal,0), ifelse(Location == "other.areas", 1000, 0)),
+         Comm.GHL.adj.legal = round(Total.GHL.legal - PU.catch.legal, 0), 
+         bkc_temp.legal = round(sum(Comm.GHL.adj.legal[Location%in%survey.locations], na.rm = TRUE)*bkc_hr, 0), 
+         Comm.GHL.adj.legal = ifelse(Location == "bkc", bkc_temp.legal, Comm.GHL.adj.legal))
+
+tbl7_d_alt <- tbl7_c_alt %>% 
+  mutate(Comm.GHL.adj.legal = ifelse(Location == "total", sum(tbl7_c_alt$Comm.GHL.adj.legal, na.rm = TRUE), Comm.GHL.adj.legal),
+         Total.GHL.legal = ifelse(Location == "total", sum(tbl7_c_alt$Total.GHL.legal, na.rm = TRUE), Total.GHL.legal),
+         PU.catch.legal = ifelse(Location == "total", sum(tbl7_c_alt$PU.catch.legal, na.rm = TRUE), PU.catch.legal),
+         Legal.HR = round(Legal.HR, 2)) %>% 
+  mutate(Location = case_when(Location == "Pybus" ~ "Pybus Bay", 
+                              Location == "Gambier" ~ "Gambier Bay",
+                              Location == "Seymour" ~ "Seymour Canal",
+                              Location == "Peril" ~ "Peril Strait",
+                              Location == "LynnSisters" ~ "Lynn Sisters",
+                              Location == "Excursion" ~ "Excursion Inlet",
+                              Location == "bkc" ~ "BKC",
+                              Location == "other.areas" ~ "Other areas",
+                              Location == "total" ~ "Total",
+                              .default = as.character(Location))) %>%
+  select(Location, adj.legal, adj.mature, Legal.HR, Total.GHL.legal, PU.catch.legal, Comm.GHL.adj.legal)
+
+
+names(tbl7_d_alt) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Legal HR",
+               "Total GHL (legal lb)", "PU harvest (legal lb)", paste0(cur_yr, " Commercial GHL (legal lb)"))
+
+
+```
+
+
+
+```{r numbers.for.text, echo = FALSE}
+
+# *************************************************************************************
+# Quick summary ----
+
+files_sh <- c(paste0(here::here(), "/results/rkc/Pybus/", cur_yr, "/stock_health.csv"), 
+                    paste0(here::here(), "/results/rkc/Gambier/", cur_yr, "/stock_health.csv"), 
+                    paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/stock_health.csv"), 
+                    paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/stock_health.csv"), #TURN ON IF WE SURVEY PERIL THIS YEAR. TURN OFF IF WE DON'T
+                    paste0(here::here(), "/results/rkc/Juneau/", cur_yr, "/stock_health.csv"), 
+                    paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/stock_health.csv"),
+                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/stock_health.csv"))
+
+sh_list <- files_sh %>%
+  map(read.csv) 
+names(sh_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion", "Peril") #add "Peril" in peril-surveyed years please.
+
+sh_all <- do.call(rbind, Map(cbind.data.frame, Location = names(sh_list), sh_list))
+row.names(sh_all) <- NULL
+
+pybus_stockhealth <- sh_all %>% filter(location == "Pybus") %>% pull(health_status)
+gambier_stockhealth <- sh_all %>% filter(location == "Gambier") %>% pull(health_status)
+seymour_stockhealth <- sh_all %>% filter(location == "Seymour") %>% pull(health_status)
+peril_stockhealth <- sh_all %>% filter(location == "Peril") %>% pull(health_status) # use this in years with a Peril survey
+#peril_stockhealth <-  "unsurveyed" # use this in years without a Peril survey
+juneau_stockhealth <- sh_all %>% filter(location == "Juneau") %>% pull(health_status)
+lynnsisters_stockhealth <- sh_all %>% filter(location == "LynnSisters") %>% pull(health_status)
+excursion_stockhealth <- sh_all %>% filter(location == "Excursion") %>% pull(health_status)
+
+# *************************************************************************************
+# Overview ----
+
+# pounds and numbers of crab targeted in the Juneau summer personal use fishery
+
+# input the Juneau mature harvest rate (decided upon in the Juneau assessment meeting in July)
+juneau_hr <- 0.10 #updated AGR #CRAP, is this # wrong? since the legal rate is 0.10, the mature rate will be lower
+##this # might not be used tho, so pay attention. FLAG!!
+
+# input the Juneau legal harvest rate
+juneau_hr_legal <- 0.10 #updated AGR
+
+# summer PU proportion of the GHL (= 0.5; winter PU is 0.1 and commercial is 0.4)
+sum.pu.prop <- 0.5 #AGR ok this seems like it will stay the same
+
+# get legal weight for conversion to numbers
+leg.wt <- read.csv(paste0(here::here(),'/results/rkc/Juneau/', cur_yr, '/maleweights.csv')) %>% #this gets auto-created by everything I did for the Juneau memo
+  filter(Year == cur_yr) %>%
+  pull(legal_lbs)
+
+# legal male lbs for Juneau total PU #TK This is wrong #WHAT? FLAG 2025
+lbs.leg.pu.total <- tbl7_d_alt %>%
+  filter(`Survey area` == "Juneau") %>%
+  mutate(pu.harvest = `PU harvest (legal lb)`) %>%
+  pull(pu.harvest)
+
+# legal male lbs for Juneau summer PU #TK this is wrong #FLAG!! 2025
+lbs.leg.pu <- tbl7_d_alt %>%
+  filter(`Survey area` == "Juneau") %>%
+  mutate(pu.harvest = sum.pu.prop*`PU harvest (legal lb)`) %>%
+  pull(pu.harvest)
+
+num.leg.pu <- lbs.leg.pu / leg.wt
+
+#AGR TK fixing immediately above - Ok I just copy-pasted where relevant below.
+
+# Commercial GHL in legal pounds- AGR this isnt right TK
+
+ghl.bkc <- tbl7_d %>% filter(`Survey area` == "BKC") %>% pull(paste0(cur_yr, " Commercial GHL (legal lb)"))
+ghl.total <- tbl7_d %>% filter(`Survey area` == "Total") %>% pull(paste0(cur_yr, " Commercial GHL (legal lb)"))
+comm.ghl.leg <- ghl.total - ghl.bkc
+
+# *************************************************************************************
+# Summary of stock status ----
+
+# change in regional legal and mature biomass
+
+reg_bio_change_leg <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/change_in_modeled_regional_biomass_', cur_yr,'.csv')) %>%
+  filter(type == "adj_legal") %>% select("change") %>% pull()
+
+reg_bio_change_mat <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/change_in_modeled_regional_biomass_', cur_yr,'.csv')) %>%
+  filter(type == "adj_mature") %>% select("change") %>% pull()
+
+reg_bio_change_leg_sign <- ifelse(reg_bio_change_leg > 0, "increased", "decreased")
+reg_bio_change_mat_sign <- ifelse(reg_bio_change_mat > 0, "increased", "decreased")
+
+
+# average regional decline in legal biomass since 2017
+
+files_regch <- c(paste0(here::here(), "/results/rkc/Region1/2019/change_in_modeled_regional_biomass_2019.csv"), 
+                    paste0(here::here(), "/results/rkc/Region1/2020/change_in_modeled_regional_biomass_2020.csv"), 
+                    paste0(here::here(), "/results/rkc/Region1/2021/change_in_modeled_regional_biomass_2021.csv"), 
+                    paste0(here::here(), "/results/rkc/Region1/2022/change_in_modeled_regional_biomass_2022.csv"), 
+                    paste0(here::here(), "/results/rkc/Region1/2023/change_in_modeled_regional_biomass_2023.csv"),
+                    paste0(here::here(), "/results/rkc/Region1/2024/change_in_modeled_regional_biomass_2024.csv"),
+                    paste0(here::here(), "/results/rkc/Region1/2025/change_in_modeled_regional_biomass_2025.csv"),
+                 paste0(here::here(), "/results/rkc/Region1/2026/change_in_modeled_regional_biomass_2026.csv")
+                 ) #AGR added TK- in the spirit of copy paste and pattern matching
+
+regch_list <- files_regch %>%
+  map(read.csv) 
+names(regch_list) <- c("2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026") #AGR added 2024, and a year later 2025 - I probs will drop the earlier years off the table. Added 2026 in 2026
+type_change <- c("type", "change")
+regch_list2 <- lapply(regch_list, "[", , type_change)
+regch_all <- do.call(rbind, Map(cbind.data.frame, name = names(regch_list2), regch_list2))
+row.names(regch_all) <- NULL
+
+avg_change_legal <- regch_all %>%
+  filter(type == "adj_legal") %>%
+  summarise(mean_change = mean(change)) %>% pull()
+
+avg_change_mature <- regch_all %>%
+  filter(type == "adj_mature") %>%
+  summarise(mean_change = mean(change)) %>% pull()
+
+avg_change_legal_sign <- ifelse(avg_change_legal > 0, "increased", "declined")
+avg_change_mature_sign <- ifelse(avg_change_mature > 0, "increased", "declined")
+
+# *************************************************************************************
+# Stock status by survey area ---- NOTE THIS SECTION IS INCOMPLETE - under development
+
+# legal and mature biomass estimated by 2023 model compared to 2022 model estimates
+
+
+gambier_lmb <- read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay 2026_adj HR_USE_updatedPU.xls"), sheet = "summary_use") #AGR changed 2023 to 2024. oh ok it's under development. changed 2024 to 2025. Updated to 2026 in 2026
+
+
+
+```
+
+
+FYI: *information is not completed yet; this is a draft of the RIR for both research (biometrics) and management. Management sections are also labeled TBD in this draft.*
+
+
+# `r cur_yr` QUICK SUMMARY {-}
+  - Regional legal and mature biomass increased by `r round(reg_bio_change_leg, 0)`% and `r round(reg_bio_change_mat, 0)`% respectively in `r cur_yr`.
+  - The Juneau area (Section 11-A) has `r juneau_stockhealth` stock health; Lynn Sisters, Gambier Bay, and Seymour Canal have `r lynnsisters_stockhealth` stock health; and Excursion Inlet and Pybus Bay have `r excursion_stockhealth` stock health. Stock health considers all age/sex classes of the population (mature males, juveniles, and females).
+  - The Juneau area, Gambier Bay, Seymour Canal, and Lynn Sisters showed an increase in both legal and mature biomass from `r pr_yr`.
+  - The regional legal biomass estimate is below the long-term median and above 50% of the long-term median (Figure 3).
+  - Tables 1, 2, and 7 can be consulted when setting the commercial GHL.
+
+
+
+# OVERVIEW {-}
+The Alaska Department of Fish and Game (ADF&G) annually evaluates stock status and establishes the guideline harvest levels (GHLs) for the Southeast red (RKC) and blue king crab (BKC) fishery using data from fishery-independent surveys (pot gear), commercial fishery catch per unit of effort (CPUE), and biological data (length, weight, and shell condition) from the surveys and fishery. The Southeast Alaska management area (Registration Area A) consists of all waters defined in 5 AAC 34.100 (Figure \@ref(fig:distribution)). 
+
+Projected estimates of regional legal male biomass and regional mature male biomass, respectively, for the `r cur_yr`/`r fut_yr` season are **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb** and **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb**, using the mark-recapture adjustments and the historical expansion factor applied to the non-surveyed areas. This value is below the baseline level (defined as the average biomass from 1995–2007), but there is a short-term increasing trend in recent years. The legal male biomass estimate is less than the long-term median (3.0 million lb) but greater that 50% of the long-term median (1.5 million lb).
+*The `r cur_yr`/`r fut_yr` Southeast commercial RKC fishery GHL opener decision and GHL WILL GO HERE after the SE RKC RIR meeting.*
+
+The personal use RKC and BKC fishery opened July 1, `r cur_yr`, in non-surveyed areas with daily bag and possession limits of one RKC or BKC per person. Results from the annual stock assessment survey in the Juneau area showed overall stock health to be at healthy stock levels, with both legal and mature biomass estimated to be above the long-term average. *The personal use summer fishery in Section 11-A opened on August 15, 2025, for ten days with a seasonal household limit of three crab and daily bag and possession limit of three crab to target 25,558 lb (3,446 crab) of legal male RKC in the summer fishery.*
+
+# `r cur_yr` SOUTHEAST RED KING CRAB STOCK ASSESSMENT {-}
+
+## SUMMARY OF STOCK STATUS {-}
+The Southeast RKC stock assessment regional biomass estimates for the `r cur_yr`/`r fut_yr` season are **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb of legal male crab and `r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb of mature male crab**, using the historical expansion factor (Tables \@ref(tab:maxHR) and \@ref(tab:riskadHR)). The legal biomass estimate `r reg_bio_change_leg_sign` `r round(reg_bio_change_leg, 0)`% from the previous year using the `r cur_yr` model estimates (Figure \@ref(fig:regionalbio)). The mature biomass estimate `r reg_bio_change_mat_sign` `r round(reg_bio_change_mat, 0)`% from `r pr_yr` using the `r cur_yr` model estimates. 
+
+Survey area biomass is estimated using a three-stage catch survey analysis model (CSA) and adjusted using the mark-recapture expansions where available (Stratman et al. 2019). Holkham Bay has not been surveyed since 2015 due to reductions in survey funding and therefore is no longer included in determining survey biomass estimates. Port Frederick was not surveyed from 2015 to 2024, but was surveyed in 2025. Port Frederick is not included in determining this year's biomass estimate, but will be included in the estimate in future years, after additional years of data collection. The legal crab component is composed of both recruit and postrecruit crab and defined as those greater than 178 mm in carapace width, whereas mature crab are prerecruit, recruit, and postrecruit crab, or those greater than 129 mm in carapace length. Biomass estimates from the survey areas are then expanded based on assumptions of how representative these areas are to the entire population in Southeast (Table \@ref(tab:maxHR), Figure \@ref(fig:distcur)).  
+
+Both mature and legal survey biomasses declined an average of 6% annually from 2001–2013 (Figure \@ref(fig:regionalbio)). Legal and mature biomasses showed regionwide increases for the first time in 2015 since 2008 and continued to increase until 2017. In 2017, the commercial fishery opened and the regionwide stock decreased until 2022. From 2023 to present, the legal and mature regional biomasses both increased annually. This year, four of the seven surveyed areas (Juneau area, Gambier Bay, Seymour Canal, and Lynn Sisters) had increases in both legal and mature biomass, while Pybus Bay and Excursion Inlet had decreases in both legal and mature biomass (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). Peril Strait was not surveyed this year and Port Frederick does not have recent data for comparison.
+
+The CPUEs of both juvenile males and females were not significantly different from the long-term average in two of seven areas surveyed in `r cur_yr` (Seymour Canal and Juneau) and below the long-term average in three of the seven areas surveyed (Pybus Bay, Lynn Sisters, Excursion Inlet; Table A1). Gambier Bay had juvenile male CPUE below the long-term average and juvenile female CPUE not significantly different from the long-term average. This suggests the possibility of low recruitment in the future and the need for continued monitoring of juvenile abundance. However, this survey was not designed to target juveniles, and thus this assessment may not be the most accurate estimate of juvenile abundance.
+
+The CPUE values for some or all of the mature male size and sex classes were below average for Excursion Inlet, Gambier Bay, and Pybus Bay.  Pybus Bay and Excursion Inlet had low values in all mature male CPUEs. Gambier Bay had CPUE values for one of three mature male recruit classes significantly below the long-term average. Seymour Canal and Lynn Sisters had mature male CPUE values non-significantly different from their long-term averages (Table A1). The Juneau area mature male CPUEs are above their long-term averages.
+
+Recruitment, in the form of prerecruit CPUE, is significantly below average levels for two of the survey areas (Pybus Bay, Excursion Inlet; Table A1). Gambier Bay, Seymour Canal, and Lynn Sisters are at the long-term average for prerecruit CPUE, and only the Juneau area is significantly above the long-term average. This suggests that some survey area crab stocks remain at a depressed level. 
+
+A matrix of stock health indicators provides an objective and repeatable evaluation of the survey data; a five-year summary of matrix results is therefore presented here (Table \@ref(tab:health5year)).  The methods used to calculate stock health indicators are described in Siddon et al. (2009); note that stock health score categories changed after 2008 (Table \@ref(tab:healthscores)). Specific stock health by survey area is discussed below.  
+
+
+## MARK–RECAPTURE EXPERIMENT ADJUSTMENTS {-}
+All survey areas (Excursion Inlet, Lynn Sisters, Peril Strait, Pybus Bay, Gambier Bay, and Seymour Canal; Figure \@ref(fig:distcur)), except Juneau, due to its expansive area, have a biomass adjustment that is calculated from mark-recapture studies (Table \@ref(tab:bioadj)). Two of the six survey areas have a single mark-recapture event, while the other four have two events; therefore, the estimate of biomass using this method does not take into account extensive inter-annual variability or variability in population size for all areas and should be applied with caution. 
+ADF&G has completed work on a second mark-recapture estimate for the four larger survey areas and does not currently plan to continue with additional mark-recapture studies. 
+Mark-recapture attempts in 2013 and 2014 (Lynn Sisters and Excursion Inlet) did not have sufficient sample sizes to produce usable biomass estimates (Robson and Regier 1964). Pybus Bay, Seymour Canal, Excursion Inlet, and Gambier Bay were successfully resampled in 2014, 2015, 2016, and 2017 respectively. 
+
+In three of the cases, resampling efforts yielded an adjustment factor similar to the first estimate (Table \@ref(tab:bioadj)). 
+Adjustments based on a weighted average of the two sampling events were used to determine the mark-recapture adjustment applied to this year’s estimates (Table \@ref(tab:bioadj)). 
+The biomass estimates presented in this analysis are the `r cur_yr` CSA model estimates adjusted by these values. 
+
+
+## EXPANSION OPTION FOR NON-SURVEYED AREAS {-}
+Regional biomass is estimated from the seven survey areas and extrapolated to the entire region using an expansion factor defined as the proportion of the population that lies within the non-surveyed areas (Tables \@ref(tab:maxHR) and \@ref(tab:riskadHR), Figure \@ref(fig:regionalbio)). In 2015, the surveyed areas were adjusted since surveys in Port Frederick and Holkham Bay were discontinued due to reduced funding. The removal of Port Frederick from the survey is accounted for by placing it in the non-surveyed area designation. Port Frederick was surveyed in 2025 but will still be treated as a non-surveyed area this year because more years of recent data are required before a biomass estimate can be produced for this area. A biomass estimate has never been produced for Holkham Bay due to the inconsistency of the data. Holkham Bay has always been included as a non-surveyed area, and thus no changes to the biomass estimation were needed in removing Holkham Bay from the survey.   
+
+The expansion factor, or an estimate of the percentage of the population found in the non-surveyed areas using historical harvest data, has not been consistent over time (Palof and Stratman 2020). 
+In the past, two expansion factors have been used that represented historical harvests from 1974–1984 (with 47.2% of the harvest coming from the non-surveyed areas), and harvests during the formerly used baseline years 1993–2007 (with 36.1% of the harvest coming from the non-surveyed areas). 
+Both options involve assumptions about the spatial distribution of the RKC population and the spatial effort of the fleet. The baseline time frame represents both a high and low period in the RKC biomass. However, this time frame is influenced by management actions, such as spatial closures, that greatly influenced the spatial effort of the fleet. The historical harvest time frame (1974–1984) was chosen to be the most appropriate for the `r cur_yr` assessment since it includes harvest years before management actions dictated spatial closure or influenced fleet behavior. However, this time frame assumes that the spatial distribution of RKC in Southeast Alaska has remained consistent over time, specifically since 1974, and with varying population sizes. 
+
+Expanding to the non-surveyed areas using the historical harvest time frame results in a regional biomass of `r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb for legal crab and `r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb for mature crab (Table \@ref(tab:maxHR)).
+
+
+## HARVEST RATES {-}
+Determining an appropriate harvest rate for RKC in Southeast Alaska has been challenging due to inconsistent recruitment and varying levels of population health. As a result, in 2018, Palof and Stratman (2020) reviewed and implemented harvest rate strategies that yielded two options for appropriate harvest rates that can be applied to mature or legal male biomass, each having its own associated risk. In 2025, we present these results in terms of legal male biomass.
+
+Option 1, using the equilibrium harvest rates, is considered the most risk neutral option with an equal probability of the male biomass decreasing or increasing in the following year after applying this level of harvest pressure when the population is at average or above average stock health. For a sustainable population, these should be considered maximum appropriate harvest rates for each of the surveyed areas. This option uses a regression model and therefore incorporates both the variability in the harvest rates and their associated change in legal male biomass. In theory, these harvest levels will maintain the equilibrium population size when the population is at equilibrium, or more realistically at average stock health levels (> moderate, Tables \@ref(tab:health5year) and \@ref(tab:healthscores)). However, a disadvantage to this method as currently applied is that it does not account for time-varying trends in survival or other factors such as environmental change, temperature, etc., that affect biomass. For our purposes, equilibrium could be defined as the average baseline population size (Figure \@ref(fig:regionalbio)) or a biomass that is sustainable over time. When the population is below equilibrium, harvesting at these rates will either maintain low population levels or, more likely, cause a decrease in population size. 
+The resulting legal biomass GHL for option 1 is **`r format((table2.7 %>% filter(Location == 'total'))$Comm.GHL, big.mark = ",")` lb** (Table \@ref(tab:maxHR)). 
+
+Option 2, using the average harvest rate for years in which the mature male biomass increased, is considered a lower risk option with a high probability of the mature male biomass increasing in the following year after applying this level of harvest pressure. This option only uses the average of the harvest rates that resulted in population increases and therefore does not incorporate variability as well as option 1. In theory, these harvest levels will increase the population size regardless of health of the stocks. However, during depressed stock health conditions, where biomass levels are below baseline values, even small harvest levels may still result in a decrease in population size. 
+The resulting GHL for option 2 is **`r format((table3.6 %>% filter(Location == 'total'))$Comm.GHL, big.mark = ",")` lb** (Table \@ref(tab:riskadHR)). 
+
+
+## STOCK ASSESSMENT CONCERNS AND RECOMMENDATIONS {-}
+Over the past decade, recovery in most of the survey areas, except for the Juneau area and Lynn Sisters, appears to be slow. Most areas, except for Peril Strait, had increasing biomass estimates from 2015–2017, however, in 2018 a decrease in both legal and mature biomass occurred in all survey areas that experienced personal use and commercial harvest in the previous season (2017/2018). 
+The impact of the commercial fishery opening in the 2017/2018 season is confounded by potential increased personal use harvest in the survey areas, but this is hard to quantify because we do not have personal use harvest estimates before 2018 in any area except Section 11-A. 
+
+Both regional legal and mature biomass levels have increased from `r pr_yr`, although both are still below the mean baseline levels (Figure \@ref(fig:regionalbio)). Juneau and Lynn Sisters are the only survey areas where legal and mature biomass are above their baseline levels. The Juneau stock is at historically high levels, and the Lynn Sisters, Seymour and Gambier stocks have shown improvements in recent years.
+
+The recent regulation revision [5 AAC 34.113] added commercial fishery opportunities based on the long-term median of the legal biomass estimate. We selected years 1995 to 2007 to represent the long-term median, to be consistent with the long-term mean. The year range used in determining a long-term median is subjective, but should consider balancing the inclusion of peaks and valleys in the population, changes in survey sampling design over time, and the long-term sustainability of the stock. The 2025 legal biomass estimate of `r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb falls in between the long-term median (3,001,030 lb) and 50% of the long-term median (1,500,515 lb; Figure \@ref(fig:med1)).
+
+We recommend no harvest in Peril Strait, Pybus Bay, and Excursion Inlet due to poor stock status. The Juneau area harvest rate has already been set at 10%. The harvest rates of Lynn Sisters, Seymour Canal, and Gambier Bay should be discussed, with consideration of Table 1 as the equilibrium guideline (the level of harvest an area can withstand under healthy stock conditions) and Table 2 as the conservative guideline.
+
+The RKC and BKC commercial fishery and personal use fishery outside of Section 11-A are managed separately and there are no regulatory thresholds or allocations that combine estimated harvest for both user groups. Personal use harvest outside of Section 11-A is not considered when calculating the commercial GHLs for each area to determine whether the total commercial GHL meets the 200,000 lb threshold in regulation for a commercial fishery. A personal use permit requirement was implemented in 2018 for the regional (outside Section 11-A) personal use fishery and reported harvests are shown in Appendix A. In the past three harvest years, the only survey area that has seen substantial harvests under the regional personal use permit is Lynn Sisters.
+
+# SURVEY AREA STOCK STATUS AND HARVEST RATE RECOMMENDATION {-}
+
+## STOCK STATUS BY SURVEY AREA {-}
+Significance in long-term or short-term trends is defined as a p-value <0.05. Long-term trends compare the current year’s mean to the long-term baseline value (1995–2007); short-term trends regress the last four years of survey data to determine if a significant increasing or decreasing trend is present. Estimates of legal and mature mark-recapture biomass (adj.legal / adj.mature) for the entire biomass time series for each area were added to the legal biomass graphs, along with their associated long-term baseline (1995–2007; solid black line for legal and grey dotted line for mature) estimates (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). Raw sample sizes for each area are reported in Table \@ref(tab:samplesizes). Graphs for each area reflect biomass estimates from the `r cur_yr` CSA model.
+
+## Pybus Bay (`r pybus_stockhealth`) {-}
+Pybus Bay stock health remained at `r pybus_stockhealth` status (Table \@ref(tab:health5year); Figures \@ref(fig:pybus2) and \@ref(fig:pybus3)). All size/sex class CPUEs are significantly below their long-term averages (Table A1). Mature female, juvenile male, and juvenile female CPUEs had a short-term decreasing trend (Table A2). 
+Legal biomass decreased 32% from the `r pr_yr` model estimate and mature biomass decreased 36%. 
+Both biomass estimates remain low compared to historical levels in this area. Female egg percentage has decreased from 2024 and the poor clutch percentage has increased.
+The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Pybus'))$pct.adj.cur, 0))`% below the baseline value and the legal biomass estimate is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Pybus'))$pct.adj.cur, 0))`% below the baseline value. 
+
+Due to the aforementioned concerns and the low level of the stock biomass in Pybus Bay, no harvest is recommended for the `r cur_yr`/`r fut_yr` season (Table \@ref(tab:harvestrec)).
+
+## Gambier Bay (`r gambier_stockhealth`) {-}
+Gambier Bay stock health increased to `r gambier_stockhealth` status (Table \@ref(tab:health5year); Figures \@ref(fig:gambier2) and \@ref(fig:gambier3)). Postrecruit and juvenile male CPUEs are significantly below their long-term averages (Table A1). Juvenile and mature females, prerecruits and recruits are not significantly different from their long-term averages. There are significant short-term increasing trends in prerecruit and recruit CPUEs and significant decreasing trends in postrecruit, juvenile male, and juvenile female CPUEs (Table A2). 
+
+Pre-recruit and recruit male biomass and CPUEs are trending up for this population in recent years (Figure \@ref(fig:gambier4)).
+Indicators of female stock health were good, as seen by the low proportion of poor clutches and high clutch fullness.
+Legal biomass increased 56% and mature biomass increased 73% from the `r pr_yr` model estimate. The legal adjusted biomass estimate is still below the baseline, but mature adjusted biomass estimate has climbed back to the baseline. 
+The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`% above and the legal biomass is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`%  below the baseline values. 
+
+Stock health has improved in Gambier this year and is categorized as moderate.
+
+## Seymour Canal (`r seymour_stockhealth`) {-}
+The overall stock health for Seymour Canal remained at `r seymour_stockhealth` (Table \@ref(tab:health5year); Figures \@ref(fig:seymour2), \@ref(fig:seymour3), and \@ref(fig:seymour4)) in 2025. All size and sex class CPUEs are not significantly different from the long-term averages (Table A1). 
+Recruit and postrecruit male CPUEs have significant short-term increasing trends (Table A2). 
+Indicators of female stock health were good, with a high mean clutch size and low percentage of poor clutches.
+
+Estimated legal biomass increased 233% and mature biomass increased 102% from the `r pr_yr` model estimates. 
+The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0))`% below and the legal biomass estimate is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0))`% below the baseline value.   
+
+Stock health in Seymour Canal has remained at moderate stock health in 2025. This is an improvement on past years' concern for the stock health of Seymour Canal. Undersampling has been a concern in recent years but does not appear to have occurred in 2024 or 2025. The biomass estimates are still below baseline values.
+
+## Peril Strait (`r peril_stockhealth`) {-}
+In 2024, the stock status for Peril Strait was poor (Table \@ref(tab:health5year); Figures \@ref(fig:peril2) and \@ref(fig:peril3). Peril Strait was not surveyed in 2025, as this area has been moved to a biennial survey schedule. 
+
+In 2024, the mature biomass estimate was `r abs(round((baseline_rel %>% filter(Location == 'Peril'))$pct.adj.cur, 0))`% and the legal biomass estimate was `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Peril'))$pct.adj.cur, 0))`% below the baseline value. Due to recent concerns about the Peril Strait stock status, no harvestable surplus is recommended for the `r cur_yr`/`r fut_yr` season (Table \@ref(tab:harvestrec)). 
+
+## Juneau (`r juneau_stockhealth`) {-}
+The stock status for the Juneau area remained at `r juneau_stockhealth` status in 2025 (Table \@ref(tab:health5year); Figures \@ref(fig:juneau2), and \@ref(fig:juneau3)). 
+Prerecruit males, recruit males, postrecruit males, and mature female CPUEs are significantly above their long-term averages; juvenile males and females are not significantly different from the long-term averages (Table \@ref(tab:longterm)). There are significant short-term increasing trends in mature female, prerecruit male, recruit male, and postrecruit male CPUEs, and a significant short-term decreasing trend in juvenile male and female CPUEs (Table \@ref(tab:shortterm)). 
+When compared to the `r pr_yr` model estimate, legal biomass increased 12%, while mature biomass increased 28.6%. 
+Indicators of female stock health remain good as indicated by the low proportion of poor clutches and high clutch fullness. Both legal and mature biomass are above their long-term baseline values, with mature biomass `r round((baseline_rel %>% filter(Location == 'Juneau'))$pct.adj.cur, 0)`% above the baseline and legal biomass `r round((LEGAL_baseline_rel %>% filter(Location == 'Juneau'))$pct.adj.cur, 0)` % above the baseline. 
+
+The annual Section 11-A red king crab stock assessment survey found both the legal and mature biomass increased compared to last year. Male CPUEs increased from the `r pr_yr` survey. Due to the increases in the biomass estimates and the survey CPUEs, the decision was made in July to set the harvest rate at 10% of the legal male biomass for the `r cur_yr`/`r fut_yr` season (Table \@ref(tab:harvestrec)).
+
+## Lynn Sisters (`r lynnsisters_stockhealth`) {-}
+Stock health in the Lynn Sisters area improved to `r lynnsisters_stockhealth` status in `r cur_yr` (Table \@ref(tab:health5year); Figures \@ref(fig:lynn2), \@ref(fig:lynn3), and \@ref(fig:lynn4)). CPUEs for juvenile males and females  were below their long-term averages, while none of the other size/sex classes were significantly different from the long-term averages (Table A1). 
+The only significant short-term trend was a decrease in juvenile male CPUE (Table A2). 
+Female clutch fullness has decreased and should continue to be monitored. The poor clutch percentage remained low. 
+Legal biomass decreased 1%, while mature biomass was unchanged from the `r pr_yr` model estimates.
+Both legal and mature biomass are above their long-term baseline values, with mature biomass `r round((baseline_rel %>% filter(Location == 'LynnSisters'))$pct.adj.cur, 0)`% above the baseline value and legal biomass `r round((LEGAL_baseline_rel %>% filter(Location == 'LynnSisters'))$pct.adj.cur, 0)`% above the baseline value. 
+
+Lynn Sisters had been on a positive trajectory from 2018 to 2021 and has flattened out in recent years. Legal and mature biomass estimates are both above long-term baselines.
+
+
+## Excursion Inlet (`r excursion_stockhealth`) {-}
+The stock health of Excursion Inlet did not improve from `r excursion_stockhealth` status (Table \@ref(tab:health5year); Figures \@ref(fig:excursion2), \@ref(fig:excursion3), \@ref(fig:excursion4)). CPUEs of all sex/size classes are significantly below their long-term averages (Table A1). There were significant short-term decreases in postrecruit male CPUE, and no short-term trends for the other size/sex classes (Table A2). Females had a low proportion of poor clutches but marginal clutch fullness. Estimated legal biomass and mature biomass both decreased 35% from the `r pr_yr` model estimates. 
+The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Excursion'))$pct.adj.cur, 0))`% and the legal biomass estimate is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Excursion'))$pct.adj.cur, 0))`% below the baseline value. 
+
+Stock health has declined in Excursion Inlet as evident from negative trends in stock health. CPUEs of all mature male size classes are below long-term baselines for the seventh consecutive season. Mature and legal biomass estimates have decreased and both are below long-term baselines. There are no short-term increasing trends. Considering these trends, there is not a harvestable surplus of RKC for the `r cur_yr`/`r fut_yr` season in Excursion Inlet (Table \@ref(tab:harvestrec)). 
+
+ 
+## Port Frederick (reintroduced to survey in 2025) {-}
+Port Frederick was surveyed in 2025 for the first time in 10 years (Figure \@ref(fig:fredtemp)). Given the ten-year gap in survey data, Port Frederick will still be considered part of the non-surveyed areas for the 2025 stock assessment (Table \@ref(tab:harvestrec)). The area can be re-incorporated into the stock assessment in future years, once more years of recent survey data are available. From 1979 to 2004 (the years used to expand the survey biomass to the non-surveyed areas), Port Frederick contributed 2.4% of the harvest. The previous percent expansion of 65.2% survey areas and 34.8% non-surveyed areas was adjusted. Excluding Port Frederick, 62.8% of the harvest is from survey areas and 37.2% from non-surveyed areas. Adjusting the expansion factor allows for consistency between previous years' estimates and the current year; all comparisons regionally were performed with a time series of estimates that were adjusted to not include Port Frederick.
+
+## Holkham Bay (unknown since 2014){-}
+Holkham Bay was removed as a survey area in 2015 due to budget constraints. The decision to drop Holkham Bay from the survey was based on difficulties in interpreting survey results from this location. Holkham Bay had consistently been surveyed since 2002, however, the data were not always adequate to use in the CSA to produce a biomass estimate; the estimates were only useful as an index of biomass and were never included in the regionwide biomass estimate. Holkham Bay continues to be part of the non-surveyed areas (Table \@ref(tab:harvestrec)).   
+
+## Non-Surveyed Areas {-}
+Information used to assess non-surveyed areas for the `r cur_yr`/`r fut_yr` commercial fishery recommendation includes the current CSA and historical harvest data, by statistical area, from fish tickets. The percentage of historical harvest that occurred within the surveyed areas from the 1974/1975 to 1984/1985 seasons was used to expand the harvestable surplus from the surveyed area to non-surveyed areas. Since 2015, when Port Frederick was removed from the survey, a historical harvest of 52.8% from surveyed areas is used; the remaining 47.2% of harvest is from the non-surveyed areas. Summing up the mature biomass estimates for the surveyed areas, and using this 52.8%/47.2% ratio, yields an adjusted legal biomass estimate of `r format(round((table2.7 %>% filter(Location == 'other.areas'))$adj.legal, 0), big.mark = ",")` lb for non-surveyed areas. Applying a 10.0% harvest rate (a percentage which is close to the average equilibrium harvest rate for all surveyed areas in combination) to this estimate provides a harvestable surplus of `r format((table2.7 %>% filter(Location == 'other.areas'))$Comm.GHL, big.mark = ",")` legal lb in the non-surveyed areas (Table \@ref(tab:harvestrec)).
+
+# `r cur_yr`/`r fut_yr` RKC FISHERY MANAGEMENT ACTIONS {-}
+TBD
+
+# FISHERY MANAGEMENT CONCERNS {-}
+TBD
+
+\newpage
+# TABLES AND FIGURES {-}
+```{r explain, include=FALSE, echo = FALSE, message = FALSE, warning=FALSE}
+#AGR: the beta below is out of date
+# Tables 1 and 5 are the same every year, bring into this word doc after knitting from word doc 'Tables RIR.docx"
+# CAS update Sept 2023: Tables 1 and 5 are now created here.
+
+# Table 4 is updated from excel sheet in 'Tables RIR.docx' and brought into this document after it's knit
+# CAS update Sept 2023: Table 4 is now created here but must be updated manually in the code chunk below
+
+# Tables 2 to 3, and 6 should be created here....look at .csv files in results/rkc/Region1
+
+# when bring in tables not created here add page numbers and header
+# CAS update Sept 2023: no longer necessary; all tables are created here.
+```
+
+\newpage
+
+```{r maxHR, tab.cap = paste("Option 1: maximum appropriate / risk neutral – model-based equilibrium harvest rates. This is a summary of", cur_yr,  "commercial red king crab fishery guideline harvest level (GHL) calculations (lb) for the seven surveyed areas and other areas. GHL values are calculated using legal male biomass. The risk neutral option is based on 2018 calculated equilibrium exploitation rates (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979–2018). Biomass estimates apply the mark-recapture adjustment to the CSA biomass output. Biomass of other areas was expanded using historical years (1974–1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use harvest for other areas is mean catch estimated from 2008–2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage."), echo=FALSE}
+#FLAG 25 - I found an error that I fixed manually. 441 needs to be in total GHL for BKC, just as it is in the commercial fishery GHL for BKC. I fixed this manually in 2025 (sorry to 2026 Alex...)
+df <- table2.7
+df <- df %>% 
+  mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
+  select(-Year, -Legal.HR) %>% 
+  filter(Location != "surveyed") %>% 
+  mutate(Location = case_when(
+    Location == "Pybus" ~ "Pybus Bay",
+    Location == "Gambier" ~ "Gambier Bay", 
+    Location == "Seymour" ~ "Seymour Canal",
+    Location == "Peril" ~ "Peril Strait", 
+    Location == "LynnSisters" ~ "Lynn Sisters", 
+    Location == "Excursion" ~ "Excursion Inlet",
+    Location == "bkc" ~ "BKC",
+    Location == "other.areas" ~ "Other areas",
+    Location == "surveyed" ~ "Surveyed",
+    Location == "total" ~ "Total",
+    .default = as.character(Location)
+  ))
+           
+names(df) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Equilibrium HR", 
+               "Total GHL", "PU harvest", paste0(cur_yr, " Commercial GHL(lb)"))
+
+#AGR add 9/6/24
+##we want Juneau to be the real selected value for HR, not the equilibrium.
+
+#knitr::kable((df), booktabs = T, caption = "Table 2")
+## FIX need to edit this to reflect decision on Juneau area
+ft <- flextable(df)
+#ft <- italic(ft, i = 4, part = "body")
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
+
+
+\newpage
+
+```{r riskadHR, tab.cap = paste("Option 2: risk adverse – high probability of mature male biomass increasing. This is a summary of", cur_yr, "commercial red king crab fishery guideline harvest level (GHL) calculations (lb) for the seven surveyed areas and other areas. GHL values are calculated using legal male biomass. The risk adverse option is based on 2018 calculated average harvest rates when the mature male biomass was increasing (Inc; K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979–2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historical years (1974–1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use (PU) harvest for other areas is mean catch estimated from 2008–2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage."), echo = FALSE, results = "asis"}
+#FLAG 25 - I found an error that I fixed manually. 441 needs to be in total GHL for BKC, just as it is in the commercial fishery GHL for BKC. I fixed this manually in 2025 (sorry to 2026 Alex...)
+df <- table3.6
+df2 <- df %>% 
+  mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
+  select(-Year, -Legal.HR) %>% 
+  filter(Location != "surveyed") %>% 
+  mutate(Location = case_when(
+    Location == "Pybus" ~ "Pybus Bay",
+    Location == "Gambier" ~ "Gambier Bay", 
+    Location == "Seymour" ~ "Seymour Canal",
+    Location == "Peril" ~ "Peril Strait", 
+    Location == "LynnSisters" ~ "Lynn Sisters", 
+    Location == "Excursion" ~ "Excursion Inlet",
+    Location == "bkc" ~ "BKC",
+    Location == "other.areas" ~ "Other areas",
+    Location == "surveyed" ~ "Surveyed",
+    Location == "total" ~ "Total",
+    .default = as.character(Location)))
+names(df2) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Avg Inc HR", 
+               "Total GHL", "PU harvest", paste0(cur_yr, " Commercial GHL(lb)"))
+#knitr::kable((df), booktabs = T, caption = "Table 2")
+ft <- flextable(df2)
+#ft <- italic(ft, i = 4, part = "body")
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
+
+
+\newpage
+
+```{r health5year, tab.cap = paste("Total stock health designations and associated scores for", cur_yr-4, "to", cur_yr, "by survey area."), results = "asis"}
+
+#AGR- NOTE, THIS ONE NEEDS MANUAL UPDATING, EVERY YEAR! Damn it-2025
+# pull the current year's health scores for the table. Can use previous years' health scores written out as strings below.
+pybus_healthscore <- sh_all %>% filter(location == "Pybus") %>% pull(score)
+gambier_healthscore <- sh_all %>% filter(location == "Gambier") %>% pull(score)
+seymour_healthscore <- sh_all %>% filter(location == "Seymour") %>% pull(score)
+peril_healthscore <- sh_all %>% filter(location == "Peril") %>% pull(score) #ARG un-hashtagged. Will need to turn off peril every other year
+juneau_healthscore <- sh_all %>% filter(location == "Juneau") %>% pull(score)
+lynnsisters_healthscore <- sh_all %>% filter(location == "LynnSisters") %>% pull(score)
+excursion_healthscore <- sh_all %>% filter(location == "Excursion") %>% pull(score)
+
+
+sur.area <- c("Pybus Bay", "Gambier Bay", "Seymour Canal", "Peril Strait", "Juneau Area", "Lynn Sisters", "Excursion Inlet")
+#y2019 <- c("Below Average (-3.75)", "Poor (-6.00)", "Poor (-5.00)", "Poor (-6.25)", "Below Average (-3.50)", "Moderate (0.50)", "Below Average (-2.75)")
+#y2020 <- c("Below Average (-2.50)", "Poor (-6.25)", "Below Average (-3.50)", "Below Average (-4.25)", "Moderate (-0.50)", "Moderate (1.50)", "Poor (-4.75)")
+y2021 <- c("Below Average (-4.00)", "Below Average (-2.75)", "Poor (-5.00)", "Below Average (-2.25)", "Above Average (3.50)", "Moderate (1.25)", "Poor (-5.00)")
+y2022 <- c("Below Average (-2.50)", "Moderate (0.75)", "Below Average (-4.00)", "Below Average (-2.75)", "Healthy (5.00)", "Moderate (1.00)", "Poor (-6.00)")
+y2023 <- c("Poor (-5.75)", "Moderate (1.25)", "Below Average (-3.00)", "Unsurveyed", "Healthy (7.75)", "Above Average (3.25)", "Poor (-5.75)")
+y2024 <- c("Poor (-5.25)", "Below Average (-2.75)", "Moderate (-0.5)", "Poor (-7)", "Healthy (4.5)", "Below Average (-2.5)", "Poor (-5.5)")
+#agr manually entered
+y2025 <- c(paste0(str_to_title(pybus_stockhealth), " (", pybus_healthscore, ")"), 
+           c(paste0(str_to_title(gambier_stockhealth), " (", gambier_healthscore, ")")), 
+           c(paste0(str_to_title(seymour_stockhealth), " (", seymour_healthscore, ")")), 
+           #c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")")), #years with peril survey
+           c(paste0(str_to_title(peril_stockhealth))), #years without peril survey
+           c(paste0(str_to_title(juneau_stockhealth), " (", juneau_healthscore, ")")), 
+           c(paste0(str_to_title(lynnsisters_stockhealth), " (", lynnsisters_healthscore, ")")),
+           c(paste0(str_to_title(excursion_stockhealth), " (", excursion_healthscore, ")")))
+
+tbl4 <- as.data.frame(cbind(sur.area, y2021, y2022, y2023, y2024, y2025))
+
+names(tbl4) <- c("Survey area", "2021", "2022", "2023", "2024", "2025")
+
+ft <- flextable(tbl4) %>%
+  fontsize(size = 7, part = "all")
+set_table_properties(ft, layout = "autofit")
+
+```
+
+\newpage
+
+```{r healthscores, tab.cap = "Stock health scores and their associated categories used for the previous (2006–2008) and current (since 2008) seasons. Scores are calculated in 0.25 increments.", results = "asis"}
+#THE SAME EVERY YEAR (TABLE 4)
+
+score <- c("-7.00 to -4.50", "-4.25 to -1.75", "-1.50 to 1.50", "1.75 to 4.25", "4.50 to 7.00")
+pre.cat <- c("Poor", "Poor", "Moderate", "Healthy", "Healthy")
+cur.cat <- c("Poor", "Below Average", "Moderate", "Above Average", "Healthy")
+
+tbl5 <- as.data.frame(cbind(score, pre.cat, cur.cat))
+
+names(tbl5) <- c("Score", "Previous Categories", "Current Categories")
+
+ft <- flextable(tbl5)
+set_table_properties(ft, layout = "autofit")
+
+```
+
+\newpage
+
+```{r bioadj, echo=FALSE, tab.cap = "Biomass adjustments based on the ratio of Chapman mark-recapture (M-R) estimates to catch-survey analysis (CSA) estimates of legal crab. Adjustments were calculated using CSA estimates for the year the M-R occurred. When a survey area has more than one year of M-R data, a weighted average of the adjustments is used. The ratio of legal to mature crab from the current year is used to scale the adjustment from biomass of legal crabs to biomass of mature crabs."}
+
+#THE SAME EVERY YEAR (TABLE 5)
+
+sur.ar <- c("Lynn Sisters", "Pybus Bay", "", "Gambier Bay", "", "Excursion Inlet", "", "Seymour Canal", "", "Peril Strait", "Port Frederick")
+mr.yr <- c("2009", "2010", "2014", "2010", "2017", "2010", "2016", "2011", "2015", "2011", "2011")
+csa.lb <- c("39,886", "80,807", "17,635", "42,104", "25,294", "20,066", "17,184", "6,387", "29,062", "19,023", "12,523")
+mr.lb <- c("69,674", "236,042", "67,220", "180,433", "84,394", "97,232", "12,501", "58,002", "267,233", "52,377", "53,436")
+adj <- c("1.75", "2.92", "3.81", "4.29", "3.34", "4.85", "0.73", "9.08", "9.20", "2.75", "4.27")
+wt.adj <- c("", "", "3.08", "", "3.93", "", "2.95", "", "9.17", "", "")
+
+tbl1 <- as.data.frame(cbind(sur.ar, mr.yr, csa.lb, mr.lb, adj, wt.adj))
+
+names(tbl1) <- c("Survey area", "M–R study year", "CSA lb", "M–R lb", "Adjustment", "Weighted avg. adjustment")
+
+ft <- flextable(tbl1)
+set_table_properties(ft, layout = "autofit")
+
+```
+
+\newpage
+
+```{r samplesizes, tab.cap = paste("Sample sizes for the", cur_yr, "survey by area."), results = "asis"}
+df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table7_raw_samp_', cur_yr,'.csv'))
+df2 <- df %>% 
+  select(-Year) %>%
+  mutate(recruit.class = case_when(
+    recruit.class == "Juvenile" ~ "Juvenile males",
+    recruit.class == "Small.Females" ~ "Small females",
+    recruit.class == "Large.Females" ~ "Large females",
+    recruit.class == "Pre_Recruit" ~ "Prerecruits",
+    recruit.class == "Recruit" ~ "Recruits",
+    recruit.class == "Post_Recruit" ~ "Postrecruits",
+    recruit.class == "effective_no_pots" ~ "Effective no. of pots"
+  ))
+
+names(df2) <- c(" ", "Excursion Inlet", "Gambier Bay", "Juneau", "Lynn Sisters", #add "Peril Strait" before Excursion in Peril survey years
+              "Pybus Bay", "Seymour Canal")
+#knitr::kable((df), booktabs = T, caption = "Table 2")
+ft <- flextable(df2)
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
+
+\newpage
+
+```{r harvestrec, tab.cap = paste("Commercial red king crab fishery guideline harvest level (GHL) calculations for", cur_yr, "(in pounds) for the surveyed areas and non-surveyed areas when applying recommended harvest rates to legal biomass. Biomass is adjusted with the mark-recapture experiment. Biomass of non-surveyed areas was expanded to be 47.2% of the region. Commercial GHL is reported in legal pounds."), results = "asis"}
+#AGR FLAG 25- adding BKC to the total GHL - added manually , FIX later!!
+#TABLE 7 
+# export in order to send a csv version of Table 7 to biologists/managers, since they need it for their announcement
+write_csv(tbl7_d, paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/SE_RKC_RIR_table_7_', cur_yr, '.csv'))
+
+
+tbl7_e <- tbl7_d %>%
+ dplyr::select(-c("Mature HR", "Total GHL (mature lb)", "PU harvest (mature lb)", "2026 Commercial GHL (mature lb)")) #updated the year to 2025, to 2026 in 2026
+
+
+ft <- flextable(tbl7_e) %>% 
+   colformat_double(j = c("Legal HR"), #"Mature HR",  also
+       digits = 2,
+      na_str = "")
+
+#ft <- italic(ft, i = 4, part = "body") %>% #italicize on odd years (when peril not surveyed)
+ # fontsize(size = 8)
+
+#AGR can I just get rid of the parts I dont want?
+
+
+set_table_properties(ft, layout = "autofit")
+
+```
+
+\newpage
+
+```{r harvestmanag, tab.cap = paste("The", cur_yr, "final management guideline harvest levels (GHLs; in pounds) and harvest rates for the commercial red king crab fishery by area. Mature and legal biomass is adjusted with the mark-recapture experiment. Biomass of non-surveyed areas was expanded to be 47.2% of the region. TK LEGAL HR FOR THE OTHER AREAS IS 0.15, SHOULD THIS BE 0.10??"), results = "asis"}
+
+#AGR this table was a specific request from last year, a "what if" we harvest a legal rate that would equal a mature HR of 0.10 for other areas (which turned out to be 0.15). This table is not a management recommendation. It also has no references nor context in the text, so add some of that if this is to be included again.
+
+#TABLE 8 
+#TK legal harvest rate is 0.15, should it be 0.10??
+#do I need to change this to be... based on table 2.6/3.6?? Check to make sure that it is please
+
+#ft_alt <- flextable(tbl7_d_alt) %>% 
+ #   colformat_double(j ="Legal HR", 
+  #     digits = 2,
+   #    na_str = "")
+#ft_alt <- italic(ft_alt, i = 4, part = "body") #maybe remove the italics on peril strait on years?
+#set_table_properties(ft_alt, layout = "autofit")
+```
+
+
+\newpage
+```{r distribution, fig.cap = "Map of Southeast Alaska (Registration Area A)."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture1.jpg'), dpi = 125)
+```
+
+```{r regionalbio, fig.cap = "Total biomass estimates (expanded regional estimates) of mature (gray points and line) and legal (black points and line) red king crab in Southeast Alaska using the 2025 assessment model. Estimates based on Catch-Survey Analysis (CSA) methodologies adjusted using mark-recapture study results (Table 1) then further expanded to include non-survey areas. Reference lines represent long-term (1995–2007) average of legal and mature biomass estimates.  Squares represent years without commercial harvest."}
+#refernce lines SHOULD be 1995-2007- check this please AGR
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr,'_edited.png'), dpi = 125)
+#AGR 25- will need a long term median - add that to figures2tables2. TODO
+#also change to odd-year tick marks on x axis please
+```
+
+```{r med1, fig.cap = "Total biomass estimates (expanded regional estimates) of legal (black points and line) red king crab in Southeast Alaska. Estimates based on Catch-Survey Analysis (CSA) methodologies adjusted using mark-recapture study results (Table 1) then further expanded to include non-survey areas. Squares represent years without commercial harvest. The long-term median and 50% of that median in the baseline years 1995-2007 is depicted as the horizontal orange dot-dash line and dotted line, respectively."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Expanded_biomass_with_1995_2007_median_simple', cur_yr,'_edited.png'), dpi = 125)
+
+```
+
+
+
+```{r distcur, fig.cap = "Current year's red king crab survey areas in Southeast Alaska. In 2015 Holkham Bay were removed as survey areas but is shown here for reference. Peril Strait was not surveyed in 2023 and is now on a biennial survey schedule."}
+
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/regional RKC survey areas.tif'), dpi=125) #was dpi = 125
+```
+
+```{r pybus2, fig.cap = "Pybus Bay CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_', cur_yr,'_2.png'), dpi = 125)
+```
+
+```{r pybus3, fig.cap = "Pybus Bay CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_', cur_yr,'_3.png'), dpi = 125)
+```
+
+```{r pybus4, fig.cap = "The Pybus Bay current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+
+```{r gambier2, fig.cap = "Gambier Bay CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_', cur_yr,'_2.png'), dpi = 125)
+```
+
+```{r gambier3, fig.cap = "Gambier Bay CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_', cur_yr,'_3.png'), dpi = 125)
+```
+
+```{r gambier4, fig.cap = "The Gambier Bay current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+
+```{r seymour2, fig.cap = "Seymour Canal CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_', cur_yr,'_2.png'), dpi = 125)
+```
+
+```{r seymour3, fig.cap = "Seymour Canal CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_', cur_yr,'_3.png'), dpi = 125)
+```
+
+```{r seymour4, fig.cap = "The Seymour Canal current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+
+```{r peril2, fig.cap = "Peril Strait CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. Peril Strait was not surveyed in 2023 because it has moved to a biennial survey schedule."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', cur_yr,'_2.png'), dpi = 125)
+#I'll need to add a graph here - run Peril for 2025 to get the grapg - it will be mising 2025 data but that's fine.
+```
+
+```{r peril3, fig.cap = "Peril Strait CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007). Peril Strait was not surveyed in 2023 because it has moved to a biennial survey schedule."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', cur_yr,'_3.png'), dpi = 125)
+```
+
+```{r peril4, fig.cap = "The Peril Strait current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+#knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_cpue_model_fit.png'), dpi = 125)
+#AGR added; turned off in 2025
+```
+
+```{r juneau2, fig.cap = "Juneau area CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_', cur_yr,'_2.png'), dpi = 125)
+```
+
+```{r juneau3, fig.cap = "Juneau area CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_', cur_yr,'_3.png'), dpi = 125)
+```
+
+```{r juneau4, fig.cap = "The Juneau area current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+
+```{r lynn2, fig.cap = "Lynn Sisters CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_', cur_yr,'_2.png'), dpi = 125)
+```
+
+```{r lynn3, fig.cap = "Lynn Sisters CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_', cur_yr,'_3.png'), dpi = 125)
+```
+
+```{r lynn4, fig.cap = "The Lynn Sisters current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+
+```{r excursion2, fig.cap = "Excursion Inlet CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_', cur_yr,'_2.png'), dpi = 125)
+```
+
+```{r excursion3, fig.cap = "Excursion Inlet CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_', cur_yr,'_3.png'), dpi = 125)
+```
+
+```{r excursion4, fig.cap = "The Excursion Inlet current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+
+
+```{r fredtemp, fig.cap = "Port Frederick CPUEs for male size/sex classes of red king crab. Reference lines represent long-term baselines for each parameter (1995–2007). Port Frederick was added back into the survey in 2025 with an alternating year schedule."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/Frederick_2025Fred_male_placeholder.png'), dpi = 125)
+```
+\newpage
+
+# (APPENDIX) Appendix A {-}
+
+
+## Tables {-}
+
+```{r longterm, tab.cap = paste("Comparisons of", cur_yr, "survey CPUE values to long-term averages by size/sex class and survey area. 1 = significantly above long-term average; 0 = not significantly different from long-term average; -1 = significantly below long-term average."), results = "asis"}
+
+#Table A1 (put that in manually)
+#turn off peril in non-peril years
+cur_yr<-2026
+
+files_lt <- c(paste0(here::here(), "/results/rkc/Pybus/", cur_yr, "/longterm.csv"), 
+                    paste0(here::here(), "/results/rkc/Gambier/", cur_yr, "/longterm.csv"), 
+                    paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/longterm.csv"), 
+                    paste0(here::here(), "/results/rkc/Juneau/", cur_yr, "/longterm.csv"), 
+                    paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/longterm.csv"),
+                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/longterm.csv")#,
+                    #paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/longterm.csv")
+              )
+
+lt_list <- files_lt %>%
+  map(read.csv) 
+names(lt_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion")# ,"Peril") #add peril in peril-survey years
+#type_change <- c("type", "change")
+
+#lt_list2 <- lapply(lt_list, "[", , type_change)
+lt_all <- do.call(rbind, Map(cbind.data.frame, Location = names(lt_list), lt_list))
+row.names(lt_all) <- NULL
+
+lt_2 <- lt_all %>%
+  select(Location, recruit.status, significant) %>%
+  mutate(recruit.status = case_when(
+    recruit.status == "Small.Female" ~ "Juvenile female",
+    recruit.status == "Large.Female" ~ "Mature female",
+    recruit.status == "Pre_Recruit" ~ "Prerecruit",
+    recruit.status == "Post_Recruit" ~ "Postrecruit",
+    recruit.status == "Juvenile" ~ "Juvenile male",
+    recruit.status == "Recruit" ~ "Recruit"
+  )) %>%
+  mutate(Location = case_when(
+    Location == "Pybus" ~ "Pybus Bay",
+    Location == "Gambier" ~ "Gambier Bay",
+    Location == "Seymour" ~ "Seymour Canal",
+    Location == "Peril" ~ "Peril Strait",
+    Location == "LynnSisters" ~ "Lynn Sisters",
+    Location == "Excursion" ~ "Excursion Inlet",
+    .default = as.character(Location)
+  )) %>%
+  #mutate(significant = case_when(
+    #significant == -1 ~ "Below long-term average",
+    #significant == 0 ~ "Not different from long-term average",
+    #significant == 1 ~ "Above long-term average"
+  #)) %>%
+  pivot_wider(names_from = recruit.status, values_from = significant)
+
+flextable(lt_2) -> ft
+
+set_table_properties(ft, layout = "autofit")
+
+```
+
+\newpage
+
+
+```{r shortterm, tab.cap = "Short-term trends in survey CPUE by size/sex class and survey area. 1 = significantly positive trend; 0 = no significant trend; -1 = significantly negative trend.", results = "asis"}
+
+files_st <- c(paste0(here::here(), "/results/rkc/Pybus/", cur_yr, "/shortterm.csv"), 
+                    paste0(here::here(), "/results/rkc/Gambier/", cur_yr, "/shortterm.csv"), 
+                    paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/shortterm.csv"), 
+                    paste0(here::here(), "/results/rkc/Juneau/", cur_yr, "/shortterm.csv"), 
+                    paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/shortterm.csv"),
+                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/shortterm.csv"))#,
+                   # paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/shortterm.csv")) #turn off peril in non-peril years
+
+st_list <- files_st %>%
+  map(read.csv) 
+names(st_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion")#, "Peril") #turn of peril in non-peril years
+
+st_all <- do.call(rbind, Map(cbind.data.frame, Location = names(st_list), st_list))
+row.names(st_all) <- NULL
+
+st_2 <- st_all %>%
+  filter(recruit.status != "Missing") %>%
+  select(Location, recruit.status, significant) %>%
+  mutate(recruit.status = case_when(
+    recruit.status == "Small.Females" ~ "Juvenile female",
+    recruit.status == "Large.Females" ~ "Mature female",
+    recruit.status == "Pre_Recruit" ~ "Prerecruit",
+    recruit.status == "Post_Recruit" ~ "Postrecruit",
+    recruit.status == "Juvenile" ~ "Juvenile male",
+    recruit.status == "Recruit" ~ "Recruit"
+  )) %>%
+  mutate(Location = case_when(
+    Location == "Pybus" ~ "Pybus Bay",
+    Location == "Gambier" ~ "Gambier Bay",
+    Location == "Seymour" ~ "Seymour Canal",
+    Location == "Peril" ~ "Peril Strait",
+    Location == "LynnSisters" ~ "Lynn Sisters",
+    Location == "Excursion" ~ "Excursion Inlet",
+    .default = as.character(Location)
+  )) %>%
+  #mutate(significant = case_when(
+    #significant == -1 ~ "Below long-term average",
+    #significant == 0 ~ "Not different from long-term average",
+    #significant == 1 ~ "Above long-term average"
+  #)) %>%
+  pivot_wider(names_from = recruit.status, values_from = significant) %>%
+  select(Location, `Juvenile male`, `Juvenile female`, `Mature female`, Prerecruit, Recruit, Postrecruit)
+
+flextable(st_2) -> ft
+
+set_table_properties(ft, layout = "autofit")
+
+```
+
+
+\newpage
+
+```{r regbiomass, tab.cap = paste("Regional biomass estimates of surveyed areas using", cur_yr, "mark-recapture CSA adjusted biomasses in areas where they are available."), echo = FALSE}
+
+
+df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/regional_biomass_', cur_yr,'.csv'))
+df %>% 
+  select(Year, adj_legal, adj_mature) -> df
+
+# this section of code only works if the two sections have equal numbers of rows - use in even years
+#df %>% filter(Year <= 2000) -> df1  
+#df %>% filter(Year > 2000) %>% 
+  #mutate(Year.cont = Year, 
+         #adj.Legal2 = adj_legal, adj.Mature2 = adj_mature) %>% 
+  #select(Year.cont, adj.Legal2, adj.Mature2) -> df2
+##df2[nrow(df2)+ 1, ] <- NA
+#df1 %>% 
+  #bind_cols(df2) %>% 
+  #mutate(Year = as.character(Year), 
+         #Year.cont = as.character(Year.cont)) -> df3
+#names(df3) <- c("Year", "Legal", "Mature", "Year(cont)", "Legal(cont)", "Mature(cont)")
+##knitr::kable((df), booktabs = T, caption = "Table 2")
+#flextable(df3) %>% 
+    #colformat_double(
+       #digits = 0,
+       #na_str = "na") -> ft
+##ft <- autofit(ft)
+##ft
+#set_table_properties(ft, layout = "autofit")
+
+names(df) <- c("Year", "Legal", "Mature")
+df1 <- df %>% 
+  mutate(Year = as.character(Year))
+ft <- flextable(df1) %>% 
+    colformat_double(
+       digits = 0,
+       na_str = "na")
+  
+set_table_properties(ft, layout = "autofit")
+
+```
+
+\newpage
+
+```{r areabiomass, tab.cap = paste("Biomass estimates (lb) for each survey area using", cur_yr, "mark-recapture CSA adjusted biomasses in areas where they are available."), results = "asis"}
+df <- read_csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/biomass_', cur_yr,'.csv')) %>%
+  select(Year, Location, adj.legal, adj.mature) %>%
+  mutate(Location = case_when(
+    Location == "LynnSisters" ~ "Lynn Sisters",
+    .default = as.character(Location)
+  ))
+  
+
+df_b <- df %>%
+  pivot_longer(cols = c(adj.legal, adj.mature), names_to = "Status", values_to = "biomass")
+
+df_c <- df_b %>%
+  pivot_wider(names_from = Location, values_from = biomass) %>%
+  mutate(Status = case_when(
+    Status == "adj.legal" ~ "Legal",
+    Status == "adj.mature" ~ "Mature"
+  )) %>%
+  mutate(Year = as.character(Year))
+
+tabA2_1 <- df_c %>% filter(Year < 1994)
+tabA2_2 <- df_c %>% filter(Year >= 1994 & Year < 2009)
+tabA2_3 <- df_c %>% filter(Year >= 2009)
+
+#df %>% 
+  #select(Year, Location, adj.legal, adj.mature) %>% 
+  #mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) -> df
+#df %>% filter(Location == "Pybus") %>%  
+  #mutate(pybus.legal = adj.legal, pybus.mature = adj.mature ) %>% 
+  #select(-Location, -adj.legal, -adj.mature) -> df1
+#names(df1) <- c("Year", "Pybus", "Legal", "Mature")
+#df %>% filter(Location == "Gambier") %>% 
+  #mutate(gambier.legal = adj.legal, gambier.mature = adj.mature ) %>% 
+  #select(-Location, -adj.legal, -adj.mature)-> df2
+#names(df2) <- c("Year", "Gambier", "Legal", "Mature")
+#df %>% filter(Location == "Seymour") %>% 
+  #mutate(seymour.legal = adj.legal, seymour.mature = adj.mature ) %>% 
+  #select(-Location, -adj.legal, -adj.mature)-> df3
+#names(df3) <- c("Year", "Seymour", "Legal", "Mature")
+#df %>% filter(Location == "Peril") %>% 
+  #mutate(peril.legal = adj.legal, peril.mature = adj.mature ) %>% 
+  #select(-Location, -adj.legal, -adj.mature)-> df4 
+#names(df4) <- c("Year", "Peril", "Legal", "Mature")
+#df %>% filter(Location == "Juneau") %>% 
+  #mutate(juneau.legal = adj.legal, juneau.mature = adj.mature ) %>% 
+  #select(-Location, -adj.legal, -adj.mature) -> df5
+#names(df5) <- c("Year", "Juneau", "Legal", "Mature")
+#df %>% filter(Location == "LynnSisters") %>% 
+  #mutate(lynn.legal = adj.legal, lynn.mature = adj.mature ) %>% 
+  #select(-Location, -adj.legal, -adj.mature) -> df6
+#names(df6) <- c("Year", "LynnSisters", "Legal", "Mature")
+#df %>% filter(Location == "Excursion") %>% 
+  #mutate(excursion.legal = adj.legal, excursion.mature = adj.mature ) %>% 
+  #select(-Location, -adj.legal, -adj.mature) -> df7
+#names(df7) <- c("Year", "Excursion", "Legal", "Mature")
+
+#df1 %>% 
+  #left_join(df2) %>% 
+  #left_join(df3) %>% 
+  #left_join(df4) %>% 
+  #mutate(Year = as.character(Year)) -> df_all1
+#df5 %>% 
+  #left_join(df6) %>% 
+  #left_join(df7) %>% 
+  #mutate(Year = as.character(Year)) -> df_all2 
+
+#knitr::kable((df), booktabs = T, caption = "Table 2")
+#flextable(df_all1) %>% 
+    #colformat_double(
+       #digits = 0,
+       #na_str = "na") %>% 
+  #fontsize(size = 7) %>% 
+  #fontsize(size = 7, part = "header") -> ft
+#ft <- autofit(ft)
+#ft
+
+ft <- flextable(tabA2_1) %>% 
+  colformat_double(
+       digits = 0,
+       na_str = "na") %>%
+  merge_v(j = "Year", target = "Year") %>%
+  valign(j = 1, valign = "top", part = "all") %>%
+  fontsize(size = 8)
+
+set_table_properties(ft, layout = "autofit")
+
+
+```
+
+
+```{r areabiomass2, tab.cap = paste("Biomass estimates (lb) for each survey area using", cur_yr, "mark-recapture CSA adjusted biomasses in areas where they are available, continued."), results = "asis"}
+#flextable(df_all2) %>% 
+    #colformat_double(
+       #digits = 0,
+       #na_str = "na") %>% 
+  #fontsize(size = 7) %>% 
+  #fontsize(size = 7, part = "header")-> ft2
+
+#set_table_properties(ft2, layout = "autofit")
+
+ft <- flextable(tabA2_2) %>% 
+  colformat_double(
+       digits = 0,
+       na_str = "na") %>%
+  merge_v(j = "Year", target = "Year") %>%
+  valign(j = 1, valign = "top", part = "all") %>%
+  fontsize(size = 8)
+
+set_table_properties(ft, layout = "autofit")
+
+``` 
+
+
+```{r areabiomass3, tab.cap = paste("Biomass estimates (lb) for each survey area using", cur_yr, "mark-recapture CSA adjusted biomasses in areas where they are available, continued."), results = "asis"}
+#flextable(df_all2) %>% 
+    #colformat_double(
+       #digits = 0,
+       #na_str = "na") %>% 
+  #fontsize(size = 7) %>% 
+  #fontsize(size = 7, part = "header")-> ft2
+
+#set_table_properties(ft2, layout = "autofit")
+
+ft <- flextable(tabA2_3) %>% 
+  colformat_double(
+       digits = 0,
+       na_str = "na") %>%
+  merge_v(j = "Year", target = "Year") %>%
+  valign(j = 1, valign = "top", part = "all") %>%
+  fontsize(size = 8)
+
+set_table_properties(ft, layout = "autofit")
+
+``` 
+
+
+```{r curyrregbio, tab.cap = paste(cur_yr, "regional CSA and mark-recapture adjusted biomass values."), results = "asis"}
+df_tabA3_a <- tableA3
+df_tabA3_b <- df_tabA3_a %>% 
+  select(-Year) %>%
+  mutate(Location = case_when(
+    Location == "Pybus" ~ "Pybus Bay",
+    Location == "Gambier" ~ "Gambier Bay",
+    Location == "Seymour" ~ "Seymour Canal",
+    Location == "Peril" ~ "Peril Strait",
+    Location == "LynnSisters" ~ "Lynn Sisters",
+    Location == "Excursion" ~ "Excursion Inlet",
+    Location == "bkc" ~ "BKC",
+    Location == "other.areas" ~ "Other areas",
+    Location == "surveyed" ~ "Surveyed",
+    Location == "total" ~ "Total",
+    .default = as.character(Location)
+  ))
+
+names(df_tabA3_b) <- c("Survey area", "Legal biomass (CSA)", "Mature biomass (CSA)", 
+               "MR adjustment", "Legal biomass (adj)", "Mature biomass (adj)")
+
+flextable(df_tabA3_b) -> ft #%>% 
+    #colformat_double(
+    #   digits = 0,
+    #   na_str = "na")
+    
+#ft <- autofit(ft)
+#ft
+set_table_properties(ft, layout = "autofit")
+```
+
+
+\newpage
+
+```{r regpu, tab.cap = "Regional personal use permit reported harvests by survey area, 2018 to present, in numbers of crab. Note that a separate permit is required for 11-A (Juneau), and thus most Juneau harvests are recorded under the 11-A permit and not represented here.", echo = FALSE}
+
+survey.area.order <- c("Pybus Bay", "Gambier Bay", "Seymour Canal", "Peril Strait", "Juneau", "Lynn Sisters", "Excursion Inlet", "Other")
+
+regpu1 <- regpu %>%
+  pivot_wider(names_from = survey.area, values_from = total_crab)
+
+regpu_tab <- regpu %>%
+  filter(crab_year < cur_yr) %>%
+  mutate(`Harvest year` = as.character(crab_year), `Survey area` =  factor(survey.area, levels = survey.area.order)) %>%
+  select(`Harvest year`, `Survey area`, total_crab) %>%
+  pivot_wider(names_from = `Survey area`, values_from = total_crab) %>%
+  mutate(
+    across(everything(), ~replace_na(.x, 0))
+  ) %>%
+  select(`Harvest year`, `Pybus Bay`, `Gambier Bay`, `Seymour Canal`, `Peril Strait`, `Juneau`, `Lynn Sisters`, `Excursion Inlet`, `Other`)
+
+ft <- flextable(regpu_tab) %>%
+  add_header_row(top = TRUE, values = c("", "Number of crab harvested"), colwidths = c(1, 8)) %>%
+  align(i = 1, j = NULL, align = "left", part = "header") %>%
+  vline(j = 1)
+set_table_properties(ft, layout = "autofit")
+```
+
+\newpage
+
+# References {-}
+Robson D. S., and H. A. Regier. 1964. Sample Size in Petersen Mark-Recapture Experiments. Transactions of the American Fisheries Society 93 (3): 215-226.
+
+Palof K. 2018. WIP RKC harvest rate determination memorandum Sept. 2018.
+
+Palof, K., and J. Stratman. 2020. 2019 Southeast Alaska red king crab stock assessment and management plan for the 2019/2020 season. Alaska Department of Fish and Game, Regional Information Report No. 1J20-09, Douglas.
+
+Siddon, C., J. Bednarski, G. Bishop. 2009. Southeast Alaska Tanner crab 2006 stock assessment and recommendations for the 2007 commercial fishery. Alaska Department of Fish and Game, Fishery Data Series No. 09-18, Douglas.
+
+Stratman, J., A. Messmer, K. Wood, T. Bergmann, and K. Palof. 2019. Operational plan: Southeast Alaska red king crab pot survey, 2018-2022. Alaska Department of Fish and Game, Regional Operational Plan ROP.CF.1J.2019.02, Douglas.
