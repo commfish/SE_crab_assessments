@@ -4,6 +4,10 @@ Southeast Alaska crab assessments; red king crab and Tanner crab currently using
 
 Both Southeast Alaska species have annual pot surveys that results in a weighted stratified CPUE estimate of 3 length bins.  These are used in a catch-survey-analysis (CSA) model to estimate biomass of mature and legal male crab for each survey area.
 
+## Best practices/ tips and tricks
+1. If the code gives weird and unexpected errors, close R and re-open the project. It could be a package conflict.
+
+
 ## How to run the RKC assessment - Juneau area
 
 The Juneau area is run first and has its own deadline, and own memo.
@@ -75,6 +79,14 @@ then...
 
 6. Some edits will need to be made to the functions.R file to make the axes marks relevant to the current year. I change the min for the tick marks back and forth between 1994 and 1995 - automate this perhaps...
 TK
+
+7. Run code/rkc_code/figures2_tables2.R. This sets up the summary for the text document
+
+8. Copy and paste pryr_draft-RIR.Rmd most recent version from last year (in the text folder) over to the current year. Rename for the current year. Update year and knit. Edit through the text as necessary, re-knit. Send to team for review. Revisions, then send out to biologists.
+- note- add in the Peril stuff in Peril years (ctrl F "Peril") - see code bloc 4
+- update the year where relevant
+
+9. Update last years powerpoint and present at the meeting. The meeting should be at least 2 weeks from the receipt of the data.
 
 ## Tanner Assessment
 

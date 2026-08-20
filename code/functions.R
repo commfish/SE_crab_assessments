@@ -310,7 +310,7 @@ write_csv(stock_health, paste0('results/rkc/', area, '/', year, '/stock_health.c
 
 
 ## CONF panel figure ---------------
-panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
+panel_figure <- function(survey.location, cur_yr, base.location, option, scale){ #TK - add in automation to the evenyr/oddyr workflow
   #survey.location = "Juneau"
   #cur_yr=2026
   #base.location="Juneau"
@@ -475,8 +475,10 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
-    geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), 
-                alpha = 0.2) +
+    #geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), 
+     #           alpha = 0.2) +
+    geom_ribbon(aes(ymin = pmax(0, mean - 1.96*se), ymax = mean + 1.96*se), 
+                alpha = 0.2) + #confidence interval with a floor
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
     #              width =.4) +
     geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", #agr note here
@@ -707,7 +709,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale){
       ylab("Biomass (lb)") + 
       xlab("Year") +
       theme(plot.title = element_text(hjust =0.5)) + 
-      scale_x_continuous(breaks = seq(min(1995),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
+      scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
       scale_y_continuous(labels = comma, 
                          limits = c(0,max(biomass_graph$pounds, 
                                           na.rm = TRUE) + 25000),
@@ -1017,8 +1019,10 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     ylab("CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #changed from min(1995) so my graphs will end at 2024 - ar
-    geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), 
-                alpha = 0.2) +
+    #geom_ribbon(aes(ymin = mean - 1.96*se, ymax = mean + 1.96*se), 
+     #           alpha = 0.2) +
+    geom_ribbon(aes(ymin = pmax(0, mean - 1.96*se), ymax = mean + 1.96*se), 
+                alpha = 0.2) + #confidence interval with a floor
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
     #              width =.4) +
     geom_hline(yintercept = baseline2$Pre_Recruit, color = "#E69F00", #agr note here

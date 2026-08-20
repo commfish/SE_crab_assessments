@@ -1,20 +1,20 @@
 # K.Palof - now A.Reich runs this
 # alex.reich@alaska.gov
-# 08/03/2018 / 9-4-19 / 8-30-20/ 8-29-21 / 7-26-22 / 8-23-2023/ 8-20-24 AGR/ 8-15-25 AGR
+# 08/03/2018 / 9-4-19 / 8-30-20/ 8-29-21 / 7-26-22 / 8-23-2023/ 8-20-24 AGR/ 8-15-25 AGR/ 8-20-26 AGR
 
 # notes ----
 # This script is a work in progress to develop figures like those currently used to view the 
 #     stock health of crab species in Southeast.  Previous figures were in SigmaPlot. 
 #     Figure 2 is regional biomass from CSA estimate - use current year's model
 
-cur_yr <- 2025
+cur_yr <- 2026
 
 # load -----
 source('./code/functions.R')
 dir.create(file.path(paste0('results/rkc/Region1'), cur_yr))
 
 # data -----
-cur_yr <- 2025
+cur_yr <- 2026
 pry_yr <- cur_yr-1
 mr_adjust <- read.csv('./data/rkc/adj_final_stock_assessment.csv') 
 fishery.status <- read.csv('./data/rkc/Juneau/hind_fore_cast_JNU_current.csv') # has fishery status
@@ -76,7 +76,7 @@ regional.b %>%
   select(-status) %>% 
   spread(key = Year, value = pounds) %>% 
   # Update annually ###
-  mutate(change = 100*(`2025`-`2024`)/`2024`) -> change # report these values in stock health doc #UPDATE #'s each year??
+  mutate(change = 100*(`2026`-`2025`)/`2025`) -> change # report these values in stock health doc #UPDATE #'s each year??
 write.csv(change, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_regional_biomass_', cur_yr, '.csv'), 
           row.names = FALSE)
 # these values go in regional overview section, other values from last years forecast
@@ -87,7 +87,7 @@ biomass %>%
   select(-harvest, -weighted_ADJ) %>% 
   gather(type, pounds, legal.biomass:adj.mature, factor_key = TRUE) %>% 
   spread(key = Year, value = pounds) %>% 
-  mutate(change = 100*(`2025`-`2024`)/`2024`) -> change2 #update annually AGR
+  mutate(change = 100*(`2026`-`2025`)/`2025`) -> change2 #update annually AGR
 write.csv(change2, paste0('./results/rkc/Region1/', cur_yr, '/change_in_modeled_area_biomasses_', cur_yr, '.csv'))
 #
 
@@ -400,10 +400,11 @@ med1 <- fig2_expand_mr_regional_biomass_edited +
 med2 <- fig2_expand_mr_regional_biomass_edited +
   geom_hline(yintercept=median_all, color="purple", linetype = "dotdash", size=1) +
   geom_hline(yintercept=half_med_all, color="purple", linetype = "dotted", size=1) +
-  labs(title = "Median 1977-2024")
+  labs(title = "Median 1977-2025") #TK automate year
 
 ggsave(med1, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1995_2007_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
-ggsave(med2, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1977_2024_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
+ggsave(med2, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1977_2025_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5) #TK automate year
+#AGR TK what did we decide in 2025 about medians
 
 ##a cleaner median graph AGR 25
 fig_median_simple <- regional.b.expand %>% 
