@@ -624,7 +624,7 @@ set_table_properties(ft, layout = "autofit")
 
 ```{r health5year, tab.cap = paste("Total stock health designations and associated scores for", cur_yr-4, "to", cur_yr, "by survey area."), results = "asis"}
 
-#AGR- NOTE, THIS ONE NEEDS MANUAL UPDATING, EVERY YEAR! Damn it-2025
+#AGR- NOTE, THIS ONE NEEDS MANUAL UPDATING, EVERY YEAR! Damn it-2025 - AGR 2026- NEeds update TK
 # pull the current year's health scores for the table. Can use previous years' health scores written out as strings below.
 pybus_healthscore <- sh_all %>% filter(location == "Pybus") %>% pull(score)
 gambier_healthscore <- sh_all %>% filter(location == "Gambier") %>% pull(score)
@@ -638,7 +638,7 @@ excursion_healthscore <- sh_all %>% filter(location == "Excursion") %>% pull(sco
 sur.area <- c("Pybus Bay", "Gambier Bay", "Seymour Canal", "Peril Strait", "Juneau Area", "Lynn Sisters", "Excursion Inlet")
 #y2019 <- c("Below Average (-3.75)", "Poor (-6.00)", "Poor (-5.00)", "Poor (-6.25)", "Below Average (-3.50)", "Moderate (0.50)", "Below Average (-2.75)")
 #y2020 <- c("Below Average (-2.50)", "Poor (-6.25)", "Below Average (-3.50)", "Below Average (-4.25)", "Moderate (-0.50)", "Moderate (1.50)", "Poor (-4.75)")
-y2021 <- c("Below Average (-4.00)", "Below Average (-2.75)", "Poor (-5.00)", "Below Average (-2.25)", "Above Average (3.50)", "Moderate (1.25)", "Poor (-5.00)")
+y2021 <- c("Below Average (-4.00)", "Below Average (-2.75)", "Poor (-5.00)", "Below Average (-2.25)", "Above Average (3.50)", "Moderate (1.25)", "Poor (-5.00)") #agr 2026 off
 y2022 <- c("Below Average (-2.50)", "Moderate (0.75)", "Below Average (-4.00)", "Below Average (-2.75)", "Healthy (5.00)", "Moderate (1.00)", "Poor (-6.00)")
 y2023 <- c("Poor (-5.75)", "Moderate (1.25)", "Below Average (-3.00)", "Unsurveyed", "Healthy (7.75)", "Above Average (3.25)", "Poor (-5.75)")
 y2024 <- c("Poor (-5.25)", "Below Average (-2.75)", "Moderate (-0.5)", "Poor (-7)", "Healthy (4.5)", "Below Average (-2.5)", "Poor (-5.5)")
