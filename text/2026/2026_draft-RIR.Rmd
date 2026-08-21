@@ -569,7 +569,7 @@ names(df) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Eq
                "Total GHL", "PU harvest", paste0(cur_yr, " Commercial GHL(lb)"))
 
 #AGR add 2026 - adds BKC numbers where they need to be
-df[8,4] <- df[8,7]
+df[8,5] <- df[8,7]
 
 #AGR add 9/6/24
 ##we want Juneau to be the real selected value for HR, not the equilibrium.
@@ -607,6 +607,11 @@ df2 <- df %>%
     .default = as.character(Location)))
 names(df2) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Avg Inc HR", 
                "Total GHL", "PU harvest", paste0(cur_yr, " Commercial GHL(lb)"))
+
+#AGR add 2026 - adds BKC numbers where they need to be
+df2[8,5] <- df2[8,7]
+
+
 #knitr::kable((df), booktabs = T, caption = "Table 2")
 ft <- flextable(df2)
 #ft <- italic(ft, i = 4, part = "body")
@@ -643,8 +648,8 @@ y2025 <- c("Poor (-7)", "Moderate (-1.25)", "Moderate (0.5)", "Unsurveyed", "Hea
 y2026 <- c(paste0(str_to_title(pybus_stockhealth), " (", pybus_healthscore, ")"), 
            c(paste0(str_to_title(gambier_stockhealth), " (", gambier_healthscore, ")")), 
            c(paste0(str_to_title(seymour_stockhealth), " (", seymour_healthscore, ")")), 
-           #c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")")), #years with peril survey
-           c(paste0(str_to_title(peril_stockhealth))), #years without peril survey
+           c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")")), #years with peril survey - CHAGNE EVERY YEAR
+           #c(paste0(str_to_title(peril_stockhealth))), #years without peril survey
            c(paste0(str_to_title(juneau_stockhealth), " (", juneau_healthscore, ")")), 
            c(paste0(str_to_title(lynnsisters_stockhealth), " (", lynnsisters_healthscore, ")")),
            c(paste0(str_to_title(excursion_stockhealth), " (", excursion_healthscore, ")")))
@@ -702,6 +707,8 @@ set_table_properties(ft, layout = "autofit")
 \newpage
 
 ```{r samplesizes, tab.cap = paste("Sample sizes for the", cur_yr, "survey by area."), results = "asis"}
+#table 6 yearly edit - change Between Fred and Peril depeding on the year
+
 df <- read.csv(paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/Table7_raw_samp_', cur_yr,'.csv'))
 df2 <- df %>% 
   select(-Year) %>%
@@ -715,7 +722,7 @@ df2 <- df %>%
     recruit.class == "effective_no_pots" ~ "Effective no. of pots"
   ))
 
-names(df2) <- c(" ", "Excursion Inlet", "Gambier Bay", "Juneau", "Lynn Sisters", #add "Peril Strait" before Excursion in Peril survey years
+names(df2) <- c(" ", "Peril Strait", "Excursion Inlet", "Gambier Bay", "Juneau", "Lynn Sisters", #add "Peril Strait" before Excursion in Peril survey years
               "Pybus Bay", "Seymour Canal")
 #knitr::kable((df), booktabs = T, caption = "Table 2")
 ft <- flextable(df2)
@@ -730,22 +737,49 @@ set_table_properties(ft, layout = "autofit")
 #AGR FLAG 25- adding BKC to the total GHL - added manually , FIX later!!
 #TABLE 7 
 # export in order to send a csv version of Table 7 to biologists/managers, since they need it for their announcement
-write_csv(tbl7_d, paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/SE_RKC_RIR_table_7_', cur_yr, '.csv'))
+write_csv(tbl7_d, paste0(here::here(),'/results/rkc/Region1/', cur_yr, '/SE_RKC_RIR_table_7_FOR_BIOLOGISTS', cur_yr, '.csv')) #AGR 2026- I'll do this after the RIR
 
 
 tbl7_e <- tbl7_d %>%
  dplyr::select(-c("Mature HR", "Total GHL (mature lb)", "PU harvest (mature lb)", "2026 Commercial GHL (mature lb)")) #updated the year to 2025, to 2026 in 2026
 
+tbl7_e <- tbl7_e %>% #wrangling so I can add the TBD's
+  dplyr::mutate(
+    `Total GHL (legal lb)` = scales::comma(`Total GHL (legal lb)`, accuracy = 1),
+    `2026 Commercial GHL (legal lb)` = scales::comma(`2026 Commercial GHL (legal lb)`, accuracy = 1)
+  )
+
+##AGR add 2026- add in the "TBDs"
+tbl7_e[2,4] <- "TBD" #gambier
+tbl7_e[3,4] <- "TBD" #seymour
+tbl7_e[6,4] <- "TBD" #lynn
+
+tbl7_e[2,5] <- "TBD" #gambier
+tbl7_e[3,5] <- "TBD" #seymour
+tbl7_e[6,5] <- "TBD" #lynn
+
+tbl7_e[8,5] <- "TBD" #BKC, depends on totals
+
+tbl7_e[10,5] <- "TBD" #total GHL legal
+
+tbl7_e[2,7] <- "TBD" #gambier
+tbl7_e[3,7] <- "TBD" #seymour
+tbl7_e[6,7] <- "TBD" #lynn
+tbl7_e[8,7] <- "TBD" #BKC, depends on totals
+tbl7_e[10,7] <- "TBD" #total GHL comm legal
+
+#ft <- align(ft, j = c("Total GHL (legal lb)", "2026 Commercial GHL (legal lb)"), align = "right", part = "all") #algin fix from adding the TBD's
 
 ft <- flextable(tbl7_e) %>% 
    colformat_double(j = c("Legal HR"), #"Mature HR",  also
        digits = 2,
       na_str = "")
 
+
 #ft <- italic(ft, i = 4, part = "body") %>% #italicize on odd years (when peril not surveyed)
  # fontsize(size = 8)
 
-#AGR can I just get rid of the parts I dont want?
+##AGR aDD 2026 - add in the TBD's so we can leave this an open-ended table for the biologists
 
 
 set_table_properties(ft, layout = "autofit")
@@ -909,13 +943,13 @@ files_lt <- c(paste0(here::here(), "/results/rkc/Pybus/", cur_yr, "/longterm.csv
                     paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/longterm.csv"), 
                     paste0(here::here(), "/results/rkc/Juneau/", cur_yr, "/longterm.csv"), 
                     paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/longterm.csv"),
-                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/longterm.csv")#,
-                    #paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/longterm.csv")
+                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/longterm.csv"),
+                    paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/longterm.csv")
               )
 
 lt_list <- files_lt %>%
   map(read.csv) 
-names(lt_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion")# ,"Peril") #add peril in peril-survey years
+names(lt_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion","Peril") #add peril in peril-survey years
 #type_change <- c("type", "change")
 
 #lt_list2 <- lapply(lt_list, "[", , type_change)
@@ -964,12 +998,12 @@ files_st <- c(paste0(here::here(), "/results/rkc/Pybus/", cur_yr, "/shortterm.cs
                     paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/shortterm.csv"), 
                     paste0(here::here(), "/results/rkc/Juneau/", cur_yr, "/shortterm.csv"), 
                     paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/shortterm.csv"),
-                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/shortterm.csv"))#,
-                   # paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/shortterm.csv")) #turn off peril in non-peril years
+                    paste0(here::here(), "/results/rkc/Excursion/", cur_yr, "/shortterm.csv"),
+                    paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/shortterm.csv")) #turn off peril in non-peril years
 
 st_list <- files_st %>%
   map(read.csv) 
-names(st_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion")#, "Peril") #turn of peril in non-peril years
+names(st_list) <- c("Pybus", "Gambier", "Seymour", "Juneau", "LynnSisters", "Excursion", "Peril") #turn of peril in non-peril years
 
 st_all <- do.call(rbind, Map(cbind.data.frame, Location = names(st_list), st_list))
 row.names(st_all) <- NULL

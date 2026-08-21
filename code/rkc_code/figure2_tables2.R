@@ -715,7 +715,7 @@ files <- c(paste0(here::here(),"/results/rkc/Pybus/", cur_yr, "/raw_sample.csv")
            paste0(here::here(), "/results/rkc/Gambier/", cur_yr, "/raw_sample.csv"), 
            paste0(here::here(), "/results/rkc/Juneau/", cur_yr, "/raw_sample.csv"), 
            paste0(here::here(), "/results/rkc/LynnSisters/", cur_yr, "/raw_sample.csv"), 
-          # paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/raw_sample.csv"), #off in no peril years???
+           paste0(here::here(), "/results/rkc/Peril/", cur_yr, "/raw_sample.csv"), #EVERY YEAR-  turn peril off or on depening on if sampled that year
            paste0(here::here(), "/results/rkc/Seymour/", cur_yr, "/raw_sample.csv"))
 
 #files <- files[2:7] #AGR here!
