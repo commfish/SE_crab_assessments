@@ -127,17 +127,19 @@ survey.locations <- c("Pybus", "Excursion", "Gambier", "Juneau",
 # input mature harvest rates. These are determined from stock health & the previous year's results.
 # the Juneau harvest rate should be the one decided upon in the Juneau assessment meeting in July.
 #AGR I did not update in 2024 because not relevant, we use legal hr
+##AGR likely obsolete below -2026
 pybus_hr <- 0
 gambier_hr <- 0
 seymour_hr <- 0
 peril_hr <- 0
-juneau_hr <- 0.10 #updated 2025 UPDATE EACH YEAR!!
+juneau_hr <- 0.09 #updated 2026 UPDATE EACH YEAR!!
 lynnsisters_hr <- 0
 excursion_hr <- 0
 bkc_hr_display <- 0
 other_hr <- 0.10
 total_hr <- NA
 
+#UPDATE THE BELOW CHUNK EACH YEAR
 # input legal harvest rates. These are determined from stock health & the previous year's results.
 # the Juneau harvest rate should be the one decided upon in the Juneau assessment meeting in July.
 #AGR 2025- FLAG - take a look and update manually...#AGR 2026- update manually - TK FLAG!!
@@ -145,7 +147,7 @@ pybus_hr_leg <- 0 #agr updated to legal stock harvest rates 2024
 gambier_hr_leg <- 0.04
 seymour_hr_leg <- 0.1 #debated 0.05 but went with 0.10
 peril_hr_leg <- 0
-juneau_hr_leg <- 0.10 #2025 number UPDATE EACH YEAR
+juneau_hr_leg <- 0.09 #2025 number UPDATE EACH YEAR
 lynnsisters_hr_leg <- 0.09
 excursion_hr_leg <- 0
 bkc_hr_display_leg <- 0
@@ -280,14 +282,15 @@ excursion_stockhealth <- sh_all %>% filter(location == "Excursion") %>% pull(hea
 # pounds and numbers of crab targeted in the Juneau summer personal use fishery
 
 # input the Juneau mature harvest rate (decided upon in the Juneau assessment meeting in July)
-juneau_hr <- 0.10 #updated AGR #CRAP, is this # wrong? since the legal rate is 0.10, the mature rate will be lower
+#probs obsolete below- AGR 2026
+juneau_hr <- 0.09 #updated AGR #CRAP, is this # wrong? since the legal rate is 0.10, the mature rate will be lower
 ##this # might not be used tho, so pay attention. FLAG!!
 
 # input the Juneau legal harvest rate
-juneau_hr_legal <- 0.10 #updated AGR
+juneau_hr_legal <- 0.09 #UPDATE EACH YEAR - updated 2026
 
 # summer PU proportion of the GHL (= 0.5; winter PU is 0.1 and commercial is 0.4)
-sum.pu.prop <- 0.5 #AGR ok this seems like it will stay the same
+sum.pu.prop <- 0.5 #Same each year
 
 # get legal weight for conversion to numbers
 leg.wt <- read.csv(paste0(here::here(),'/results/rkc/Juneau/', cur_yr, '/maleweights.csv')) %>% #this gets auto-created by everything I did for the Juneau memo
@@ -307,8 +310,6 @@ lbs.leg.pu <- tbl7_d_alt %>%
   pull(pu.harvest)
 
 num.leg.pu <- lbs.leg.pu / leg.wt
-
-#AGR TK fixing immediately above - Ok I just copy-pasted where relevant below.
 
 # Commercial GHL in legal pounds- AGR this isnt right TK
 
@@ -361,14 +362,6 @@ avg_change_mature <- regch_all %>%
 
 avg_change_legal_sign <- ifelse(avg_change_legal > 0, "increased", "declined")
 avg_change_mature_sign <- ifelse(avg_change_mature > 0, "increased", "declined")
-
-# *************************************************************************************
-# Stock status by survey area ---- NOTE THIS SECTION IS INCOMPLETE - under development
-
-# legal and mature biomass estimated by 2023 model compared to 2022 model estimates
-
-
-gambier_lmb <- read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay 2026_adj HR_USE_updatedPU.xls"), sheet = "summary_use") #AGR changed 2023 to 2024. oh ok it's under development. changed 2024 to 2025. Updated to 2026 in 2026
 
 
 
@@ -552,7 +545,7 @@ TBD
 \newpage
 
 ```{r maxHR, tab.cap = paste("Option 1: maximum appropriate / risk neutral – model-based equilibrium harvest rates. This is a summary of", cur_yr,  "commercial red king crab fishery guideline harvest level (GHL) calculations (lb) for the seven surveyed areas and other areas. GHL values are calculated using legal male biomass. The risk neutral option is based on 2018 calculated equilibrium exploitation rates (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979–2018). Biomass estimates apply the mark-recapture adjustment to the CSA biomass output. Biomass of other areas was expanded using historical years (1974–1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use harvest for other areas is mean catch estimated from 2008–2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage."), echo=FALSE}
-#FLAG 25 - I found an error that I fixed manually. 441 needs to be in total GHL for BKC, just as it is in the commercial fishery GHL for BKC. I fixed this manually in 2025 (sorry to 2026 Alex...)
+
 df <- table2.7
 df <- df %>% 
   mutate(adj.legal = round(adj.legal, 0), adj.mature = round(adj.mature, 0)) %>% 
@@ -574,6 +567,9 @@ df <- df %>%
            
 names(df) <- c("Survey area", "Legal biomass (adj)", "Mature biomass (adj)", "Equilibrium HR", 
                "Total GHL", "PU harvest", paste0(cur_yr, " Commercial GHL(lb)"))
+
+#AGR add 2026 - adds BKC numbers where they need to be
+df[8,4] <- df[8,7]
 
 #AGR add 9/6/24
 ##we want Juneau to be the real selected value for HR, not the equilibrium.
@@ -638,12 +634,13 @@ excursion_healthscore <- sh_all %>% filter(location == "Excursion") %>% pull(sco
 sur.area <- c("Pybus Bay", "Gambier Bay", "Seymour Canal", "Peril Strait", "Juneau Area", "Lynn Sisters", "Excursion Inlet")
 #y2019 <- c("Below Average (-3.75)", "Poor (-6.00)", "Poor (-5.00)", "Poor (-6.25)", "Below Average (-3.50)", "Moderate (0.50)", "Below Average (-2.75)")
 #y2020 <- c("Below Average (-2.50)", "Poor (-6.25)", "Below Average (-3.50)", "Below Average (-4.25)", "Moderate (-0.50)", "Moderate (1.50)", "Poor (-4.75)")
-y2021 <- c("Below Average (-4.00)", "Below Average (-2.75)", "Poor (-5.00)", "Below Average (-2.25)", "Above Average (3.50)", "Moderate (1.25)", "Poor (-5.00)") #agr 2026 off
+#y2021 <- c("Below Average (-4.00)", "Below Average (-2.75)", "Poor (-5.00)", "Below Average (-2.25)", "Above Average (3.50)", "Moderate (1.25)", "Poor (-5.00)") #agr 2026 off
 y2022 <- c("Below Average (-2.50)", "Moderate (0.75)", "Below Average (-4.00)", "Below Average (-2.75)", "Healthy (5.00)", "Moderate (1.00)", "Poor (-6.00)")
 y2023 <- c("Poor (-5.75)", "Moderate (1.25)", "Below Average (-3.00)", "Unsurveyed", "Healthy (7.75)", "Above Average (3.25)", "Poor (-5.75)")
 y2024 <- c("Poor (-5.25)", "Below Average (-2.75)", "Moderate (-0.5)", "Poor (-7)", "Healthy (4.5)", "Below Average (-2.5)", "Poor (-5.5)")
+y2025 <- c("Poor (-7)", "Moderate (-1.25)", "Moderate (0.5)", "Unsurveyed", "Healthy (5.5)", "Moderate (-1.25)", "Poor (-6.25)")
 #agr manually entered
-y2025 <- c(paste0(str_to_title(pybus_stockhealth), " (", pybus_healthscore, ")"), 
+y2026 <- c(paste0(str_to_title(pybus_stockhealth), " (", pybus_healthscore, ")"), 
            c(paste0(str_to_title(gambier_stockhealth), " (", gambier_healthscore, ")")), 
            c(paste0(str_to_title(seymour_stockhealth), " (", seymour_healthscore, ")")), 
            #c(paste0(str_to_title(peril_stockhealth), " (", peril_healthscore, ")")), #years with peril survey
@@ -652,9 +649,9 @@ y2025 <- c(paste0(str_to_title(pybus_stockhealth), " (", pybus_healthscore, ")")
            c(paste0(str_to_title(lynnsisters_stockhealth), " (", lynnsisters_healthscore, ")")),
            c(paste0(str_to_title(excursion_stockhealth), " (", excursion_healthscore, ")")))
 
-tbl4 <- as.data.frame(cbind(sur.area, y2021, y2022, y2023, y2024, y2025))
+tbl4 <- as.data.frame(cbind(sur.area, y2022, y2023, y2024, y2025, y2026))
 
-names(tbl4) <- c("Survey area", "2021", "2022", "2023", "2024", "2025")
+names(tbl4) <- c("Survey area", "2022", "2023", "2024", "2025" , "2026")
 
 ft <- flextable(tbl4) %>%
   fontsize(size = 7, part = "all")

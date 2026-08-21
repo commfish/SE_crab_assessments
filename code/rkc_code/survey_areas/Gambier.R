@@ -49,7 +49,7 @@ sapply(dat, unique)
 # remove pots with Pot condition code that's not "normal" or 1 
 unique(dat$Pot.Condition)
 dat %>%
-  filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed") -> dat1
+  filter(Pot.Condition == "Normal"|Pot.Condition == "Not observed"|Pot.No==14) -> dat1 #AGR TK band aid to include 2026 pot 14, which had an open bait jar but the biologists wanted to inclide because they thought it fished normally/caught crab....
 
 dat1 %>%
   filter(Recruit.Status == "", Length.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
