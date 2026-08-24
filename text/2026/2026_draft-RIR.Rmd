@@ -376,7 +376,7 @@ FYI: *information is not completed yet; this is a draft of the RIR for both rese
   - The Juneau area (Section 11-A) has `r juneau_stockhealth` stock health; Lynn Sisters and Seymour Canal have `r lynnsisters_stockhealth` stock health; Gambier Bay and Peril Strait have `r gambier_stockhealth`; Excursion Inlet and Pybus Bay have `r excursion_stockhealth` stock health. Stock health considers all age/sex classes of the population (mature males, juveniles, and females).
   - The legal biomass estimates from `r pr_yr` increased in Gambier Bay, Juneau Area, and Seymour Canal. The by-area mature biomass estimates are either near or below the `r pr_yr` estimates. The trends seen in the Juneau 2026 memo look to be consistent across most of the survey areas: aging postrecruits males without prerecruits or juvenile males to replace them. Due to the high number of postrecruit male RKC, the biomass estimates are high, but the biomass looks like it will fall after the current postrecruit age cohort is removed from the population.
   - The regional legal biomass estimate is above the long-term median (Figure 3).
-  - Tables 1, 2, and 7 can be consulted when setting the commercial GHL.
+  - Tables 1, 2, and 7 can be consulted when setting the commercial GHL. We recommend setting harvest rates less than or equal to those of last year. These results suggest the data would support a GHL above 200,000 lb, should managers choose to open the full commercial fishery.
 
 
 
@@ -455,7 +455,10 @@ The RKC and BKC commercial fishery and personal use fishery outside of Section 1
 
 # SURVEY AREA STOCK STATUS AND HARVEST RATE RECOMMENDATION {-}
 
+The overall impression is most of the areas with consistent RKC survey catch (Juneau, Seymour, Gambier, and possibly Lynn Sisters) experienced a recruitment pulse, as reflected in the high CPUEs of male recruit and postrecruit RKC. However, the low CPUES of juvenile males, juvenile females, and prerecruit males indicate that once this cohort has been fished, it will not be replaced in similar numbers. This pattern is also suggested by the length composition figures (\@ref(fig:ridgesJNU) - \@ref(fig:ridgesLS)). We recommend setting harvest rates at or below 2025 levels in order to provide the opportunity fish the current pulse of large male RKC over multiple years.
+
 ## STOCK STATUS BY SURVEY AREA {-}
+
 Significance in long-term or short-term trends is defined as a p-value <0.05. Long-term trends compare the current year’s mean to the long-term baseline value (1995–2007); short-term trends regress the last four years of survey data to determine if a significant increasing or decreasing trend is present. Estimates of legal and mature mark-recapture biomass (adj.legal / adj.mature) for the entire biomass time series for each area were added to the legal biomass graphs, along with their associated long-term baseline (1995–2007; solid black line for legal and grey dotted line for mature) estimates (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). Raw sample sizes for each area are reported in Table \@ref(tab:samplesizes). Graphs for each area reflect biomass estimates from the `r cur_yr` CSA model.
 
 ## Pybus Bay (`r pybus_stockhealth`) {-}
@@ -472,9 +475,7 @@ Indicators of female stock health were good, as seen by the low proportion of po
 Legal biomass increased 50% and mature biomass decreased 1% from the `r pr_yr` model estimate, reflecting the low prerecruit CPUE. The legal adjusted biomass estimate is near the baseline, and the mature adjusted biomass estimate is below the baseline. 
 The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`% above and the legal biomass is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`%  below the baseline values. 
 
-
 ## Seymour Canal (`r seymour_stockhealth`) {-}
-
 The overall stock health for Seymour Canal remained at `r seymour_stockhealth` (Table \@ref(tab:health5year); Figures \@ref(fig:seymour2), \@ref(fig:seymour3), and \@ref(fig:seymour4)) in 2025. Recruit and postrecruit mature males CPUEs are above their long-term averages, which jubenile male and prerecruit CPUEs are below their long-term averages (Table A1). 
 Recruit and postrecruit male CPUEs have significant short-term increasing trends (Table A2). 
 Indicators of female stock health were good, with a high mean clutch size and low percentage of poor clutches.
@@ -520,6 +521,7 @@ Holkham Bay was removed as a survey area in 2015 due to budget constraints. The 
 
 ## Non-Surveyed Areas {-}
 Information used to assess non-surveyed areas for the `r cur_yr`/`r fut_yr` commercial fishery recommendation includes the current CSA and historical harvest data, by statistical area, from fish tickets. The percentage of historical harvest that occurred within the surveyed areas from the 1974/1975 to 1984/1985 seasons was used to expand the harvestable surplus from the surveyed area to non-surveyed areas. Since 2015, when Port Frederick was removed from the survey, a historical harvest of 52.8% from surveyed areas is used; the remaining 47.2% of harvest is from the non-surveyed areas. Summing up the mature biomass estimates for the surveyed areas, and using this 52.8%/47.2% ratio, yields an adjusted legal biomass estimate of `r format(round((table2.7 %>% filter(Location == 'other.areas'))$adj.legal, 0), big.mark = ",")` lb for non-surveyed areas. Applying a 10.0% harvest rate (a percentage which is close to the average equilibrium harvest rate for all surveyed areas in combination) to this estimate provides a harvestable surplus of `r format((table2.7 %>% filter(Location == 'other.areas'))$Comm.GHL, big.mark = ",")` legal lb in the non-surveyed areas (Table \@ref(tab:harvestrec)).
+
 
 # `r cur_yr`/`r fut_yr` RKC FISHERY MANAGEMENT ACTIONS {-}
 TBD
@@ -933,6 +935,25 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/Frederick_2025Fre
 ## Figures {-}
 ```{r statextra, fig.cap = "Stat areas near the Juneau Area and Lynn Sisters. In 2026, commercial catch from stat areas 115-14 (Outer St. James) and 115-13 (Postage Stamp) were discussed in their relevancy to the adjacent survey areas (Lynn Sisters and the Juneau Area, respectively)."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/stat_areas_contentious.png'), dpi = 125)
+
+```
+```{r ridgesJNU, fig.cap = "Length density composition for the Juneau Area by year. This figure is not scaled to biomass between years."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Juneau.png'), dpi = 125)
+
+```
+
+```{r ridgesGB,  fig.cap = "Length density composition for Gambier Bay by year. This figure is not scaled to biomass between years."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Gambier_Bay.png'), dpi = 125)
+
+```
+
+```{r ridgesSC,  fig.cap = "Length density composition for Seymour Canal by year. This figure is not scaled to biomass between years."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Seymour_Canal.png'), dpi = 125)
+
+```
+
+```{r ridges LS,  fig.cap = "Length density composition for Lynn Sisters by year. This figure is not scaled to biomass between years."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Lynn_Sisters.png'), dpi = 125)
 
 ```
 
