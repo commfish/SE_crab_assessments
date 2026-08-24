@@ -436,9 +436,9 @@ The resulting GHL for option 2 is **`r format((table3.6 %>% filter(Location == '
 
 ## 2026 SPECIFIC STOCK ASSESSMENT COMMENTS {-}
 
-The Southeast RKC commercial fishery opened in 2025, necessitating the inclusion of commercial catch in the 2026 CSA. While Lynn Sisters was closed to commercial fishing in 2025, crab from the Lynn Sisters population are thought to exit the bay and are caught in stat area 115-14 (Figure TK ADD STAT AREAS!!). Thus, commercial harvest stat area 115-14 was included in the Lynn Sisters CSA. There is a similar situation for the Juneau Area. Stat area 115-13 had a substantial commercial catch in 2026 and it is thought that crab from the Juneau Area move in and out of 115-13. However, 115-13 was not included in the Juneau Area CSA catch due to the noise TK it adds to the analysis. Adding in 115-13 to the Juneau area commercial catch would skew the 60%/40% personal use to commercial catch ratio AND TK??. In preliminary explorations, including 115-13 in the Juneau Area CSA catch increased the Juneau Area GHL by about 500 lb in 2026.
+The Southeast RKC commercial fishery opened in 2025, necessitating the inclusion of commercial catch in the 2026 CSA. While Lynn Sisters was closed to commercial fishing in 2025, crab from the Lynn Sisters population are thought to exit the bay and are caught in stat area 115-14 (REF STAT AREA FIGURE TK!!). Thus, commercial harvest stat area 115-14 was included in the Lynn Sisters CSA. The Juneau Area presents an analogous situation. Stat area 115-13 had a substantial commercial catch in 2026 and crab from the Juneau Area are thought to move in and out of 115-13. However, 115-13 was not included in the Juneau Area CSA due to the added complexity of the Juneau Area management. 115-13 falls outside the survey area used to set the Juneau Area GHL and isn't otherwise factored into that GHL calculation. It would also skew the 60%/40% personal-use-to-commercial-catch ratio underlying the GHL. In preliminary explorations, including 115-13 in the Juneau Area CSA catch increased the Juneau Area GHL by about 500 lb in 2026.
 
-Additionally of note is the Seymour Canal CSA. REVISIT AFTER TALKING TO KATIE. The model underestimates the quantity of RKC in Seymour Canal such that it thinks the 2026 catch was impossible and the high postrecruit CPUE unlikely (Figure 13). In order to achieve realistic results for the Seymour Canal CSA, I divided the 2026 commercial catch by the adjustment factor. As a result, please note that there is more uncertainty in the Seymour Canal CSA than for the other areas CSAs. Seymour Canal has a significant mark-recapture adjustment factor (TABLE REF TK) in this analysis that has a large impact on the final biomass numbers. The RTMB model that I am developing may reduce this dependency, but we should consider an additional mark-recapture survey in Seymour Canal to reduce our dependency on historical data and have the most up to date mark-recapture numbers.
+Additionally of note is the Seymour Canal CSA. The survey does an inconsistent job of representatively sampling RKC in Seymour Canal, and the Seymour CSA model historically underestimates the biomass, an issue that is corrected via a mark-recapture adjustment factor (Figure \@ref(fig:seymour2), Table \@ref(tab:bioadj)). In order to achieve realistic results for the 2026 Seymour Canal CSA, I divided the 2026 commercial catch by the adjustment factor for the model input. As a result, please note that there are more uncertainty in the Seymour Canal 2026 biomass estimates than in other years. The RTMB model that I am developing may reduce the mark-recapture adjustment dependency going forward, but we should consider an additional mark-recapture survey in Seymour Canal to reduce our reliance on historical data and have more up-to-date mark-recapture numbers.
 
 
 ## STOCK ASSESSMENT CONCERNS AND RECOMMENDATIONS {-}
@@ -489,7 +489,7 @@ In 2026, the stock status for Peril Strait was `r peril_stockhealth` (Table \@re
 
 In 2026, the mature biomass estimate was `r abs(round((baseline_rel %>% filter(Location == 'Peril'))$pct.adj.cur, 0))`% and the legal biomass estimate was `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Peril'))$pct.adj.cur, 0))`% below the baseline value. Due to recent concerns about the Peril Strait stock status, no harvestable surplus is recommended for the `r cur_yr`/`r fut_yr` season (Table \@ref(tab:harvestrec)). 
 
-## Juneau (`r juneau_stockhealth`) {-} TK ADD LENGTHS FIG?
+## Juneau (`r juneau_stockhealth`) {-}
 The stock status for the Juneau area is at `r juneau_stockhealth` status in 2026 (Table \@ref(tab:health5year); Figures \@ref(fig:juneau2), and \@ref(fig:juneau3)). 
 Recruit and postrecruit males CPUEs are significantly above their long-term averages; all other size and sex classes are are not significantly different from the long-term averages (Table \@ref(tab:longterm)). There is a significant short-term increasing trends in postrecruit male CPUEs, and a significant short-term decreasing trend in juvenile male and juvenile female CPUEs (Table \@ref(tab:shortterm)). 
 When compared to the `r pr_yr` model estimate, legal biomass increased 16%, while mature biomass 0.1%. 
@@ -929,6 +929,12 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/Frederick_2025Fre
 \newpage
 
 # (APPENDIX) Appendix A {-}
+
+## Figures {-}
+```{r statextra, fig.cap = "Stat areas near the Juneau Area and Lynn Sisters. In 2026, commercial catch from stat areas 115-14 (Outer St. James) and 115-13 (Postage Stamp) were discussed in their relevancy to the adjacent survey areas (Lynn Sisters and the Juneau Area, respectively)."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/stat_areas_contentious.png'), dpi = 125)
+
+```
 
 
 ## Tables {-}

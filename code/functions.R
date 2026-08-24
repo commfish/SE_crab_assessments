@@ -1577,7 +1577,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale) 
     scale_fill_manual(name = "", values = c("black", "gray100")) +
     scale_colour_manual(name = "", values = c("grey1", "black")) +
     scale_shape_manual(name = "", values = c(21, 21)) +
-    ylim(0, 100) +
+    coord_cartesian(ylim = c(0, 100)) + #ylim(0, 100) +
     ylab("Percentage") +
     xlab(NULL) +
     theme(plot.title = element_text(hjust = 0.5)) +
@@ -2014,7 +2014,7 @@ panel_figure_NC <- function(survey.location, cur_yr, base.location, option, scal
     scale_fill_manual(name = "", values = c("black", "gray100")) +
     scale_colour_manual(name = "", values = c("grey1", "black")) +
     scale_shape_manual(name = "", values = c(21, 21)) +
-    ylim(0, 100) +
+    coord_cartesian(ylim = c(0, 100)) + #ylim(0, 100) +
     ylab("Percentage") +
     xlab(NULL) +
     theme(plot.title = element_text(hjust = 0.5)) +
