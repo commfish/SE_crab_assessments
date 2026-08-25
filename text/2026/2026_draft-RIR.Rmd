@@ -467,17 +467,17 @@ Gambier Bay stock health dropped to `r gambier_stockhealth` status (Table \@ref(
 Pre-recruit and recruit male biomass and CPUEs are trending up for this population in recent years, even after the 2025 fishery (Figure \@ref(fig:gambier4)). However, the CPUEs of prerecruits and juveniles have dropped in 2026.
 Indicators of female stock health were good, as seen by the low proportion of poor clutches and high clutch fullness.
 Legal biomass increased 50% and mature biomass decreased 1% from the `r pr_yr` model estimate, reflecting the low prerecruit CPUE. The legal adjusted biomass estimate is near the baseline, and the mature adjusted biomass estimate is below the baseline. 
-The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`% above and the legal biomass is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`%  below the baseline values. 
+The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`% below and the legal biomass is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`%  below the baseline values. 
 
 The 2025 legal harvest rate in Gambier Bay was 0.08, a realized rate of 0.05.
 
 ## Seymour Canal (`r seymour_stockhealth`) {-}
-The overall stock health for Seymour Canal remained at `r seymour_stockhealth` (Table \@ref(tab:health5year); Figures \@ref(fig:seymour2), \@ref(fig:seymour3), and \@ref(fig:seymour4)) in 2025. Recruit and postrecruit mature males CPUEs are above their long-term averages, while juvenile male and prerecruit CPUEs are below their long-term averages (Table A1). 
+The overall stock health for Seymour Canal remained at `r seymour_stockhealth` (Table \@ref(tab:health5year); Figures \@ref(fig:seymour2), \@ref(fig:seymour3), and \@ref(fig:seymour4)) in `r cur_yr`. Recruit and postrecruit mature males CPUEs are above their long-term averages, while juvenile male and prerecruit CPUEs are below their long-term averages (Table A1). 
 Recruit and postrecruit male CPUEs have significant short-term increasing trends (Table A2). 
 Indicators of female stock health were good, with a high mean clutch size and low percentage of poor clutches.
 
 Estimated legal biomass increased 31% and mature biomass increased 6% from the `r pr_yr` model estimates.
-The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0))`% below and the legal biomass estimate is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0))`% below the baseline value.   
+The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0))`% above and the legal biomass estimate is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0))`% above the baseline value.   
 
 Undersampling during the survey has historically been a concern in Seymour Canal. The Seymour Canal model has extra uncertainty in 2026; see the above 2026 model run discussion. The biomass estimates are near the baseline values, an improvement from prior years.
 
