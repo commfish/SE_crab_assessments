@@ -811,11 +811,11 @@ set_table_properties(ft, layout = "autofit")
 
 
 \newpage
-```{r distribution, fig.cap = "Map of Southeast Alaska (Registration Area A)."}
+```{r distribution, fig.cap = "Map of Southeast Alaska (Registration Area A) commercial fishery boundaries."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture1.jpg'), dpi = 125)
 ```
 
-```{r regionalbio, fig.cap = "Total biomass estimates (expanded regional estimates) of mature (gray points and line) and legal (black points and line) red king crab in Southeast Alaska using the 2025 assessment model. Estimates based on Catch-Survey Analysis (CSA) methodologies adjusted using mark-recapture study results (Table 1) then further expanded to include non-survey areas. Reference lines represent long-term (1995–2007) average of legal and mature biomass estimates.  Squares represent years without commercial harvest."}
+```{r regionalbio, fig.cap = "Southeast Alaska red king crab total biomass estiamtes (expanded regional estimates) of mature male (gray points and grey dashed line) and legal male (black points and black solid line). The gray dashed and black solid horizontal reference lines represent the long-term baselines for mature and legal biomasses, respectively."}
 #refernce lines SHOULD be 1995-2007- check this please AGR
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr,'_edited.png'), dpi = 125)
 #AGR 25- will need a long term median - add that to figures2tables2. TODO
@@ -829,16 +829,16 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Expanded_
 
 
 
-```{r distcur, fig.cap = "Current year's red king crab survey areas in Southeast Alaska. In 2015 Holkham Bay were removed as survey areas but is shown here for reference. Peril Strait was not surveyed in 2023 and is now on a biennial survey schedule."}
+```{r distcur, fig.cap = "Southeast Alaska (Registration Area A) survey areas for red king crab."}
 
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/regional RKC survey areas.tif'), dpi=125) #was dpi = 125
 ```
 
-```{r pybus2, fig.cap = "Pybus Bay CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+```{r pybus2, fig.cap = "Pybus Bay CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_', cur_yr,'_2.png'), dpi = 125)
 ```
 
-```{r pybus3, fig.cap = "Pybus Bay CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+```{r pybus3, fig.cap = "Pybus Bay CPUEs for mature and juvenile female and juvenile male size/sex classes of red king crab (top panel), and clutch fullness and proportion of poor clutches (bottom panel). The horizontal reference lines in the top panel represent long-term baselines for each size/sex class."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_', cur_yr,'_3.png'), dpi = 125)
 ```
 
@@ -847,11 +847,11 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_cpu
 #AGR added
 ```
 
-```{r gambier2, fig.cap = "Gambier Bay CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+```{r gambier2, fig.cap = "Gambier Bay CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_', cur_yr,'_2.png'), dpi = 125)
 ```
 
-```{r gambier3, fig.cap = "Gambier Bay CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+```{r gambier3, fig.cap = "Gambier Bay CPUEs for mature and juvenile female and juvenile male size/sex classes of red king crab (top panel), and clutch fullness and proportion of poor clutches (bottom panel). The horizontal reference lines in the top panel represent long-term baselines for each size/sex class."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_', cur_yr,'_3.png'), dpi = 125)
 ```
 
@@ -860,11 +860,11 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_c
 #AGR added
 ```
 
-```{r seymour2, fig.cap = "Seymour Canal CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+```{r seymour2, fig.cap = "Seymour Canal CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_', cur_yr,'_2.png'), dpi = 125)
 ```
 
-```{r seymour3, fig.cap = "Seymour Canal CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+```{r seymour3, fig.cap = "Seymour Canal CPUEs for mature and juvenile female and juvenile male size/sex classes of red king crab (top panel), and clutch fullness and proportion of poor clutches (bottom panel). The horizontal reference lines in the top panel represent long-term baselines for each size/sex class."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_', cur_yr,'_3.png'), dpi = 125)
 ```
 
@@ -873,25 +873,25 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_c
 #AGR added
 ```
 
-```{r peril2, fig.cap = "Peril Strait CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass. Peril Strait was not surveyed in 2023 because it has moved to a biennial survey schedule."}
+```{r peril2, fig.cap = "Peril Strait CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', cur_yr,'_2.png'), dpi = 125)
 #I'll need to add a graph here - run Peril for 2025 to get the grapg - it will be mising 2025 data but that's fine.
 ```
 
-```{r peril3, fig.cap = "Peril Strait CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007). Peril Strait was not surveyed in 2023 because it has moved to a biennial survey schedule."}
+```{r peril3, fig.cap = "Peril Strait CPUEs for mature and juvenile female and juvenile male size/sex classes of red king crab (top panel), and clutch fullness and proportion of poor clutches (bottom panel). The horizontal reference lines in the top panel represent long-term baselines for each size/sex class."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', cur_yr,'_3.png'), dpi = 125)
 ```
 
 ```{r peril4, fig.cap = "The Peril Strait current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-#knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_cpue_model_fit.png'), dpi = 125)
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_cpue_model_fit.png'), dpi = 125)
 #AGR added; turned off in 2025
 ```
 
-```{r juneau2, fig.cap = "Juneau Area CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model, and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+```{r juneau2, fig.cap = "Juneau Area CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_', cur_yr,'_2.png'), dpi = 125)
 ```
 
-```{r juneau3, fig.cap = "Juneau Area CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+```{r juneau3, fig.cap = "Juneau Area CPUEs for mature and juvenile female and juvenile male size/sex classes of red king crab (top panel), and clutch fullness and proportion of poor clutches (bottom panel). The horizontal reference lines in the top panel represent long-term baselines for each size/sex class."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_', cur_yr,'_3.png'), dpi = 125)
 ```
 
@@ -900,11 +900,11 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_cp
 #AGR added
 ```
 
-```{r lynn2, fig.cap = "Lynn Sisters CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+```{r lynn2, fig.cap = "Lynn Sisters CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_', cur_yr,'_2.png'), dpi = 125)
 ```
 
-```{r lynn3, fig.cap = "Lynn Sisters CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+```{r lynn3, fig.cap = "Lynn Sisters CPUEs for mature and juvenile female and juvenile male size/sex classes of red king crab (top panel), and clutch fullness and proportion of poor clutches (bottom panel). The horizontal reference lines in the top panel represent long-term baselines for each size/sex class."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_', cur_yr,'_3.png'), dpi = 125)
 ```
 
@@ -913,11 +913,11 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSiste
 #AGR added
 ```
 
-```{r excursion2, fig.cap = "Excursion Inlet CPUEs for male size/sex classes of red king crab, biomass estimates from the current year’s CSA model and harvest data. Reference lines represent long-term baselines for each parameter (1995–2007). Gray dotted reference line in the biomass figure represents the long-term baseline for mature biomass, while the solid black refers to the legal biomass."}
+```{r excursion2, fig.cap = "Excursion Inlet CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_', cur_yr,'_2.png'), dpi = 125)
 ```
 
-```{r excursion3, fig.cap = "Excursion Inlet CPUEs for female and juvenile male size/sex classes of red king crab, clutch fullness, and proportion of poor clutches. Reference lines represent long-term baselines for each parameter (1995–2007)."}
+```{r excursion3, fig.cap = "Excursion Inlet CPUEs for mature and juvenile female and juvenile male size/sex classes of red king crab (top panel), and clutch fullness and proportion of poor clutches (bottom panel). The horizontal reference lines in the top panel represent long-term baselines for each size/sex class."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_', cur_yr,'_3.png'), dpi = 125)
 ```
 
@@ -927,7 +927,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion
 ```
 
 
-```{r fredtemp, fig.cap = "Port Frederick CPUEs for male size/sex classes of red king crab. Reference lines represent long-term baselines for each parameter (1995–2007). Port Frederick was added back into the survey in 2025 with an alternating year schedule."}
+```{r fredtemp, fig.cap = "Port Frederick CPUEs for male size/sex classes of red king crab. Reference lines represent long-term baselines for each parameter. Port Frederick was added back into the survey in 2025 with an alternating year schedule."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/2025/Frederick_2025Fred_male_placeholder.png'), dpi = 125)
 ```
 \newpage
