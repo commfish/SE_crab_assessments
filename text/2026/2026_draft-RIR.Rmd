@@ -453,13 +453,11 @@ The RKC and BKC commercial fishery and personal use fishery outside of Section 1
 
 # SURVEY AREA STOCK STATUS AND HARVEST RATE RECOMMENDATION {-}
 
-AGR HERE TK
-
-The overall impression is most of the areas with consistent RKC survey catch (Juneau, Seymour, Gambier, and possibly Lynn Sisters) experienced a recruitment pulse, as reflected in the high CPUEs of male recruit and postrecruit RKC. However, the low CPUES of juvenile males, juvenile females, and prerecruit males indicate that once this cohort has been fished, it will not be replaced in similar numbers. This pattern is also suggested by the length composition figures (\@ref(fig:ridgesJNU) - \@ref(fig:ridgesLS)). We recommend setting harvest rates at or below 2025 levels in order to provide the opportunity fish the current pulse of large male RKC over multiple years.
+Most of the areas with consistent RKC survey catch (Juneau, Seymour, Gambier, and possibly Lynn Sisters) experienced a recruitment pulse, as reflected in the high CPUEs of male recruit and postrecruit RKC. However, the low CPUES of juvenile males, juvenile females, and prerecruit males indicate that once this cohort has been fished, it will not be replaced in similar numbers. This pattern is also suggested by the length composition figures (\@ref(fig:ridgesJNU) - \@ref(fig:ridgesLS)). We recommend setting harvest rates at or below TK 2025 levels in order to provide the opportunity fish the current pulse of large male RKC over multiple years.
 
 ## STOCK STATUS BY SURVEY AREA {-}
 
-Significance in long-term or short-term trends is defined as a p-value <0.05. Long-term trends compare the current year’s mean to the long-term baseline value (1995–2007); short-term trends regress the last four years of survey data to determine if a significant increasing or decreasing trend is present. Estimates of legal and mature mark-recapture biomass (adj.legal / adj.mature) for the entire biomass time series for each area were added to the legal biomass graphs, along with their associated long-term baseline (1995–2007; solid black line for legal and grey dotted line for mature) estimates (Figures \@ref(fig:pybus2) – \@ref(fig:excursion3)). Raw sample sizes for each area are reported in Table \@ref(tab:samplesizes). Graphs for each area reflect biomass estimates from the `r cur_yr` CSA model.
+Significance in long-term or short-term trends is defined as a p-value <0.05. Long-term trends compare the current year’s mean to the long-term baseline value (1995–2007); short-term trends regress the last four years of survey data to determine if a significant increasing or decreasing trend is present. Estimates of legal and mature mark-recapture biomass (adjusted legal/adjusted mature) for the entire biomass time series for each area, along with their associated long-term baseline (1995–2007; solid black line for legal and grey dotted line for mature) estimates can be viewed in Figures \@ref(fig:pybus2) – \@ref(fig:excursion3). Graphs for each area reflect biomass estimates from the `r cur_yr` CSA model.
 
 ## Pybus Bay (`r pybus_stockhealth`) {-}
 Pybus Bay stock health remained at `r pybus_stockhealth` status (Table \@ref(tab:health5year); Figures \@ref(fig:pybus2) and \@ref(fig:pybus3)). All size/sex class CPUEs are significantly below their long-term averages (Table A1). 
@@ -469,11 +467,14 @@ The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location ==
 Due to the aforementioned concerns and the low level of the stock biomass in Pybus Bay, no harvest is recommended for the `r cur_yr`/`r fut_yr` season (Table \@ref(tab:harvestrec)).
 
 ## Gambier Bay (`r gambier_stockhealth`) {-}
-Gambier Bay stock health dropped to `r gambier_stockhealth` status (Table \@ref(tab:health5year); Figures \@ref(fig:gambier2) and \@ref(fig:gambier3)). Prerecruit, postrecruit, and juvenile male CPUEs are significantly below their long-term averages (Table A1). Juvenile and mature females and recruit males are not significantly different from their long-term averages. There are significant short-term increasing trends in recruit male and mature female CPUEs and decreasing trends in juvenile male and female CPUEs (Table A2). 
+Gambier Bay stock health dropped to `r gambier_stockhealth` status (Table \@ref(tab:health5year); Figures \@ref(fig:gambier2) and \@ref(fig:gambier3)). Prerecruit, postrecruit, and juvenile male CPUEs are significantly below their long-term averages (Table A1). Juvenile and mature females and recruit males are not significantly different from their long-term averages. There are significant short-term increasing trends in recruit male and mature female CPUEs and decreasing trends in juvenile male and female CPUEs (Table A2).
+
 Pre-recruit and recruit male biomass and CPUEs are trending up for this population in recent years, even after the 2025 fishery (Figure \@ref(fig:gambier4)). However, the CPUEs of prerecruts and juveniles have dropped in 2026.
 Indicators of female stock health were good, as seen by the low proportion of poor clutches and high clutch fullness.
 Legal biomass increased 50% and mature biomass decreased 1% from the `r pr_yr` model estimate, reflecting the low prerecruit CPUE. The legal adjusted biomass estimate is near the baseline, and the mature adjusted biomass estimate is below the baseline. 
 The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`% above and the legal biomass is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`%  below the baseline values. 
+
+The 2025 legal harvest rate in Gambier Bay was 0.08, a realized rate of 0.05.
 
 ## Seymour Canal (`r seymour_stockhealth`) {-}
 The overall stock health for Seymour Canal remained at `r seymour_stockhealth` (Table \@ref(tab:health5year); Figures \@ref(fig:seymour2), \@ref(fig:seymour3), and \@ref(fig:seymour4)) in 2025. Recruit and postrecruit mature males CPUEs are above their long-term averages, which jubenile male and prerecruit CPUEs are below their long-term averages (Table A1). 
@@ -484,6 +485,8 @@ Estimated legal biomass increased 31% and mature biomass increased 6% from the `
 The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0))`% below and the legal biomass estimate is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Seymour'))$pct.adj.cur, 0))`% below the baseline value.   
 
 Undersampling during the survey has historically been a concern in Seymour Canal. The Seymour Canal model has extra uncertainty in 2026; see the above 2026 model run discussion. The biomass estimates are near the baseline values, an improvement from prior years.
+
+The 2025 legal harvest rate in Seymour Canal was 0.07, a realized rate of 0.12.
 
 ## Peril Strait (`r peril_stockhealth`) {-}
 In 2026, the stock status for Peril Strait was `r peril_stockhealth` (Table \@ref(tab:health5year); Figures \@ref(fig:peril2) and \@ref(fig:peril3). Peril Strait is on a biennial survey schedule. 
@@ -498,6 +501,8 @@ Indicators of female stock health remain good as indicated by the low proportion
 
 The high recruit and postrecruit CPUEs and fall in juvenile and prerecruit CPUEs indicate the end of an age cohort. In order to provide fishing opportunity this year while retaining large crab for future years of fishing, the decision was made in July to set the harvest rate at 9% of the legal male biomass for the `r cur_yr`/`r fut_yr` season (Table \@ref(tab:harvestrec)).
 
+The 2025 legal harvest rate in the Juneau Area was 0.10, a realized rate of 0.09.
+
 ## Lynn Sisters (`r lynnsisters_stockhealth`) {-}
 Stock health in the Lynn Sisters area remained at `r lynnsisters_stockhealth` status in `r cur_yr` (Table \@ref(tab:health5year); Figures \@ref(fig:lynn2), \@ref(fig:lynn3), and \@ref(fig:lynn4)). CPUEs for juvenile males and juvenile females were below their long-term averages, while none of the other size/sex classes were significantly different from the long-term averages (Table A1). 
 Juvnile male and prerecruit CPUEs had decreasing short-term trends (Table A2). 
@@ -505,23 +510,25 @@ Female clutch indicators looked good as indicated by the high percentage clutch 
 Legal biomass decreased 8%, while mature biomass decreased 20% from was the `r pr_yr` model estimates.
 Both legal and mature biomass are above their long-term baseline values, with mature biomass `r round((baseline_rel %>% filter(Location == 'LynnSisters'))$pct.adj.cur, 0)`% above the baseline value and legal biomass `r round((LEGAL_baseline_rel %>% filter(Location == 'LynnSisters'))$pct.adj.cur, 0)`% above the baseline value. 
 
+Lynn Sisters was closed to commercial fishing in 2025.
+
 
 ## Excursion Inlet (`r excursion_stockhealth`) {-}
-The stock health of Excursion Inlet did not improve from `r excursion_stockhealth` status (Table \@ref(tab:health5year); Figures \@ref(fig:excursion2), \@ref(fig:excursion3), \@ref(fig:excursion4)). CPUEs of all sex/size classes are significantly below their long-term averages (Table A1). There were no significant short-termshort-term trends for all size/sex classes (Table A2). Females had a low proportion of poor clutches but marginal clutch fullness. Estimated legal biomass decreased 14% and and mature biomass decreased 13% from the `r pr_yr` model estimates. 
+The stock health of Excursion Inlet did not improve from `r excursion_stockhealth` status (Table \@ref(tab:health5year); Figures \@ref(fig:excursion2), \@ref(fig:excursion3), \@ref(fig:excursion4)). CPUEs of all sex/size classes are significantly below their long-term averages (Table A1). There were no significant short-term trends for all size/sex classes (Table A2). Females had a low proportion of poor clutches but marginal clutch fullness. Estimated legal biomass decreased 14% and and mature biomass decreased 13% from the `r pr_yr` model estimates. 
 The mature biomass estimate is `r abs(round((baseline_rel %>% filter(Location == 'Excursion'))$pct.adj.cur, 0))`% and the legal biomass estimate is `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Excursion'))$pct.adj.cur, 0))`% below the baseline value. 
 
-Stock health has declined in Excursion Inlet as evident from negative trends in stock health. CPUEs of all mature male size classes are below long-term baselines for the seventh consecutive season. Mature and legal biomass estimates have decreased and both are below long-term baselines. There are no short-term increasing trends. Considering these trends, there is not a harvestable surplus of RKC for the `r cur_yr`/`r fut_yr` season in Excursion Inlet (Table \@ref(tab:harvestrec)). 
+Stock health is low in declined in Excursion Inlet. CPUEs of all mature male size classes are below long-term baselines for the seventh consecutive season. Mature and legal biomass estimates have decreased and both are below long-term baselines. There are no short-term increasing trends. Considering these trends, there is not a harvestable surplus of RKC for the `r cur_yr`/`r fut_yr` season in Excursion Inlet (Table \@ref(tab:harvestrec)). 
 
- 
 ## Port Frederick (reintroduced to survey in 2025) {-}
-Port Frederick was surveyed in 2025 for the first time in 10 years (Figure \@ref(fig:fredtemp)). Given the ten-year gap in survey data, Port Frederick will still be considered part of the non-surveyed areas for the current year's stock assessment (Table \@ref(tab:harvestrec)). The area can be re-incorporated into the stock assessment in future years, once more years of recent survey data are available. From 1979 to 2004 (the years used to expand the survey biomass to the non-surveyed areas), Port Frederick contributed 2.4% of the harvest. The previous percent expansion of 65.2% survey areas and 34.8% non-surveyed areas was adjusted. Excluding Port Frederick, 62.8% of the harvest is from survey areas and 37.2% from non-surveyed areas. Adjusting the expansion factor allows for consistency between previous years' estimates and the current year; all comparisons regionally were performed with a time series of estimates that were adjusted to not include Port Frederick.
+Port Frederick was surveyed in 2025 for the first time in 10 years (Figure \@ref(fig:fredtemp)). Given the ten-year gap in survey data, Port Frederick was considered part of the non-surveyed areas for the current year's stock assessment (Table \@ref(tab:harvestrec)). The area may be re-incorporated into the surveyed areas biomass estimate in future years, once more years of recent survey data are available. From 1979 to 2004 (the years used to expand the survey biomass to the non-surveyed areas), Port Frederick contributed 2.4% of the harvest. The previous percent expansion of 65.2% survey areas and 34.8% non-surveyed areas was adjusted. Excluding Port Frederick, 62.8% of the harvest is from survey areas and 37.2% from non-surveyed areas. Adjusting the expansion factor allows for consistency between previous years' estimates and the current year; all comparisons regionally were performed with a time series of estimates that were adjusted to not include Port Frederick.
 
 ## Holkham Bay (unknown since 2014){-}
 Holkham Bay was removed as a survey area in 2015 due to budget constraints. The decision to drop Holkham Bay from the survey was based on difficulties in interpreting survey results from this location. Holkham Bay had consistently been surveyed since 2002, however, the data were not always adequate to use in the CSA to produce a biomass estimate; the estimates were only useful as an index of biomass and were never included in the regionwide biomass estimate. Holkham Bay continues to be part of the non-surveyed areas (Table \@ref(tab:harvestrec)).   
 
 ## Non-Surveyed Areas {-}
-Information used to assess non-surveyed areas for the `r cur_yr`/`r fut_yr` commercial fishery recommendation includes the current CSA and historical harvest data, by statistical area, from fish tickets. The percentage of historical harvest that occurred within the surveyed areas from the 1974/1975 to 1984/1985 seasons was used to expand the harvestable surplus from the surveyed area to non-surveyed areas. Since 2015, when Port Frederick was removed from the survey, a historical harvest of 52.8% from surveyed areas is used; the remaining 47.2% of harvest is from the non-surveyed areas. Summing up the mature biomass estimates for the surveyed areas, and using this 52.8%/47.2% ratio, yields an adjusted legal biomass estimate of `r format(round((table2.7 %>% filter(Location == 'other.areas'))$adj.legal, 0), big.mark = ",")` lb for non-surveyed areas. Applying a 10.0% harvest rate (a percentage which is close to the average equilibrium harvest rate for all surveyed areas in combination) to this estimate provides a harvestable surplus of `r format((table2.7 %>% filter(Location == 'other.areas'))$Comm.GHL, big.mark = ",")` legal lb in the non-surveyed areas (Table \@ref(tab:harvestrec)).
+Information used to assess non-surveyed areas for the `r cur_yr`/`r fut_yr` commercial fishery recommendation includes the current CSA and historical harvest data, by statistical area, from fish tickets. The percentage of historical harvest that occurred within the surveyed areas from the 1974/1975 to 1984/1985 seasons was used to expand the harvestable surplus from the surveyed area to non-surveyed areas. Since 2015, when Port Frederick was removed from the survey, a historical harvest of 52.8% from surveyed areas is used; the remaining 47.2% of harvest is from the non-surveyed areas. Summing up the mature biomass estimates for the surveyed areas, and using this 52.8%/47.2% ratio, yields an adjusted legal biomass estimate of `r format(round((table2.7 %>% filter(Location == 'other.areas'))$adj.legal, 0), big.mark = ",")` lb for non-surveyed areas.
 
+The harvest rate for the non-surveyed areas in 2025 was set at 0.11, a realized rate of 0.10.
 
 # `r cur_yr`/`r fut_yr` RKC FISHERY MANAGEMENT ACTIONS {-}
 TBD
