@@ -1594,7 +1594,7 @@ panel_figure <- function(survey.location, cur_yr, base.location, option, scale) 
   }
   
   if (survey.location == "Peril") { # will need to turn off in even years
-    p3 = p3 + scale_x_continuous(breaks = seq(min(1995), max(2025), by = 2))
+    p3 = p3 + scale_x_continuous(breaks = seq(min(1994), max(2026), by = 2)) #adj every Peril yera
   }
   
   ### biomass harvest graph ---------------------------------------------------

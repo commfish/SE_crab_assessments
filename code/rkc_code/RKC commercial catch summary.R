@@ -220,3 +220,21 @@ View(comm_catch_JNU_postage)
 View(com_just_JNU)
 
 
+#################################################################
+##unsurveyed areas
+##########################################################
+names(comm_catch)
+unique(comm_catch$Fishery)
+
+comm_catch_unsurveyed <- comm_catch %>% 
+  filter(Fishery != "Gambier Bay RKC" & 
+           Fishery != "Semour Canal RKC" &
+           Fishery != "Juneau area RKC"&
+           Stat.Area!="11514") #not counting the outside ST. James are twice (went into Lynn sisters)
+View(comm_catch_unsurveyed)
+
+sum_unsurveyed <- comm_catch_unsurveyed %>%
+  summarize(Whole_weight_total = sum(Whole.Weight..sum.))
+
+cur_yr_legal_biomass_unsurveydareas <- 1749620
+sum_unsurveyed/cur_yr_legal_biomass_unsurveydareas  #dividing sum unsurveyed by biomass estimate (just usin 2026's estimate of 2025, it's more accurate)

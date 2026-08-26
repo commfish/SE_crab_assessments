@@ -371,8 +371,8 @@ panel_figure_NC('Gambier', cur_yr, 'Gambier', 2, 0)
 
 library(readxl)
 
-cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "A8:E56") %>%
-  cbind(read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "Q8:S56")) %>%
+cpue_fit <- read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "A8:E57") %>%
+  cbind(read_excel(paste0(here::here(), "/CSA_excel/Gambier Bay ", cur_yr, "_adj HR_USE_updatedPU.xls"), sheet = "Estimates 3S_exper", range = "Q8:S57")) %>%
   select(-c(`...2`)) %>% #get rid of columns we dont want (we do want: year, pre-rec, rec, post-rec)
   dplyr::rename(Year = `...1`, Obs_prerecruits = `...3`, Obs_recruits = `...4`, Obs_postrecruits = `...5`, Est_prerecruits = Prerecruits, Est_recruits = Recruits, Est_postrecruits = Postrecruits) %>% 
   mutate(across(c(Obs_prerecruits, Obs_recruits, Obs_postrecruits, Est_prerecruits, Est_recruits, Est_postrecruits), as.numeric)) %>% #added step so things to explode- AGR
