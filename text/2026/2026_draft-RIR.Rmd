@@ -689,8 +689,7 @@ set_table_properties(ft, layout = "autofit")
 
 \newpage
 
-```{r bioadj, echo=FALSE, tab.cap = "Biomass adjustments based on the ratio of Chapman mark-recapture (M-R) estimates to catch-survey analysis (CSA) estimates of legal crab. Adjustments were calculated using CSA estimates for the year the M-R occurred. When a survey area has more than one year of M-R data, a weighted average of the adjustments is used. The ratio of legal to mature crab from the current year is used to scale the adjustment from biomass of legal crabs to biomass of mature crabs."}
-
+```{r bioadj, echo=FALSE, tab.cap = "Southeast Alaska red king crab legal crab biomass adjustments to catch–survey analysis (CSA) based on Chapman mark–recapture estimates."}
 #THE SAME EVERY YEAR (TABLE 5)
 
 sur.ar <- c("Lynn Sisters", "Pybus Bay", "", "Gambier Bay", "", "Excursion Inlet", "", "Seymour Canal", "", "Peril Strait", "Port Frederick")
@@ -700,12 +699,37 @@ mr.lb <- c("69,674", "236,042", "67,220", "180,433", "84,394", "97,232", "12,501
 adj <- c("1.75", "2.92", "3.81", "4.29", "3.34", "4.85", "0.73", "9.08", "9.20", "2.75", "4.27")
 wt.adj <- c("", "", "3.08", "", "3.93", "", "2.95", "", "9.17", "", "")
 
-tbl1 <- as.data.frame(cbind(sur.ar, mr.yr, csa.lb, mr.lb, adj, wt.adj))
+#tbl1 <- as.data.frame(cbind(sur.ar, mr.yr, csa.lb, mr.lb, adj, wt.adj))
+tbl1 <- data.frame(sur.ar, mr.yr, adj, wt.adj, stringsAsFactors = FALSE)
 
-names(tbl1) <- c("Survey area", "M–R study year", "CSA lb", "M–R lb", "Adjustment", "Weighted avg. adjustment")
+#names(tbl1) <- c("Survey area", "M–R study year", "CSA lb", "M–R lb", "Adjustment", "Weighted avg. adjustment")
+# Fill blank area names down so each row knows its group
+tbl1$sur.ar[tbl1$sur.ar == ""] <- NA
+tbl1 <- tidyr::fill(tbl1, sur.ar)
+tbl1$sur.ar <- factor(tbl1$sur.ar, levels = unique(tbl1$sur.ar))
 
-ft <- flextable(tbl1)
-set_table_properties(ft, layout = "autofit")
+
+# Collapse to one row per area
+tbl2 <- tbl1 %>%
+  group_by(sur.ar) %>%
+  summarise(
+    `Study years` = paste(mr.yr, collapse = ", "),
+    Adjustment = dplyr::last(dplyr::coalesce(na_if(wt.adj, ""), adj)),
+    .groups = "drop"
+  ) %>%
+  rename(`Survey area` = sur.ar)
+
+ft <- flextable(tbl2)
+ft <- set_table_properties(ft, layout = "autofit")
+ft
+
+#ft <- flextable(tbl1)
+
+# Merge the grouping columns vertically where areas span multiple study years
+#ft <- merge_v(ft, j = c("Survey area", "Weighted avg. adjustment"))
+
+
+#set_table_properties(ft, layout = "autofit")
 
 ```
 
@@ -738,7 +762,7 @@ set_table_properties(ft, layout = "autofit")
 
 \newpage
 
-```{r harvestrec, tab.cap = paste("Commercial red king crab fishery guideline harvest level (GHL) calculations for", cur_yr, "(in pounds) for the surveyed areas and non-surveyed areas when applying recommended harvest rates to legal biomass. Biomass is adjusted with the mark-recapture experiment. Biomass of non-surveyed areas was expanded to be 47.2% of the region. Commercial GHL is reported in legal pounds."), results = "asis"}
+```{r harvestrec, tab.cap = paste(cur_yr, "Southeast Alaska commercial RKC fishery guideline harvest level (GHL) calculations for the surveyed areas and non-surveyed areas."), results = "asis"}
 #AGR FLAG 25- adding BKC to the total GHL - added manually , FIX later!!
 #TABLE 7 
 # export in order to send a csv version of Table 7 to biologists/managers, since they need it for their announcement
@@ -791,23 +815,7 @@ set_table_properties(ft, layout = "autofit")
 
 ```
 
-\newpage
 
-```{r harvestmanag, tab.cap = paste("The", cur_yr, "final management guideline harvest levels (GHLs; in pounds) and harvest rates for the commercial red king crab fishery by area. Mature and legal biomass is adjusted with the mark-recapture experiment. Biomass of non-surveyed areas was expanded to be 47.2% of the region. TK LEGAL HR FOR THE OTHER AREAS IS 0.15, SHOULD THIS BE 0.10??"), results = "asis"}
-
-#AGR this table was a specific request from last year, a "what if" we harvest a legal rate that would equal a mature HR of 0.10 for other areas (which turned out to be 0.15). This table is not a management recommendation. It also has no references nor context in the text, so add some of that if this is to be included again.
-
-#TABLE 8 
-#TK legal harvest rate is 0.15, should it be 0.10??
-#do I need to change this to be... based on table 2.6/3.6?? Check to make sure that it is please
-
-#ft_alt <- flextable(tbl7_d_alt) %>% 
- #   colformat_double(j ="Legal HR", 
-  #     digits = 2,
-   #    na_str = "")
-#ft_alt <- italic(ft_alt, i = 4, part = "body") #maybe remove the italics on peril strait on years?
-#set_table_properties(ft_alt, layout = "autofit")
-```
 
 
 \newpage
