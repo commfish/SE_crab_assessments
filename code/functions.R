@@ -2197,10 +2197,16 @@ plot_rkc_ridges <- function(dat_all, cur_yr, location) {
     aes(x = Length.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
     geom_density_ridges(alpha = 0.7) +
     theme_ridges() +
-    xlab("Length (mm)") +
+    xlab("Carapace length (mm)") +
     scale_fill_gradientn(colors = wes_palette("Zissou1", nyrs, type = "continuous"),
                          name = "Year") +
-    coord_cartesian(xlim = c(50, 200))
+    ylab(NULL) +
+    coord_cartesian(xlim = c(50, 200)) + 
+    ggtitle(location)+
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      axis.title.x = element_text(hjust = 0.5)
+    )
   
   out_dir <- file.path("figures", "rkc", cur_yr)
   dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
