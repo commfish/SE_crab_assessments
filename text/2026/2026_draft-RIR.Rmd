@@ -974,7 +974,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Juneau.png
 
 \newpage
 
-```{r ridgesGB,  fig.cap = "Length density composition for Barlow Cove by year. This figure is not scaled to biomass between years."}
+```{r ridgesBC,  fig.cap = "Length density composition for Barlow Cove by year. This figure is not scaled to biomass between years."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Barlow_Cove.png'), dpi = 125)
 
 ```
