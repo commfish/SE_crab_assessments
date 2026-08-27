@@ -471,7 +471,7 @@ equ_rate <- exploit_rate %>%
   dplyr::select(Location, equ.er.adj, avg.inc.hr, alt.equ.hr) %>% 
   bind_rows(exploit_other) %>% 
   mutate(hr_cur_yr = case_when(
-    Location == "Juneau" ~ 0.10, # Juneau area HR set in July, UPDATE in each year
+    Location == "Juneau" ~ 0.09, # Juneau area HR set in July, UPDATE in each year
     Location == "other.areas" ~ 0.10,
     .default = 0
   ))
@@ -588,8 +588,8 @@ write.csv(table2.6_csv, paste0('./results/rkc/Region1/', cur_yr, '/Table2.6_regi
 #table 2.7 - 
 biomass_rate_J <- biomass_rate %>%
   mutate(
-  equ.er.adj = ifelse(Location=="Juneau", 0.10, equ.er.adj), #adding in the Juneau harvset rate for 2024, now updated for 2025
-  avg.inc.hr = ifelse(Location=="Juneau", 0.10, avg.inc.hr)
+  equ.er.adj = ifelse(Location=="Juneau", 0.09, equ.er.adj), #adding in the Juneau harvset rate for 2024, now updated for 2025, updated for 2026
+  avg.inc.hr = ifelse(Location=="Juneau", 0.09, avg.inc.hr)
   )
   #biomass_rate$equ.er.adj #get these values and copy-pasted below
   #mutate(equ.er.adj.J = c(0.12, 0.04, 0.01, 0.04, 0.17 0.09 0.06   NA 0.10   NA   NA))
