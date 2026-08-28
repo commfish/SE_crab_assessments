@@ -1,6 +1,6 @@
 ---
 title: "2026 Southeast Alaska red king crab stock assessment CONFIDENTIAL RIR draft "
-author: "Alex Reich (alex.reich@alaska.gov) and Katie Palof"
+author: "Alex Reich (alex.reich@alaska.gov), Caitlin Stern, and Katie Palof"
 date: "`r format(Sys.time(), '%B %Y')`"
 output:
   bookdown::word_document2:
@@ -373,7 +373,7 @@ FYI: *information is not completed yet; this is a draft of the RIR for both rese
 
 # `r cur_yr` QUICK SUMMARY {-}
   - Regional legal and mature RKC biomass increased by `r round(reg_bio_change_leg, 0)`% and `r round(reg_bio_change_mat, 0)`% respectively in `r cur_yr`.
-  - Stock health was above average in the Juneau Area (section 11-A); moderate in Lynn Sisters and Seymour Canal, below average in Gambier Bay and Peril Strait; poor in Excusrion Inlet and Pybus Bay. Stock health considers all age/sex classes of the population (mature males, juveniles, and females).
+  - Stock health was above average in the Juneau Area (section 11-A); moderate in Lynn Sisters and Seymour Canal, below average in Gambier Bay and Peril Strait; poor in Excursion Inlet and Pybus Bay. Stock health considers all age/sex classes of the population (mature males, juveniles, and females).
   - Gambier Bay, the Juneau Area, and Seymour Canal showed increases in legal biomass from `r pr_yr`, while by-area mature biomass estimates were either near or below `r pr_yr` levels. 
   - This pattern is consistent with the trends noted in the Juneau Area `r cur_yr` memo, with recruit and postrecruit males aging through the population without sufficient biomass of prerecruits or juveniles to replace them. Biomass estimates, while currently high, may fall once the abundant recruit and postrecruit cohorts are removed. 
   - The expanded regional legal biomass estimate was above the long-term median (Figure \@ref(fig:med1)). Managers can consult Tables 1, A1, and A2 when setting the commercial GHL; we recommend harvest rates at or below last year's levels, and the data would support a GHL above 200,000 lb should managers choose to open the full commercial fishery.
@@ -434,14 +434,14 @@ The resulting GHL for option 2 is **`r format((table3.6 %>% filter(Location == '
 ## 2026 SPECIFIC STOCK ASSESSMENT COMMENTS {-}
 The Southeast RKC commercial fishery opened in 2025, necessitating the inclusion of commercial catch in the 2026 CSA model. While Lynn Sisters was closed to commercial fishing in 2025, RKC from the Lynn Sisters population are thought to exit the bay and be caught in statistical area 115-14 (Figure A1). Thus, commercial harvest statistical area 115-14 was included in the Lynn Sisters CSA. The Juneau Area presents an analogous situation. Statistical area 115-13 had a substantial commercial catch in 2026 and RKC from the Juneau Area are thought to move in and out of 115-13. However, 115-13 was not included in the Juneau Area CSA due to the added complexity of the Juneau Area management. 115-13 falls outside the survey area used to set the Juneau Area GHL and is not otherwise factored into that GHL calculation. Including the commercial catch from this area would also skew the 60%/40% personal-use-to-commercial-catch ratio underlying the GHL.
 
-Additionally of note is the Seymour Canal CSA. The survey likely does not capture a representative sample of RKC in Seymour Canal every year, and the Seymour CSA model historically underestimates the biomass, an issue that is corrected via a mark-recapture adjustment factor (Table \@ref(tab:bioadj) and Figure \@ref(fig:seymour2)). In order to achieve realistic results for the 2026 Seymour Canal CSA, the 2026 commercial catch was divided by the adjustment factor for the model input. As a result, there is more uncertainty in the Seymour Canal 2026 biomass estimates than in other years. The RTMB model that is under development may reduce the mark-recapture adjustment dependency going forward, but an additional mark-recapture survey in Seymour Canal should be prioritized to have more up-to-date mark-recapture numbers and reduce the reliance on historical data.
+Also of note is the Seymour Canal CSA. The survey likely does not capture a representative sample of RKC in Seymour Canal every year, and the Seymour CSA model historically underestimates the biomass, an issue that is corrected via a mark-recapture adjustment factor (Table \@ref(tab:bioadj) and Figure \@ref(fig:seymour2)). In order to achieve realistic results for the 2026 Seymour Canal CSA, the 2026 commercial catch was divided by the adjustment factor for the model input. As a result, there is more uncertainty in the Seymour Canal 2026 biomass estimates than in other years. The RTMB model that is under development may reduce the mark-recapture adjustment dependency going forward, but an additional mark-recapture survey in Seymour Canal should be prioritized to have more up-to-date mark-recapture numbers and reduce the reliance on historical data.
 
 
 ## STOCK ASSESSMENT CONCERNS AND RECOMMENDATIONS {-}
 Over the past decade, most of the survey areas, except for the Juneau Area and Lynn Sisters, have recovered slowly from low biomass levels. Most areas, apart from Peril Strait, had increasing biomass estimates from 2015–2017. Both legal and mature biomass decreased in 2018 in all survey areas that experienced personal use and commercial harvest in the previous season (2017–2018). 
 The impact of the commercial fishery opening in the 2017/2018 season is confounded by potential increased personal use harvest in the survey areas, but this is hard to quantify because we do not have personal use harvest estimates before 2018 in any area except Section 11-A. 
 
-In 2026, both regional legal and mature biomass estimates were at a 30-year high (Figure \@ref(fig:regionalbio)). However, the juvenile and postrecruit CPUEs, along with carapace length density graphs (Figures \@ref(fig:ridgesJNU) - \@ref(fig:ridgesLS)) indicate that a large cohort of recruit and postrecruit RKC are aging through the fishery without sufficient recruitment to replace their numbers. Commercial fishermen have expressed that they appreciate consistency in fishing opportunity (CITE TK); in order achieve consistency in fishing opportunity, the GHL can be set with the goal of fishing the large recruitment pulse of legal crab over multiple years.
+In 2026, both regional legal and mature biomass estimates were at a 30-year high (Figure \@ref(fig:regionalbio)). However, the juvenile and postrecruit CPUEs, along with carapace length density graphs (Figures \@ref(fig:ridgesJNU) - \@ref(fig:ridgesLS)) indicate that a large cohort of recruit and postrecruit RKC are aging through the fishery without sufficient recruitment to replace their numbers. Commercial fishermen have expressed that they appreciate consistency in fishing opportunity (CITATION NEEDED); in order to achieve consistency in fishing opportunity, the GHL can be set with the goal of fishing the large recruitment pulse of legal crab over multiple years.
 
 The recent regulation revision [5 AAC 34.113] added commercial fishery opportunities based on the long-term median of the legal biomass estimate. The years 1995–2007 were chosen to represent the long-term median; this time period captures a high and low period of population biomass and these years are already used as the baseline when calculating the long-term mean. The `r cur_yr` legal biomass estimate of `r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb is above the long-term median (3,001,030 lb).
 
@@ -467,7 +467,7 @@ Due to the aforementioned concerns and the low level of the stock biomass in Pyb
 ## Gambier Bay (`r gambier_stockhealth`) {-}
 Gambier Bay stock health dropped to `r gambier_stockhealth` status (Table \@ref(tab:health5year); Figures \@ref(fig:gambier2) and \@ref(fig:gambier3)). Prerecruit, postrecruit, and juvenile male CPUEs were significantly below their long-term averages (Table \@ref(tab:longterm)). Juvenile and mature females and recruit male CPUEs were not significantly different from their long-term averages. There were significant short-term increasing trends in recruit male and mature female CPUEs and decreasing trends in juvenile male and female CPUEs (Table \@ref(tab:shortterm)).
 
-Pre-recruit and recruit male biomass and CPUEs trended up for this population in recent years, even after the 2025 fishery (Figure \@ref(fig:gambier4)). However, the CPUEs of prerecruits and juveniles declined in 2026.
+Prerecruit and recruit male biomass and CPUEs trended up for this population in recent years, even after the 2025 fishery (Figure \@ref(fig:gambier4)). However, the CPUEs of prerecruits and juveniles declined in 2026.
 Indicators of female stock health were good, as seen by the low proportion of poor clutches and high clutch fullness.
 Legal biomass increased 50% and mature biomass decreased 1% from the `r pr_yr` model estimate, reflecting the low prerecruit CPUE. The legal adjusted biomass estimate was near the baseline, and the mature adjusted biomass estimate was below the baseline. 
 The mature biomass estimate was `r abs(round((baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`% below and the legal biomass was `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Gambier'))$pct.adj.cur, 0))`%  below the baseline values. 
@@ -475,7 +475,7 @@ The mature biomass estimate was `r abs(round((baseline_rel %>% filter(Location =
 The 2025 legal harvest rate in Gambier Bay was 0.08, a realized rate of 0.05.
 
 ## Seymour Canal (`r seymour_stockhealth`) {-}
-The overall stock health for Seymour Canal remained `r seymour_stockhealth` in 2026 (Table \@ref(tab:health5year); Figures \@ref(fig:seymour2), \@ref(fig:seymour3), and \@ref(fig:seymour4)). Recruit and postrecruit mature males CPUEs were above their long-term averages, while juvenile male and prerecruit CPUEs were below their long-term averages (Table \@ref(tab:longterm)). 
+The overall stock health for Seymour Canal remained `r seymour_stockhealth` in 2026 (Table \@ref(tab:health5year); Figures \@ref(fig:seymour2), \@ref(fig:seymour3), and \@ref(fig:seymour4)). Recruit and postrecruit male CPUEs were above their long-term averages, while juvenile male and prerecruit CPUEs were below their long-term averages (Table \@ref(tab:longterm)). 
 Recruit and postrecruit male CPUEs had significant short-term increasing trends (Table \@ref(tab:shortterm)). 
 Indicators of female stock health were good, with a high mean clutch size and low percentage of poor clutches.
 
@@ -492,7 +492,7 @@ The stock status for Peril Strait was `r peril_stockhealth` in 2026 (Table \@ref
 In 2026, the mature biomass estimate was `r abs(round((baseline_rel %>% filter(Location == 'Peril'))$pct.adj.cur, 0))`% below and the legal biomass estimate was `r abs(round((LEGAL_baseline_rel %>% filter(Location == 'Peril'))$pct.adj.cur, 0))`% below their respective baseline values. Due to recent concerns about the Peril Strait stock status, no harvestable surplus is recommended for the `r cur_yr`/`r fut_yr` season (Table \@ref(tab:harvestrec)). 
 
 ## Juneau (`r juneau_stockhealth`) {-}
-The stock status for the Juneau Area was at `r juneau_stockhealth` in 2026 (Table \@ref(tab:health5year); Figures \@ref(fig:juneau2) and \@ref(fig:juneau3)). 
+The stock status for the Juneau Area was `r juneau_stockhealth` in 2026 (Table \@ref(tab:health5year); Figures \@ref(fig:juneau2) and \@ref(fig:juneau3)). 
 Recruit and postrecruit males CPUEs were significantly above their long-term averages; all other size and sex classes were not significantly different from the long-term averages (Table \@ref(tab:longterm)). There was a significant short-term increasing trend in postrecruit male CPUE and a significant short-term decreasing trend in juvenile male and juvenile female CPUEs (Table \@ref(tab:shortterm)). 
 When compared to the `r pr_yr` model estimate, legal biomass increased 16%, while mature biomass increased 0.1%. 
 Indicators of female stock health remained stable as indicated by the low proportion of poor clutches and high clutch fullness. Both legal and mature biomass were above their long-term baseline values, with mature biomass `r round((baseline_rel %>% filter(Location == 'Juneau'))$pct.adj.cur, 0)`% above the baseline and legal biomass `r round((LEGAL_baseline_rel %>% filter(Location == 'Juneau'))$pct.adj.cur, 0)`% above the baseline. 
@@ -844,7 +844,7 @@ set_table_properties(ft, layout = "autofit")
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/Picture1.jpg'), dpi = 125)
 ```
 
-```{r regionalbio, fig.cap = "Southeast Alaska red king crab total biomass estiamtes (expanded regional estimates) of mature male (gray points and grey dashed line) and legal male (black points and black solid line) from the 2026 CSA model. The gray dashed and black solid horizontal reference lines represent the long-term baselines for mature and legal biomasses, respectively."}
+```{r regionalbio, fig.cap = "Southeast Alaska red king crab total biomass estimates (expanded regional estimates) of mature male (gray points and grey dashed line) and legal male (black points and black solid line) from the 2026 CSA model. The gray dashed and black solid horizontal reference lines represent the long-term baselines for mature and legal biomasses, respectively."}
 #refernce lines SHOULD be 1995-2007- check this please AGR
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr,'_edited.png'), dpi = 125)
 #AGR 25- will need a long term median - add that to figures2tables2. TODO
@@ -985,6 +985,13 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Barlow_Cov
 
 \newpage
 
+```{r ridgesJNUBC,  fig.cap = "Length density composition for Barlow Cove by year. This figure is not scaled to biomass between years."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Juneau_Area_including_Barlow_Cove.png'), dpi = 125)
+
+```
+
+\newpage
+
 ```{r ridgesGB,  fig.cap = "Length density composition for Gambier Bay by year. This figure is not scaled to biomass between years."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Gambier_Bay.png'), dpi = 125)
 
@@ -1009,7 +1016,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Lynn_Siste
 
 ## Tables {-}
 
-```{r maxHR, tab.cap = paste("Option 1: maximum appropriate / risk neutral – model-based equilibrium harvest rates. This is a summary of", cur_yr,  "commercial red king crab fishery guideline harvest level (GHL) calculations (lb) for the seven surveyed areas and other areas. GHL values are calculated using legal male biomass. The risk neutral option is based on 2018 calculated equilibrium exploitation rates (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979–2018). Biomass estimates apply the mark-recapture adjustment to the CSA biomass output. Biomass of other areas was expanded using historical years (1974–1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use harvest for other areas is mean catch estimated from 2008–2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage."), echo=FALSE}
+```{r maxHR, tab.cap = paste("Option 1: maximum appropriate / risk neutral – model-based equilibrium harvest rates. This is a summary of", cur_yr,  "commercial red king crab fishery guideline harvest level (GHL) calculations (lb) for the seven surveyed areas and other areas. GHL values are calculated using legal male biomass. The risk neutral option is based on 2018 calculated equilibrium exploitation rates (K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas' harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979–2018). Biomass estimates apply the mark-recapture adjustment to the CSA biomass output. Biomass of other areas was expanded using historical years (1974–1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use harvest for other areas is mean catch estimated from 2008–2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage."), echo=FALSE}
 
 df <- table2.7
 df <- df %>% 
@@ -1051,7 +1058,7 @@ set_table_properties(ft, layout = "autofit")
 
 \newpage
 
-```{r riskadHR, tab.cap = paste("Option 2: risk adverse – high probability of mature male biomass increasing. This is a summary of", cur_yr, "commercial red king crab fishery guideline harvest level (GHL) calculations (lb) for the seven surveyed areas and other areas. GHL values are calculated using legal male biomass. The risk adverse option is based on 2018 calculated average harvest rates when the mature male biomass was increasing (Inc; K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979–2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historical years (1974–1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use (PU) harvest for other areas is mean catch estimated from 2008–2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage."), echo = FALSE, results = "asis"}
+```{r riskadHR, tab.cap = paste("Option 2: risk-averse – high probability of mature male biomass increasing. This is a summary of", cur_yr, "commercial red king crab fishery guideline harvest level (GHL) calculations (lb) for the seven surveyed areas and other areas. GHL values are calculated using legal male biomass. The risk-averse option is based on 2018 calculated average harvest rates when the mature male biomass was increasing (Inc; K.Palof, WIP RKC harvest rate determination memo Sept. 2018). The harvest rate for the non-surveyed areas is a weighted average of the surveyed areas' harvest rates (shown below) and the average mature male biomass for each area over the entire time series (1979–2018). Biomass estimates apply the adjustment in Table 1 to the CSA biomass output. Biomass of “other areas” was expanded using historical years (1974–1984), where 47.2% of the population is estimated to be in the non-surveyed areas. Personal use (PU) harvest for other areas is mean catch estimated from 2008–2012 statewide survey data. Blue king crab (BKC) is estimated as 1.06% of the surveyed areas based on historical catch, and its GHL contribution is an expansion of the surveyed areas GHL using the same percentage."), echo = FALSE, results = "asis"}
 #FLAG 25 - I found an error that I fixed manually. 441 needs to be in total GHL for BKC, just as it is in the commercial fishery GHL for BKC. I fixed this manually in 2025 (sorry to 2026 Alex...)
 df <- table3.6
 df2 <- df %>% 

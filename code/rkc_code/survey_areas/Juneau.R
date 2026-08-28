@@ -685,4 +685,38 @@ plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Juneau")
 plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Barlow Cove")
 ##perhaps combine these areas, or give the option to combine them, in the future
 
+#combined Juneau and Barlow Cove ridges plot
+dat_all_1 <- dat_all %>%
+  filter(Pot.Condition == "Normal" | Pot.Condition == "Not observed") %>%
+  mutate(Year = as.factor(Year)) %>%
+  filter(Sex.Code==1) %>%
+  filter(Location == "Juneau"| Location=="Barlow Cove")
+
+nyrs <- length(unique(dat_all_1$Year))
+
+location = "Juneau Area including Barlow Cove"
+
+p <- ggplot(dat_all_1) +
+  aes(x = Length.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
+  geom_density_ridges(alpha = 0.7) +
+  theme_ridges() +
+  xlab("Carapace length (mm)") +
+  scale_fill_gradientn(colors = wes_palette("Zissou1", nyrs, type = "continuous"),
+                       name = "Year") +
+  ylab(NULL) +
+  coord_cartesian(xlim = c(50, 200)) + 
+  ggtitle(location)+
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.title.x = element_text(hjust = 0.5)
+  )
+
+out_dir <- file.path("figures", "rkc", cur_yr)
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+
+
+out_file <- file.path(out_dir, paste0("ridges_", gsub(" ", "_", location), ".png"))
+
+ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
+
 
