@@ -269,6 +269,12 @@ comm_catch_sum <-   comm_catch %>%
   group_by(Fishery2, Surveyed_or_unsurveyed_area) %>%
   summarise(Whole_weight_total = sum(Whole_weight_total),
             Landed_weight_total = sum(Landed_weight_total)) %>% ungroup()
+  
+  comm_catch_sum3 <- comm_catch_sum %>% #sum unsurveyed and surveyed areas
+    group_by(Surveyed_or_unsurveyed_area) %>%
+    summarise(Whole_weight_total = sum(Whole_weight_total),
+              Landed_weight_total = sum(Landed_weight_total)) %>% ungroup()
+  
 
 
 #graph by fishery
@@ -284,4 +290,9 @@ p2 <- ggplot(comm_catch_sum2) + aes(x=Fishery2, y=Whole_weight_total, color=Surv
   theme_cowplot()+ theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_color_manual(values=c("orange", "purple")) + theme(legend.position = "none")
 
 ggsave(paste0("figures/rkc/", cur_yr,"/comm_plot_2.png"), p2)
+
+p3 <- ggplot(comm_catch_sum3) + aes(x=Surveyed_or_unsurveyed_area, y=Whole_weight_total, color=Surveyed_or_unsurveyed_area, shape = Surveyed_or_unsurveyed_area) + geom_point(size=5) +
+  theme_cowplot()+ theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_color_manual(values=c("orange", "purple")) + theme(legend.position = "none") + ylim(0,105000)
+
+ggsave(paste0("figures/rkc/", cur_yr,"/comm_plot_3.png"), p3)
 
