@@ -424,4 +424,12 @@ plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Gambier Bay")
 
 
 
+### ggridges by biomass
+unique(dat_all$Year)
+bm_area <- biomass %>% filter(Location == survey.location) %>% filter(Year > 1994) #matching the years that I will graph
+unique(bm_area$Year)
+
+plot_rkc_ridges_biomass(dat_all, bm_area, cur_yr = cur_yr, location = "Gambier Bay")
+
+
 

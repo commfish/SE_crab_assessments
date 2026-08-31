@@ -385,3 +385,8 @@ dat_all <- read.csv("data/rkc/Region1/RKC_survey_CSA_ALL_CRAB_95_26.csv") #AGR T
 #Plot ridges
 plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Lynn Sisters")
 
+
+### ggridges by biomass
+bm_area <- biomass %>% filter(Location == survey.location) %>% filter(Year > 1994) 
+
+plot_rkc_ridges_biomass(dat_all, bm_area, cur_yr = cur_yr, location = "Lynn Sisters")

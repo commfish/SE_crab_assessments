@@ -396,6 +396,9 @@ dat1_allyr <- dat1 %>% filter(Year == cur_yr) %>% rbind(dat_all) #adds the new y
 plot_rkc_ridges(dat1_allyr, cur_yr = cur_yr, location = "Seymour Canal") #filters for males and plots the length cohorts
 
 
+### ggridges by biomass
+bm_area <- biomass %>% filter(Location == survey.location) %>% filter(Year > 1994) #matching the years that I will graph
 
+plot_rkc_ridges_biomass(dat_all, bm_area, cur_yr = cur_yr, location = "Seymour Canal")
 
 

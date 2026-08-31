@@ -720,3 +720,41 @@ out_file <- file.path(out_dir, paste0("ridges_", gsub(" ", "_", location), ".png
 ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
 
 
+### ggridges by biomass
+bm_area <- biomass %>% filter(Location == survey.location) %>% filter(Year > 1994) 
+
+plot_rkc_ridges_biomass(dat_all, bm_area, cur_yr = cur_yr, location = "Juneau")
+plot_rkc_ridges_biomass(dat_all, bm_area, cur_yr = cur_yr, location = "Barlow Cove")
+
+
+#jnu and barlow:
+  
+  bm_join <- bm_area %>%
+    mutate(Year = as.factor(Year)) %>%
+    select(Year, legal.biomass)  
+  
+  dat_all_1 <- dat_all_1 %>%
+    left_join(bm_join, by = "Year")
+  
+  p <- ggplot(dat_all_1) +
+    aes(x = Length.Millimeters, y = Year, fill = legal.biomass) +
+    geom_density_ridges(alpha = 0.7) +
+    theme_ridges() +
+    xlab("Carapace length (mm)") +
+    scale_fill_gradientn(colors = RColorBrewer::brewer.pal(9, "YlOrRd"),
+                         name = "Legal biomass") +
+    ylab(NULL) +
+    coord_cartesian(xlim = c(50, 200)) + 
+    ggtitle(location) +
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      axis.title.x = element_text(hjust = 0.5)
+    )
+  
+  out_dir <- file.path("figures", "rkc", cur_yr)
+  dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+  
+  out_file <- file.path(out_dir, paste0("ridges_biomass_", gsub(" ", "_", location), ".png"))
+  
+  ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
+

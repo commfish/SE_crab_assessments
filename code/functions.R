@@ -2221,5 +2221,50 @@ plot_rkc_ridges <- function(dat_all, cur_yr, location) {
 }
 
 
+#################
+## ggridges by area, colored by biomass instead of year
+#################
+plot_rkc_ridges_biomass <- function(dat_all, bm_area, cur_yr, location) {
+  
+  dat_all_1 <- dat_all %>%
+    filter(Pot.Condition == "Normal" | Pot.Condition == "Not observed") %>%
+    mutate(Year = as.factor(Year)) %>%
+    filter(Sex.Code == 1) %>%
+    filter(Location == location)
+  
+  bm_join <- bm_area %>%
+    mutate(Year = as.factor(Year)) %>%
+    select(Year, legal.biomass)  
+  
+  dat_all_1 <- dat_all_1 %>%
+    left_join(bm_join, by = "Year")
+  
+  p <- ggplot(dat_all_1) +
+    aes(x = Length.Millimeters, y = Year, fill = legal.biomass) +
+    geom_density_ridges(alpha = 0.7) +
+    theme_ridges() +
+    xlab("Carapace length (mm)") +
+    scale_fill_gradientn(colors = RColorBrewer::brewer.pal(9, "YlOrRd"),
+                         name = "Legal biomass") +
+    ylab(NULL) +
+    coord_cartesian(xlim = c(50, 200)) + 
+    ggtitle(location) +
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      axis.title.x = element_text(hjust = 0.5)
+    )
+  
+  out_dir <- file.path("figures", "rkc", cur_yr)
+  dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+  
+  out_file <- file.path(out_dir, paste0("ridges_biomass_", gsub(" ", "_", location), ".png"))
+  
+  ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
+  
+  message("Saved: ", out_file)
+  
+  return(p)
+}
+
 
 
