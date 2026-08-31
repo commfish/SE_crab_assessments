@@ -19,7 +19,7 @@ cur_yr <- 2026
 comm_catch <- read.csv("data/harvest/RKC commercial fish tickets 25 26.csv")
 
 comm_catch_by_area <- comm_catch %>%
-  dplyr::filter(Fishery == "Juneau area RKC"|Fishery=="Seymour Canal RKC"|Fishery=="Gambier Bay RKC") %>%
+  dplyr::filter(c) %>%
   group_by(Fishery) %>%
   summarise(Whole_weight_total = sum(Whole.Weight..sum.),
             Landed_weight_total = sum(Landed.Weight..sum.)
@@ -238,3 +238,50 @@ sum_unsurveyed <- comm_catch_unsurveyed %>%
 
 cur_yr_legal_biomass_unsurveydareas <- 1749620
 sum_unsurveyed/cur_yr_legal_biomass_unsurveydareas  #dividing sum unsurveyed by biomass estimate (just usin 2026's estimate of 2025, it's more accurate)
+
+
+#####
+#summary of comm catch by area
+#####
+
+comm_catch <- read.csv("data/harvest/RKC commercial fish tickets 25 26.csv") 
+
+
+
+comm_catch_sum <-   comm_catch %>%
+  #change "fishery" to lynn sisters if the stat area is 15514
+  mutate(Fishery = if_else(Stat.Area == 11514, "Lynn Sisters", Fishery) 
+         ) %>%
+  group_by(Fishery) %>%
+  summarise(Whole_weight_total = sum(Whole.Weight..sum.),
+            Landed_weight_total = sum(Landed.Weight..sum.)
+  ) %>%#summarized by biomass.
+  mutate(Surveyed_or_unsurveyed_area = if_else(
+    Fishery == "Lynn Sisters" | Fishery == "Juneau area RKC" | 
+      Fishery == "Seymour Canal RKC" | Fishery == "Gambier Bay RKC",
+    "Surveyed", "Unsurveyed")) %>%
+  ungroup() %>%
+  arrange(Surveyed_or_unsurveyed_area, Fishery) %>%
+  mutate(Fishery = factor(Fishery, levels = unique(Fishery)))
+  
+  
+  comm_catch_sum2 <- comm_catch_sum %>% mutate(Fishery2 = if_else(Surveyed_or_unsurveyed_area == "Unsurveyed", "Unsurveyed", Fishery)) %>%#make another column that has the sum of all unsurveyed areas but keep the surveyed areas individual
+  group_by(Fishery2, Surveyed_or_unsurveyed_area) %>%
+  summarise(Whole_weight_total = sum(Whole_weight_total),
+            Landed_weight_total = sum(Landed_weight_total)) %>% ungroup()
+
+
+#graph by fishery
+library(cowplot)
+p1 <- ggplot(comm_catch_sum) + aes(x=Fishery, y=Whole_weight_total, color=Surveyed_or_unsurveyed_area, shape = Surveyed_or_unsurveyed_area) + geom_point(size=5) +
+  theme_cowplot()+ theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_color_manual(values=c("orange", "purple"))
+ggsave(paste0("figures/rkc/", cur_yr,"/comm_plot_1.png"), p1)
+
+p1.2 <- p1 + theme(legend.position = "none")
+ggsave(paste0("figures/rkc/", cur_yr,"/comm_plot_1.2.png"), p1.2)
+
+p2 <- ggplot(comm_catch_sum2) + aes(x=Fishery2, y=Whole_weight_total, color=Surveyed_or_unsurveyed_area, shape = Surveyed_or_unsurveyed_area) + geom_point(size=5) +
+  theme_cowplot()+ theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_color_manual(values=c("orange", "purple")) + theme(legend.position = "none")
+
+ggsave(paste0("figures/rkc/", cur_yr,"/comm_plot_2.png"), p2)
+
