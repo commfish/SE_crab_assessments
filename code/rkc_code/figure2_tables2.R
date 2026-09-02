@@ -147,8 +147,8 @@ regional.b.2 %>%
   geom_text(data = reg_baseline_CSA, aes(x = st_yr, y = pounds, label = label), 
           hjust = -0.05, vjust = 1.5, nudge_y = 0.05, size = 3.5) -> fig2_regional_biomass
 
-ggsave(fig2_regional_biomass, filename = paste0('./figures/rkc/', cur_yr, '/CSAregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
-
+#ggsave(fig2_regional_biomass, filename = paste0('./figures/rkc/', cur_yr, '/CSAregional_biomass', cur_yr, '.png'), dpi = 800, width = 7.5, height = 5.5)
+## agr 2026 -  the graph above is obsolete
 #CSA but expanded
 
 # Figure 2 TBD regional biomass M/R adjusted biomass---------
@@ -311,8 +311,8 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>%
                                                        na.rm = TRUE) + 100000)),
                      breaks= seq(min(0), max(max(regional.b.expand$expanded_mature, na.rm = TRUE) +100000), 
                                  by = 1000000)) +
-  #scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year)), by = 2)) + #even years
-  scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) + #odd years
+  scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year)), by = 2)) + #even years
+  #scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) + #odd years
   #ggtitle("Biomass of surveyed areas for Southeast Alaska red king crab") + 
   ylab("Biomass (lb)") + 
   #ggtitle("Regional biomass estimates for Southeast Alaska red king crab") +
@@ -340,7 +340,7 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>% #EYES HERE! THIS
   ##BELOW  LINE NEEDS MANUAL EDIT IN ACCORDANCE WITH WHEN YOU RUN THIS CODE!! TURN THE 
   ##FOLLOWING MUTATE LINE OFF WHEN RUNNING THIS FOR THE STOCK ASSESSMENT. tURN BACK ON AND RUN AFTER THE CRAB TEAM
   ##MAKES  A dECISION! FLAG FLAG FLAg
-  #mutate(status = replace(status, which(status == "TBD"), "Open")) %>% # can replace the TBD with open or closed #TUrN ON AFTER WE DECIDE!!!- EDIT YEARLY
+  mutate(status = replace(status, which(status == "TBD"), "Open")) %>% # can replace the TBD with open or closed #TUrN ON AFTER WE DECIDE!!!- EDIT YEARLY
   dplyr::rename(`Fishery Status` = status) %>%
   ggplot(aes(Year, pounds, group = type)) +
   geom_line(aes(color = type, group = type, linetype = type))+
@@ -354,8 +354,8 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>% #EYES HERE! THIS
                                  by = 1000000)) +
   #ggtitle(paste0("Juneau ", cur_yr," model")) + 
   ylab("Biomass (lb)")+ xlab("Year") +
-  #scale_x_continuous(breaks = seq(min(1976),max(max(regional.b.expand$Year)+1), by = 2)) + #even years
-  scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) + #odd years
+  scale_x_continuous(breaks = seq(min(1976),max(max(regional.b.expand$Year)+1), by = 2)) + #even years
+  #scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) + #odd years
   #theme(plot.title = element_text(hjust =0.5)) +
   #scale_x_continuous(breaks = seq(min(1975),max(cur_yr), by = 5)) +
   geom_hline(yintercept =  reg_baseline_MR$pounds_expanded[1], color = "grey1")+
@@ -368,8 +368,8 @@ fig2_expand_mr_regional_biomass_edited <- regional.b.expand %>% #EYES HERE! THIS
   guides(shape = guide_legend(ncol = 1), group = guide_legend((ncol = 1)))
 
 #CHOOSE THE SAVE OPTION BELOW BASED ON IF ITS BEFORE OR AFTER THE CRAB TEAM MADE THE OPEN CLOSE DECISION!!
-ggsave(fig2_expand_mr_regional_biomass_edited, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
-#ggsave(fig2_expand_mr_regional_biomass_edited, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '_edited_POST_DECISION.png'), dpi = 800, width = 7.5, height = 5.5)
+#ggsave(fig2_expand_mr_regional_biomass_edited, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
+ggsave(fig2_expand_mr_regional_biomass_edited, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_MRregional_biomass2_', cur_yr, '_edited_POST_DECISION.png'), dpi = 800, width = 7.5, height = 5.5)
 
 
 ###AGR December 2025 - creating the above fig but after they make a fishery decision. This one is for use in publication, 
@@ -402,11 +402,13 @@ med2 <- fig2_expand_mr_regional_biomass_edited +
   geom_hline(yintercept=half_med_all, color="purple", linetype = "dotted", size=1) +
   labs(title = "Median 1977-2025") #TK automate year
 
-ggsave(med1, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1995_2007_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
-ggsave(med2, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1977_2025_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5) #TK automate year
-#AGR TK what did we decide in 2025 about medians
+#ggsave(med1, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1995_2007_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5)
+#AGr- this is the median that we used, but I dont need mature male biomass in my graph
 
-##a cleaner median graph AGR 25
+#ggsave(med2, filename = paste0('./figures/rkc/', cur_yr, '/Expanded_biomass_with_1977_2025_median', cur_yr, '_edited.png'), dpi = 800, width = 7.5, height = 5.5) #TK automate year
+#AGR 2026 -  we're using the 1995-2007 median, we decided
+
+##a cleaner median graph AGR 25  #agr 2026- make this so it labels even #'s on even years and odd #'s on odd years
 fig_median_simple <- regional.b.expand %>% 
   select(Year, expanded_legal, status) %>%
   mutate(status = case_when(
@@ -430,8 +432,8 @@ fig_median_simple <- regional.b.expand %>%
                                  by = 1000000)) +
   #ggtitle(paste0("Juneau ", cur_yr," model")) + 
   ylab("Legal biomass (lb)")+ xlab("Year") +
-  #scale_x_continuous(breaks = seq(min(1976),max(max(regional.b.expand$Year)+1), by = 2)) + #even years
-  scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) + #odd years
+  scale_x_continuous(breaks = seq(min(1976),max(max(regional.b.expand$Year)+1), by = 2)) + #even years
+  #scale_x_continuous(breaks = seq(min(1975),max(max(regional.b.expand$Year) + 1), by = 2)) + #odd years
   #theme(plot.title = element_text(hjust =0.5)) +
   #scale_x_continuous(breaks = seq(min(1975),max(cur_yr), by = 5)) +
   #geom_hline(yintercept =  reg_baseline_MR$pounds_expanded[1], color = "grey1")+
