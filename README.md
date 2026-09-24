@@ -88,6 +88,10 @@ TK
 
 9. Update last years powerpoint and present at the meeting. The meeting should be at least 2 weeks from the receipt of the data.
 
+10. additional flags
+ - confidentail_harvest_2018.csv in the data/rkc folder is updated manually every year. THAT should be automated... Presently, I run a manual check in RKC commercial catch summary.R to see if any areas are <3 vessels.
+
+
 ## Tanner Assessment
 
 1. Read in data, either using pull\_data\_for\_csa.R or OceanAK

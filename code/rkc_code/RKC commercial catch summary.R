@@ -19,10 +19,11 @@ cur_yr <- 2026
 comm_catch <- read.csv("data/harvest/RKC commercial fish tickets 25 26.csv")
 
 comm_catch_by_area <- comm_catch %>%
-  dplyr::filter(c) %>%
+  #dplyr::filter(c) %>%
   group_by(Fishery) %>%
   summarise(Whole_weight_total = sum(Whole.Weight..sum.),
-            Landed_weight_total = sum(Landed.Weight..sum.)
+            Landed_weight_total = sum(Landed.Weight..sum.),
+            num_vessels = n_distinct(Vessel.Name) #added 9/24/26 to see if anything is confidentail
             ) %>%#summarized by biomass.
     ungroup() #whole weight is the same as landed weight
 
@@ -296,3 +297,10 @@ p3 <- ggplot(comm_catch_sum3) + aes(x=Surveyed_or_unsurveyed_area, y=Whole_weigh
 
 ggsave(paste0("figures/rkc/", cur_yr,"/comm_plot_3.png"), p3)
 
+
+#write a code that generates if any of these catches are confidential
+## right now data/rkc/confidential_harvest_2018.csv feeds into the panel_NC function in functions.R. This will NOT update with additional confidential year
+### so please, 2027 Alex, deal with that.
+
+#here I'll at least identify which fisheries are confidential in 2026.
+#none of the fishing data is confidentail in 2026, confirmed by the num_vessels line in comm_catch_by_area.
