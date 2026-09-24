@@ -381,11 +381,11 @@ FYI: *information is not completed yet; this is a draft of the RIR for both rese
   - The expanded regional legal biomass estimate was above the long-term median (Figure \@ref(fig:med1)). Managers can consult Tables 1, A1, and A2 when setting the commercial GHL; biometrics recommends harvest rates at or below last year's levels, and the data support a GHL above 200,000 lb, provided harvest rates remain consistent with a manageable and sustainable fishery across the entire region.
 
 # OVERVIEW {-}
-The Alaska Department of Fish and Game (ADF&G) annually evaluates stock status and establishes the guideline harvest levels (GHLs) for the Southeast red king crab (RKC) and blue king crab (BKC) fishery using data from fishery-independent surveys (pot gear), commercial fishery catch per unit of effort (CPUE), and biological data (length, weight, and shell condition) from the surveys and the fishery. Southeast Alaska (Registration Area A) consists of all waters defined in 5 AAC 34.100 (Figure \@ref(fig:distribution)). 
+The Alaska Department of Fish and Game (ADF&G) annually evaluates stock status and establishes the guideline harvest levels (GHLs) for the Southeast red king crab (RKC) and blue king crab (BKC) fishery using data from fishery-independent surveys (pot gear), commercial fishery catch per unit of effort (CPUE), and biological data (length, weight, and shell condition) from the surveys and the fishery. Southeast Alaska (Registration Area A) consists of all waters defined in 5 AAC 34.100 (Figure \@ref(fig:distcur)). 
 
 For the `r cur_yr`/`r fut_yr_alt` season, the estimate of regional legal male biomass was **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb** and regional mature male biomass was **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** (Table \@ref(tab:harvestrec), Figure \@ref(fig:regionalbio)). These values were determined using mark–recapture adjustments and the historical expansion factor applied to the non-surveyed areas (Table \@ref(tab:bioadj)). The legal and mature male biomass estimates were below their baseline levels, defined as the average biomass from 1995–2007, but there were short-term increasing trends in recent years for both biomass estimates. The legal male biomass estimate is above the long-term median (3.0 million lb; Figure \@ref(fig:med1)).
 
-The `r cur_yr`/`r fut_yr_alt` Southeast commercial RKC fishery GHL was 213,076 lb of legal male RKC, which is above the 200,000 lb minimum threshold [5 AAC 34.113] required to open a competitive commercial fishery; 3 of the 7 surveyed areas had notable increases in legal biomass. Therefore, the commercial fishery opened for the `r cur_yr`/`r r fut_yr_alt` season (Table \@ref(tab:harvestrec) and Figure \@ref(fig:med1)).
+The `r cur_yr`/`r fut_yr_alt` Southeast commercial RKC fishery GHL was 213,076 lb of legal male RKC, which is above the 200,000 lb minimum threshold [5 AAC 34.113] required to open a competitive commercial fishery; 3 of the 7 surveyed areas had notable increases in legal biomass. Therefore, the commercial fishery opened for the `r cur_yr`/`r fut_yr_alt` season (Table \@ref(tab:harvestrec) and Figure \@ref(fig:med1)).
 
 The regional personal use RKC and BKC fishery opened outside of Section 11-A on July 1, `r cur_yr`, with daily bag and possession limits of three RKC or BKC per person. Results from the annual stock assessment survey in the Juneau Area indicated that stock health was above average, with both legal and mature biomass estimated to be above the long-term average. The personal use summer fishery in Section 11-A opened on August 14, 2026, for ten days with a seasonal household limit of three red or blue male king crab to target 27,606 lb (3,572 crab).
 
@@ -860,10 +860,6 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_', 
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_', cur_yr,'_3.png'), dpi = 125)
 ```
 
-```{r pybus4, fig.cap = "The Pybus Bay current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_cpue_model_fit.png'), dpi = 125)
-#AGR added
-```
 
 ```{r gambier2, fig.cap = "Gambier Bay CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_', cur_yr,'_2.png'), dpi = 125)
@@ -873,10 +869,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_'
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_', cur_yr,'_3.png'), dpi = 125)
 ```
 
-```{r gambier4, fig.cap = "The Gambier Bay current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_cpue_model_fit.png'), dpi = 125)
-#AGR added
-```
+
 
 ```{r seymour2, fig.cap = "Seymour Canal CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_', cur_yr,'_2.png'), dpi = 125)
@@ -886,10 +879,6 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_'
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_', cur_yr,'_3.png'), dpi = 125)
 ```
 
-```{r seymour4, fig.cap = "The Seymour Canal current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_cpue_model_fit.png'), dpi = 125)
-#AGR added
-```
 
 ```{r peril2, fig.cap = "Peril Strait CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', cur_yr,'_2.png'), dpi = 125)
@@ -900,10 +889,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', 
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_', cur_yr,'_3.png'), dpi = 125)
 ```
 
-```{r peril4, fig.cap = "The Peril Strait current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_cpue_model_fit.png'), dpi = 125)
-#AGR added; turned off in 2025
-```
+
 
 ```{r juneau2, fig.cap = "Juneau Area CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_', cur_yr,'_2.png'), dpi = 125)
@@ -913,10 +899,6 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_',
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_', cur_yr,'_3.png'), dpi = 125)
 ```
 
-```{r juneau4, fig.cap = "The Juneau Area current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_cpue_model_fit.png'), dpi = 125)
-#AGR added
-```
 
 ```{r lynn2, fig.cap = "Lynn Sisters CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_', cur_yr,'_2.png'), dpi = 125)
@@ -926,10 +908,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSiste
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_', cur_yr,'_3.png'), dpi = 125)
 ```
 
-```{r lynn4, fig.cap = "The Lynn Sisters current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_cpue_model_fit.png'), dpi = 125)
-#AGR added
-```
+
 
 ```{r excursion2, fig.cap = "Excursion Inlet CPUEs for male size/sex classes of red king crab (top panel) and biomass estimates from the current year’s CSA model with the annual harvest data (bottom panel). The horizontal reference lines represent long-term baselines for each male maturity class. The dashed gray and solid back horizontal reference lines in the bottom panel represent the long-term baseline for mature and legal biomasses, respectively."}
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_', cur_yr,'_2.png'), dpi = 125)
@@ -939,10 +918,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion
 knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_', cur_yr,'_3.png'), dpi = 125)
 ```
 
-```{r excursion4, fig.cap = "The Excursion Inlet current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_cpue_model_fit.png'), dpi = 125)
-#AGR added
-```
+
 \newpage
 
 
@@ -1001,7 +977,45 @@ knitr::include_graphics(paste0(here::here(),'/figures/rkc/2026/ridges_Lynn_Siste
 ```
 
 \newpage
+```{r pybus4, fig.cap = "The Pybus Bay current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Pybus_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+\newpage
 
+```{r gambier4, fig.cap = "The Gambier Bay current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Gambier_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+\newpage
+
+```{r seymour4, fig.cap = "The Seymour Canal current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Seymour_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+\newpage
+
+```{r peril4, fig.cap = "The Peril Strait current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Peril_cpue_model_fit.png'), dpi = 125)
+#AGR added; turned off in 2025
+```
+\newpage
+
+```{r juneau4, fig.cap = "The Juneau Area current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Juneau_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+\newpage
+
+```{r lynn4, fig.cap = "The Lynn Sisters current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/LynnSisters_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
+
+```{r excursion4, fig.cap = "The Excursion Inlet current year's CSA model fitted CPUE (blue line) compared to the survey CPUE (black points) for pre-recruit, recruit, and post-recruit males."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/', cur_yr, '/Excursion_cpue_model_fit.png'), dpi = 125)
+#AGR added
+```
 
 ## Tables {-}
 
