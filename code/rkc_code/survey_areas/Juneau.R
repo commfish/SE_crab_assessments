@@ -689,7 +689,7 @@ plot_rkc_ridges(dat_all, cur_yr = 2026, location = "Barlow Cove")
 dat_all_1 <- dat_all %>%
   filter(Pot.Condition == "Normal" | Pot.Condition == "Not observed") %>%
   mutate(Year = as.factor(Year)) %>%
-  filter(Sex.Code==1) %>%
+  filter(Sex.Code==1) %>% #filter for males
   filter(Location == "Juneau"| Location=="Barlow Cove")
 
 nyrs <- length(unique(dat_all_1$Year))
@@ -734,7 +734,8 @@ plot_rkc_ridges_biomass(dat_all, bm_area, cur_yr = cur_yr, location = "Barlow Co
     select(Year, legal.biomass)  
   
   dat_all_1 <- dat_all_1 %>%
-    left_join(bm_join, by = "Year")
+    left_join(bm_join, by = "Year") #%>%
+    #filter(Sex.Code == 1) #filtered for males
   
   p <- ggplot(dat_all_1) +
     aes(x = Length.Millimeters, y = Year, fill = legal.biomass) +
@@ -756,5 +757,5 @@ plot_rkc_ridges_biomass(dat_all, bm_area, cur_yr = cur_yr, location = "Barlow Co
   
   out_file <- file.path(out_dir, paste0("ridges_biomass_", gsub(" ", "_", location), ".png"))
   
-  ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
+  #ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
 
