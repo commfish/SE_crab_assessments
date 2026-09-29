@@ -17,6 +17,11 @@ cur_yr <- 2026
 ###pull just the most recent year/season in OceanAK
 
 comm_catch <- read.csv("data/harvest/RKC commercial fish tickets 25 26.csv")
+names(comm_catch)
+#what things make up confidentiality... # vessels, # permits, # permit holders, # processors.
+## corresponds to -  ADFG.Number for vessels, Permit.Holder.Name for people, (not sure how # permits will differ, ask Tessa), and which one of these columns corresponds to processor?
+###(what is CFEC?)
+
 
 comm_catch_by_area <- comm_catch %>%
   #dplyr::filter(c) %>%
@@ -304,3 +309,34 @@ ggsave(paste0("figures/rkc/", cur_yr,"/comm_plot_3.png"), p3)
 
 #here I'll at least identify which fisheries are confidential in 2026.
 #none of the fishing data is confidentail in 2026, confirmed by the num_vessels line in comm_catch_by_area.
+
+
+##############################################################################################################
+#historic confidentiality calculation, re-done in 2026 b/c earlier regs were only # permits.
+## now non-confidential is greater or equal to 3 of processors, permit holders, permits, and vessels. If any of those are less than 2, the harvest is confidentail
+## so here I will re-calculate non-confidentiality, and save the output in the data folder
+## this will inform the panel_NC function in the functions.R folder
+
+#read in the stat area key
+stat_area_key <- read.csv("data/RKC stat areas.csv") %>%
+  rename(Stat.Area = stat_area) #%>%
+  #mutate(Fishery = case_when(
+   # mgt_area == "Juneau 11A"    ~ "Juneau area RKC",
+  #  mgt_area == "Gambier Bay"   ~ "Gambier Bay RKC",
+  #  mgt_area == "Seymour Canal" ~ "Seymour Canal RKC",
+  #  TRUE                        ~ mgt_area   # everything else keeps its original name
+  #)
+
+
+comm_catch_historic <- read.csv("data/harvest/Red and Blue fish ticket data HISTORIC.csv") %>%
+  #filter() %>% #just rkc? nah, keep bkc
+  left_join(stat_area_key) %>%
+  filter(mgt_area== "Juneau 11A"| Fishery== "Gambier Bay"|Fishery=="Seymour Canal") #just the survey areas
+names(comm_catch_historic)
+unique(comm_catch_historic$Season)
+
+#cool, filtered successfully. Now calculate the confidetiality based on processors, permit holders (no, data not specific enough for that), permits, and vessels
+
+unique(comm_catch_historic$Fishery)
+
+
