@@ -327,16 +327,48 @@ stat_area_key <- read.csv("data/RKC stat areas.csv") %>%
   #  TRUE                        ~ mgt_area   # everything else keeps its original name
   #)
 
+comm_catch_temp <-read.csv("data/harvest/Red and Blue fish ticket data HISTORIC.csv")
+
+#calculate how many instances of permit.holder.names are left blank
+comm_catch_temp %>%
+  group_by(Season) %>%
+  summarize(num_blank_permit_holders = sum(Permit.Holder.Name == "", na.rm = TRUE)) #enough to not use that as a metric
+
+
+
 
 comm_catch_historic <- read.csv("data/harvest/Red and Blue fish ticket data HISTORIC.csv") %>%
   #filter() %>% #just rkc? nah, keep bkc
-  left_join(stat_area_key) %>%
-  filter(mgt_area== "Juneau 11A"| Fishery== "Gambier Bay"|Fishery=="Seymour Canal") #just the survey areas
+  right_join(stat_area_key) #%>% #right or left join??
+  #filter(mgt_area== "Juneau 11A"| Fishery== "Gambier Bay"|Fishery=="Seymour Canal") #just the survey areas
 names(comm_catch_historic)
 unique(comm_catch_historic$Season)
 
-#cool, filtered successfully. Now calculate the confidetiality based on processors, permit holders (no, data not specific enough for that), permits, and vessels
+conf_key <- comm_catch_historic %>%
+  group_by(mgt_area, Season) %>%
+  summarize(
+    num_processors = n_distinct(Processor.Code[Processor.Code != ""]),
+    num_permits    = n_distinct(CFEC, na.rm = TRUE),
+    num_vessels    = n_distinct(ADFG.Number, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(confidential = if_else(num_processors < 3 | num_permits < 3 | num_vessels < 3, "yes", "no"))
 
-unique(comm_catch_historic$Fishery)
+write.csv(conf_key, "data/rkc/confidential_harvest_2026_temp.csv", row.names = TRUE)
+
+#filter for just the survey areas I am interested in : excursion, deadmans reach, pybus, juneau area, gambier bay, seymour canal, lynn sisters
+conf_key_1 <- conf_key %>%
+  filter(mgt_area %in% c("Juneau 11A", "Gambier Bay", "Seymour Canal", "Excursion Inlet", "Eastern Frederick Sound", "Pybus Bay")) #%>%
+  #select(mgt_area, Season, confidential)
+
+#rename survey areas to match the cofidential_harvest_2018.csv file
 
 
+#add year to represent the first year in the "season"
+#also, add in the confidential/no confidential calculation
+
+#NOTE -Lynn sisters is wack and does not exist. as of 10/1/16 coordinating with Zane to resolve.
+
+
+
+#export to csv to replace confidential_harvest_2018
