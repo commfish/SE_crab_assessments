@@ -1,9 +1,9 @@
-# K.Palof 10-16-18 updated / 10-16-19 / 11-9-2020 / 11-3-2021/ 10-19-22/ AGR 10-2-24
+# K.Palof 10-16-18 updated / 10-16-19 / 11-9-2020 / 11-3-2021/ 10-19-22/ AGR 10-2-24/ AGR 2026
 # Code to review logbook data for Tanner crab fishery.
 # needed to separate out catch for Lynn Sisters and North Juneau, previously done in .JMP and Excel
 
 # logbook data from ALEX (as of 10-16-18) pull only data from district 115 - have to sort here for sub-district 10
-#    since that's all that is needed. Pull for all years and save file in results/tanner 
+#    since that's all that is needed. Pull for all years and save file in results/tanner
 
 
 #####Load Packages ---------------------------------
@@ -11,7 +11,7 @@ library(tidyverse)
 library(readxl)
 
 ## global ------
-cur_yr <- 2025 # update annually
+cur_yr <- 2026 # update annually
 
 #####Load Data -------------------------------------
 
@@ -69,7 +69,7 @@ percent_assigned_cur <- log11510 %>%
   select(survey.area, YEAR, crabs, pots, total_no, percent) %>%
   filter(is.na(survey.area) == FALSE) # delete this after dealing with NAs
 
-#create a "2025" folder in the results/tanner/harvest folder
+#create a cur_yr folder in the results/tanner/harvest folder
 output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
 dir.create(output_path)
 

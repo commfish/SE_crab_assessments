@@ -6,6 +6,8 @@
 # commercial catch - report called 'tanner_harvest'
 # need to run 'tanner_logbook.R' prior to this script
 
+#AGR TK - qc this.
+
 # Load ---------------------------
 library(tidyverse)
 library(readxl)
@@ -21,14 +23,14 @@ windowsFonts(Times=windowsFont("TT Times New Roman"))
 theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
             theme(panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank()))
-cur_yr = 2025
+cur_yr = 2026 #update every year
 pr_yr = cur_yr-1
 output_path <- paste0('results/tanner/harvest/', cur_yr) # output and results
 #dir.create(output_path) 
 
 # Data ---------------------------------------------------
 # change input file to most recent year's catch from OceanAK for each
-harvest <- read.csv(paste0('./data/harvest/tanner_harvest_',cur_yr,'.csv')) # From oceanAK- in agreich folder now - tanner_harvest_se- UPDATE EVERY YEAR
+harvest <- read.csv(paste0('./data/harvest/tanner_harvest_',cur_yr,'.csv')) # From oceanAK- in agreich folder now - tanner_harvest_se- UPDATE EVERY YEAR- looks like it needs to be pulled every year, but the OceanAK table does not need to be manually updated
 #harvest <- read.csv("./data/harvest/2025 Detailed Fish Tickets_Tanner.csv")  #got from Tessa's OceakAK search, adding  Batch Year and Sum of Animals to the query.
 glimpse(harvest)
 
@@ -227,7 +229,7 @@ logb11510 %>%
  # mutate(year_caught = Year + 1) 
 
 
-#AGR tK error above - this one also does not work
+#AGR tK error above
 
 ###START CAITLIN ADD OCT 24
 stat_11510 <- harvest2_cur %>% 

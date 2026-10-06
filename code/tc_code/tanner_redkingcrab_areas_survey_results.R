@@ -1,6 +1,6 @@
 #K.Palof 
 # ADF&G 9-21-18 updated and reworked similar to RKC code
-# 10-19-2021/ 10-19-2022 
+# 10-19-2021/ 10-19-2022 / AGR 2026
 # updated Oct 2023 by Caitlin Stern; Sept 2024 by Alex Reich; Oct 2025 AGR
 # Areas: RKCS areas for Tanner crab - EXCLUDES north juneau and stephens passage (see readme.md for reason)
 # includes: Excursion, Seymour Canal, Pybus Bay, Gambier Bay, Peril Strait, and Lynn Sisters
@@ -10,7 +10,7 @@
 source('./code/tanner_rkc_functions.R') # need to create versions of this code to deal with multiple areas at once.
 
 ## setup global ---------------
-cur_yr <- 2025 #ran 2024 graphs again for Jan in 2025
+cur_yr <- 2026 #ran 2024 graphs again for Jan in 2025 - that was hell
 pr_yr <- cur_yr - 1
 n_yr <- cur_yr + 1
 fig_path <- paste0('figures/tanner/tanner_rkc/', cur_yr) # folder to hold all figs for a given year
@@ -28,7 +28,7 @@ dat.b <- read.csv(paste0("./data/tanner/tanner_rkc/red crab survey for Tanner cr
     # all data in this file do not need area, historic or female files here
 baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
 biomass <- read.csv(paste0("./data/tanner/tanner_", n_yr, "_biomassmodel.csv")) #!! create a file for the current year
-# by copying last years to start, then have to add each area from CSA models. !!outside R!!
+# by copying last years to start, then have to add each area from CSA models (after they run each year. Like RKC). !!outside R!!
 # this file should be updated with current year model output. 
 
 # survey data QAC -------
@@ -84,7 +84,7 @@ dat %>%
 
 dat1 %>%
   filter(Recruit.Status == "", Width.Millimeters >= 1) # this SHOULD produce NO rows.  If it does you have data problems go back and correct
-# before moving forward.- AGR TK this totally produces rows. Crap. Why?
+# before moving forward.- AGR TK this totally produces rows. Crap. Why?- 2026- a 2010 excursion row and 2011 pybus row. nothing recent
 dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> test1 #AGR oh looks like C fixed it
 # 2018 excursion pot 2 and 42
 # 2019 gambier bay pot 39
@@ -225,7 +225,7 @@ long_term2 <- long_term[[1]] %>%
   bind_rows(long_term[[2]]) %>% 
   bind_rows(long_term[[3]]) %>% 
   bind_rows(long_term[[4]]) %>% 
-  bind_rows(long_term[[5]]) #%>% 
+  bind_rows(long_term[[5]]) %>% 
   bind_rows(long_term[[6]]) # use this for years with a Peril survey
 write.csv(long_term2, paste0('./results/tanner/tanner_rkc/', cur_yr, '/long_term.csv'))
 
@@ -238,12 +238,14 @@ weight_L(Tdat1, cur_yr) # function found in tanner_rkc_functions.R
 
 ##### mid-date survey-------------#BROKEN!!- AGR 25
 glimpse(Tdat1)
-# need just the date of Time.Set and then to get the mid-date
-#Tdat1 %>%
- #mutate(time.set = as.POSIXlt(Time.Set)) -> Tdattest
-EI_middate_survey <- Tdat1 %>% filter(Year == cur_yr & AREA == "EI")
-EI_middate_survey$time.set
-#** FIX ** 
+
+Middate_survey <- Tdat1 %>% filter(Year == cur_yr) %>%
+   group_by(AREA) %>%
+   select(Time.Set) %>%
+   summarize(middate_survey = median(Time.Set))
+
+write.csv(Middate_survey, paste0('./results/tanner/tanner_rkc/',cur_yr,"/mid_dates.csv"))
+
 
 ##### Females - large or mature females --------------------------
 # large or mature females
@@ -308,7 +310,7 @@ Fem_long_term2 <- Fem_long_term[[1]] %>%
   bind_rows(Fem_long_term[[2]]) %>% 
   bind_rows(Fem_long_term[[3]]) %>% 
   bind_rows(Fem_long_term[[4]]) %>% 
-  bind_rows(Fem_long_term[[5]]) #%>% 
+  bind_rows(Fem_long_term[[5]]) %>% 
   bind_rows(Fem_long_term[[6]]) # use this in years with a Peril survey
 write.csv(Fem_long_term2, paste0('./results/tanner/tanner_rkc/', cur_yr, '/Female_long_term.csv'))
 # need to figure out a way to store these results in a better format

@@ -1,14 +1,14 @@
 ---
 title: "Tanner results from RKC survey"
 author: "Alex Reich"
-date: "October 2025"
+date: "October 2026"
 output: html_document
 ---
 
 ```{r setup, include = FALSE}
 library(knitr)
 library(tidyverse)
-cur_yr <- 2025
+cur_yr <- 2026
 pr_yr <- cur_yr - 1
 
 ```
@@ -27,6 +27,15 @@ kable(cpue_cur_yr, digits = 6)
 # so mid-date would be 26th.
 ```
 
+
+## Mid dates
+```{r, echo = FALSE}
+dates_cur_yr <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/',cur_yr,"/mid_dates.csv")) %>%
+  select(-X)
+kable(dates_cur_yr)
+```
+
+
 ### Male weights from survey 
 ```{r weights, echo = FALSE }
 male_weights <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_yr, '/RKCS_weights.csv')) %>%
@@ -34,6 +43,7 @@ male_weights <- read.csv(paste0(here::here(),'/results/tanner/tanner_rkc/', cur_
   select(-X)
 kable(male_weights, digits = 3)
 ```
+
 
 ## Short term trends in CPUE
 ```{r short term, echo = FALSE }
