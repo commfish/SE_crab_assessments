@@ -357,7 +357,8 @@ effort_sel03 <- effort_sel[2001:3000]
 effort_sel04 <- effort_sel[3001:4000]
 effort_sel05 <- effort_sel[4001:5000]
 effort_sel06 <- effort_sel[5001:6000]
-effort_sel07 <- effort_sel[6001:length(effort_sel)]
+effort_sel07 <- effort_sel[6001:7000]
+effort_sel08 <- effort_sel[7001:length(effort_sel)] #2026 change
 
 # select only Tanner specimens with wanted effort IDs
 spec_effort01 <- tbl(con, "SPECIMEN") %>%
@@ -388,7 +389,11 @@ spec_effort07 <- tbl(con, "SPECIMEN") %>% #AGR added so code does not blow up
   filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel07) %>%
   as.data.frame()
 
-spec_effort <- rbind(spec_effort01, spec_effort02, spec_effort03, spec_effort04, spec_effort05, spec_effort06, spec_effort07)
+spec_effort08 <- tbl(con, "SPECIMEN") %>% #AGR added so code does not blow up 2026
+  filter(SPECIES_CODE == 931 & EFFORT_ID %in% effort_sel08) %>%
+  as.data.frame()
+
+spec_effort <- rbind(spec_effort01, spec_effort02, spec_effort03, spec_effort04, spec_effort05, spec_effort06, spec_effort07, spec_effort08)
 
 # join effort with specimens on EFFORT_ID
 # fields needed from specimen table: SPECIMEN_NO, SUBSAMPLE_RATE, RECRUIT_STATUS, SPECIES_CODE, SEX_CODE, 

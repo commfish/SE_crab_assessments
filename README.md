@@ -94,11 +94,12 @@ TK
 
 ## Tanner Assessment
 
-1. Read in data, either using pull\_data\_for\_csa.R or OceanAK
+1. Read in data, either using pull\_data\_for\_csa.R (you need to be in the office or connected to the VPN) or OceanAK (downloaded datasets NEED to be in the same format as previous years. And mind the silent row limit...)
 
-* pick through this and just run the tanner-relevant code
+* just run the tanner-relevant code
 * as of 10/2/25 - the pull\_data\_for\_csa.R code is functional. Insure the Juneau, Barlow areas pull everything that they need to and there is no weird alternation error.
 * there are 3 main parts of data: "tanner\_rkc/rkc survey for Tanner crab CSA\_cur\_yr.csv", "tanner\_tcs/tanner crab survey for CSA\_13\_cur\_yr.csv", and "nj\_stp/Juneau\_red\_crab\_survey\_for\_Tanner\_crab\_CSA\_cur\_yr.csv"
+* may have to add more effort_sel and table lines. Running this code takes a long time if on the VPN vs. being in the office (but less time than it takes to drive to the office.)
 
 -cur\_yr being "25" for 2025, etc.
 
