@@ -381,7 +381,7 @@ panel_figure("LS", cur_yr, "Lynn Sisters", 2, "include", 0.55, 0.8)
 panel_figure("LS", cur_yr, "Lynn Sisters", 3, "include", 0.55, 0.8)
 
 
-# non-confidential areas ------------
+# non-confidential areas ------------ #probs need to re-do based on historical data - agr 2026
 panel_figure("EI", cur_yr, "Excursion Inlet", 2, "exclude", 0.55, 0.7)
 panel_figure("SC", cur_yr, "Seymour Canal", 2, "exclude", 0.55, 0.8)
 panel_figure("GB", cur_yr, "Gambier Bay", 2, "exclude", 0.50, 0.8)

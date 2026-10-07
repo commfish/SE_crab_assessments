@@ -1,14 +1,14 @@
 #K.Palof 
-# ADF&G 11-4-16 / 10-17-17 / 10-26-18 / 10-29-19 / 11-11-20 / 11-3-21/ 11-5-22 / 10-16-24 AGR
+# ADF&G 11-4-16 / 10-17-17 / 10-26-18 / 10-29-19 / 11-11-20 / 11-3-21/ 11-5-22 / 10-16-24 AGR/ 10-7-24 AGR
 # Areas: Tanner crab survey areas - includes Holkham, Thomas, Glacier Bay and Icy Strait
 # code to process data from Ocean AK to use in crab CSA models.  
 # Prior to 2016 this was done in excel then JMP
 
 #####Load ------------
 source('./code/tanner_functions.R')
-cur_yr <- 2025 #re-ran 2024 graphs for Jan after the 2025 analysis
+cur_yr <- 2026 #re-ran 2024 graphs for Jan after the 2025 analysis
 pr_yr <- cur_yr -1
-cur_yr2 <- 25
+cur_yr2 <- 26
 n_yr <- cur_yr + 1 # need this because the tanner_yr_biomassmodel.csv file has yr = the next year, not the current year
 fig_path <- paste0('figures/tanner/', cur_yr) # folder to hold all figs for a given year
 dir.create(fig_path) # creates YEAR subdirectory inside figures folder
