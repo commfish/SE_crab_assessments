@@ -349,9 +349,10 @@ sum.mat <- as.data.frame(cbind(row.name.col, sc.sum1)) #TK AGR there is a warnin
 ### save output with this year/last year's output with last year
 
 # READ ME: 
-# put cpue from this markdown into CSA excel files or R input files. 
+# put cpue, crab weights, and mid-date from this markdown into CSA excel files or R input files. 
 # need harvest for each survey area from 'tanner_harvest.R' file created:  
 # 'tanner_comm_catch'cur_yr'.csv' (catch in numbers) & 'tanner_catch_mid_date'cur_yr'.csv' (mid-catch date)
+## for lynn sisters, see the mid-date file for both total catch and the survey mid-date. That one is created in tanner_harvest.R but for some reason isn't written in the same place.
 # Run CSA - put resulting biomass 'cur_yr' values into 
 # 'tanner_cur_yr_biomassmodel.csv'
 
@@ -359,6 +360,7 @@ sum.mat <- as.data.frame(cbind(row.name.col, sc.sum1)) #TK AGR there is a warnin
 # make sure biomass file is updated.....
 # need to run 'tanner_harvest.R' code to produce file with catch for last season prior to figure creation.
 
+#before running panel_figures, re-load biomass csv file.
 ## panel figures -----
 panel_figure("EI", cur_yr, "Excursion Inlet", 2, "include", 0.55, 0.7) #these crash so that's fun - AGR 25 - troubleshoot tanner_rkc_functions.R
 panel_figure("EI", cur_yr, "Excursion Inlet", 3, "include", 0.55, 0.8)

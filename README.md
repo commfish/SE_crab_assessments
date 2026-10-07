@@ -119,7 +119,7 @@ NOTE: For steps 4 and 6, there is a QC aspect for the survey data. Pay attention
 
 
 
-4\. Run tanner\_redkingcrab\_areas\_survey\_results.R
+4\. Run code/tc_code/tanner_redkingcrab_areas_survey_results.R
 
 * make a new biomass file for this year. NAME GOES HERE!!
 * STOP at the stop point and run the R markdown with summary of RKC areas (line~335). Follow instructions
