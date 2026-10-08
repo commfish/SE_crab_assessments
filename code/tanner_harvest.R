@@ -255,25 +255,43 @@ harvest_all_update2 <- harvest_all_update %>%
 
 #AGR ADD Oct 16 2024
 ##mid date catch for lynn sistsers. Lynn sisters is two stat areas, ask caitlin to explain it to me later
-mid.catch.ls <- harvest2 %>% filter(Stat.Area %in% c(11510, 11215)) %>% arrange(Date.Fishing.Began) %>%
+#mid.catch.ls <- harvest2 %>% filter(Stat.Area %in% c(11510, 11215)) %>% arrange(Date.Fishing.Began) %>%
   
-  group_by(Date.Fishing.Began) %>%
+#  group_by(Date.Fishing.Began) %>%
   
-  summarise(numbers = sum(Number.Of.Animals),
-            survey.area = max(survey.area),
-            Year= max(Year))
+ # summarise(numbers = sum(Number.Of.Animals),
+  #          survey.area = max(survey.area),
+   #         Year= max(Year))
 
-mid.catch.ls %>% 
+#mid.catch.ls %>% 
   
-  group_by(survey.area, Year) %>% 
+ # group_by(survey.area, Year) %>% 
   
-  summarise(total = sum(numbers)) -> step1.ls
+  #summarise(total = sum(numbers)) -> step1.ls
 
-mid.catch.ls %>% 
+#mid.catch.ls %>% 
   
-  left_join(step1.ls) %>% 
+ # left_join(step1.ls) %>% 
   
-  mutate(ratio_catch = numbers/total) -> mid.catch2.ls
+#  mutate(ratio_catch = numbers/total) %>%
+#  select(Date.Fishing.Began, survey.area, Year)-> mid.catch2.ls
+
+mid.catch2.ls <- harvest2 %>%
+  filter(Stat.Area %in% c(11510, 11215)) %>%
+  left_join(logb_merge, by = c("Year" = "year_caught")) %>%
+  mutate(ls_numbers = case_when(
+    Stat.Area == 11215 ~ Number.Of.Animals,
+    Stat.Area == 11510 ~ Number.Of.Animals * (1 - percentNJ))) %>%
+  group_by(Year, Date.Fishing.Began) %>%
+  summarise(numbers = sum(ls_numbers, na.rm = TRUE), .groups = "drop") %>%
+  arrange(Year, Date.Fishing.Began) %>%
+  group_by(Year) %>%
+  mutate(survey.area = "Lynn Sisters",
+         total = sum(numbers),
+         ratio_catch = numbers / total,
+         cum_ratio = cumsum(ratio_catch)) %>%
+  ungroup()
+
 
 write.csv(mid.catch2.ls, paste0('./results/tanner/harvest/', cur_yr, '/lynnsisters_middate', cur_yr,'.csv'))
 ##end AGR add
