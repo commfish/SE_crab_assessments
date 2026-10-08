@@ -124,6 +124,7 @@ NOTE: For steps 4 and 6, there is a QC aspect for the survey data. Pay attention
 * make a new biomass file for this year. NAME GOES HERE!!
 * STOP at the stop point and run the R markdown with summary of RKC areas (line~335). Follow instructions
 * Run the Excel CSAs- with the std CPUE data from the summary. Copy-paste the biomass output from this into the 2025 tanner biomass file
+**  use tanner_comm_Catch_97_2026.csv for the CSA input harvest totals.
 * Then continue running the rest of the R file
 
 

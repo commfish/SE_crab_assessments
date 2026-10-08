@@ -357,6 +357,7 @@ sum.mat <- as.data.frame(cbind(row.name.col, sc.sum1)) #TK AGR there is a warnin
 # 'tanner_cur_yr_biomassmodel.csv'
 
 # need to run CSA models and put into biomass file before creating figures
+##when running the csa's : use tanner_com_catch_97_curyr.csv
 # make sure biomass file is updated.....
 # need to run 'tanner_harvest.R' code to produce file with catch for last season prior to figure creation.
 

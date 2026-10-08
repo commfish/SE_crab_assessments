@@ -720,7 +720,9 @@ write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percen
 total_health_njsp(cur_yr)
 
 ## !!!!!!!!!!!!! update biomass.csv file before running figure creation #AGR TK here - need tp run CSA for NJ and SP
-# this needs to be updated from CSA runs for 2021 for SP and NJ
+# this needs to be updated from CSA runs for 2021 for SP and NJ - what?? AGRT 2026
+
+##when running the csa's : use tanner_com_catch_97_curyr.csv
 
 #and load in that biomass file
 

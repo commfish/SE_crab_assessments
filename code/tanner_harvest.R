@@ -39,12 +39,6 @@ harvest_all <- read.csv(paste0('./results/tanner/harvest/', pr_yr, '/comm_catch_
 #harvest_all <- read.csv("./data/harvest/Tanner_Detailed Fish Tickets_97_18.csv")
 logb11510 <- read.csv(paste0('./results/tanner/harvest/', cur_yr,'/logbook_11510_all.csv')) # from tanner_logbook.R calculations
 
-#aside test AGR TK- DELETE THIS BLOC
-#test <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr,'.csv'))
-#test2 <- test %>% filter(Year>2019)
-#test3 <- read.csv(paste0('./data/harvest/tanner_logbook_2020_', pr_yr,'.csv'))
-#library(diffr)
-#diffr(test2, test3)
 
 # these are for calculating std cpue
 #logbook <- read.csv(paste0('./data/harvest/tanner_logbook_', cur_yr,'.csv')) %>% filter(Year > 2019)
@@ -106,10 +100,10 @@ harvest2 %>%
 #  filter(Date.of.Landing != '2018-07-13 00:00:00') %>% 
   group_by(Year, survey.area)%>%
   summarise(permits = length(unique(CFEC)), numbers = sum(Number.Of.Animals), 
-            pounds = sum(Whole.Weight..sum.)) -> comm.catch.sum #TK AGR there is an NA here, revisit pease
+            pounds = sum(Whole.Weight..sum.)) -> comm.catch.sum 
 
 # lynn sister and north juneau need to be manually split up in area 115-10
-write.csv(comm.catch.sum, paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch', cur_yr,'.csv'))
+#write.csv(comm.catch.sum, paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch', cur_yr,'.csv')) #writes the wrong NJ and LS numbers. this is printed too early
 ### current year mid-catch date ------------------
 harvest2 %>%
   #filter (Season == "Sep2017 - Aug18") %>% 
@@ -135,7 +129,7 @@ comm.catch.sum %>%
 write.csv(annual_catch, paste0('./results/tanner/harvest/', cur_yr, '/tanner_annual_catch_', cur_yr,'.csv'))
 
 
-### all years ---------------------- #TK AGR  IDK what is going on heree
+### all years ---------------------- 
  
 # remove 11511 from Lynn Canal - make it part of 'other'
 # by stat area, not needed for this analysis
