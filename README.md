@@ -126,14 +126,15 @@ NOTE: For steps 4 and 6, there is a QC aspect for the survey data. Pay attention
 * Run the Excel CSAs- with the std CPUE data from the summary. Copy-paste the biomass output from this into the 2025 tanner biomass file
 **  use tanner_comm_Catch_97_2026.csv for the CSA input harvest totals.
 * Then continue running the rest of the R file
+* tanner_comm_catch_97_2026- use this one to get the harvest numbers, NOT the mid-date file. It has the NJ/Lynn sisters extra step
+
 
 
 
 5\. Run NJ\_SP\_processing.R
 
 * then run sp\_nj\_figures.R
-* check to make sure no alternatey weird input issues with Juneau and Barlow (does barlow have BOTH odd and even pots??)
-
+* tanner_comm_catch_97_2026- use this one to get the harvest numbers, NOT the mid-date file. It has the NJ/Lynn sisters extra step
 
 
 6\. Run TCS\_processingCODE.R

@@ -1,8 +1,8 @@
 #K.Palof 
 # ADF&G 11-15-16 / 10-11-17 / 11-2-18 /10-10-19/ 11-12-20 / 11-7-21 / 11-7-22/ AGR 10-8-25/ AGR 10/7/26
 # Areas: tanner crab assessment of red crab areas : North Juneau and Stephens Passage
-#   done seperately because they need to be divided into these two areas based on the pot locations, 
-#   division is done in ArcGIS using shape files for survey strata
+#   done separately because they need to be divided into these two areas based on the pot locations, 
+#   division is done in ArcGIS (by Zane) using shape files for survey strata
 #   - SP pots are placed in their correct strata and the rest of the pots 
 #   for that year are used for NJ
 # process current year's data first and then add to older data already stored. 
@@ -587,8 +587,8 @@ datWL %>%
                                  Number.Of.Specimens[mod_recruit %in% Mature]), 
             legal_lbs = weighted.mean(weight_lb[mod_recruit %in% Legal], 
                                 Number.Of.Specimens[mod_recruit %in% Legal]), 
-            prer_lbs = weighted.mean(weight_lb[mod_recruit == "Pre_Recruit"], 
-                               Number.Of.Specimens[mod_recruit == "Pre_Recruit"])) -> male_weights
+            prer_lbs = weighted.mean(weight_lb[mod_recruit %in% "Pre_Recruit"],  #%in% was ==, I think there was an NA in the data somewhere - in 2026. Geez, 45 NA weights in 2021?
+                               Number.Of.Specimens[mod_recruit %in% "Pre_Recruit"])) -> male_weights
 # final results with score - save here
 
 write.csv(male_weights, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_weights.csv'))
@@ -719,12 +719,11 @@ write.csv(percent_clutch, paste0('./results/tanner/nj_stp/', cur_yr, '/SP_percen
 ##### total stock health for both NJ and SP -----------------------------------
 total_health_njsp(cur_yr)
 
-## !!!!!!!!!!!!! update biomass.csv file before running figure creation #AGR TK here - need tp run CSA for NJ and SP
-# this needs to be updated from CSA runs for 2021 for SP and NJ - what?? AGRT 2026
+## !!!!!!!!!!!!! update biomass.csv file before running figure creation - need to run CSA for NJ and SP
 
-##when running the csa's : use tanner_com_catch_97_curyr.csv
+##when running the csa's : use tanner_com_catch_97_curyr.csv for harvest,
+## and use the mid-date file for mid dates
 
-#and load in that biomass file
 
 
 # confidential panel figure SP ---------------

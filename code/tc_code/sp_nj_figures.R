@@ -174,7 +174,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
              size = 6, fontface = "bold"    
     )+ 
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #1993 to 1994 for the even year (2024)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 to 1994 for the even year (2024)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -207,7 +207,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("CPUE (number of crab per pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #chagned 1993 to 1994 for the even year (2024)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #chagned 1993 to 1994 for the even year (2024)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
@@ -244,7 +244,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
     xlab(NULL) +
     geom_hline(yintercept = 10, color = "black") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #chagned 1993 to 1994 for the even year (2024)
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #chagned 1993 to 1994 for the even year (2024)
     geom_ribbon(aes(ymin = mean - se, ymax = mean + se), 
                 alpha = 0.2) +
     theme(legend.position = c(0.2,0.5), 
@@ -271,7 +271,7 @@ panel_figure_J <- function(survey.location, cur_yr, area, abrv, option, conf){
     ylab("Biomass estimates and harvest (lb)") + 
     xlab("Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) + #changed 1993 to 1994 for even-year numbering
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #changed 1993 to 1994 for even-year numbering
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                         na.rm = TRUE) + 25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds, 
@@ -440,7 +440,7 @@ panel_figure_nj <- function(survey.location, cur_yr, area, abrv, option){
     #                   oob = rescale_none) +
     ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
                   width =.4) +
     geom_hline(yintercept = baseline2$Pre_Recruit, color = "grey65")+
@@ -463,7 +463,7 @@ panel_figure_nj <- function(survey.location, cur_yr, area, abrv, option){
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("Mature female CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
                   width =.4) +
     geom_hline(yintercept = baseline2$Large.Female, color = "black")+
@@ -493,7 +493,7 @@ panel_figure_nj <- function(survey.location, cur_yr, area, abrv, option){
     xlab(NULL) +
     geom_hline(yintercept = 10, color = "black") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     theme(legend.position = c(0.2,0.5), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) 
@@ -515,7 +515,7 @@ panel_figure_nj <- function(survey.location, cur_yr, area, abrv, option){
     ylab("Pounds (100,000 lbs)") + 
     xlab("Survey Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) +
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds/100000, 
                                                         na.rm = TRUE) + 0.25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
@@ -665,7 +665,7 @@ panel_figure_jnu_pres <- function(survey.location, cur_yr, area, abrv, option){
     #                   oob = rescale_none) +
     ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
                   width =.4) +
     geom_hline(yintercept = baseline2$Pre_Recruit, color = "grey65")+
@@ -690,7 +690,7 @@ panel_figure_jnu_pres <- function(survey.location, cur_yr, area, abrv, option){
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("Mature female CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
                   width =.4) +
     geom_hline(yintercept = baseline2$Large.Female, color = "black")+
@@ -722,7 +722,7 @@ panel_figure_jnu_pres <- function(survey.location, cur_yr, area, abrv, option){
     xlab(NULL) +
     geom_hline(yintercept = 10, color = "black") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     theme(legend.position = c(0.2,0.5), 
           legend.text = element_text(size = 20),
           legend.key.size = unit(1.5, 'lines'),
@@ -746,7 +746,7 @@ panel_figure_jnu_pres <- function(survey.location, cur_yr, area, abrv, option){
     ylab("Pounds (100,000 lbs)") + 
     xlab("Survey Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) +
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds/100000, 
                                                         na.rm = TRUE) + 0.25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 
@@ -897,7 +897,7 @@ panel_figure_nj_pres <- function(survey.location, cur_yr, area, abrv, option){
     #                   oob = rescale_none) +
     ggtitle(area) + ylab("Mature male CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
                   width =.4) +
     geom_hline(yintercept = baseline2$Pre_Recruit, color = "grey65")+
@@ -922,7 +922,7 @@ panel_figure_nj_pres <- function(survey.location, cur_yr, area, abrv, option){
     #scale_y_continuous(limits = c(0,25), oob = rescale_none) +
     ylab("Mature female CPUE (number/pot)")+ xlab(NULL)+
     theme(axis.text.x = element_blank(), plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = recruit.class), 
                   width =.4) +
     geom_hline(yintercept = baseline2$Large.Female, color = "black")+
@@ -954,7 +954,7 @@ panel_figure_nj_pres <- function(survey.location, cur_yr, area, abrv, option){
     xlab(NULL) +
     geom_hline(yintercept = 10, color = "black") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) +
     theme(legend.position = c(0.2,0.5), 
           legend.text = element_text(size = 20),
           legend.key.size = unit(1.5, 'lines'),
@@ -978,7 +978,7 @@ panel_figure_nj_pres <- function(survey.location, cur_yr, area, abrv, option){
     ylab("Pounds (100,000 lbs)") + 
     xlab("Survey Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) +
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds/100000, 
                                                         na.rm = TRUE) + 0.25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds/100000, 

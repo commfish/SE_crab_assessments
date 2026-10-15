@@ -126,7 +126,7 @@ comm.catch.sum %>%
   group_by(Year)%>%
   summarise(numbers = sum(numbers), pounds = sum(pounds)) -> annual_catch
 
-write.csv(annual_catch, paste0('./results/tanner/harvest/', cur_yr, '/tanner_annual_catch_', cur_yr,'.csv'))
+write.csv(annual_catch, paste0('./results/tanner/harvest/', cur_yr, '/tanner_annual_catch_', cur_yr,'.csv')) 
 
 
 ### all years ---------------------- 
