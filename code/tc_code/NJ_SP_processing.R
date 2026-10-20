@@ -725,47 +725,23 @@ total_health_njsp(cur_yr)
 ## and use the mid-date file for mid dates
 
 
-
-# confidential panel figure SP ---------------
-#survey.location = "Juneau"
-#area = "Stephens Passage"
-#abrv = "SP"
+# confidential and nonconf panel figures
 
 panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 2, "include")
-panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 3, "include")
-
-# nonconfidential panel figure SP ---------------
-#survey.location = "Juneau"
-#area = "Stephens Passage"
-#abrv = "SP"
-
 panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 2, "exclude")
-panel_figure_J("Juneau", cur_yr, "Stephens Passage", "SP", 3, "exclude")
 
-# presentation figures----------------
-# old function - needs to be updated.
-#panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 2)
-#panel_figure_jnu_pres("Juneau", 2018, "Stephens Passage", "SP", 3)
-
-
-# confidential panel figure NJ ----
-# issues is that prior to 2009 don't have good idea of what raw data is used.  Take CPUE/SE and 
-#     female info from Sigma Plot file.
-#survey.location = "North Juneau"
-#area = "North Juneau"
-#abrv = "NJ"
 panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 2, "include")
-panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 3, "include")
-
-# nonconfidential panel figure NJ ---------------
-#survey.location = "North Juneau"
-#area = "North Juneau"
-#abrv = "NJ"
-
 panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 2, "exclude")
-panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 3, "exclude")
 
 
-# presentation figures---------------- #AGR tk not sure I need these below...
-#panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 2)
-#panel_figure_nj_pres("North Juneau", 2018, "North Juneau", "NJ", 3)
+###########################################
+#cohort density graphs-ggridges
+dat_all <- read.csv("data/tanner/tanner_data_ALL/all_Tanner_thru_2026.csv") %>%
+  filter(Sex.Code == 1)
+
+ridges_Tanner_JNU <- plot_ridges(dat_all, cur_yr = 2026, location = "Juneau") #could separate into Nj and SP but that would be a headache
+
+ggsave("figures/tanner/2026/ridges_Tanner_Juneau.png", ridges_Tanner_JNU)
+
+#so... WHY are tanner separated into NJ and SP??
+
