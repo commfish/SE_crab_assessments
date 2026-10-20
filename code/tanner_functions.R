@@ -823,3 +823,43 @@ panel_figure_pres <- function(survey.location, cur_yr, area, option, conf){
            dpi = 800, width = 8, height = 9.5)}
 }
 
+##############################################################AGR add
+# ggridges sizes plot by area
+#############################################################
+plot_ridges <- function(dat_all, cur_yr, location) {
+  
+  dat_all_1 <- dat_all %>%
+    filter(Pot.Condition == "Normal" | Pot.Condition == "Not observed") %>%
+    mutate(Year = as.factor(Year)) %>%
+    filter(Sex.Code==1) %>%
+    filter(Location == location)
+  
+  nyrs <- length(unique(dat_all_1$Year))
+  
+  p <- ggplot(dat_all_1) +
+    aes(x = Length.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
+    geom_density_ridges(alpha = 0.7) +
+    theme_ridges() +
+    xlab("Carapace length (mm)") +
+    scale_fill_gradientn(colors = wes_palette("Zissou1", nyrs, type = "continuous"),
+                         name = "Year") +
+    ylab(NULL) +
+    coord_cartesian(xlim = c(50, 200)) + 
+    ggtitle(location)+
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      axis.title.x = element_text(hjust = 0.5)
+    )
+  
+  out_dir <- file.path("figures", "rkc", cur_yr)
+  dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+  
+  out_file <- file.path(out_dir, paste0("ridges_", gsub(" ", "_", location), ".png"))
+  
+  ggsave(filename = out_file, plot = p, width = 8, height = 6, dpi = 300)
+  
+  message("Saved: ", out_file)
+  
+  return(p)
+}
+
