@@ -12,8 +12,8 @@
 # katie.palof@alaska.gov
 # 11/07/2018 / 11-15-2020 / 3-2-21 / 11-8-21/ 11-7-22
 
-#AGR 10/27/25 - 11/4/25
-cur_yr <- 2025
+#AGR 10/27/25 - 11/4/25/ 10/23/26
+cur_yr <- 2026
 # load -----
 source('./code/tanner_functions.R')
 output_path <- paste0('results/tanner/', cur_yr) # output and results
@@ -34,10 +34,10 @@ hist_biomass <- read.csv(paste0("./data/tanner/tanner_annual_pt_estimate_histori
 hist_biomass_update <- read.csv(paste0("./data/tanner/tanner_annual_pt_estimate_historic_", cur_yr, ".csv"))
 # this is updated in the cur_yr_tanner_draft.Rmd file - in the 2nd block
 
-# repeat previous year's estimates for Peril Strait, due to lack of survey in 2023 - agr updated for this same thing in 2025
-biomass_ps_2025 <- biomass %>% filter(Year == 2024 & Area == "Peril Strait") %>% mutate(Year = 2025)
-biomass_ps <- rbind(biomass, biomass_ps_2025)
-biomass <- biomass_ps
+# TURN OFF IN PERIL YEARS# repeat previous year's estimates for Peril Strait, due to lack of survey in 2023 - agr updated for this same thing in 2025
+#biomass_ps_2025 <- biomass %>% filter(Year == 2024 & Area == "Peril Strait") %>% mutate(Year = 2025)
+#biomass_ps <- rbind(biomass, biomass_ps_2025)
+#biomass <- biomass_ps
 
 # data prep for Figure 1 ---------------
 biomass %>% 
@@ -120,9 +120,8 @@ year_totals %>%
 
 # Figure 1 ------------
 # Now is calculated based on the current years model output.
-# use average contribution in early years with all years data - hmm what- AGR 25
-#AGr flag- look at last year and see what you did to the data
-cur_yr_biomass %>% #AGr flag will have to update this graph -  biomass/100000 NO, I want my real numbers
+# use average contribution in early years with all years data 
+cur_yr_biomass %>% 
   gather(type, pounds, Legal:Mature, factor_key = TRUE) %>% 
   ggplot(aes(Year, y = pounds/1000000, group = type)) +
   geom_line(aes(color = type, linetype = type))+
@@ -134,7 +133,7 @@ cur_yr_biomass %>% #AGr flag will have to update this graph -  biomass/100000 NO
   ylab("Biomass (1,000,000 lbs)") + 
   xlab("Survey Year") +
   theme(plot.title = element_text(hjust =0.5)) + 
-  scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+  scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) +
   scale_y_continuous(limits = c(0,max(cur_yr_biomass$Mature/1000000, 
                                                       na.rm = TRUE) + 1.5), 
                      breaks= seq(min(0), max(max(cur_yr_biomass$Mature/1000000, 
@@ -161,7 +160,7 @@ fig1_reg <- cur_yr_biomass %>%
     ylab("Biomass (1,000,000 lb)") + 
     xlab("Survey Year") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) +
     scale_y_continuous(limits = c(0,max(cur_yr_biomass$Mature/1000000, 
                                         na.rm = TRUE) + 1.5), 
                        breaks= seq(min(0), max(max(cur_yr_biomass$Mature/1000000, 
@@ -205,7 +204,7 @@ hist_biomass %>%
     xlab("Survey Year") +
     ggtitle("Historic Point Estimates") +
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) +
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) +
     scale_y_continuous(labels = comma, limits = c(0,max(cur_yr_biomass$Mature/1000000, 
                                                         na.rm = TRUE) + 1.5), 
                        breaks= seq(min(0), max(max(cur_yr_biomass$Mature/1000000, 
@@ -257,7 +256,7 @@ annual_harvest_all %>%
   select(Year, pounds) %>% 
   filter(Year > 1991) %>% 
   left_join(std_cpue) -> figure2 #warning, there are some NA's for the early years AGR. this might be ok tho.
-# issues with current pull from OceanAK #I think no issues in 25? AGR
+# issues with current pull from OceanAK #I think no issues in 25? AGR; no issues in 2026
 #annual_harvest_cur %>% 
 #  select(Year, pounds) %>% 
 #  filter(Year > 1991) %>% 
@@ -407,7 +406,7 @@ reg_harvest_comm_catch <- biomass_harvest2 %>%
                                       na.rm = TRUE) + .5), 
                      breaks= seq(min(0), max(max(biomass_harvest2$Regional_Mature/1000000, 
                                                  na.rm = TRUE)+ .5), by = 1.0)) +
-  scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2))
+  scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) #change from 199, 1994 depending on odd or even year
   
 reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like the 2024 graph
 
@@ -436,7 +435,7 @@ reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like
     xlab("Survey Year") +
     ggtitle("Historic Point Estimates (Expanded)") + #agr 11/27/24 changed title at biologists' request
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) + #1993 in odd years
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 in odd years
     scale_y_continuous(labels = comma, limits = c(0,max(hist_biomass_exp$Regional_Mature/1000000, 
                                                         na.rm = TRUE) + 1.5), 
                        breaks= seq(min(0), max(max(hist_biomass_exp$Regional_Mature/1000000, 
@@ -471,7 +470,7 @@ reg_harvest_comm_catch #agr 25 I'm sure I'll need to update this to be more like
     xlab("Survey Year") +
     ggtitle("Historic point estimates used for annual management (not updated with current year's data)") + 
     theme(plot.title = element_text(hjust =0.5)) + 
-    scale_x_continuous(breaks = seq(min(1993),max(cur_yr), by =2)) + #1993 in odd years
+    scale_x_continuous(breaks = seq(min(1994),max(cur_yr), by =2)) + #1993 in odd years
     scale_y_continuous(labels = comma, limits = c(0,max(hist_biomass_exp$Regional_Mature/1000000, 
                                                         na.rm = TRUE) + 1.5), 
                        breaks= seq(min(0), max(max(hist_biomass_exp$Regional_Mature/1000000, 

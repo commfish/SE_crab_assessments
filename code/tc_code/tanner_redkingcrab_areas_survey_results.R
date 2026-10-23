@@ -417,7 +417,36 @@ panel_figure("PB", cur_yr, "Pybus Bay", 2, "exclude", 0.35, 0.8)
 
 
 
+###########################################
+#cohort density graphs-ggridges
 
+dat_all <- read.csv("data/tanner/tanner_data_ALL/all_Tanner_thru_2026.csv") %>%
+  filter(Sex.Code == 1)
+
+#unique(dat_all$Location)
+##Pybus
+ridges_Tanner<- plot_ridges(dat_all, cur_yr = 2026, location = "Pybus Bay") 
+ggsave("figures/tanner/2026/ridges_Tanner_Pybus.png", ridges_Tanner)
+
+## Peril - Deadman's Reach
+ridges_Tanner<- plot_ridges(dat_all, cur_yr = 2026, location = "Deadman Reach") 
+ggsave("figures/tanner/2026/ridges_Tanner_Peril.png", ridges_Tanner)
+
+## Gambier Bay
+ridges_Tanner <- plot_ridges(dat_all, cur_yr = 2026, location = "Gambier Bay") 
+ggsave("figures/tanner/2026/ridges_Tanner_Gambier.png", ridges_Tanner)
+
+## Excursion Inlet
+ridges_Tanner<- plot_ridges(dat_all, cur_yr = 2026, location = "Excursion Inlet") 
+ggsave("figures/tanner/2026/ridges_Tanner_Excursion.png", ridges_Tanner)
+
+## Lynn Sisters
+ridges_Tanner<- plot_ridges(dat_all, cur_yr = 2026, location = "Lynn Sisters") 
+ggsave("figures/tanner/2026/ridges_Tanner_LynnSisters.png", ridges_Tanner)
+
+## Seymour Canal
+ridges_Tanner <- plot_ridges(dat_all, cur_yr = 2026, location = "Seymour Canal") 
+ggsave("figures/tanner/2026/ridges_Tanner_Seymour.png", ridges_Tanner)
 
 
 
