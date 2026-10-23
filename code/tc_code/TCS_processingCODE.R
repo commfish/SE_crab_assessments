@@ -4,6 +4,9 @@
 # code to process data from Ocean AK to use in crab CSA models.  
 # Prior to 2016 this was done in excel then JMP
 
+library(ggridges)
+library(wesanderson)
+
 #####Load ------------
 source('./code/tanner_functions.R')
 cur_yr <- 2026 #re-ran 2024 graphs for Jan after the 2025 analysis
@@ -54,9 +57,15 @@ dat1 %>% filter(Recruit.Status == "", Number.Of.Specimens >= 1) -> test1
 write.csv(test1, paste0("./results/tanner/tanner_tcs/data_issues", cur_yr, ".csv"))
 
 
-# **FIX **  calculate soak time 
+# calculate soak time 
 #come back later and add a soak time column - tanner soak time should be between 16-20??? double check this
 ##dont filter anythign tho -just to look at
+# Convert to POSIXct
+dat1$Time.Set    <- as.POSIXct(dat1$Time.Set,    format = "%Y-%m-%d %H:%M:%S", tz = "America/Anchorage")
+dat1$Time.Hauled <- as.POSIXct(dat1$Time.Hauled, format = "%Y-%m-%d %H:%M:%S", tz = "America/Anchorage")
+# Soak time in hours
+dat1$Soak.Time.Hrs <- as.numeric(difftime(dat1$Time.Hauled, dat1$Time.Set, units = "hours"))
+View(dat1 %>% filter(Soak.Time.Hrs> 24))
 
 ##### Tanner specific manipulations -----------------------------
 ###     Tanner Survey areas ONLY 
@@ -124,8 +133,8 @@ unique(Tdat1_noGB %>% filter(Year == 2021, Location == "Glacier Bay") %>% select
 Tdat1 <- Tdat1_noGB
 
 #great! but that was just a fix for years 2013-current year. I'll need to do this for historic years (1999-2012) separately I beleive
-View(hist_dat) #that;s the summary. Hmm. I'll likely choose to write a different R file to update hist_dat- will need to pull the pots from OceanAK
-#AGR HERE
+#View(hist_dat) #that;s the summary. Hmm. I'll likely choose to write a different R file to update hist_dat- will need to pull the pots from OceanAK
+#AGR 2026- this is still relevant, because I believe the oceanak data will still have all Glacier Bay data, including the pots that are no longer relevant to the analysis
 
 ################
 
@@ -359,7 +368,6 @@ catch.mid <- read_csv(paste0(here::here(), "/results/tanner/harvest/", cur_yr, "
   slice(1) %>%
   write_csv(paste0(here::here(), "/results/tanner/harvest/", cur_yr, "/tanner_mid_catch_date_area", cur_yr, ".csv"))
 
-#AGR TK partially to here. Will need to run all code above once I have full data from the second survey
 ##but now I can run GBAY and Icy CSA's
 ### STOP here and run .Rmd file for these results: SE_crab_assessments\text\tanner\tanner_tcs_area.Rmd ------------------------
 
@@ -406,4 +414,50 @@ panel_figure("Glacier Bay", cur_yr, "Glacier Bay", 2, "exclude", 0.55, 0.8)
 #panel_figure_pres("Thomas Bay", cur_yr, "Thomas Bay", 2, "exclude")
 #panel_figure_pres("Thomas Bay", cur_yr, "Thomas Bay", 3, "exclude")
 
+##Ridges figure
+dat_all <- read.csv("data/tanner/tanner_data_ALL/all_Tanner_thru_2026.csv") %>%
+  filter(Sex.Code == 1)
 
+## Holham Bay
+ridges_Tanner <- plot_ridges(dat_all, cur_yr = 2026, location = "Holkham Bay") 
+ggsave("figures/tanner/2026/ridges_Tanner_Holkham.png", ridges_Tanner)
+
+## Thomas Bay - not in my data? maybe it goes by a different name
+#ridges_Tanner <- plot_ridges(dat_all, cur_yr = 2026, location = "Holkham Bay") 
+#ggsave("figures/tanner/2026/ridges_Tanner_Holkham.png", ridges_Tanner)
+
+## Icy strait - not in my data either
+#ridges_Tanner <- plot_ridges(dat_all, cur_yr = 2026, location = "Holkham Bay") 
+#ggsave("figures/tanner/2026/ridges_Tanner_Holkham.png", ridges_Tanner)
+
+## Glacier bay isnt here either... Barlow cove??
+# - oh... it's because you need to pull data from the fall surveys, not just the summer surveys
+
+#############################################################################
+###2026 tangent  - icy strait had a 2 day soak due to weather this year
+##let's look at that
+T_icy <- Tdat1 %>% filter(Location=="Icy Strait")
+T_icy_2026 <- T_icy %>% filter(Year==2026) %>%
+  mutate(`soak_duration` = if_else(Pot.No <= 26, 1, 2))
+
+
+#histogram with # crab by category and year
+ggplot(T_icy) + aes(x=mod_recruit) + geom_bar() + facet_wrap(~Year)
+
+#icy hauls by day
+
+ggplot(T_icy_2026) + aes(x=mod_recruit) + geom_bar(aes(fill=Density.Strata, group = Density.Strata), position="dodge") + facet_wrap(~soak_duration)
+ggplot(T_icy_2026) + aes(x=mod_recruit) + geom_bar(aes(fill=Density.Strata, group = Density.Strata)) + facet_wrap(~soak_duration)
+
+T_icy_26_pots <- T_icy_2026 %>% group_by(Density.Strata, soak_duration, Pot.No) %>%
+  summarize(count = n()) %>%
+  ungroup()
+
+ggplot(T_icy_26_pots) + aes(x=Density.Strata) + geom_bar() + facet_wrap(~soak_duration)
+
+
+
+#well what does Gbay look like? It's right there.
+T_glacier <- Tdat1 %>% filter(Location=="Glacier Bay")
+ggplot(T_glacier) + aes(x=mod_recruit) + geom_bar() + facet_wrap(~Year)
+##ok, that's also an increase.

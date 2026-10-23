@@ -739,9 +739,10 @@ panel_figure_J("North Juneau", cur_yr, "North Juneau", "NJ", 2, "exclude")
 dat_all <- read.csv("data/tanner/tanner_data_ALL/all_Tanner_thru_2026.csv") %>%
   filter(Sex.Code == 1)
 
+#might want to change the below to juneau and barlow
 ridges_Tanner_JNU <- plot_ridges(dat_all, cur_yr = 2026, location = "Juneau") #could separate into Nj and SP but that would be a headache
 
 ggsave("figures/tanner/2026/ridges_Tanner_Juneau.png", ridges_Tanner_JNU)
 
-#so... WHY are tanner separated into NJ and SP??
+#so... WHY are tanner separated into NJ and SP?? #WHOOPS. didnt include barlow cove here
 

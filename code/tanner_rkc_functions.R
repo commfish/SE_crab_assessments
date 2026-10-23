@@ -1058,10 +1058,10 @@ plot_ridges <- function(dat_all, cur_yr, location) {
   nyrs <- length(unique(dat_all_1$Year))
   
   p <- ggplot(dat_all_1) +
-    aes(x = Length.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
+    aes(x = Width.Millimeters, y = Year, fill = as.numeric(as.character(Year))) +
     geom_density_ridges(alpha = 0.7) +
     theme_ridges() +
-    xlab("Carapace length (mm)") +
+    xlab("Carapace width (mm)") +
     scale_fill_gradientn(colors = wes_palette("Zissou1", nyrs, type = "continuous"),
                          name = "Year") +
     ylab(NULL) +
@@ -1083,3 +1083,6 @@ plot_ridges <- function(dat_all, cur_yr, location) {
   
   return(p)
 }
+
+
+
