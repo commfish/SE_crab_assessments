@@ -330,7 +330,7 @@ ggplot(poorclutch1, aes(Year, var1))+geom_point() +facet_wrap(~AREA)
 female_shortterm <- read.csv(paste0("./results/tanner/tanner_rkc/", cur_yr, "/female_shortterm.csv"))
 
 ## stock health -------
-total_health("tanner_rkc", cur_yr)
+total_health("tanner_rkc", cur_yr) #leave Peril out in the peril off years. Need to fix... FLAG 26
 
 stock_health_curyr <- read.csv(paste0("./results/tanner/tanner_rkc/", cur_yr, "/stock_health.csv"))
 stock_health_pryr <- read.csv(paste0("./results/tanner/tanner_rkc/", pr_yr, "/stock_health.csv"))
