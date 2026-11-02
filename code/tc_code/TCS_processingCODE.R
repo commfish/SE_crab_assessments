@@ -461,3 +461,193 @@ ggplot(T_icy_26_pots) + aes(x=Density.Strata) + geom_bar() + facet_wrap(~soak_du
 T_glacier <- Tdat1 %>% filter(Location=="Glacier Bay")
 ggplot(T_glacier) + aes(x=mod_recruit) + geom_bar() + facet_wrap(~Year)
 ##ok, that's also an increase.
+
+##cleaner Icy strait 2026 plots/data
+##I want to know
+# 1) graph of pots by strata and soak duration(haul day)- in icy strait
+
+# 2) graph of crab by strata and soak duration(haul day) -in icy strait
+
+
+
+
+##Claude graphs:
+# Label soak duration as a factor so the legend/axis reads nicely
+T_icy_2026 <- T_icy_2026 %>%
+  mutate(soak_label = factor(soak_duration,
+                             levels = c(1, 2),
+                             labels = c("1-day soak", "2-day soak")))
+
+# Shared theme/colors so both figures match
+soak_cols <- c("1-day soak" = "#2C7FB8", "2-day soak" = "#F28E2B")
+
+base_theme <- theme_classic(base_size = 14) +
+  theme(legend.position = "top",
+        legend.title = element_blank(),
+        plot.title = element_text(face = "bold"))
+
+# 1) Pots by density strata and soak duration -----------------------------
+pots_summary <- T_icy_2026 %>%
+  distinct(Pot.No, Density.Strata, soak_label) %>%
+  count(Density.Strata, soak_label, name = "n_pots") %>%
+  complete(Density.Strata, soak_label, fill = list(n_pots = 0))
+
+strata_order <- c("High", "Medium High", "Medium", "Medium Low", "Low/Zero")
+
+pots_summary <- pots_summary %>%
+  mutate(Density.Strata = factor(Density.Strata, levels = strata_order))
+
+
+icy_2026_pots <- ggplot(pots_summary, aes(x = Density.Strata, y = n_pots, fill = soak_label)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.7) +
+  scale_fill_manual(values = soak_cols) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
+                     breaks = function(x) unique(floor(pretty(seq(0, max(x) + 1))))) +
+  labs(title = "Icy Strait 2026: Pots by Density Strata and Soak Duration",
+       x = "Density strata", y = "Number of pots") +
+  base_theme
+
+icy_2026_pots
+
+# 2) Crab by density strata and soak duration -----------------------------
+strata_order <- c("High", "Medium High", "Medium", "Medium Low", "Low")
+
+crab_summary <- T_icy_2026 %>%
+  mutate(Density.Strata = as.character(Density.Strata)) %>%
+  count(Density.Strata, soak_label, name = "n_crab") %>%
+  complete(Density.Strata, soak_label, fill = list(n_crab = 0)) %>%
+  mutate(Density.Strata = factor(Density.Strata, levels = strata_order))
+
+ggplot(crab_summary, aes(x = Density.Strata, y = n_crab, fill = soak_label)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.7) +
+  scale_fill_manual(values = soak_cols) +
+  scale_x_discrete(limits = strata_order) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
+                     breaks = function(x) unique(floor(pretty(seq(0, max(x) + 1))))) +
+  labs(title = "Icy Strait 2026: Crab by Density Strata and Soak Duration",
+       x = "Density strata", y = "Number of crab") +
+  base_theme
+
+
+####CPUE graph - 2 day haul vs one day haul
+strata_order <- c("High", "Medium High", "Medium", "Medium Low", "Low/Zero")
+
+# --- Pot-level table, built like dat3/dat5 in your CPUE section --------------
+pot_level <- T_icy_2026 %>%
+  mutate(Density.Strata = as.character(Density.Strata)) %>%
+  group_by(Year, Location, Pot.No, Density.Strata, Density.Strata.Code, soak_label) %>%
+  summarise(crab = sum(Number.Of.Specimens, na.rm = TRUE), .groups = "drop") %>%
+  left_join(area) %>%                       # adds Area_km, same join as pipeline
+  group_by(Density.Strata.Code) %>%
+  mutate(npots_stratum = n(),               # pots per stratum, both soak days combined
+         weighting = Area_km / npots_stratum) %>%
+  ungroup()
+
+# --- 1) Weighted CPUE by strata and soak duration ----------------------------
+cpue_strata <- pot_level %>%
+  group_by(Density.Strata, soak_label) %>%
+  summarise(n_pots = n(),
+            cpue = weighted.mean(crab, weighting),
+            .groups = "drop") %>%
+  complete(Density.Strata, soak_label, fill = list(n_pots = 0, cpue = 0)) %>%
+  mutate(Density.Strata = factor(Density.Strata, levels = strata_order))
+
+ggplot(cpue_strata, aes(x = Density.Strata, y = cpue, fill = soak_label)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.7) +
+  scale_fill_manual(values = soak_cols) +
+  scale_x_discrete(limits = strata_order) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(title = "Icy Strait 2026: Weighted CPUE by Density Strata and Soak Duration",
+       x = "Density strata", y = "CPUE (crab per pot)") +
+  base_theme
+
+
+##############3
+##claude
+# --- Weighted CPUE by recruit class, strata, and soak duration ---------------
+classes <- c("Pre_Recruit", "Recruit", "Post_Recruit", "Large.Females")
+
+class_labels <- c("Pre_Recruit"   = "Pre-recruit",
+                  "Recruit"       = "Recruit",
+                  "Post_Recruit"  = "Post-recruit",
+                  "Large.Females" = "Mature female")
+
+# crab per pot per class (only pots that caught that class appear here)
+class_counts <- T_icy_2026 %>%
+  filter(mod_recruit %in% classes) %>%
+  group_by(Pot.No, mod_recruit) %>%
+  summarise(crab = sum(Number.Of.Specimens, na.rm = TRUE), .groups = "drop")
+
+# every pot x every class, with zeros for pots that caught none
+pot_class <- pot_level %>%
+  select(Pot.No, Density.Strata, soak_label, weighting) %>%
+  crossing(mod_recruit = classes) %>%
+  left_join(class_counts, by = c("Pot.No", "mod_recruit")) %>%
+  mutate(crab = replace_na(crab, 0))
+
+cpue_class <- pot_class %>%
+  group_by(mod_recruit, Density.Strata, soak_label) %>%
+  summarise(cpue = weighted.mean(crab, weighting), .groups = "drop") %>%
+  complete(mod_recruit = classes, Density.Strata, soak_label, fill = list(cpue = 0)) %>%
+  mutate(mod_recruit = factor(mod_recruit, levels = classes, labels = class_labels[classes]),
+         Density.Strata = factor(Density.Strata, levels = strata_order))
+
+CPUE_icy_storm <- ggplot(cpue_class, aes(x = Density.Strata, y = cpue, fill = soak_label)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.7) +
+  facet_wrap(~mod_recruit, ncol = 2, scales = "free_y") +
+  scale_fill_manual(values = soak_cols) +
+  scale_x_discrete(limits = strata_order) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(title = "Icy Strait 2026 Weighted CPUE",
+       x = "Density strata", y = "CPUE (crab per pot)") +
+  base_theme +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 30, hjust = 1))
+
+CPUE_icy_storm
+ggsave("figures/tanner/2026/CPUE_icy_storm.png", CPUE_icy_storm, width = 8, height = 6, dpi = 300)
+##add that to RMD in an appendix
+
+####DELETE BELOW SCRATCH EXPLORE CODE
+# --- Per-pot exploratory plot --------------------------------------------------
+pot_plot <- pot_level %>%
+  mutate(Density.Strata = factor(Density.Strata, levels = strata_order))
+
+# label the pots that stand out: top 3 overall, plus anything > mean + 2 SD within its soak group
+pot_plot <- pot_plot %>%
+  group_by(soak_label) %>%
+  mutate(outlier = crab > mean(crab) + 2 * sd(crab)) %>%
+  ungroup() %>%
+  mutate(label = if_else(outlier | rank(-crab, ties.method = "first") <= 3,
+                         as.character(Pot.No), NA_character_))
+
+ggplot(pot_plot, aes(x = Density.Strata, y = crab, color = soak_label)) +
+  geom_point(position = position_jitterdodge(jitter.width = 0.15, dodge.width = 0.7, seed = 1),
+             size = 3, alpha = 0.3) +
+  geom_text(aes(label = label),
+            position = position_jitterdodge(jitter.width = 0.15, dodge.width = 0.7, seed = 1),
+            vjust = -1, size = 3.5, show.legend = FALSE, na.rm = TRUE) +
+  scale_color_manual(values = soak_cols) +
+  scale_x_discrete(limits = strata_order) +
+  scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0.1))) +
+  labs(title = "Icy Strait 2026: Crab per Pot by Density Strata and Soak Duration",
+       subtitle = "Each point is one pot; labels are pot numbers",
+       x = "Density strata", y = "Crab in pot") +
+  base_theme
+
+# Top pots by crab count
+pot_level %>%
+  arrange(desc(crab)) %>%
+  select(Pot.No, Density.Strata, soak_label, crab, weighting) %>%
+  head(10)
+
+# Day-1 CPUE with and without the single biggest day-1 pot
+day1 <- pot_level %>% filter(soak_label == "1-day soak")
+top_pot <- day1$Pot.No[which.max(day1$crab)]
+
+day1 %>%
+  summarise(with_top    = weighted.mean(crab, weighting),
+            without_top = weighted.mean(crab[Pot.No != top_pot], weighting[Pot.No != top_pot]))
+
+
