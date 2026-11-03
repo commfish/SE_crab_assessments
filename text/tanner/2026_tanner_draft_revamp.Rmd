@@ -1022,6 +1022,18 @@ ft
 ```
 
 \newpage
+# Appendix B: Icy Strait 2026 Concerns {-}
+
+In 2026, a severe October storm event resulted in a 2-day soak for some of the pots in icy strait. Due to concerns about a 2-day soak raising the CPUE relative to the standard 1-day soak, the CPUE of the two haul events were compared. The 2-day soak did not results in a higher CPUE for any of the size/sex classes of Tanner crab (Figure B1). The CPUE of the 1-day soak was notably higher than that of the 2-day soak in medium-high strata (strata 4). 
+
+```{r IcyStorm, fig.cap = "Comparison of the weighted CPUEs by Tanner crab size/sex class and strata density for the 1-day soak and 2-day soak events in Icy Strait during the 2026 fall Tanner crab survey. The 2-day soak occurred during a severe weather event in October 2026."}
+knitr::include_graphics(paste0(here::here(),'/figures/tanner/2026/CPUE_icy_storm.png'), dpi = 125)
+
+```
+
+
+
+\newpage
  
 # References - tK- make sure ref's alighn with what is acually in document {-}
 Bishop, G., C. Siddon, and A. Olson. 2013. Southeast Alaska Tanner crab survey and stock health prior to the 2011/2012 season. Regional information report No. 1J13-03. Alaska Department of Fish and Game, Division of Commercial Fisheries.
