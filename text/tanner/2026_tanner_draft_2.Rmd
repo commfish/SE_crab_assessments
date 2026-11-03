@@ -680,22 +680,19 @@ rec.GHL <- modelest_tab3 %>% filter(`Survey area` == "Total") %>% pull(CGHL) %>%
 
 ```
 
-To DO: 
-- edit to match Jan's structure (figs, tables order too)
-- check fig and table citations
 
 FYI: CONFIDENTIAL biometrics draft; 
 prepared for Southeast Shellfish staff 
 
 # `r cur_yr` QUICK SUMMARY {-}
-  - Regional biomass increased in 2026 from the 2025 estimate (Figures \@ref(fig:regionalbio), \@ref(fig:stdcpue), and A1).
-  - The mature biomass estimate is in between the upper and lower biomass thresholds.
-  - Overall stock health is mixed with most areas either improving or the same status as last year. Stock status is “Below Average” in one area, “Moderate” in seven areas, and “Above Average” in four areas (Tables 2 and 3).
+  - Regional biomass increased in 2026 (Figures \@ref(fig:regionalbio) and A1).
+  - The mature biomass estimate is in between the upper and lower biomass thresholds (Figures \@ref(fig:regionalbio)).
+  - Overall stock health is mixed with most areas either improving or the same status as last year. Stock status is “Below Average” in one area, “Moderate” in seven areas, and “Above Average” in four areas (Tables 4 and 5 TK add refs (and check)).
 
-# SUMMARY TO DELETE THIS SECTION TK {-}
+# CONFIDENTIAL SUMMARY {-}
 The estimated `r cur_yr`/`r fut_yr` Southeast Alaska Region mature male Tanner crab biomass was **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb**, up approximately **`r pr_yr_diff` million lb** from the `r pr_yr`/`r cur_yr` estimate of **`r pr_yr_mat` million lb**. 
 This estimate exceeds the 2.3-million-pound threshold of mature male biomass in regulation [5 AAC 35.113(a)] required to open the commercial fishery. Once the threshold is met, season length is determined using a regulatory harvest strategy based on effort and mature male biomass. No guideline harvest level (GHL) is set or targeted through inseason management. Despite the lack of a GHL-based harvest strategy, harvestable surplus (GHL) of legal male Tanner crab is estimated to provide a basis for evaluating fishery performance and removals from the stock. 
-Applying the stock health status recommended (`r mean.hr`) and maximum (20%) exploitation rates to mature male biomass results in a range of GHLs between `r rec.GHL` and `r max.GHL` pounds, respectively (Table \@ref(tab:modelest)). Harvesting at higher levels, when stock health is poor to moderate, may increase the probability of population declines. According to this year’s stock assessment model, mature male biomass decreased overall from 2017 to 2024 before the slight increase in 2025 and notable increase in 2026, and legal biomass remained steady from 2018-2021 before declining from 2022 to 2025, and before increasing in 2026 (Figure \@ref(fig:regionalbio)). 
+Applying the stock health status recommended (`r mean.hr`) and maximum (20%) exploitation rates to mature male biomass results in a range of GHLs between `r rec.GHL` and `r max.GHL` pounds, respectively (Table A1). Harvesting at higher levels, when stock health is poor to moderate, may increase the probability of population declines. According to this year’s stock assessment model, mature male biomass decreased overall from 2017 to 2024 before the slight increase in 2025 and notable increase in 2026, and legal biomass remained steady from 2018-2021 before declining from 2022 to 2025, and before increasing in 2026 (Figure \@ref(fig:regionalbio)). 
 
 # OVERVIEW {-}
 
@@ -968,7 +965,7 @@ flextable(table4) %>%
 \newpage
 
 
-```{r}
+```{r table 5, tab.cap = paste("Southeast Alaska Tanner crab stock health designations and scores 2024–2026 by survey area."), echo = FALSE}
 # Table 5: stock health designations and scores, last 3 years ----
 
 yrs <- c(cur_yr - 2, pr_yr, cur_yr)
@@ -1088,7 +1085,8 @@ Table 7.–Southeast Alaska Tanner crab participation, harvest, effort, and catc
 
 
 
-Not-used tables below, put in appendix??-- AGR TK
+# Appendix A
+
 ```{r modelest, tab.cap = paste("Results of", cur_yr, "catch-survey modeling estimation of legal and mature Tanner crab biomass (in pounds (lb)) and guideline harvest level (GHL) calculations using proposed maximum 20% region-wide mature exploitation rates and exploitation rates based upon the current stock health status for each of the 12 survey areas. See matrices below for a more detailed look at the basis of stock status determinations. The expansion factor of 66% (34% for non-surveyed areas) for the total legal and mature male crab biomass was based on the percent of commercial harvest taken from 1980–2000 in surveyed areas. The average harvest and biomass from the first ten years of survey data in each area represents a mean historical baseline (long-term average); in most areas, these years are 1997 to 2006. Both fall and summer crab survey areas are presented. Note that, if calculating GHL as 20% of the mature male biomass results in a legal harvest rate that is greater than 38%, the GHL is adjusted to be 38% of legal male biomass. Peril strait was not surveyed in 2025; the 2024 model-estimated biomass and survey stock status were used as these are the most recent available information."), echo = FALSE}
 
 ft <- flextable(modelest_tab3) %>%
@@ -1144,8 +1142,13 @@ ft
 
 ```
 
+\newpage
 
-Figure 1 - Ask Zane for the full quality figure- Figure 1.–Southeast Alaska (Registration Area A) commercial Tanner crab fishery core, noncore, inside and outside exploratory, and closed areas. AGR TK
+```{r corenoncore, fig.cap ="PLACEHOLDER FIGURE, need to replace with the core and noncore areas map. Southeast Alaska (Registration Area A) commercial Tanner crab fishery core, noncore, inside and outside exploratory, and closed areas."}
+#knitr::include_graphics("figures/rkc/Picture1.jpg", dpi = 125)
+knitr::include_graphics(here::here("figures", "rkc", "Picture1.jpg"), dpi = 125)
+```
+
 
 
 
@@ -1162,6 +1165,10 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur
 
 Figure 4.–Southeast Alaska (Registration Area A) summer and fall survey areas for Tanner and red king crab. AGR TK
 - need an update - Port Fred is not biennial.- ask Zane
+```{r surveyareas, fig.cap = "PLACEHOLDER- Zane is updating the map to include Fall Tanner areas. Southeast Alaska (Registration Area A) summer and fall survey areas for Tanner and red king crab."}
+knitr::include_graphics(paste0(here::here(),'/figures/rkc/regional RKC survey areas.png'), dpi = 125)
+```
+
 
 \newpage
 
