@@ -786,6 +786,7 @@ TBD
 # TABLES AND FIGURES {-}
 
 Table 1 - produced by management staff.
+\newpage
 
 ```{r regbiomass, tab.cap = paste0("Southeast Alaska Tanner crab surveys legal and mature male biomass point estimates (lb), ", cur_yr-2, "–", cur_yr, ". Other areas and Total are expanded using the 66% expansion factor (34% of historical harvest from non-surveyed areas). When an area was not surveyed in a given year (e.g., Peril Strait in 2025), the most recent available estimate was carried forward."), echo = FALSE}
 
@@ -850,10 +851,12 @@ ft2 <- flextable(table2) %>%
   set_table_properties(layout = "autofit")
 ft2
 ```
+\newpage
 
-Table 3 - number of pots, no. of crab - 2023, 2024, 2025 - AGR TK- i dont think I made this table.
-ties(ft3, layout = "autofit")- AGR TK- below isnt right. This table was created by managemnt staff. Need to update
+
 ```{r table3, tab.cap = paste0("Number of survey pots set and number of Tanner crab sampled in Southeast Alaska crab survey by area, ", cur_yr - 2, "–", cur_yr, "."), echo = FALSE}
+#TABLE 3
+
 # ---- SETTINGS ----
 t3_years <- (cur_yr - 2):cur_yr                       # three most recent years, follows cur_yr
 t3_files <- c(
@@ -947,9 +950,11 @@ ft3 <- flextable::flextable(t3_tab) %>%
 
 flextable::set_table_properties(ft3, layout = "autofit")
 ```
+\newpage
 
-Table 4- health scores- straighforward table - insert here from doc
 ```{r healhscores, tab.cap = paste("Southeast Alaska Tanner crab stock health score key, with associated categories, and suggested exploitation rates."), echo = FALSE}
+#TABLE 4
+
 table4 <- data.frame(
   Score = c("< -3.25", "-3.25 to -1.26", "-1.25 to 1.25", "1.26 to 3.25", "> 3.25"),
   `Stock health category` = c("Poor", "Below average", "Moderate", "Above average", "Healthy"),
@@ -960,11 +965,12 @@ table4 <- data.frame(
 flextable(table4) %>%
   set_table_properties(layout = "autofit")
 ```
+\newpage
 
 
-Table 5- stock health scores last 3 years by survey area
 ```{r}
 # Table 5: stock health designations and scores, last 3 years ----
+
 yrs <- c(cur_yr - 2, pr_yr, cur_yr)
 
 # read all stock_health files for a given year and standardize to Location / score / health_status
@@ -1024,7 +1030,7 @@ ft5 <- flextable(table5) %>%
 set_table_properties(ft5, layout = "autofit")
 ```
 
-
+\newpage
 
 
 ```{r harvest, tab.cap = paste("Southeast Alaska Tanner crab commercial fishery harvest contribution by survey area for ", cur_yr - 2, "–", cur_yr, "."), echo = FALSE}
@@ -1077,7 +1083,7 @@ ft6 <- flextable(table6) %>%
 set_table_properties(ft6, layout = "autofit")
 ```
 
-
+\newpage
 Table 7.–Southeast Alaska Tanner crab participation, harvest, effort, and catch per unit effort (CPUE) from core and noncore designated areas, 2024–2026. - table created by the regional staff.
 
 
