@@ -717,11 +717,11 @@ Methods to estimate mature male biomass and assess stock health are similar to t
 # Harvestable surplus {-}
 Since the 2009/2010 fishing season, the Southeast Alaska Tanner commercial crab fishery has been managed using a minimum mature male biomass threshold with a variable season length, determined by a regulatory harvest strategy reliant on fishing effort and mature male biomass. Even though the fishery is not managed using a GHL, the department continues to determine stock health, establish a biologically appropriate mature male harvest rate, and calculate GHLs to provide a biologically sound benchmark by which actual fishery performance can be evaluated.
 
-CSA modeling of the `r cur_yr` fishery and survey data yields a biomass estimate of **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** of mature (greater than 108 mm carapace width) and **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb** of legal (greater than 140 mm carapace width) male Tanner crab (Table A1). This is an increase of **`r pr_yr_diff_L` million lb** of legal male Tanner crab (`r pr_yr_per_L `%) from the `r pr_yr` estimate (Figure \@ref(fig:regionalbio2)). Harvesting at the maximum rate (20% of mature biomass) would equate to a GHL of approximately `r max.GHL` pounds (Table A1). Harvest above this level would likely increase the probability of population declines. Incorporating stock health information suggests a regional exploitation rate of `r mean.hr` of the mature male biomass would reduce the likelihood of population decline and may make an increase in biomass more likely (Table A1). Based on the analysis of Tanner crab biology and harvest strategies adopted in other regions, region-wide exploitation rate (ER) should not exceed 20% of mature male or 38% of legal male estimated biomass.
+CSA modeling of the `r cur_yr` fishery and survey data yields a biomass estimate of **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** of mature (greater than 108 mm carapace width) and **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb** of legal (greater than 140 mm carapace width) male Tanner crab (Table A1). This is an increase of **`r pr_yr_diff_L` million lb** of legal male Tanner crab (`r pr_yr_per_L `%) from the `r pr_yr` estimate (Figure A1). Harvesting at the maximum rate (20% of mature biomass) would equate to a GHL of approximately `r max.GHL` pounds (Table A1). Harvest above this level would likely increase the probability of population declines. Incorporating stock health information suggests a regional exploitation rate of `r mean.hr` of the mature male biomass would reduce the likelihood of population decline and may make an increase in biomass more likely (Table A1). Based on the analysis of Tanner crab biology and harvest strategies adopted in other regions, region-wide exploitation rate should not exceed 20% of mature male or 38% of legal male estimated biomass.
 
 
 # SURVEY AREA STOCK STATUS {-}
-Stock health status is determined by a combination of long- and short-term trends in CPUE. Significance in long-term or short-term trends is defined as a p-value < 0.05. Long-term trends compare the current year's mean to the long-term baseline value (1997-2006, or the first ten years for which survey data are available). The last 4 years of survey data are used in a regression to determine if there are short-term significant trends (increasing or decreasing). The total stock health score is the sum of scores (1, 0, -1 for long-term; 0.25, 0, -0.25 for short-term) for each biological crab category (precrecruit males, recruit males, postrecruit males, mature females) in a given survey area. Stock health is defined by the total score with 5 designated categories and associated exploitation rates (Tables \@ref(tab:healthscores) and\@ref(tab:table5)).
+Stock health status is determined by a combination of long- and short-term trends in CPUE. Significance in long-term or short-term trends is defined as a p-value < 0.05. Long-term trends compare the current year's mean to the long-term baseline value (1997-2006, or the first ten years for which survey data are available). The last 4 years of survey data are used in a regression to determine if there are short-term significant trends (increasing or decreasing). The total stock health score is the sum of scores (1, 0, -1 for long-term; 0.25, 0, -0.25 for short-term) for each biological crab category (precrecruit males, recruit males, postrecruit males, mature females) in a given survey area. Stock health is defined by the total score with five designated categories and associated exploitation rates (Tables \@ref(tab:healthscores) and \@ref(tab:table5)).
 
 
 ## Icy Strait, `r is.status`, `r is.hr` {-}
@@ -1078,7 +1078,7 @@ ft6 <- flextable(table6) %>%
   align(j = 2:ncol(table6), align = "center", part = "all") %>%
   align(i = 1, align = "center", part = "header") %>%
   add_footer_lines(c("Note: Asterisk (*) indicates confidential data.",
-                     "Baseline indicates the average contribution from 1997–2006.")) %>%
+                     "Baseline indicates the average contribution from 1997–2006 or the first ten years for which survey data are available.")) %>%
   align(align = "left", part = "footer")
 
 set_table_properties(ft6, layout = "autofit")
@@ -1098,17 +1098,20 @@ knitr::include_graphics(here::here("figures", "rkc", "Picture1.jpg"), dpi = 125)
 \newpage
 
 ```{r regionalbio, fig.cap = "Trends in Southeast Alaska Tanner crab mature and legal biomass estimated from the current year's catch-survey (CSA) modeling using the pot survey data for Southeast Alaska. Prior to 2001 the biomass of areas initially not surveyed (Thomas Bay, Glacier Bay), but added in subsequent years, is estimated as their average percent contribution to the total surveyed biomass in all subsequent years (first year surveyed to current year’s survey). Bars represent commercial harvest from fish tickets. Threshold lines indicate the lower (dashed orange) and upper (dashed green) thresholds of mature male biomass for the Tanner crab harvest strategy."}
+
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_comm_catch_yr.png'), dpi = 125)
 ```
 \newpage
 
 ```{r stdcpue, fig.cap = "Southeast Alaska commercial Tanner crab harvest and standardized commercial catch-per-unit-effort (CPUE) for the 1991/1992 through 2024/2025 fishery seasons. Fishery year corresponds to the later year listed for a given fishery season; e.g., the 2018/2019 season is the 2019 fishery year. CPUE was calculated using logbook data, which began during the 1993/1994 season. Standardized CPUE was calculated by using a similar number of pot lifts for each year, based on the year (2008/2009) with the fewest number of pot lifts (12,521)."}
+
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 125)
 ```
 
 \newpage
 
 ```{r surveyareas, fig.cap = "PLACEHOLDER- Zane is updating the map to include Fall Tanner areas. Southeast Alaska (Registration Area A) summer and fall survey areas for Tanner and red king crab."}
+
 #knitr::include_graphics("figures/rkc/regional RKC survey areas.png", dpi = 125)
  knitr::include_graphics(here::here("figures", "rkc", "regional RKC survey areas.png"), dpi = 125)
 ```
@@ -1222,7 +1225,7 @@ Clark, J.E. 2008. Restratification of the red king crab stock assessment survey 
 
 \newpage
 
-# Appendix A {-}
+# Appendix A: Extra tables and figures {-}
 
 
 ## Figures and Tables {-}
@@ -1255,7 +1258,7 @@ ft
 
 \newpage
 
-```{r stockstatsummera, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "red king crab survey. The long-term average is defined from 1997–2006. Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
+```{r stockstatsummera, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "red king crab survey. The long-term average is defined from 1997–2006, or the first ten years for which survey data are available. Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
 
 ft <- flextable(summer.stock.stat.a) %>%
   set_header_labels(categ = " ", type = " ") %>%
@@ -1326,7 +1329,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur
 
 \newpage
 
-# Appendix B: Icy Strait 2026 Concerns {-}
+# Appendix B: Icy Strait 2026 concerns {-}
 
 In 2026, a severe October storm event resulted in a 2-day soak for some of the pots in icy strait. Due to concerns about a 2-day soak raising the CPUE relative to the standard 1-day soak, the CPUE of the two haul events were compared. The 2-day soak did not results in a higher CPUE for any of the size/sex classes of Tanner crab (Figure B1). The CPUE of the 1-day soak was notably higher than that of the 2-day soak in medium-high strata (strata 4). 
 
@@ -1339,7 +1342,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/2026/CPUE_icy_storm
 
 \newpage
 
-# APPENDIX C: HISTORIC SURVEY CHANGES IN METHODOLOGY (move to appendix, remove in NC version) {-}
+# Appendix C: Hisotric survey methodology changes {-}
 
 ## 2026: No updates or changes {-}
 
