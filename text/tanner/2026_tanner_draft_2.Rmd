@@ -687,7 +687,7 @@ prepared for Southeast Shellfish staff
 # `r cur_yr` QUICK SUMMARY {-}
   - Regional biomass increased in 2026 (Figures \@ref(fig:regionalbio) and A1).
   - The mature biomass estimate is in between the upper and lower biomass thresholds (Figures \@ref(fig:regionalbio)).
-  - Overall stock health is mixed with most areas either improving or the same status as last year. Stock status is “Below Average” in one area, “Moderate” in seven areas, and “Above Average” in four areas (Tables 4 and 5 TK add refs (and check)).
+  - Overall stock health is mixed with most areas either improving or the same status as last year. Stock status is “Below Average” in one area, “Moderate” in seven areas, and “Above Average” in four areas (Tables \@ref(tab:healthscores) and \@ref(tab:table5)).
 
 # CONFIDENTIAL SUMMARY {-}
 The estimated `r cur_yr`/`r fut_yr` Southeast Alaska Region mature male Tanner crab biomass was **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb**, up approximately **`r pr_yr_diff` million lb** from the `r pr_yr`/`r cur_yr` estimate of **`r pr_yr_mat` million lb**. 
@@ -707,67 +707,66 @@ The estimated `r cur_yr`/`r fut_yr` Southeast Alaska Region mature male Tanner c
 # SOUTHEAST TANNER CRAB STOCK ASSESSMENT, `r cur_yr` {-}
 
 ## SUMMARY OF STOCK STATUS {-}
-This year's biomass estimate of **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** mature male Tanner crab exceeded the 2.3 million lb threshold of mature male biomass in regulation (5 AAC 35.113(a)) required to open the commercial fishery. According to this year’s stock assessment model, mature male biomass decreased overall from 2017 to 2024 before the slight increase in 2025 and notable increase in 2026, and legal biomass remained steady from 2018-2021 before declining from 2022 to 2025, and before increasing in 2026 (Figure \@ref(fig:regionalbio)) -TK table 2 figure 2 in Jan's version. 
+This year's biomass estimate of **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** mature male Tanner crab exceeded the 2.3 million lb threshold of mature male biomass in regulation (5 AAC 35.113(a)) required to open the commercial fishery. According to this year’s stock assessment model, mature male biomass decreased overall from 2017 to 2024 before the slight increase in 2025 and notable increase in 2026; legal biomass remained steady from 2018-2021 before declining from 2022 to 2025, and increased in 2026 (Figure \@ref(fig:regionalbio)).
 
 
-## SOUTHEAST TANNER CRAB SURVEYT AND ANALYSIS {-}
+## SOUTHEAST TANNER CRAB SURVEY AND ANALYSIS {-}
 
 Methods to estimate mature male biomass and assess stock health are similar to those used since 2013 (Bishop et al. 2013). Changes to the sampling areas, sampling methods, and catch per unit effort (CPUE) calculations are described below. Background and details of historic methods can be found in Bishop et al. (2013). A three-stage Catch Survey Analysis (CSA) model is used to estimate biomass using ADF&G survey and commercial catch data. Standardized CPUE calculated from the survey data was used to assess stock health by survey area.
 
 # Harvestable surplus {-}
 Since the 2009/2010 fishing season, the Southeast Alaska Tanner commercial crab fishery has been managed using a minimum mature male biomass threshold with a variable season length, determined by a regulatory harvest strategy reliant on fishing effort and mature male biomass. Even though the fishery is not managed using a GHL, the department continues to determine stock health, establish a biologically appropriate mature male harvest rate, and calculate GHLs to provide a biologically sound benchmark by which actual fishery performance can be evaluated.
 
-CSA modeling of the `r cur_yr` fishery and survey data yields a biomass estimate of **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** of mature (greater than 108 mm carapace width) and **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb** of legal (greater than 140 mm carapace width) male Tanner crab (Table \@ref(tab:modelest)). This is an increase of **`r pr_yr_diff_L` million lb** of legal male Tanner crab (`r pr_yr_per_L `%) from the `r pr_yr` estimate (Figure \@ref(fig:regionalbio2)). Harvesting at the maximum rate (20% of mature biomass) would equate to a GHL of approximately `r max.GHL` pounds (Table \@ref(tab:modelest)). Harvest above this level would likely increase the probability of population declines. Incorporating stock health information suggests a regional exploitation rate of `r mean.hr` of the mature male biomass would reduce the likelihood of population decline and may make an increase in biomass more likely (Table \@ref(tab:modelest)) -AGR TK- move the tables to the appendix, and remove this paragraph in the NC version- italicize to identify this, maybe. Based on the analysis of Tanner crab biology and harvest strategies adopted in other regions, region-wide exploitation rate (ER) should not exceed 20% of mature male or 38% of legal male estimated biomass.
+CSA modeling of the `r cur_yr` fishery and survey data yields a biomass estimate of **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** of mature (greater than 108 mm carapace width) and **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb** of legal (greater than 140 mm carapace width) male Tanner crab (Table A1). This is an increase of **`r pr_yr_diff_L` million lb** of legal male Tanner crab (`r pr_yr_per_L `%) from the `r pr_yr` estimate (Figure \@ref(fig:regionalbio2)). Harvesting at the maximum rate (20% of mature biomass) would equate to a GHL of approximately `r max.GHL` pounds (Table A1). Harvest above this level would likely increase the probability of population declines. Incorporating stock health information suggests a regional exploitation rate of `r mean.hr` of the mature male biomass would reduce the likelihood of population decline and may make an increase in biomass more likely (Table A1). Based on the analysis of Tanner crab biology and harvest strategies adopted in other regions, region-wide exploitation rate (ER) should not exceed 20% of mature male or 38% of legal male estimated biomass.
 
 
 # SURVEY AREA STOCK STATUS {-}
-Stock health status is determined by a combination of long- and short-term trends in CPUE. Significance in long-term or short-term trends is defined as a p-value < 0.05. Long-term trends compare the current year's mean to the long-term baseline value (1997-2006, or the first ten years for which survey data are available). The last 4 years of survey data are used in a regression to determine if there are short-term significant trends (increasing or decreasing). The total stock health score is the sum of scores (1, 0, -1 for long-term; 0.25, 0, -0.25 for short-term) for each biological crab category (precrecruit males, recruit males, postrecruit males, mature females) in a given survey area. Stock health is defined by the total score with 5 designated categories and associated exploitation rates (Table 4 TK- table 4 ideally talks about stock score metrics).
+Stock health status is determined by a combination of long- and short-term trends in CPUE. Significance in long-term or short-term trends is defined as a p-value < 0.05. Long-term trends compare the current year's mean to the long-term baseline value (1997-2006, or the first ten years for which survey data are available). The last 4 years of survey data are used in a regression to determine if there are short-term significant trends (increasing or decreasing). The total stock health score is the sum of scores (1, 0, -1 for long-term; 0.25, 0, -0.25 for short-term) for each biological crab category (precrecruit males, recruit males, postrecruit males, mature females) in a given survey area. Stock health is defined by the total score with 5 designated categories and associated exploitation rates (Tables \@ref(tab:healthscores) and\@ref(tab:table5)).
 
-**remove the HR #'s in the NC version. Or remove now, and just lean on the table. AGR TK.
 
 ## Icy Strait, `r is.status`, `r is.hr` {-}
-The Icy Strait stock status improved to `r is.status` in `r cur_yr` (Table \@ref(tab:stockstatfall)). Prerecruit male Tanner crab CPUE increased sharply, postrecruit male CPUE increased, and recruit male CPUE was about the same as the previous year (Figure \@ref(fig:icy2)). Only recruit male CPUE was significantly below its long-term baseline. Recruit CPUE also had a short-term decreasing trend. Female CPUE increased from the previous year (Figure \@ref(fig:icy3)). The percent of females with poor clutch fullness was not significantly different from 10% (Figure \@ref(fig:icy3)). The mature biomass estimate increased notably due to the high prerecruit CPUE, while the legal biomass estimate increased marginally (Figure \@ref(fig:icy2)).
+The Icy Strait stock status improved to `r is.status` in `r cur_yr` (Table \@ref(tab:table5)). Prerecruit male Tanner crab CPUE increased sharply, postrecruit male CPUE increased, and recruit male CPUE was about the same as the previous year (Figure \@ref(fig:icy2)). Only recruit male CPUE was significantly below its long-term baseline. Recruit CPUE also had a short-term decreasing trend. Female CPUE increased from the previous year (Figure \@ref(fig:icy3)). The percent of females with poor clutch fullness was not significantly different from 10% (Figure \@ref(fig:icy3)). The mature biomass estimate increased notably due to the high prerecruit CPUE, while the legal biomass estimate increased marginally (Figure \@ref(fig:icy2)).
 
 Harvest in Icy Strait has always been close to the estimated legal biomass (see relationship between circles and solid legal biomass line in Figure \@ref(fig:icy2)), suggesting that the population is not isolated to the survey area and that there is likely movement of crab in and out of this area. This hypothesis would suggest that the CSA model is underestimating biomass in Icy Strait, which is apparent in the high harvest rates in this area that are likely not sustainable without population fluctuations. Harvest from this area provided an average of 12.0% of the commercial harvest over the baseline years and `r perc.h.is`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:icy2)).
 
-During the 2026 survey, 23 of the ##TK pots were left to soak for two days instead of one day, due to severe weather. After discussion, it was decided to use all of the data, as it did not appear that the additional soak time resulted in a higher catch (Figure ##TK).
+During the 2026 survey, some of the pots were left to soak for two days instead of one day, due to severe weather. After discussion, it was decided to use all of the data, as it did not appear that the additional soak time resulted in a higher catch (Figure B1).
 
 ## Glacier Bay, `r gl.status`, `r gl.hr` {-}
-The Glacier Bay stock status improved to `r gl.status` in `r cur_yr` (Table \@ref(tab:stockstatfall)). Prerecruit and recruit CPUEs were above their long-term baselines (Figures \@ref(fig:glacier2)). Poor clutch size percentage in female crab was low and thus not concerning (Figures \@ref(fig:glacier3)). Both legal and mature biomass estimates increased from the previous year and are above their respective long-term baselines (Figures \@ref(fig:glacier2)). Harvest from this area provided an average of 9.2% of the commercial harvest over the baseline years and `r perc.h.gl`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:glacier2)).
+The Glacier Bay stock status improved to `r gl.status` in `r cur_yr` (Table \@ref(tab:table5)). Prerecruit and recruit CPUEs were above their long-term baselines (Figures \@ref(fig:glacier2)). Poor clutch size percentage in female crab was low and thus not concerning (Figures \@ref(fig:glacier3)). Both legal and mature biomass estimates increased from the previous year and are above their respective long-term baselines (Figures \@ref(fig:glacier2)). Harvest from this area provided an average of 9.2% of the commercial harvest over the baseline years and `r perc.h.gl`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:glacier2)).
 
 ## Thomas Bay, `r tb.status`, `r tb.hr` {-}
-The Thomas Bay stock status improved from below average in `r pr_yr` to `r tb.status` stock status in `r cur_yr` (Table \@ref(tab:stockstatfall)). Postrecruit male CPUE was significantly below its long-term baseline, while all other size/sex class CPUEs were not significantly different from their long-term baselines (Figure \@ref(fig:thomas2) and \@ref(fig:thomas3)). There were no short-term decreasing trends (table TK?). The percent of females with poor clutch fullness was not significantly different from 10% (Figure \@ref(fig:thomas3)). Both legal and mature biomass estimates increased from the previous year (Figure \@ref(fig:thomas2)). Thomas Bay commercial harvest provided an average of 4.8% of the regional commercial harvest over the baseline years and `r perc.h.tb`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:thomas2)).
+The Thomas Bay stock status improved from below average in `r pr_yr` to `r tb.status` stock status in `r cur_yr` (Table \@ref(tab:table5)). Postrecruit male CPUE was significantly below its long-term baseline, while all other size/sex class CPUEs were not significantly different from their long-term baselines (Figure \@ref(fig:thomas2) and \@ref(fig:thomas3)). There were no short-term decreasing trends (table TK?). The percent of females with poor clutch fullness was not significantly different from 10% (Figure \@ref(fig:thomas3)). Both legal and mature biomass estimates increased from the previous year (Figure \@ref(fig:thomas2)). Thomas Bay commercial harvest provided an average of 4.8% of the regional commercial harvest over the baseline years and `r perc.h.tb`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:thomas2)).
 
 ## Holkham Bay, `r hb.status`, `r hb.hr` {-}
-The Holkham Bay stock remained at `r hb.status` status (Table \@ref(tab:stockstatfall)). All size and sex CPUEs were not significantly different from their long-term baselines (Figures \@ref(fig:holkham2) and \@ref(fig:holkham3)). No size or sex classes displayed short-term decreasing trends. The percentage of females with poor clutch fullness was not significantly different from the baseline 10% level. Both legal and mature male biomass estimates increased. Harvest from this area provided an average of 7.1% of the commercial harvest over the baseline years and `r perc.h.hb`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:holkham2)).
+The Holkham Bay stock remained at `r hb.status` status (Table \@ref(tab:table5)). All size and sex CPUEs were not significantly different from their long-term baselines (Figures \@ref(fig:holkham2) and \@ref(fig:holkham3)). No size or sex classes displayed short-term decreasing trends. The percentage of females with poor clutch fullness was not significantly different from the baseline 10% level. Both legal and mature male biomass estimates increased. Harvest from this area provided an average of 7.1% of the commercial harvest over the baseline years and `r perc.h.hb`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:holkham2)).
 
 ## Port Camden, `r pc.status` {-}
 The Port Camden area was removed from the survey in 2015 due to budgetary constraints as well as the low contribution of this area to the overall Tanner crab commercial harvest.  Port Camden is now included in the non-surveyed areas; the average contribution of the catch from Port Camden from 1980 to 2000 (catch years used for survey expansion value calculation) was removed from the survey expansion percentage. See Appendix A TK for specific methods. The harvest from this area provided an average of 3.8% of the commercial harvest over the baseline years and 0% of the harvest during the `r pr_yr`/`r cur_yr` fishery. 
 
 ## Stephens Passage, `r sp.status`, `r sp.hr` {-}
-The Stephens Passage stock status improved to `r sp.status` from below average stock status in `r pr_yr` (Table \@ref(tab:stockstatsummera)). Postrecruit male and mature female CPUEs were significantly above the long-term baselines, while prerecruit and recruit CPUEs were not significantly different from their long-term baselines (Figures \@ref(fig:sp2) and \@ref(fig:sp3)). Prerecruit male CPUE showed a significant short-term decreasing trend. The percentage of females with poor clutch fullness was significantly below the 10% threshold. The legal biomass estimate was below the baseline value and both legal and mature biomass were down from `r pr_yr`. The harvest from this area provided an average of 9.5% of the commercial harvest over the baseline years and `r perc.h.sp`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:sp2)). Starting in 2015, only survey data from the summer crab survey were used to assess the Stephens Passage area. Refer to the assessment updates and changes at the beginning of this document for details on this change in the methods.  
+The Stephens Passage stock status improved to `r sp.status` from below average stock status in `r pr_yr` (Table \@ref(tab:table5)). Postrecruit male and mature female CPUEs were significantly above the long-term baselines, while prerecruit and recruit CPUEs were not significantly different from their long-term baselines (Figures \@ref(fig:sp2) and \@ref(fig:sp3)). Prerecruit male CPUE showed a significant short-term decreasing trend. The percentage of females with poor clutch fullness was significantly below the 10% threshold. The legal biomass estimate was below the baseline value and both legal and mature biomass were down from `r pr_yr`. The harvest from this area provided an average of 9.5% of the commercial harvest over the baseline years and `r perc.h.sp`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:sp2)). Starting in 2015, only survey data from the summer crab survey were used to assess the Stephens Passage area. Refer to the assessment updates and changes at the beginning of this document for details on this change in the methods.  
 
 ## Seymour Canal, `r sc.status`, `r sc.hr` {-}
-The Seymour Canal stock status remained `r sc.status` (Table \@ref(tab:stockstatsummera)). All mature male CPUEs were not significantly different from their long-term baselines; mature female CPUE was significantly above the long-term baseline (Figures \@ref(fig:seymour2) and \@ref(fig:seymour3)). There were short-term decreasing trends in recruit male CPUE. Mature female poor clutch percentage was not signficantly greater than the 10% threhold of concern. The mature biomass esimate increased from the previous year, while the legal biomass estimate remained near the previous year's value. The harvest from this area provided an average of 6.3% of the commercial harvest over the baseline years and `r perc.h.sc`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:seymour2)).
+The Seymour Canal stock status remained `r sc.status` (Table \@ref(tab:table5)). All mature male CPUEs were not significantly different from their long-term baselines; mature female CPUE was significantly above the long-term baseline (Figures \@ref(fig:seymour2) and \@ref(fig:seymour3)). There were short-term decreasing trends in recruit male CPUE. Mature female poor clutch percentage was not signficantly greater than the 10% threhold of concern. The mature biomass esimate increased from the previous year, while the legal biomass estimate remained near the previous year's value. The harvest from this area provided an average of 6.3% of the commercial harvest over the baseline years and `r perc.h.sc`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:seymour2)).
 
 ## North Juneau, `r nj.status`, `r nj.hr` {-}
 The North Juneau stock status improved to `r nj.status` from 
-below average stock status in `r pr_yr` (Table \@ref(tab:stockstatsummera)).Prerecruit male and mature female CPUEs were significantly above the long-term baseline and postrecruit male CPUE was significantly below the long-term baseline (Figures \@ref(fig:nj2) and \@ref(fig:nj3)). Prerecruit males and mature female CPUEs showed significant short-term decreasing trends. The percentage of females with poor clutch fullness was below the 10% threshold. Both legal and mature biomass estimates increased from the previous year and are below their long-term baselines. The harvest from this area provided an average of 7.1% of the commercial harvest over the baseline years and `r perc.h.nj`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:nj2)).
+below average stock status in `r pr_yr` (Table \@ref(tab:table5)).Prerecruit male and mature female CPUEs were significantly above the long-term baseline and postrecruit male CPUE was significantly below the long-term baseline (Figures \@ref(fig:nj2) and \@ref(fig:nj3)). Prerecruit males and mature female CPUEs showed significant short-term decreasing trends. The percentage of females with poor clutch fullness was below the 10% threshold. Both legal and mature biomass estimates increased from the previous year and are below their long-term baselines. The harvest from this area provided an average of 7.1% of the commercial harvest over the baseline years and `r perc.h.nj`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:nj2)).
 
 ## Excursion Inlet, `r ei.status`, `r ei.hr` {-}
-The Excursion Inlet stock score was `r ei.status` in 2026, down from above average in `r pr_yr` (Table \@ref(tab:stockstatsummera)). Prerecruit male CPUE was significantly above the long-term baseline and postrecruit CPUE was significantly below the long-term baseline; all other size and sex class CPUEs were not significantly different from their long-term baselines (Figures \@ref(fig:ei2) and \@ref(fig:ei3)). There were significant short-term increasing trends in all mature male size class CPUEs. The percentage of females with poor clutches not significantly different than the 10% threshold. Both legal and mature biomass estimates increased from 2025 and were below the baseline values. The harvest from this area provided an average of 6.3% of the commercial harvest over the baseline years and `r perc.h.ei`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:ei2)).
+The Excursion Inlet stock score was `r ei.status` in 2026, down from above average in `r pr_yr` (Table \@ref(tab:table5)). Prerecruit male CPUE was significantly above the long-term baseline and postrecruit CPUE was significantly below the long-term baseline; all other size and sex class CPUEs were not significantly different from their long-term baselines (Figures \@ref(fig:ei2) and \@ref(fig:ei3)). There were significant short-term increasing trends in all mature male size class CPUEs. The percentage of females with poor clutches not significantly different than the 10% threshold. Both legal and mature biomass estimates increased from 2025 and were below the baseline values. The harvest from this area provided an average of 6.3% of the commercial harvest over the baseline years and `r perc.h.ei`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:ei2)).
 
 ## Pybus Bay, `r pb.status`, `r pb.hr` {-}
-The Pybus Bay stock status remained at `r pb.status` stock status, as in the `r pr_yr` survey (Table \@ref(tab:stockstatsummerb)). Prerecruit and recruit male CPUEs were significantly above their long-term baselines; postrecruit and mature female CPUEs were not significantly different from their long-term baselines (Figures \@ref(fig:pybus2) and \@ref(fig:pybus3)). Poor clutch percentage in mature females was significantly below 10% (Figure \@ref(fig:pybus3)). Both mature and legal biomass estimates increased from the previous year and are above their long-term baselines (Figure \@ref(fig:pybus2)). The harvest from this area provided an average of 1.2% of the commercial harvest over the baseline years and `r perc.h.pb`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:pybus2)).
+The Pybus Bay stock status remained at `r pb.status` stock status, as in the `r pr_yr` survey (Table \@ref(tab:table5)). Prerecruit and recruit male CPUEs were significantly above their long-term baselines; postrecruit and mature female CPUEs were not significantly different from their long-term baselines (Figures \@ref(fig:pybus2) and \@ref(fig:pybus3)). Poor clutch percentage in mature females was significantly below 10% (Figure \@ref(fig:pybus3)). Both mature and legal biomass estimates increased from the previous year and are above their long-term baselines (Figure \@ref(fig:pybus2)). The harvest from this area provided an average of 1.2% of the commercial harvest over the baseline years and `r perc.h.pb`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:pybus2)).
 
 ## Gambier Bay, `r ga.status`, `r ga.hr` {-}
-The Gambier Bay stock status improved to `r ga.status` from poor in 2025 (Table \@ref(tab:stockstatsummerb)). All size and sex class CPUEs were significantly below their baseline values (Figures \@ref(fig:gambier2) and \@ref(fig:gambier3)). Recruit male CPUE had a significant decreasing trend. No poor clutch sizes were observed in Gambier Bay in 2026. The mature biomass estimate was slightly above and legal biomass was slightly below the previous year's estimates. The harvest from this area provided an average of 1.9% of the commercial harvest over the baseline years and `r perc.h.ga`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:gambier2)).
+The Gambier Bay stock status improved to `r ga.status` from poor in 2025 (Table \@ref(tab:table5)). All size and sex class CPUEs were significantly below their baseline values (Figures \@ref(fig:gambier2) and \@ref(fig:gambier3)). Recruit male CPUE had a significant decreasing trend. No poor clutch sizes were observed in Gambier Bay in 2026. The mature biomass estimate was slightly above and legal biomass was slightly below the previous year's estimates. The harvest from this area provided an average of 1.9% of the commercial harvest over the baseline years and `r perc.h.ga`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:gambier2)).
 
 ## Peril Strait, `r ps.status`, `r ps.hr` {-}
-The Peril Strait stock status was above average in 2026, up from below average in 2024; Peril Strait was not surveyed in 2025 (Table \@ref(tab:stockstatsummerb)). In 2026, Peril Strait male prerecruit male and mature female CPUEs were above their baseline values (Figures \@ref(fig:peril2) and \@ref(fig:peril3)). Prerecuits and recruit males and mature female CPUEs had positive short-term trends. The mature and legal biomass estimates increased in 2026 and are above their respective baseline values. The harvest from this area contributed an average of 0.7% of the commercial harvest over the baseline years and `r perc.h.ps`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:peril2)).
+The Peril Strait stock status was above average in 2026, up from below average in 2024; Peril Strait was not surveyed in 2025 (Table \@ref(tab:table5)). In 2026, Peril Strait male prerecruit male and mature female CPUEs were above their baseline values (Figures \@ref(fig:peril2) and \@ref(fig:peril3)). Prerecuits and recruit males and mature female CPUEs had positive short-term trends. The mature and legal biomass estimates increased in 2026 and are above their respective baseline values. The harvest from this area contributed an average of 0.7% of the commercial harvest over the baseline years and `r perc.h.ps`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:peril2)).
 
 ## Lynn Sisters, `r ls.status`, `r ls.hr` {-}
-The Lynn Sisters stock status remained `r ls.status` in `r cur_yr` (Table \@ref(tab:stockstatsummerb)). All size and sex class CPUEs were not significantly different from their long-term baselines and did not show any significant short-term trends (Figures \@ref(fig:lynn2) and \@ref(fig:lynn3)). Percentage of mature female poor clutches was not significantly different than 10% (Figure \@ref(fig:lynn3)). Both mature and legal biomass estimates increased in `r cur_yr` and are above below their long-term baselines. The harvest from this area provided an average of 0.7% of the commercial harvest over the baseline years and `r perc.h.ls`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:lynn2)).
+The Lynn Sisters stock status remained `r ls.status` in `r cur_yr` (Table \@ref(tab:table5)). All size and sex class CPUEs were not significantly different from their long-term baselines and did not show any significant short-term trends (Figures \@ref(fig:lynn2) and \@ref(fig:lynn3)). Percentage of mature female poor clutches was not significantly different than 10% (Figure \@ref(fig:lynn3)). Both mature and legal biomass estimates increased in `r cur_yr` and are above below their long-term baselines. The harvest from this area provided an average of 0.7% of the commercial harvest over the baseline years and `r perc.h.ls`% of the harvest during the `r pr_yr`/`r cur_yr` fishery (Figure \@ref(fig:lynn2)).
 
 ## Port Frederick, `r pf.status` {-}
 The Port Frederick survey area was removed from the survey in 2015 due to its low contribution to the overall Tanner crab catch and department budget constraints. For the 2015 to `r cur_yr` analyses, Port Frederick was included in the non-surveyed areas. The average contribution of catch in Port Frederick from 1980 to 2000 was removed from the survey expansion percentage. See Appendix A for more detail. Port Frederick was surveyed in 2025 on a biennial schedule, and may be added back into the surveyed areas after the accumulation of more years of recent data collection. The harvest from this area provided an average of 0.5% of the commercial harvest over the baseline years and `r perc.h.pf`% of the harvest during the `r pr_yr`/`r cur_yr` fishery.
@@ -783,6 +782,12 @@ TBD
 # TABLES AND FIGURES {-}
 
 Table 1 - produced by management staff.
+```{r tab1, tab.cap = "Southeast Alaska (Registration Area A) commercial Tanner crab harvest (lb), effort, and value by season and gear type, 2000–2001 through 2025–2026."}
+knitr::kable(
+  data.frame(Placeholder = "Table 1 to be added (produced by management staff)")
+)
+```
+
 \newpage
 
 ```{r regbiomass, tab.cap = paste0("Southeast Alaska Tanner crab surveys legal and mature male biomass point estimates (lb), ", cur_yr-2, "–", cur_yr, ". Other areas and Total are expanded using the 66% expansion factor (34% of historical harvest from non-surveyed areas). When an area was not surveyed in a given year (e.g., Peril Strait in 2025), the most recent available estimate was carried forward."), echo = FALSE}
@@ -949,7 +954,7 @@ flextable::set_table_properties(ft3, layout = "autofit")
 ```
 \newpage
 
-```{r healhscores, tab.cap = paste("Southeast Alaska Tanner crab stock health score key, with associated categories, and suggested exploitation rates."), echo = FALSE}
+```{r healthscores, tab.cap = paste("Southeast Alaska Tanner crab stock health score key, with associated categories, and suggested exploitation rates."), echo = FALSE}
 #TABLE 4
 
 table4 <- data.frame(
@@ -965,7 +970,7 @@ flextable(table4) %>%
 \newpage
 
 
-```{r table 5, tab.cap = paste("Southeast Alaska Tanner crab stock health designations and scores 2024–2026 by survey area."), echo = FALSE}
+```{r table5, tab.cap = paste("Southeast Alaska Tanner crab stock health designations and scores 2024-2026 by survey area."), echo = FALSE}
 # Table 5: stock health designations and scores, last 3 years ----
 
 yrs <- c(cur_yr - 2, pr_yr, cur_yr)
@@ -1085,62 +1090,7 @@ Table 7.–Southeast Alaska Tanner crab participation, harvest, effort, and catc
 
 
 
-# Appendix A
 
-```{r modelest, tab.cap = paste("Results of", cur_yr, "catch-survey modeling estimation of legal and mature Tanner crab biomass (in pounds (lb)) and guideline harvest level (GHL) calculations using proposed maximum 20% region-wide mature exploitation rates and exploitation rates based upon the current stock health status for each of the 12 survey areas. See matrices below for a more detailed look at the basis of stock status determinations. The expansion factor of 66% (34% for non-surveyed areas) for the total legal and mature male crab biomass was based on the percent of commercial harvest taken from 1980–2000 in surveyed areas. The average harvest and biomass from the first ten years of survey data in each area represents a mean historical baseline (long-term average); in most areas, these years are 1997 to 2006. Both fall and summer crab survey areas are presented. Note that, if calculating GHL as 20% of the mature male biomass results in a legal harvest rate that is greater than 38%, the GHL is adjusted to be 38% of legal male biomass. Peril strait was not surveyed in 2025; the 2024 model-estimated biomass and survey stock status were used as these are the most recent available information."), echo = FALSE}
-
-ft <- flextable(modelest_tab3) %>%
-  add_header_row(values = c("", "Healthy stock status", "Current stock status", "1997 - 2006"), colwidths = c(3, 3, 3, 2), top = TRUE) %>%
-  align(i = 1, j = NULL, align = "center", part = "header") %>%
-  vline(j = c(1, 3, 6, 9)) %>%
-  italic(i = 10, j = NULL, italic = TRUE, part = "body") #no italics in the even years (you'd hastag out this line and the pipe immediately before)
-#flag- peril strait is twice in this table...11/3/25
-
-set_table_properties(ft, layout = "autofit")
-```
-
-\newpage
-```{r stockstatfall, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "Tanner crab survey. The long-term average is defined as the first 10 years of available data from 1997–2010. Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
-
-ft <- flextable(fall.stock.stat) %>%
-  set_header_labels(categ = " ", type = " ") %>%
-  merge_v(j = 1) %>%
-  valign(j = 1, valign = "top", part = "all") %>%
-  hline(i = c(3, 6, 9, 12, 15, 18)) %>%
-  fix_border_issues()
-ft
-
-```
-
-\newpage
-
-```{r stockstatsummera, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "red king crab survey. The long-term average is defined from 1997–2006. Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
-
-ft <- flextable(summer.stock.stat.a) %>%
-  set_header_labels(categ = " ", type = " ") %>%
-  merge_v(j = 1) %>%
-  valign(j = 1, valign = "top", part = "all") %>%
-  hline(i = c(3, 6, 9, 12, 15, 18)) %>%
-  fix_border_issues()
-ft
-
-
-```
-
-\newpage
-
-```{r stockstatsummerb, tab.cap = "continued. Note that Peril Strait was not surveyed in 2025, so 2024 values were used to inform the 2025 stock assessment", echo = FALSE}
-
-ft <- flextable(summer.stock.stat.b) %>%
-  set_header_labels(categ = " ", type = " ") %>%
-  merge_v(j = 1) %>%
-  valign(j = 1, valign = "top", part = "all") %>%
-  hline(i = c(3, 6, 9, 12, 15, 18)) %>%
-  fix_border_issues()
-ft
-
-
-```
 
 \newpage
 
@@ -1166,7 +1116,8 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur
 Figure 4.–Southeast Alaska (Registration Area A) summer and fall survey areas for Tanner and red king crab. AGR TK
 - need an update - Port Fred is not biennial.- ask Zane
 ```{r surveyareas, fig.cap = "PLACEHOLDER- Zane is updating the map to include Fall Tanner areas. Southeast Alaska (Registration Area A) summer and fall survey areas for Tanner and red king crab."}
-knitr::include_graphics(paste0(here::here(),'/figures/rkc/regional RKC survey areas.png'), dpi = 125)
+#knitr::include_graphics("figures/rkc/regional RKC survey areas.png", dpi = 125)
+ knitr::include_graphics(here::here("figures", "rkc", "regional RKC survey areas.png"), dpi = 125)
 ```
 
 
@@ -1273,6 +1224,66 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_y
 
 
 ## Figures and Tables {-}
+
+
+```{r modelest, tab.cap = paste("Results of", cur_yr, "catch-survey modeling estimation of legal and mature Tanner crab biomass (in pounds (lb)) and guideline harvest level (GHL) calculations using proposed maximum 20% region-wide mature exploitation rates and exploitation rates based upon the current stock health status for each of the 12 survey areas. See matrices below for a more detailed look at the basis of stock status determinations. The expansion factor of 66% (34% for non-surveyed areas) for the total legal and mature male crab biomass was based on the percent of commercial harvest taken from 1980–2000 in surveyed areas. The average harvest and biomass from the first ten years of survey data in each area represents a mean historical baseline (long-term average); in most areas, these years are 1997 to 2006. Both fall and summer crab survey areas are presented. Note that, if calculating GHL as 20% of the mature male biomass results in a legal harvest rate that is greater than 38%, the GHL is adjusted to be 38% of legal male biomass. Peril strait was not surveyed in 2025; the 2024 model-estimated biomass and survey stock status were used as these are the most recent available information."), echo = FALSE}
+
+ft <- flextable(modelest_tab3) %>%
+  add_header_row(values = c("", "Healthy stock status", "Current stock status", "1997 - 2006"), colwidths = c(3, 3, 3, 2), top = TRUE) %>%
+  align(i = 1, j = NULL, align = "center", part = "header") %>%
+  vline(j = c(1, 3, 6, 9)) %>%
+  italic(i = 10, j = NULL, italic = TRUE, part = "body") #no italics in the even years (you'd hastag out this line and the pipe immediately before)
+#flag- peril strait is twice in this table...11/3/25
+
+set_table_properties(ft, layout = "autofit")
+```
+
+\newpage
+```{r stockstatfall, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "Tanner crab survey. The long-term average is defined as the first 10 years of available data from 1997–2010. Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
+
+ft <- flextable(fall.stock.stat) %>%
+  set_header_labels(categ = " ", type = " ") %>%
+  merge_v(j = 1) %>%
+  valign(j = 1, valign = "top", part = "all") %>%
+  hline(i = c(3, 6, 9, 12, 15, 18)) %>%
+  fix_border_issues()
+ft
+
+```
+
+\newpage
+
+```{r stockstatsummera, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "red king crab survey. The long-term average is defined from 1997–2006. Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
+
+ft <- flextable(summer.stock.stat.a) %>%
+  set_header_labels(categ = " ", type = " ") %>%
+  merge_v(j = 1) %>%
+  valign(j = 1, valign = "top", part = "all") %>%
+  hline(i = c(3, 6, 9, 12, 15, 18)) %>%
+  fix_border_issues()
+ft
+
+
+```
+
+\newpage
+
+```{r stockstatsummerb, tab.cap = "continued. Note that Peril Strait was not surveyed in 2025, so 2024 values were used to inform the 2025 stock assessment", echo = FALSE}
+
+ft <- flextable(summer.stock.stat.b) %>%
+  set_header_labels(categ = " ", type = " ") %>%
+  merge_v(j = 1) %>%
+  valign(j = 1, valign = "top", part = "all") %>%
+  hline(i = c(3, 6, 9, 12, 15, 18)) %>%
+  fix_border_issues()
+ft
+
+
+```
+
+
+
+\newpage
 ### Table A1: Regional biomass estimates from surveyed areas only. The “`r cur_yr` model” columns contain biomass estimates from the `r cur_yr` CSA models (displayed in Figure \@ref(fig:regionalbio)) and the “Annual Point Estimates” columns contain the survey area biomass as a point estimate from each modeling year. {-}
 
 ```{r tableA1prep, include = FALSE}
