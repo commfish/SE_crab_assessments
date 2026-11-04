@@ -508,6 +508,7 @@ icy_2026_pots <- ggplot(pots_summary, aes(x = Density.Strata, y = n_pots, fill =
   base_theme
 
 icy_2026_pots
+ggsave("figures/tanner/2026/Icy_2026_no_pots.png", icy_2026_pots, width = 8, height = 6, dpi = 300)
 
 # 2) Crab by density strata and soak duration -----------------------------
 strata_order <- c("High", "Medium High", "Medium", "Medium Low", "Low")
