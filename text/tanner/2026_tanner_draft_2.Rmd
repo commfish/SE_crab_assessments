@@ -718,7 +718,7 @@ Methods to estimate mature male biomass and assess stock health are similar to t
 # Harvestable surplus {-}
 Since the 2009/2010 fishing season, the Southeast Alaska Tanner commercial crab fishery has been managed using a minimum mature male biomass threshold with a variable season length, determined by a regulatory harvest strategy reliant on fishing effort and mature male biomass. Even though the fishery is not managed using a GHL, the department continues to determine stock health, establish a biologically appropriate mature male harvest rate, and calculate GHLs to provide a biologically sound benchmark by which actual fishery performance can be evaluated.
 
-CSA modeling of the `r cur_yr` fishery and survey data yields a biomass estimate of **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** of mature (greater than 108 mm carapace width) and **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb** of legal (greater than 140 mm carapace width) male Tanner crab (Table A1). This is an increase of **`r pr_yr_diff_L` million lb** of legal male Tanner crab (`r pr_yr_per_L `%) from the `r pr_yr` estimate (Figure A1). Harvesting at the maximum rate (20% of mature biomass, capped at 38% of legal biomass) would equate to a GHL of approximately `r max.GHL` pounds (Table A1). Harvest above this level would likely increase the probability of population declines. Incorporating stock health information suggests a regional exploitation rate of `r mean.hr` of the mature male biomass would reduce the likelihood of population decline and may make an increase in biomass more likely (Table A1). Based on the analysis of Tanner crab biology and harvest strategies adopted in other regions, region-wide exploitation rate should not exceed 20% of mature male or 38% of legal male estimated biomass.
+CSA modeling of the `r cur_yr` fishery and survey data yields a biomass estimate of **`r round(b_cur_yr$TOTAL_mat/1000000, 2)` million lb** of mature (greater than 108 mm carapace width) and **`r round(b_cur_yr$TOTAL_leg/1000000, 2)` million lb** of legal (greater than 140 mm carapace width) male Tanner crab (Table 2). This is an increase of **`r pr_yr_diff_L` million lb** of legal male Tanner crab (`r pr_yr_per_L `%) from the `r pr_yr` estimate (Table 2 and Figure A1). Harvesting at the maximum rate (20% of mature biomass, capped at 38% of legal biomass) would equate to a GHL of approximately `r max.GHL` pounds (Table A1). Harvest above this level would likely increase the probability of population declines. Incorporating stock health information suggests a regional exploitation rate of `r mean.hr` of the mature male biomass would reduce the likelihood of population decline and may make an increase in biomass more likely (Table A1). Based on the analysis of Tanner crab biology and harvest strategies adopted in other regions, region-wide exploitation rate should not exceed 20% of mature male or 38% of legal male estimated biomass.
 
 
 # SURVEY AREA STOCK STATUS {-}
@@ -1224,7 +1224,9 @@ Bishop, G., C. Siddon, and A. Olson. 2013. Southeast Alaska Tanner crab survey a
 
 Clark, J.E. 2008. Restratification of the red king crab stock assessment survey in Southeast Alaska (pp.96). Juneau: Alaska Department of Fish and Game, Division of Commercial Fisheries.
 
-\newpage
+```{=openxml}
+<w:p><w:pPr><w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/></w:sectPr></w:pPr></w:p>
+```
 
 # Appendix A: Extra tables and figures {-}
 
@@ -1241,10 +1243,14 @@ ft <- flextable(modelest_tab3) %>%
   #italic(i = 10, j = NULL, italic = TRUE, part = "body") #no italics in the even years (you'd hastag out this line and the pipe immediately before)
 #flag- peril strait is twice in this table...11/3/25
 
-set_table_properties(ft, layout = "autofit")
+set_table_properties(ft, layout = "autofit", width=1)
 ```
 
-\newpage
+```{=openxml}
+<w:p><w:pPr><w:sectPr><w:pgSz w:w="15840" w:h="12240" w:orient="landscape"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/></w:sectPr></w:pPr></w:p>
+```
+
+
 ```{r stockstatfall, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "Tanner crab survey. The long-term average is defined as from 1997–2006 or the first 10 years of available data Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
 
 ft <- flextable(fall.stock.stat) %>%
@@ -1291,7 +1297,7 @@ ft
 
 \newpage
 
-### Table A1: Regional biomass estimates from surveyed areas only. The “`r cur_yr` model” columns contain biomass estimates from the `r cur_yr` CSA models (displayed in Figure \@ref(fig:regionalbio)) and the “Annual Point Estimates” columns contain the survey area biomass as a point estimate from each modeling year. {-}
+### Table A3: Regional biomass estimates from surveyed areas only. The “`r cur_yr` model” columns contain biomass estimates from the `r cur_yr` CSA models (displayed in Figure \@ref(fig:regionalbio)) and the “Annual Point Estimates” columns contain the survey area biomass as a point estimate from each modeling year. {-}
 
 ```{r tableA1prep, include = FALSE}
 
