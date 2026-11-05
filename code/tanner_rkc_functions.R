@@ -476,7 +476,7 @@ total_health_njsp <- function(year){
 }
 
 
-## CONF panel figure ---------------
+## CONF/NC panel figure ---------------
 panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   # survey.location here are codes: EI, PS, PB, GB, SC, LS
   #TEST
@@ -489,8 +489,8 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   #l2 = 0.88
   
   # area is used in biomass /harvest file:  Icy Strait, Glacier Bay, 
-      # Holkham Bay, Thomas Bay, Stephens Passage, North Juneau, Lynn Sisters, Pybus Bay, 
-      # Gambier Bay, Excursion Inlet, Peril Strait, Seymour Canal  
+  # Holkham Bay, Thomas Bay, Stephens Passage, North Juneau, Lynn Sisters, Pybus Bay, 
+  # Gambier Bay, Excursion Inlet, Peril Strait, Seymour Canal  
   # cur_yr is the current year
   # option refers to output from this function. 
   # Option 1 - all 4 on one file, Option 2 - just p1, p4 (males), 
@@ -506,9 +506,9 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   baseline <- read.csv("./data/tanner/tanner_rkc/longterm_means_TC.csv")
   biomass <- read.csv(paste0('./data/tanner/tanner_', n_yr, '_biomassmodel.csv'))
   harvest <- read.csv(paste0('./results/tanner/harvest/', cur_yr, '/tanner_comm_catch_97_', cur_yr,'_confid.csv')) # needs to be updated with
-                                    # recent year - both biomass and harvest files.
+  # recent year - both biomass and harvest files.
   # file for all locations.  Has legal and mature biomass from current year CSA & harvest
-
+  
   # prep data 
   ### Mature males
   # create data frame that has mature males - just means
@@ -573,9 +573,19 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   
   ## biomass manipulations -------------
   # file for all locations.  Has preR, legal, and mature biomass from CSAs
+  
+  # ADDED: instead of dropping confidential harvest rows, blank the values (NA)
+  # and remember which years were confidential for THIS area so they can be
+  # asterisked on the harvest panel.
+  conf_years <- numeric(0)
   if(conf == "exclude"){
     harvest %>% 
-      filter(confidential == "n") -> harvest
+      filter(Year >= 1997, survey.area == area, confidential != "n") %>% 
+      pull(Year) %>% 
+      unique() -> conf_years
+    
+    harvest %>% 
+      mutate(pounds = ifelse(confidential == "n", pounds, NA)) -> harvest
   }
   
   harvest %>% 
@@ -606,7 +616,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                       labels =c("Postrecruit", "Prerecruit", "Recruit")) +
     scale_shape_manual(name = "", values = c(15, 16, 17),
                        labels=c("Postrecruit", "Prerecruit", "Recruit")
-                       )+ #fixed 11/18/24
+    )+ #fixed 11/18/24
     #scale_y_continuous(limits = c(0,(max(males_graph$mean) + max(males_graph$se))),
     #                   oob = rescale_none) +
     #ggtitle(area) + #no title agr 25
@@ -670,10 +680,10 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     ) #agr add-  annotation of area to me graph
   
   #if(option == 3){
-   # p2 = p2 + ggtitle(paste0(area, ' - Females')) + #AGR 25 off- gonna have a label inside the plot instead
-    #  theme(plot.title = element_text(size = 24))
+  # p2 = p2 + ggtitle(paste0(area, ' - Females')) + #AGR 25 off- gonna have a label inside the plot instead
+  #  theme(plot.title = element_text(size = 24))
   #}
-   
+  
   
   #### F1c Female eggs graph -----------
   p3 <- ggplot(female_egg_graph, aes(Year, mean, group = female.egg, fill = female.egg)) + 
@@ -726,8 +736,8 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     theme(plot.title = element_text(hjust =0.5)) + 
     scale_x_continuous(limits = c(1997, cur_yr), breaks = seq(min(1994),max(cur_yr), by =2)) + #1993, 1994 depending on even or odd yr- arg
     scale_y_continuous(labels = scales::comma, #agr added to put comma 25
-      limits = c(0,max(biomass_graph$pounds, 
-                                                        na.rm = TRUE) + 25000),
+                       limits = c(0,max(biomass_graph$pounds, 
+                                        na.rm = TRUE) + 25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds, 
                                                    na.rm = TRUE) + 25000), by = 50000)) + #agr change per graph (with an if statement) as relevant 25
     theme(legend.position = c(l1, l2), #c(0.55,0.8), 
@@ -737,31 +747,21 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                linetype = "solid")+
     geom_hline(data = baseline_means, aes(yintercept = mature_mean), color = "grey55", 
                linetype = "dashed") #agr added Dec 2025
-    #geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey62", linetype = "dashed")
+  #geom_hline(data = baseline_means, aes(yintercept = legal_adj_mean), color = "grey62", linetype = "dashed")
   #if(scale == 1){
   #  p4 = p4 + scale_y_continuous(labels = comma, limits = c(0,1400000),
   #                               breaks= seq(min(0), max(1400000), by = 50000), oob = rescale_none)
   #}
   
+  # ADDED: asterisk at the bottom of the harvest panel for each confidential
+  # (suppressed) harvest year -- only when conf == "exclude"
+  if(conf == "exclude" && length(conf_years) > 0){
+    p4 <- p4 +
+      annotate("text", x = conf_years, y = -Inf, label = "*",
+               vjust = -0.3, size = 6)
+  }
+  
   ### FINAL plot -------------
-  #png(paste0('./figures/redcrab/', survey.location, '_', cur_yr, '.png'), res= 600, 
-  #    width = 8, height =11, units = "in")
-  #grid.arrange(p1, p2, p3, p4, ncol = 1)
-  #panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'vh')
-  #ggsave(paste0('./figures/redcrab/', survey.location, '_', cur_yr, '.png'), panel,  
-  #       dpi = 800, width = 8, height = 9.5)
-  #dev.off()
-  
-  #p1 + scale_shape_manual(name = "", values = c(15, 16, 17)) #fixed 11/18/24
-  
-  #ifelse(option == 1 , 
-   #      panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
-    #     ifelse(option == 2, 
-     #           panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
-      #          ifelse(option == 3, 
-       #                panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  
-  
   add_margin <- theme(plot.margin = margin(5.5, 5.5, 5.5, 15, "pt")) #agr added 25 to prevent dumb overlay problem
   
   p1 <- p1 + add_margin
@@ -782,14 +782,14 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     panel <- 0
   }
   
-if(conf == "exclude"){  
-  ggsave(paste0('./figures/tanner/tanner_rkc/',cur_yr,'/', survey.location, '_', cur_yr, '_', 
-                option, '_nonconf.png'), panel,  
-         dpi = 800, width = 8, height = 9.5)}
-if(conf == "include"){
-  ggsave(paste0('./figures/tanner/tanner_rkc/' ,cur_yr,'/', survey.location, '_', cur_yr, '_', 
-                option, 'confidential.png'), panel,  
-         dpi = 800, width = 8, height = 9.5)}
+  if(conf == "exclude"){  
+    ggsave(paste0('./figures/tanner/tanner_rkc/',cur_yr,'/', survey.location, '_', cur_yr, '_', 
+                  option, '_nonconf.png'), panel,  
+           dpi = 800, width = 8, height = 9.5)}
+  if(conf == "include"){
+    ggsave(paste0('./figures/tanner/tanner_rkc/' ,cur_yr,'/', survey.location, '_', cur_yr, '_', 
+                  option, 'confidential.png'), panel,  
+           dpi = 800, width = 8, height = 9.5)}
 }
 
 

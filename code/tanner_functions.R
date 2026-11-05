@@ -363,9 +363,19 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   
   ## biomass manipulations -------------
   # file for all locations.  Has preR, legal, and mature biomass from CSAs
+  
+  # ADDED: instead of dropping confidential harvest rows, blank the values (NA)
+  # and remember which years were confidential for THIS location so they can be
+  # asterisked on the harvest panel.
+  conf_years <- numeric(0)
   if(conf == "exclude"){
     harvest %>% 
-      filter(confidential == "n") -> harvest
+      filter(Year >= 1997, survey.area == survey.location, confidential != "n") %>% 
+      pull(Year) %>% 
+      unique() -> conf_years
+    
+    harvest %>% 
+      mutate(pounds = ifelse(confidential == "n", pounds, NA)) -> harvest
   }
   
   harvest %>% 
@@ -463,15 +473,15 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
              size = 6, fontface = "bold"    
     )
   
- # if(option == 3){
+  # if(option == 3){
   #  p2 = p2 + ggtitle(paste0(survey.location, ' - Females')) +
-   #   theme(plot.title = element_text(size = 24))
+  #   theme(plot.title = element_text(size = 24))
   #}
   
   
   #### F1c Female eggs graph -----------
   p3 <- ggplot(female_egg_graph, aes(Year, mean, group = female.egg, fill = female.egg)) + 
-        #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = female.egg), 
+    #geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = female.egg), 
     #              width =.4) +
     geom_point(aes(fill = female.egg, shape = female.egg), size =3) +
     geom_line(aes(color = female.egg, group = female.egg)) +
@@ -521,7 +531,7 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
     scale_y_continuous(labels = comma, limits = c(0,max(biomass_graph$pounds, 
                                                         na.rm = TRUE) + 25000),
                        breaks= seq(min(0), max(max(biomass_graph$pounds, 
-                                                  na.rm = TRUE)+25000), by = 100000)) +
+                                                   na.rm = TRUE)+25000), by = 100000)) +
     theme(legend.position = c(l1, l2), #c(0.55,0.8), 
           axis.text = element_text(size = 12), 
           axis.title=element_text(size=14,face="bold")) + 
@@ -535,22 +545,15 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
   #                               breaks= seq(min(0), max(1400000), by = 50000), oob = rescale_none)
   #}
   
+  # ADDED: asterisk at the bottom of the harvest panel for each confidential
+  # (suppressed) harvest year -- only when conf == "exclude"
+  if(conf == "exclude" && length(conf_years) > 0){
+    p4 <- p4 +
+      annotate("text", x = conf_years, y = -Inf, label = "*",
+               vjust = -0.3, size = 6)
+  }
+  
   ### FINAL plot -------------
-  #png(paste0('./figures/redcrab/', survey.location, '_', cur_yr, '.png'), res= 600, 
-  #    width = 8, height =11, units = "in")
-  #grid.arrange(p1, p2, p3, p4, ncol = 1)
-  #panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'vh')
-  #ggsave(paste0('./figures/redcrab/', survey.location, '_', cur_yr, '.png'), panel,  
-  #       dpi = 800, width = 8, height = 9.5)
-  #dev.off()
-  
- # ifelse(option == 1 , 
-  #       panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v'),
-   #      ifelse(option == 2, 
-    #            panel <- plot_grid(p1, p4, ncol = 1, align = 'v'), 
-     #           ifelse(option == 3, 
-      #                 panel <- plot_grid(p2, p3, ncol = 1, align = 'v'), 0)))
-  
   if (option == 1) {
     panel <- plot_grid(p1, p2, p3, p4, ncol = 1, align = 'v')
   } else if (option == 2) {
@@ -573,8 +576,6 @@ panel_figure <- function(survey.location, cur_yr, area, option, conf, l1, l2){
                   option, 'confidential.png'), panel,  
            dpi = 800, width = 8, height = 9.5)}
 }
-
-
 
 ## PRESENTATION CONF / non-conf panel figure ---------------
 panel_figure_pres <- function(survey.location, cur_yr, area, option, conf){

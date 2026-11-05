@@ -160,10 +160,11 @@ NOTE: For steps 4 and 6, there is a QC aspect for the survey data. Pay attention
 
 
 8\. Update and run cur\_yr\_tanner\_draft.rmd
+* revise this figure, send for internal review, then send to management biologist team on or before the deadline.
 
 
 
-9\. update the Tanner crab presentation - for the meeting with biologists
+9\. update the Tanner crab PPT presentation - for the meeting with biologists
 
 ## 
 
@@ -236,7 +237,7 @@ code for regional figures, etc. is in 'code/rkc\_code'
 Area instructions:
 
 * Juneau areas is usually done on its own, and there's a specific memo for this area to address Juneau (11-A) personal use openings - usually in August.
-* Each survey area is processed seperately due to the historic differences between them.
+* Each survey area is processed separately due to the historic differences between them.
 
 
 
