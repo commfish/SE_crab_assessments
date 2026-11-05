@@ -645,6 +645,7 @@ modelest_tab1 <- biomass_rate %>%
   )) %>%
   mutate(Legal = round(Legal, 0), Mature = round(Mature, 0))
 
+  modelest_tab1 <- modelest_tab1 %>% mutate(Healthy_GHL = round(Healthy_GHL, 0))#agr added 2926
 
 # add in historical data
 hist.area <- c("Icy Strait", "Glacier Bay", "Holkham Bay", "Thomas Bay", "Stephens Passage", "North Juneau", "Lynn Sisters", "Pybus Bay", "Gambier Bay", "Peril Strait", "Excursion Inlet", "Seymour Canal", "Other areas", "Total")
@@ -722,7 +723,7 @@ CSA modeling of the `r cur_yr` fishery and survey data yields a biomass estimate
 
 
 # SURVEY AREA STOCK STATUS {-}
-Stock health status is determined by a combination of long- and short-term trends in CPUE. Significance in long-term or short-term trends is defined as a p-value < 0.05. Long-term trends compare the current year's mean to the long-term baseline value (1997-2006, or the first ten years for which survey data are available). The last 4 years of survey data are used in a regression to determine if there are short-term significant trends (increasing or decreasing). The total stock health score is the sum of scores (1, 0, -1 for long-term; 0.25, 0, -0.25 for short-term) for each biological crab category (precrecruit males, recruit males, postrecruit males, mature females) in a given survey area. Stock health is defined by the total score with five designated categories and associated exploitation rates (Tables \@ref(tab:healthscores) and \@ref(tab:table5)).
+Stock health status is determined by a combination of long- and short-term trends in CPUE. Significance in long-term or short-term trends is defined as a p-value < 0.05. Long-term trends compare the current year's mean to the long-term baseline value (1997-2006, or the first ten years for which survey data are available). The last 4 years of survey data are used in a regression to determine if there are short-term significant trends (increasing or decreasing). The total stock health score is the sum of scores (1, 0, -1 for long-term; 0.25, 0, -0.25 for short-term) for each biological crab category (prerecruit males, recruit males, postrecruit males, mature females) in a given survey area. Stock health is defined by the total score with five designated categories and associated exploitation rates (Tables \@ref(tab:healthscores) and \@ref(tab:table5)).
 
 
 ## Icy Strait, `r is.status`, `r is.hr` {-}
@@ -1251,7 +1252,7 @@ set_table_properties(ft, layout = "autofit", width=1)
 ```
 
 
-```{r stockstatfall, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "Tanner crab survey. The long-term average is defined as from 1997–2006 or the first 10 years of available data Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
+```{r stockstatfall, tab.cap = paste("Matrix of Tanner crab stock status determination from the", cur_yr, "Tanner crab survey. The long-term average is defined as 1997–2006 or the first 10 years of available data, Short-term trends are based on individual regression analyses over the past 4 years (including the current year). Total score is the sum of scores (+1, 0, -1 for long-term; +.25, 0, -.25 for short-term) for each response variable. Stock health is defined by the total score: < -3.25 = Poor, -3.25 to -1.26 = Below Average, -1.25 to 1.25 = Moderate, 1.26 to 3.25 = Above Average, and > 3.25 = Healthy."), echo = FALSE}
 
 ft <- flextable(fall.stock.stat) %>%
   set_header_labels(categ = " ", type = " ") %>%
@@ -1357,7 +1358,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/2026/CPUE_icy_storm
 The strata area sizes used in calculating weighted CPUE for Glacier Bay were updated, and survey CPUEs and crab weights were updated accordingly for all Glacier Bay survey years. This improved the survey CPUE calculation for Glacier Bay. Port Frederick was surveyed in 2025. Port Frederick remains an "unsurveyed area" in this analysis and can be re-incorporated as a survey area in the future with additional years of recent data. Peril Strait was not surveyed in 2025, as this area is now surveyed only in even years.
 
 ## 2024 changes {-}
-The area of the Glacier Bay survey was reduced in order to reduce the time and effort spent on sampling in light of budget constraints (Figure A2). The strata area sizes used in calculating weighted CPUE for Glacier Bay were not yet updated, but because the removed areas primarily consisted of strata 1 and 2, the 2024 Glacier Bay biomass estimate was conservative.
+The area of the Glacier Bay survey was reduced in order to reduce the time and effort spent on sampling in light of budget constraints (Figure C1). The strata area sizes used in calculating weighted CPUE for Glacier Bay were not yet updated, but because the removed areas primarily consisted of strata 1 and 2, the 2024 Glacier Bay biomass estimate was conservative.
 
 ## 2023 changes {-}
 Peril Strait has been moved to a biennial survey schedule due to budget constraints and was not surveyed in 2023.
