@@ -782,7 +782,7 @@ TBD
 
 \newpage
 # ACKNOWLEDGEMENTS {-}
-We would like to thank the 2026 crew of R/V Medeia (Cedar Stark, Jensina Sundberg, Katy Hamilton, ENGINEER NAME, as well as everyone who assisted data collection and/or vessel operations (Tina Cruz, Alan Young, Mason Emery, Tyler Jackson)).
+We would like to thank the 2026 crew of R/V Medeia (Cedar Stark, Jensina Sundberg, Katy Hamilton, Derek Mason, as well as everyone who assisted data collection and/or vessel operations (Tina Cruz, Alan Young, Mason Emery, Tyler Jackson)).
 
 Claude AI [Sonnet 5.5] was used to format tables in R Markdown and check grammar and spelling of the document text. The authors reviewed and revised all AI-assisted material and maintain responsibility for the accuracy of the science, code, analyses, and conclusions.
 
@@ -791,7 +791,7 @@ Claude AI [Sonnet 5.5] was used to format tables in R Markdown and check grammar
 
 ```{r tab1, tab.cap = "Southeast Alaska (Registration Area A) commercial Tanner crab harvest (lb), effort, and value by season and gear type, 2000–2001 through 2025–2026."}
 knitr::kable(
-  data.frame(Placeholder = "Table 1 to be added (produced by management staff)")
+  data.frame(Placeholder = "Table 1 to be added (produced by management staff - see 2025/26 RIR)")
 )
 ```
 
@@ -955,6 +955,8 @@ ft3 <- flextable::flextable(t3_tab) %>%
   flextable::align(j = 1, align = "left", part = "all") %>%
   flextable::bold(i = nrow(t3_tab), part = "body") %>%
   flextable::hline(i = nrow(t3_tab) - 1, part = "body") %>%
+  flextable::vline(j = c(1, 3, 5)) %>%
+  flextable::fix_border_issues() %>%
   flextable::add_footer_lines("Note: NA indicates area not surveyed.")
 
 flextable::set_table_properties(ft3, layout = "autofit")
@@ -977,7 +979,7 @@ flextable(table4) %>%
 \newpage
 
 
-```{r table5, tab.cap = paste("Southeast Alaska Tanner crab stock health designations and scores 2024-2026 by survey area."), echo = FALSE}
+```{r table5, tab.cap = paste("Southeast Alaska Tanner crab stock health designations and scores 2024–2026 by survey area."), echo = FALSE}
 # Table 5: stock health designations and scores, last 3 years ----
 
 yrs <- c(cur_yr - 2, pr_yr, cur_yr)
@@ -1046,7 +1048,7 @@ set_table_properties(ft5, layout = "autofit")
 \newpage
 
 
-```{r harvest, tab.cap = paste("Southeast Alaska Tanner crab commercial fishery harvest contribution by survey area for ", cur_yr - 2, "–", cur_yr, "."), echo = FALSE}
+```{r harvest, tab.cap = paste("Southeast Alaska Tanner crab commercial fishery harvest contribution by survey area for ",cur_yr - 2, "–", cur_yr,"."), echo = FALSE}
 # Table 6: harvest contribution to fishery (%) by survey area ----
 ph <- read.csv(paste0(here::here(), '/results/tanner/harvest/', cur_yr, '/proportion_total_harvest_', cur_yr, '.csv'))
 
@@ -1097,23 +1099,23 @@ set_table_properties(ft6, layout = "autofit")
 ```
 
 \newpage
-Table 7.–Southeast Alaska Tanner crab participation, harvest, effort, and catch per unit effort (CPUE) from core and noncore designated areas, 2024–2026. - table created by the regional staff.
+Table 7.–Southeast Alaska Tanner crab participation, harvest, effort, and catch per unit effort (CPUE) from core and noncore designated areas, 2024–2026. - table created by the regional staff - see 2025/26 RIR.
 
 
 \newpage
 
-```{r corenoncore, fig.cap ="PLACEHOLDER FIGURE, need to replace with the core and noncore areas map. Southeast Alaska (Registration Area A) commercial Tanner crab fishery core, noncore, inside and outside exploratory, and closed areas."}
+```{r corenoncore, fig.cap ="PLACEHOLDER FIGURE, need to replace with the core and noncore areas map - see 2025/26 RIR. Southeast Alaska (Registration Area A) commercial Tanner crab fishery core, noncore, inside and outside exploratory, and closed areas."}
 knitr::include_graphics(here::here("figures", "rkc", "Picture1.jpg"), dpi = 150)
 ```
 
 
-```{r regionalbio, fig.cap = "Trends in Southeast Alaska Tanner crab mature and legal biomass estimated from the current year's catch-survey (CSA) modeling using the pot survey data for Southeast Alaska. Prior to 2001 the biomass of areas initially not surveyed (Thomas Bay, Glacier Bay), but added in subsequent years, is estimated as their average percent contribution to the total surveyed biomass in all subsequent years (first year surveyed to current year's survey). Bars represent commercial harvest from fish tickets. Threshold lines indicate the lower (dashed orange) and upper (dashed green) thresholds of mature male biomass for the Tanner crab harvest strategy.", out.width = "100%"}
+```{r regionalbio, fig.cap = "Trends in Southeast Alaska Tanner crab mature and legal biomass estimated from the current year's catch-survey analysis (CSA) model using the pot survey data for Southeast Alaska. Prior to 2001, the biomass of areas initially not surveyed (Thomas Bay, Glacier Bay), but added in subsequent years, is estimated as their average percent contribution to the total surveyed biomass in all subsequent years (first year surveyed to current year's survey). Bars represent commercial harvest from fish tickets. Threshold lines indicate the lower (dashed orange) and upper (dashed green) thresholds of mature male biomass for the Tanner crab harvest strategy.", out.width = "100%"}
 
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_harvest_regional_bio_comm_catch_yr.png'))
 ```
 
 
-```{r stdcpue, fig.cap = "Southeast Alaska commercial Tanner crab harvest and standardized commercial catch-per-unit-effort (CPUE) for the 1991/1992 through 2025/2026 fishery seasons. Fishery year corresponds to the later year listed for a given fishery season; e.g., the 2018/2019 season is the 2019 fishery year. CPUE was calculated using logbook data, which began during the 1993/1994 season. Standardized CPUE was calculated by using a similar number of pot lifts for each year, based on the year (2008/2009) with the fewest number of pot lifts (12,521)."}
+```{r stdcpue, fig.cap = "Southeast Alaska commercial Tanner crab harvest and standardized commercial catch-per-unit-effort (CPUE) for the 1991/1992 through 2025/2026 fishery seasons. Fishery year corresponds to the later year listed for a given fishery season; e.g., the 2018/2019 season is the 2019 fishery year. CPUE was calculated using logbook data, which has been collected since the 1993/1994 season. Standardized CPUE was calculated by using a similar number of pot lifts for each year, based on the year (2008/2009) with the fewest number of pot lifts (12,521)."}
 
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 125)
 ```
@@ -1126,7 +1128,7 @@ knitr::include_graphics(here::here("figures", "rkc", "regional RKC survey areas.
 
 
 
-```{r icy2, fig.cap = "Icy Strait standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r icy2, fig.cap = "Icy Strait standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Icy Strait_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
@@ -1135,7 +1137,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Icy St
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Icy Strait_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r glacier2, fig.cap = "Glacier Bay standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r glacier2, fig.cap = "Glacier Bay standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Glacier Bay_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1143,7 +1145,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Glacie
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Glacier Bay_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r thomas2, fig.cap = "Thomas Bay standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r thomas2, fig.cap = "Thomas Bay standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Thomas Bay_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1151,7 +1153,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Thomas
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Thomas Bay_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r holkham2, fig.cap = "Holkham Bay standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r holkham2, fig.cap = "Holkham Bay standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Holkham Bay_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1159,7 +1161,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Holkha
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Holkham Bay_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r sp2, fig.cap = "Stephens Passage standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r sp2, fig.cap = "Stephens Passage standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Juneau_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1167,7 +1169,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Juneau
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/Juneau_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r seymour2, fig.cap = "Seymour Canal standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r seymour2, fig.cap = "Seymour Canal standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/SC_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1175,7 +1177,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_y
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/SC_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r nj2, fig.cap = "North Juneau standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r nj2, fig.cap = "North Juneau standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/North Juneau_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1183,7 +1185,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/North 
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/North Juneau_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r ei2, fig.cap = "Excursion Inlet standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r ei2, fig.cap = "Excursion Inlet standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/EI_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1191,7 +1193,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_y
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/EI_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r pybus2, fig.cap = "Pybus Bay standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r pybus2, fig.cap = "Pybus Bay standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PB_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1199,7 +1201,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_y
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PB_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r gambier2, fig.cap = "Gambier Bay standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r gambier2, fig.cap = "Gambier Bay standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/GB_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1207,7 +1209,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_y
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/GB_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r peril2, fig.cap = "Peril Strait standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r peril2, fig.cap = "Peril Strait standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PS_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1215,7 +1217,7 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_y
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/PS_', cur_yr, '_3confidential.png'), dpi = 90)
 ```
 
-```{r lynn2, fig.cap = "Lynn Sisters standardized CPUEs for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
+```{r lynn2, fig.cap = "Lynn Sisters standardized CPUE for male size classes of Tanner crab, biomass estimates from the current year’s CSA model, and harvest data. The top panel horizontal reference lines represent the long-term baselines for each male maturity class. In the bottom panel, the horizontal gray dotted line represents the long-term baseline for mature biomass and the horizontal solid black line represents the legal biomass long-term baseline."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/tanner_rkc/', cur_yr, '/LS_', cur_yr, '_2confidential.png'), dpi = 90)
 ```
 
@@ -1235,13 +1237,13 @@ Clark, J.E. 2008. Restratification of the red king crab stock assessment survey 
 <w:p><w:pPr><w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/></w:sectPr></w:pPr></w:p>
 ```
 
-# Appendix A: Extra tables and figures {-}
+# Appendix A: Confidential tables and figures, to be removed or included in the non-confidential document version at the authors' discression {-}
 
 
 ## Figures and Tables {-}
 
 
-```{r modelest, tab.cap = paste("Results of", cur_yr, "catch-survey modeling: legal and mature male Tanner crab biomass (lb) and guideline harvest level (GHL) for each of the 12 survey areas. GHLs are calculated at the maximum exploitation rate of 20% of mature biomass (healthy stock status) and at the exploitation rate based on current stock health (current stock status); each area's GHL is capped at 38% of its legal biomass. Other areas and Total are expanded using the 66% expansion factor (34% of 1980–2000 commercial harvest came from non-surveyed areas). Total GHLs are the sum of the area GHLs; Total harvest rates are the maximum rates applied to each area (20% mature, 38% legal) and the mean of the area-specific recommended rates. Average harvest and estimated mature biomass are long-term baselines (1997–2006 in most areas)."), echo = FALSE}
+```{r modelest, tab.cap = paste("Results of", cur_yr, "catch-survey modeling: legal and mature male Tanner crab biomass (lb) and guideline harvest level (GHL) for each of the 12 survey areas. GHLs are calculated at the maximum exploitation rate of 20% of mature biomass (healthy stock status) and at the exploitation rate based on current stock health (current stock status); each area's GHL is capped at 38% of its legal biomass. "Other areas" and "Total" are expanded using the 66% expansion factor (34% of 1980–2000 commercial harvest came from non-surveyed areas). Total GHLs are the sum of the area GHLs; total harvest rates are the maximum rates applied to each area (20% mature, 38% legal) and the mean of the area-specific recommended rates. Average harvest and estimated mature biomass are long-term baselines (1997–2006 in most areas)."), echo = FALSE}
 
 ft <- flextable(modelest_tab3) %>%
   add_header_row(values = c("", "Healthy stock status", "Current stock status", "Baseline"), colwidths = c(3, 3, 3, 2), top = TRUE) %>%
@@ -1345,10 +1347,11 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/', cur_yr, '/', cur
 
 # Appendix B: Icy Strait 2026 concerns {-}
 
-In 2026, a severe October storm event resulted in a 2-day soak for some of the pots in Icy Strait. Due to concerns about a 2-day soak raising the CPUE relative to the standard 1-day soak, the CPUE of the two haul events were compared. The 2-day soak did not result in a higher CPUE for any of the size/sex classes of Tanner crab (Figure B1). The CPUE of the 1-day soak was notably higher than that of the 2-day soak in medium-high strata (strata 4). 
+In 2026, a severe October storm event resulted in a 2-day soak for some of the pots in Icy Strait. Due to concerns about a 2-day soak raising the CPUE relative to the standard 1-day soak, the CPUE of the two haul events were compared. The 2-day soak did not result in a higher CPUE for any of the size/sex classes of Tanner crab (Figure B1). The CPUE of the 1-day soak was notably higher than that of the 2-day soak in medium-high strata (stratum 4). 
 
-```{r IcyStorm, fig.cap = "Comparison of the weighted CPUEs by Tanner crab size/sex class and strata density for the 1-day soak and 2-day soak events in Icy Strait during the 2026 fall Tanner crab survey. The 2-day soak occurred during a severe weather event in October 2026."}
+```{r IcyStorm, fig.cap = "Comparison of the CPUE by Tanner crab size/sex class and strata density for the 1-day soak and 2-day soak events in Icy Strait during the 2026 fall Tanner crab survey. The 2-day soak occurred during a severe weather event in October 2026."}
 knitr::include_graphics(paste0(here::here(),'/figures/tanner/2026/CPUE_icy_storm.png'), dpi = 125)
+#perhaps remove the title from this graph- the CPUES are not weighted at this point
 
 ```
 
@@ -1364,10 +1367,10 @@ knitr::include_graphics(paste0(here::here(),'/figures/tanner/2026/CPUE_icy_storm
 The strata area sizes used in calculating weighted CPUE for Glacier Bay were updated, and survey CPUEs and crab weights were updated accordingly for all Glacier Bay survey years. This improved the survey CPUE calculation for Glacier Bay. Port Frederick was surveyed in 2025. Port Frederick remains an "unsurveyed area" in this analysis and can be re-incorporated as a survey area in the future with additional years of recent data. Peril Strait was not surveyed in 2025, as this area is now surveyed only in even years.
 
 ## 2024 changes {-}
-The area of the Glacier Bay survey was reduced in order to reduce the time and effort spent on sampling in light of budget constraints (Figure C1). The strata area sizes used in calculating weighted CPUE for Glacier Bay were not yet updated, but because the removed areas primarily consisted of strata 1 and 2, the 2024 Glacier Bay biomass estimate was conservative.
+The area of the Glacier Bay survey was reduced in order to reduce the time and effort spent on sampling due to budget constraints (Figure C1). The strata area sizes used in calculating weighted CPUE for Glacier Bay were not yet updated, but because the removed areas primarily consisted of strata 1 and 2, the 2024 Glacier Bay biomass estimate was conservative.
 
 ## 2023 changes {-}
-Peril Strait has been moved to a biennial survey schedule due to budget constraints and was not surveyed in 2023.
+Peril Strait was moved to a biennial survey schedule due to budget constraints and was not surveyed in 2023.
 
 ## 2016–2022: No updates or changes {-}
 
