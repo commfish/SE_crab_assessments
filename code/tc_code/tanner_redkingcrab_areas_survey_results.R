@@ -136,8 +136,8 @@ dat1ab %>%
                                        !is.na(Width.Millimeters),'Pre_Recruit', 
                                ifelse(Sex.Code ==1 & Width.Millimeters > 137 & Width.Millimeters <170 &
                                         !is.na(Width.Millimeters)& Shell.Condition.Code <4, 'Recruit',
-                                ifelse((Sex.Code ==1 & !is.na(Width.Millimeters)) &
-                                         Width.Millimeters >169|(Shell.Condition.Code >3 & Width.Millimeters >137 & !is.na(Width.Millimeters)), 'Post_Recruit', 
+                                ifelse(Sex.Code ==1 & !is.na(Width.Millimeters) &
+                                         (Width.Millimeters >169|(Shell.Condition.Code >3 & Width.Millimeters >137 )), 'Post_Recruit', 
                                   ifelse(Sex.Code ==2 & Egg.Development.Code==4 & !is.na(Egg.Development.Code), 'Small.Females', 
                                          ifelse(Sex.Code ==2 & Width.Millimeters>0 & !is.na(Width.Millimeters), 'Large.Females', 
                                                 ifelse(is.na(Width.Millimeters), 'Missing', 'Missing'))))))))) -> Tdat1
