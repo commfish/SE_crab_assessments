@@ -317,6 +317,12 @@ ggsave(paste0('./figures/tanner/', cur_yr, '/', cur_yr,'_figure2.png'), dpi = 80
        width = 8, height = 9.0)
 
 # fig 2 for RIR, changes made according to regional staff requests
+# Year = season END year (2026 = 2025/26 season)
+last_yr  <- max(figure2$Year, figure2s$Year, na.rm = TRUE)   # should be 2026
+x_breaks <- rev(seq(last_yr, 1991, by = -2))                 # 2026, 2024, ..., 1992
+x_labels <- paste0(x_breaks - 1, "/", substr(x_breaks, 3, 4)) # "2025/26", "2023/24", ...
+x_lims   <- c(1991 - 0.6, last_yr + 0.6)
+
 fig2a_reg <- ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
   geom_bar(stat = "identity", 
            fill = "grey75", colour = "black") +
@@ -324,7 +330,8 @@ fig2a_reg <- ggplot(figure2, aes(x = Year, y = pounds/1000000)) +
   ylab("Harvest (1,000,000 lb)") + 
   xlab(NULL) +
   theme(plot.title = element_text(hjust =0.5)) + 
-  scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2)) +
+  #scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2)) +
+  scale_x_continuous(breaks = x_breaks, limits = x_lims) +
   scale_y_continuous(limits = c(0,max(figure2$pounds/1000000, 
                                       na.rm = TRUE) + 0.5), 
                      breaks= seq(min(0), max(max(figure2$pounds/1000000, 
@@ -345,8 +352,9 @@ fig2b_reg <- ggplot(figure2s, aes(x = Year, y = avg.cpue)) +
   expand_limits(y = 0) +
   ylab("Fishery CPUE (crab per pot)") + 
   xlab("Season") +
-  scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2), 
-                     labels = b_labels) +
+  #scale_x_continuous(breaks = seq(min(1991),max(cur_yr), by =2), 
+   #                  labels = b_labels) +
+  scale_x_continuous(breaks = x_breaks, labels = x_labels, limits = x_lims) +
   scale_y_continuous(labels = comma, limits = c(0, 40), 
                      breaks= seq(min(0), max(40), by = 10)) +
   theme(legend.position = c(0.65,0.80), 
