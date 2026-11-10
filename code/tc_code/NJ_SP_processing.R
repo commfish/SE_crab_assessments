@@ -366,8 +366,8 @@ one %>%
 
 #Now need to add column for significance and score
 F_short_term_results %>%
-  mutate(significant = ifelse(p.value < 0.05 & estimate > 0, 1,
-                              ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
+  mutate(significant = ifelse(p.value < 0.05 & estimate > 0, -1,
+                              ifelse(p.value <0.05 & estimate <0, 1, 0))) %>%
   mutate(score = 0.25*significant) -> F_short_term_results #estimate is slope from regression
 
 # final results with score - save here
@@ -695,8 +695,8 @@ one %>%
 
 #Now need to add column for significance and score
 F_short_term_results %>%
-  mutate(significant = ifelse(p.value < 0.05 & estimate > 0, 1,
-                              ifelse(p.value <0.05 & estimate <0, -1, 0))) %>%
+  mutate(significant = ifelse(p.value < 0.05 & estimate > 0, -1,
+                              ifelse(p.value <0.05 & estimate <0, 1, 0))) %>%
   mutate(score = 0.25*significant) -> F_short_term_results #estimate is slope from regression
 
 # final results with score - save here

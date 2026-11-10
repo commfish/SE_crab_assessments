@@ -317,8 +317,8 @@ poor_clutch_short <- function(females_all, year){
   
   #Now need to add column for significance and score
   fem_short_results %>%
-    mutate(significant = ifelse(p.value < 0.05 & slope > 0, 1,
-                                ifelse(p.value <0.05 & slope <0, -1, 0))) %>%
+    mutate(significant = ifelse(p.value < 0.05 & slope > 0, -1,
+                                ifelse(p.value <0.05 & slope <0, 1, 0))) %>%
     mutate(score = 0.25*significant) -> short_term_results
   write_csv(short_term_results, paste0('results/tanner/tanner_rkc/', year, '/female_shortterm.csv'))
 }
